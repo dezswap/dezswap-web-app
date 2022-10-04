@@ -1,0 +1,48 @@
+{
+  "name": "dezswap-web-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
+    "@rollup/plugin-inject": "^4.0.4",
+    "@xpla/wallet-provider": "^0.3.4",
+    "@xpla/xpla.js": "^0.2.1",
+    "buffer": "^6.0.3",
+    "emotion-reset": "^3.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-grid-system": "^8.1.6",
+    "react-router-dom": "^6.4.1",
+    "vite-plugin-svgr": "^2.2.1"
+  },
+  "devDependencies": {
+    "@emotion/babel-plugin": "^11.10.2",
+    "@types/node": "^18.8.1",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
+    "@vitejs/plugin-basic-ssl": "^0.1.2",
+    "@vitejs/plugin-react": "^2.1.0",
+    "eslint": "^8.24.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0",
+    "vite-tsconfig-paths": "^3.5.1"
+  }
+}
