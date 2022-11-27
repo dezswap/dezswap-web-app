@@ -1,4 +1,5 @@
 import { FormEventHandler, useCallback } from "react";
+import Typography from "components/Typography";
 
 function WithdrawPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -8,7 +9,12 @@ function WithdrawPage() {
     [],
   );
 
-  return <form onSubmit={handleSubmit} />;
+  return (
+    <>
+      <form onSubmit={handleSubmit} />
+      <Typography>Withdraw</Typography>
+    </>
+  );
 }
 
 export default WithdrawPage;

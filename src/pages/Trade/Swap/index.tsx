@@ -1,4 +1,5 @@
 import { FormEventHandler, useCallback } from "react";
+import Typography from "components/Typography";
 
 function SwapPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -8,7 +9,12 @@ function SwapPage() {
     [],
   );
 
-  return <form onSubmit={handleSubmit} />;
+  return (
+    <>
+      <form onSubmit={handleSubmit} />
+      <Typography>Swap</Typography>
+    </>
+  );
 }
 
 export default SwapPage;
