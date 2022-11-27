@@ -3,6 +3,8 @@ export type Network = {
   chainId: string;
 };
 
+export const XPLA_ADDRESS = "axpla";
+
 const networks: Record<string, Network> = {
   dimension: {
     lcd: "https://dimension-lcd.xpla.dev",
