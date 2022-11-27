@@ -24,6 +24,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "error",
     "import/no-unresolved": "off",
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
     "import/extensions": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
@@ -38,6 +39,7 @@
     "@typescript-eslint/no-shadow": "error",
     "react/jsx-props-no-spreading": "off",
     "react/destructuring-assignment": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "no-console": "off"
   }
 }

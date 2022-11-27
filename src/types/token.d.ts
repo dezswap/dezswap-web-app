@@ -16,4 +16,4 @@ export type AllowedTokenInfo = {
   protocol: string;
   symbol: string;
   token: string;
-}
+};

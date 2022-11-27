@@ -1,4 +1,4 @@
-import { Pair } from "./pair";
+import { Pair } from "types/pair";
 
 export interface Pairs {
   pairs: Pair[];

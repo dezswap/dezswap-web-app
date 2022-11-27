@@ -4,7 +4,7 @@ import App from "App";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import theme from "styles/theme";
-import {QueryClient, QueryClientProvider} from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +19,6 @@ getChainOptions().then((chainOptions) => {
           </BrowserRouter>
         </ThemeProvider>
       </QueryClientProvider>
-    </WalletProvider>
+    </WalletProvider>,
   );
 });

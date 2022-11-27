@@ -9,9 +9,7 @@ const Wrapper = styled(Container)`
 `;
 
 function PlaygroundPage() {
-  return (
-    <Wrapper>Hello Dezswap!</Wrapper>
-  );
+  return <Wrapper>Hello Dezswap!</Wrapper>;
 }
 
 export default PlaygroundPage;

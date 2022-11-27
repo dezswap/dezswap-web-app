@@ -4,19 +4,13 @@ import { useCallback } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 
 function App() {
-  const renderRoute = useCallback(
-    ({ children, ...props }: RouteObject) => {
-      return (
-        <Route
-          key={`${props.path} ${props.index}`}
-          {...props}
-        >
-          {children?.map(renderRoute)}
-        </Route>
-      );
-    },
-    [],
-  );
+  const renderRoute = useCallback(({ children, ...props }: RouteObject) => {
+    return (
+      <Route key={`${props.path} ${props.index}`} {...props}>
+        {children?.map(renderRoute)}
+      </Route>
+    );
+  }, []);
 
   return (
     <>

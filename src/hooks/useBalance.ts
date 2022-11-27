@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useAPI } from "hooks/useAPI";
-import {isNativeTokenAddress} from "utils/dezswap";
+import { isNativeTokenAddress } from "utils/dezswap";
 
 export const useBalance = (asset: string) => {
   const connectedWallet = useConnectedWallet();
@@ -18,15 +18,18 @@ export const useBalance = (asset: string) => {
       if (isNativeTokenAddress(asset)) {
         api
           .getNativeTokenBalance(asset)
-          .then(
-            (value) => (typeof value !== "undefined" && !isAborted) ? setBalance(`${value}`) : setBalance("0")
+          .then((value) =>
+            typeof value !== "undefined" && !isAborted
+              ? setBalance(`${value}`)
+              : setBalance("0"),
           );
       } else {
         api
           .getTokenBalance(asset)
-          .then(
-            (value) =>
-              (typeof value !== "undefined" && !isAborted) ? setBalance(value) : setBalance("0")
+          .then((value) =>
+            typeof value !== "undefined" && !isAborted
+              ? setBalance(value)
+              : setBalance("0"),
           );
       }
     }
@@ -37,4 +40,4 @@ export const useBalance = (asset: string) => {
   }, [api, connectedWallet, asset]);
 
   return balance;
-}
+};

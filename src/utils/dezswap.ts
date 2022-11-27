@@ -1,4 +1,4 @@
-import {Asset, NativeAsset} from "../types/pair";
+import { Asset, NativeAsset } from "types/pair";
 
 export type Amount = string | number;
 
@@ -6,25 +6,26 @@ export const isNativeTokenAddress = (token: string) =>
   !token.startsWith("xpla");
 
 export const generatePairsMsg = (startAfter?: string[]) => {
-  return startAfter ? {
-    pairs: {
-      start_after: startAfter.map((asset) => {
-        if (isNativeTokenAddress(asset)) {
-          return {
-            native_token: {
-              denom: `${asset}`,
+  return startAfter
+    ? {
+        pairs: {
+          start_after: startAfter.map((asset) => {
+            if (isNativeTokenAddress(asset)) {
+              return {
+                native_token: {
+                  denom: `${asset}`,
+                },
+              };
             }
-          }
-        } else {
-          return {
-            token: {
-              contract_addr: `${asset}`,
-            }
-          }
-        }
-      })
-    },
-  } : { pairs: {} };
+            return {
+              token: {
+                contract_addr: `${asset}`,
+              },
+            };
+          }),
+        },
+      }
+    : { pairs: {} };
 };
 
 export const generateSimulationMsg = (offerAsset: string, amount: Amount) => {
@@ -57,7 +58,10 @@ export const generateSimulationMsg = (offerAsset: string, amount: Amount) => {
   };
 };
 
-export const generateReverseSimulationMsg = (askAsset: string, amount: Amount) => {
+export const generateReverseSimulationMsg = (
+  askAsset: string,
+  amount: Amount,
+) => {
   if (isNativeTokenAddress(askAsset)) {
     return {
       reverse_simulation: {

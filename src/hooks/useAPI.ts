@@ -1,7 +1,12 @@
 import { useCallback, useMemo } from "react";
-import { Pair, Pool, ReverseSimulation, Simulation} from "types/pair";
+import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
 import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
-import { Amount, generateReverseSimulationMsg, generateSimulationMsg, generatePairsMsg } from "utils/dezswap";
+import {
+  Amount,
+  generateReverseSimulationMsg,
+  generateSimulationMsg,
+  generatePairsMsg,
+} from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
 import { AllowedTokenInfo } from "types/token";
@@ -15,7 +20,7 @@ export const useAPI = () => {
   const connectedWallet = useConnectedWallet();
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,
-    [connectedWallet]
+    [connectedWallet],
   );
 
   const getPairs = useCallback(
@@ -23,8 +28,10 @@ export const useAPI = () => {
       if (!contractAddress) {
         return undefined;
       }
-      const res =
-        await lcd.wasm.contractQuery<Pairs>(contractAddress, generatePairsMsg(startAfter));
+      const res = await lcd.wasm.contractQuery<Pairs>(
+        contractAddress,
+        generatePairsMsg(startAfter),
+      );
 
       return res;
     },
@@ -61,22 +68,24 @@ export const useAPI = () => {
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: Amount) => {
-      const res = await lcd.wasm.contractQuery<Simulation>(contractAddress,
-        generateSimulationMsg(offerAsset, amount)
+      const res = await lcd.wasm.contractQuery<Simulation>(
+        contractAddress,
+        generateSimulationMsg(offerAsset, amount),
       );
       return res;
     },
-    [lcd]
+    [lcd],
   );
 
   const reverseSimulate = useCallback(
     async (contractAddress: string, askAsset: string, amount: Amount) => {
-      const res = await lcd.wasm.contractQuery<ReverseSimulation>(contractAddress,
-        generateReverseSimulationMsg(askAsset, amount)
+      const res = await lcd.wasm.contractQuery<ReverseSimulation>(
+        contractAddress,
+        generateReverseSimulationMsg(askAsset, amount),
       );
       return res;
     },
-    [lcd]
+    [lcd],
   );
 
   const getNativeTokenBalance = useCallback(
@@ -110,10 +119,15 @@ export const useAPI = () => {
     [lcd, walletAddress],
   );
 
-  const getAllowedTokenInfos = useCallback(async (network: string): Promise<Record<string, AllowedTokenInfo>> => {
-    const { data } = await axios.get("https://assets.xpla.io/cw20/tokens.json");
-    return data[network];
-  }, []);
+  const getAllowedTokenInfos = useCallback(
+    async (network: string): Promise<Record<string, AllowedTokenInfo>> => {
+      const { data } = await axios.get(
+        "https://assets.xpla.io/cw20/tokens.json",
+      );
+      return data[network];
+    },
+    [],
+  );
 
   const api = useMemo(
     () => ({

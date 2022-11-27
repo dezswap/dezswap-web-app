@@ -1,22 +1,22 @@
 import { css, Global } from "@emotion/react";
 import reset from "emotion-reset";
-import theme from "../theme";
+import theme from "styles/theme";
 
 function GlobalStyles() {
   return (
-      <Global
-        styles={css`
-          ${reset}
-          body,
+    <Global
+      styles={css`
+        ${reset}
+        body,
           html {
-            width: 100%;
-            position: relative;
-            overflow-x: hidden;
-            font-family: "Nunito", sans-serif;
-            background-color: ${theme.colors.background};
-          }
-        `}
-      />
+          width: 100%;
+          position: relative;
+          overflow-x: hidden;
+          font-family: "Nunito", sans-serif;
+          background-color: ${theme.colors.background};
+        }
+      `}
+    />
   );
 }
 

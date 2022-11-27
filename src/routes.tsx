@@ -1,7 +1,4 @@
-import {
-  Navigate,
-  RouteObject as IRouteObject,
-} from "react-router-dom";
+import { Navigate, RouteObject as IRouteObject } from "react-router-dom";
 import PlaygroundPage from "pages/Playground";
 
 export interface RouteObject extends Omit<IRouteObject, "children"> {
