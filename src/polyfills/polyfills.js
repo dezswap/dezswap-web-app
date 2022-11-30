@@ -1,9 +1,10 @@
 import process from "./process-es6.js";
 
-const { Buffer } = await import("buffer/");
+(async () => {
+    const { Buffer } = await import("buffer/");
+    globalThis.Buffer = Buffer;
+    window.Buffer = Buffer;
+})();
 
-window.Buffer = Buffer;
-window.process = process;
-
-globalThis.Buffer = Buffer;
 globalThis.process = process;
+window.process = process;
