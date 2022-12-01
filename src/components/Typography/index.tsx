@@ -22,7 +22,7 @@ const Typography = styled.div<TypographyProps>`
     font-weight: ${weight};
   `}
 
-  ${({ color = colors.text, theme }) => css`
+  ${({ color = colors.text.primary, theme }) => css`
     color: ${theme.colors[color as Color] ?? color};
   `}
 

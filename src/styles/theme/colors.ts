@@ -1,17 +1,18 @@
 const colors = {
-  background: "#FFD2D9",
-  backgroundBlur: "rgba(255, 210, 217, 0.8)",
   primary: "#0129BD",
-  secondary: "#8875f8",
-  caution: "#FF0D23",
-  buttonDisabled: "#B1B6CA",
-  buttonSelected: "#DEE7FF",
-  text: "#1A1A1A",
-  subtext: "rgba(26, 26, 26, 0.7)",
-  placeholder: "rgba(26, 26, 26, 0.3)",
-  textboxBackground: "#F5F5F5",
-  white: "#FFFFFF",
-  spreadWarning: "#ff6600",
+  secondary: "#8875F8",
+  danger: "#FF0D23",
+  disabled: "#B1B6CA",
+  selected: "#DEE7FF",
+  background: "#FFD2D9",
+  white: "#ffffff",
+  text: {
+    primary: "#1a1a1a",
+    secondary: "rgba(26, 26, 26, 0.7)",
+    placeholder: "rgba(26, 26, 26, 0.3)",
+    background: "#f5f5f5",
+  },
+  gradient: "linear-gradient(267.8deg, #8875F8 22.3%, #E85175 79.49%)",
 };
 
 export type Colors = typeof colors;
