@@ -10,10 +10,15 @@ function GlobalStyles() {
         body,
           html {
           width: 100%;
+          height: 100%;
           position: relative;
           overflow-x: hidden;
           font-family: "Nunito", sans-serif;
           background-color: ${theme.colors.background};
+        }
+
+        * {
+          box-sizing: border-box;
         }
       `}
     />
