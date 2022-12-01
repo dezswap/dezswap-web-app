@@ -10,12 +10,15 @@ import {
 import { Pairs } from "types/factory";
 import axios from "axios";
 import { AllowedTokenInfo } from "types/token";
+import { contractAddresses } from "constants/dezswap";
+import { useNetwork } from "hooks/useNetwork";
 
 interface TokenBalance {
   balance: string;
 }
 
 export const useAPI = () => {
+  const network = useNetwork();
   const lcd = useLCDClient();
   const connectedWallet = useConnectedWallet();
   const walletAddress = useMemo(
@@ -24,13 +27,14 @@ export const useAPI = () => {
   );
 
   const getPairs = useCallback(
-    async (contractAddress: string, startAfter?: string[]) => {
+    (options: Parameters<typeof generatePairsMsg>[0]) => {
+      const contractAddress = contractAddresses[network.name]?.factory;
       if (!contractAddress) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<Pairs>(
+      const res = lcd.wasm.contractQuery<Pairs>(
         contractAddress,
-        generatePairsMsg(startAfter),
+        generatePairsMsg(options),
       );
 
       return res;
@@ -119,15 +123,12 @@ export const useAPI = () => {
     [lcd, walletAddress],
   );
 
-  const getAllowedTokenInfos = useCallback(
-    async (network: string): Promise<Record<string, AllowedTokenInfo>> => {
-      const { data } = await axios.get(
-        "https://assets.xpla.io/cw20/tokens.json",
-      );
-      return data[network];
-    },
-    [],
-  );
+  const getAllowedTokenInfos = useCallback(async (): Promise<
+    Record<string, AllowedTokenInfo>
+  > => {
+    const { data } = await axios.get("https://assets.xpla.io/cw20/tokens.json");
+    return data;
+  }, []);
 
   const api = useMemo(
     () => ({

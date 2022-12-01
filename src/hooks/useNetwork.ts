@@ -1,8 +1,12 @@
-import { NetworkInfo, useWallet } from "@xpla/wallet-provider";
+import { useWallet } from "@xpla/wallet-provider";
 import { useMemo } from "react";
+import { NetworkName } from "types/common";
 
 export const useNetwork = () => {
-  const { network } = useWallet();
+  const wallet = useWallet();
 
-  return useMemo(() => network, [network]);
+  return useMemo(
+    () => ({ ...wallet.network, name: wallet.network.name as NetworkName }),
+    [wallet.network],
+  );
 };
