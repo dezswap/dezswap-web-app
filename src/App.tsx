@@ -11,13 +11,21 @@ setGridConfiguration({
 });
 
 function App() {
-  const renderRoute = useCallback(({ children, ...props }: RouteObject) => {
-    return (
-      <Routes key={`${props.path} ${props.index}`} {...props}>
-        {children?.map(renderRoute)}
-      </Routes>
-    );
-  }, []);
+  const renderRoute = useCallback(
+    ({ children, element, index, ...props }: RouteObject) => {
+      return (
+        <Route
+          {...(index
+            ? { index: true }
+            : { children: children?.map(renderRoute) })}
+          key={`${props.path}`}
+          element={element}
+          {...props}
+        />
+      );
+    },
+    [],
+  );
 
   return (
     <>

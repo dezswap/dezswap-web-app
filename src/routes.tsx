@@ -1,4 +1,4 @@
-import { Navigate, RouteObject as IRouteObject } from "react-router-dom";
+import { Navigate, RouteProps } from "react-router-dom";
 import PlaygroundPage from "pages/Playground";
 import SwapPage from "pages/Trade/Swap";
 import ProvidePage from "pages/Pool/Provide";
@@ -6,13 +6,14 @@ import WithdrawPage from "pages/Pool/Withdraw";
 import PoolPage from "pages/Pool";
 import TradePage from "pages/Trade";
 
-export interface RouteObject extends Omit<IRouteObject, "children"> {
+export interface RouteObject extends Omit<RouteProps, "children"> {
   children?: RouteObject[];
-  isPrivate?: boolean;
 }
 
 const routes: RouteObject[] = [
-  { path: "playground", element: <PlaygroundPage /> },
+  ...(import.meta.env?.DEV
+    ? [{ path: "playground", element: <PlaygroundPage /> }]
+    : []),
   {
     path: "trade",
     element: <TradePage />,
