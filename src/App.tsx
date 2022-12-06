@@ -6,13 +6,9 @@ import {
   setConfiguration as setGridConfiguration,
   useScreenClass,
 } from "react-grid-system";
-import { SCREEN_CLASSES } from "constants/layout";
+import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
 
-setGridConfiguration({
-  // sm, md, lg, xl, xxl, xxxl
-  breakpoints: [375, 768, 992, 1280, 1600, 1920],
-  containerWidths: [360, 740, 960, 1140, 1540, 1810],
-});
+setGridConfiguration(gridConfiguration);
 
 function App() {
   const screenClass = useScreenClass();
