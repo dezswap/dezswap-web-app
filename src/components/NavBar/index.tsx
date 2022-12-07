@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { NavLink, NavLinkProps } from "react-router-dom";
 
 interface NavBarProps {
-  items: NavLinkProps[];
+  items: (NavLinkProps & { key: React.Key })[];
   flex?: boolean;
 }
 
@@ -16,7 +16,11 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const NavItem = styled(NavLink)<{ flex?: boolean }>`
+const NavItem = styled(NavLink, {
+  shouldForwardProp: (prop) => prop !== "flex",
+})<{
+  flex?: boolean;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,8 +42,12 @@ const NavItem = styled(NavLink)<{ flex?: boolean }>`
 function NavBar({ items, flex = true }: NavBarProps) {
   return (
     <Wrapper>
-      {items.map((navLink) => (
-        <NavItem {...navLink} flex={flex} />
+      {items.map(({ key, ...navLink }) => (
+        <NavItem
+          key={key ?? `${navLink.to.toString()}`}
+          {...navLink}
+          flex={flex}
+        />
       ))}
     </Wrapper>
   );
