@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 
 interface ButtonProps {
   size?: "default" | "large";
-  variant?: "default" | "primary" | "secondary" | "link";
+  variant?: "default" | "primary" | "secondary" | "link" | "gradient";
   block?: boolean;
 }
 
@@ -71,6 +71,18 @@ const Button = styled.button<ButtonProps>`
           &:active,
           &.active {
             opacity: 1;
+          }
+        `;
+      case "gradient":
+        return css`
+          background-color: transparent;
+          background-image: ${theme.colors.gradient};
+          border-color: ${theme.colors.primary};
+          color: ${theme.colors.white};
+          &:disabled {
+            background-image: unset;
+            background-color: ${theme.colors.disabled};
+            border-color: ${theme.colors.selected};
           }
         `;
       default:
