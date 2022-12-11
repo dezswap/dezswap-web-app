@@ -9,7 +9,7 @@ import {
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
-import { AllowedTokenInfo } from "types/token";
+import { TokenInfo, VerifiedTokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
 
@@ -24,6 +24,16 @@ export const useAPI = () => {
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,
     [connectedWallet],
+  );
+
+  const getToken = useCallback(
+    async (address: string) => {
+      const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+        token_info: {},
+      });
+      return res;
+    },
+    [lcd],
   );
 
   const getPairs = useCallback(
@@ -123,15 +133,14 @@ export const useAPI = () => {
     [lcd, walletAddress],
   );
 
-  const getAllowedTokenInfos = useCallback(async (): Promise<
-    Record<string, AllowedTokenInfo>
-  > => {
+  const getVerifiedTokenInfo = useCallback(async () => {
     const { data } = await axios.get("https://assets.xpla.io/cw20/tokens.json");
     return data;
   }, []);
 
   const api = useMemo(
     () => ({
+      getToken,
       getPairs,
       getPair,
       getPool,
@@ -139,7 +148,7 @@ export const useAPI = () => {
       reverseSimulate,
       getNativeTokenBalance,
       getTokenBalance,
-      getAllowedTokenInfos,
+      getVerifiedTokenInfo,
     }),
     [getPool],
   );

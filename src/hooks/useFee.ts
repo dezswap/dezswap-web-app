@@ -1,6 +1,7 @@
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
+import { AxiosError } from "axios";
 
 export const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
@@ -8,11 +9,14 @@ export const useFee = (txOptions?: CreateTxOptions) => {
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
-  const walletAddress = useMemo(
-    () => connectedWallet?.walletAddress,
-    [connectedWallet],
-  );
+  const deferredCreateTxOptions = useDeferredValue(txOptions);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setIsFailed(false);
+  }, [txOptions]);
 
   useEffect(() => {
     let isAborted = false;
@@ -23,27 +27,65 @@ export const useFee = (txOptions?: CreateTxOptions) => {
       };
     }
 
-    const fetchFee = async () => {
+    const estimateFee = async () => {
       try {
-        const tx = await lcd.tx.create(
-          [{ address: walletAddress || "" }],
-          txOptions,
-        );
+        if (!connectedWallet?.walletAddress || !deferredCreateTxOptions) {
+          setFee(undefined);
+          setErrMsg("");
+          setIsFailed(false);
+          setIsLoading(false);
+          return;
+        }
 
-        if (!isAborted) {
-          setFee(tx.auth_info.fee);
+        const account = await lcd.auth.accountInfo(
+          connectedWallet.walletAddress,
+        );
+        const res = await lcd.tx.estimateFee(
+          [
+            {
+              sequenceNumber: account.getSequenceNumber(),
+              publicKey: account.getPublicKey(),
+            },
+          ],
+          deferredCreateTxOptions,
+        );
+        if (res && !isAborted) {
+          setFee(res);
+          setErrMsg("");
+          setIsLoading(false);
+          setIsFailed(false);
         }
       } catch (error) {
-        console.log(`fetch failed: ${error}`);
-        setIsFailed(true);
+        console.log(error);
+        const msg = (error as AxiosError<{ message: string }>)?.response?.data
+          .message;
+        if (msg) {
+          if (msg.includes("Invalid zero amount")) {
+            setErrMsg(
+              "The amount of asset received is zero, please increase your LP amount to withdraw.",
+            );
+          }
+          if (
+            msg.includes("Max spread assertion") ||
+            msg.includes("Max slippage assertion")
+          ) {
+            setErrMsg(
+              "The estimated slippage has been exceeded the tolerance.",
+            );
+          }
+        }
+        if (!isAborted) {
+          setFee(undefined);
+          setIsFailed(true);
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false);
     };
 
     const timerId = setTimeout(
       () => {
         if (!isAborted) {
-          fetchFee();
+          estimateFee();
         }
       },
       fee ? 750 : 125,
@@ -58,7 +100,7 @@ export const useFee = (txOptions?: CreateTxOptions) => {
         clearTimeout(timerId);
       }
     };
-  }, [connectedWallet, lcd.tx, txOptions]);
+  }, [connectedWallet, lcd.tx, lcd.auth, txOptions]);
 
-  return { fee, isLoading, isFailed };
+  return { fee, isLoading, isFailed, errMsg };
 }
