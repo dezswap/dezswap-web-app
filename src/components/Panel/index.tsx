@@ -6,6 +6,7 @@ import { PropsWithChildren } from "react";
 interface StyledPanelProps {
   shadow?: boolean;
   border?: boolean;
+  inner?: boolean;
   noPadding?: boolean;
 }
 
@@ -40,7 +41,6 @@ const Content = styled.div<StyledPanelProps>`
   width: 100%;
   height: auto;
   position: relative;
-  background-color: ${({ theme }) => theme.colors.white};
   padding: 25px;
   .${MOBILE_SCREEN_CLASS} & {
     padding: 16px;
@@ -53,6 +53,16 @@ const Content = styled.div<StyledPanelProps>`
     css`
       padding: 0;
     `}
+
+  ${({ inner, theme }) =>
+    inner
+      ? css`
+          padding: 16px;
+          background-color: ${theme.colors.text.background};
+        `
+      : css`
+          background-color: ${theme.colors.white};
+        `}
 
   ${({ border, theme }) =>
     border &&
@@ -79,11 +89,18 @@ function Panel({
   wrapperStyle,
   shadow,
   border = true,
+  inner,
   ...divProps
 }: PanelProps) {
   return (
     <Wrapper shadow={shadow} style={wrapperStyle}>
-      <Content {...divProps} shadow={shadow} border={border} style={style}>
+      <Content
+        {...divProps}
+        shadow={shadow}
+        border={border}
+        inner={inner}
+        style={style}
+      >
         {children}
       </Content>
     </Wrapper>

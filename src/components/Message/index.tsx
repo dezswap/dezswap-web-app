@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import iconCaution from "assets/icons/icon-caution.svg";
 
 type MessageProps = React.PropsWithChildren<{
-  variant?: "error"; // TODO: "default" | "success" | "error" | "warning";
+  variant?: string; // TODO: "default" | "success" | "error" | "warning";
 }>;
 
 const Wrapper = styled.div<Pick<MessageProps, "variant">>`
@@ -25,6 +25,11 @@ const Wrapper = styled.div<Pick<MessageProps, "variant">>`
       case "error":
         return css`
           background-color: ${theme.colors.danger};
+          color: ${theme.colors.white};
+        `;
+      case "warning":
+        return css`
+          background-color: ${theme.colors.warning};
           color: ${theme.colors.white};
         `;
       default:
@@ -56,14 +61,14 @@ const Icon = styled.div<{ src?: string }>`
 
 const getIconSrc = (variant: MessageProps["variant"]) => {
   switch (variant) {
-    case "error":
+    case "error" || "warning":
       return iconCaution;
     default:
       return undefined;
   }
 };
 
-function Message({ variant, children }: MessageProps) {
+function Message({ variant = "error", children }: MessageProps) {
   const iconSrc = getIconSrc(variant);
   return (
     <Wrapper variant={variant}>

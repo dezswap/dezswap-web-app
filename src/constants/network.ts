@@ -1,9 +1,12 @@
+import { Asset } from "types/common";
+
 export type Network = {
   lcd: string;
   chainId: string;
 };
 
 export const XPLA_ADDRESS = "axpla";
+export const XPLA_SYMBOL = "XPLA";
 
 const networks: Record<string, Network> = {
   dimension: {
@@ -15,5 +18,16 @@ const networks: Record<string, Network> = {
     chainId: "cube_47-5",
   },
 };
+
+export const nativeTokens: Asset[] = [
+  {
+    address: XPLA_ADDRESS,
+    decimals: 18,
+    name: XPLA_SYMBOL,
+    symbol: XPLA_SYMBOL,
+    total_supply: "",
+    iconSrc: "https://assets.xpla.io/icon/svg/XPLA.svg",
+  },
+];
 
 export default networks;
