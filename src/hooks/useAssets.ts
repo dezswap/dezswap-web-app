@@ -35,7 +35,7 @@ const useAssets = () => {
             const currentAsset = assetsRef.current[index];
             if (
               new Date((currentAsset as Asset).updatedAt || 0)?.getTime() <
-              Date.now() - 5 * 1000 &&
+                Date.now() - 5 * 1000 &&
               window.navigator.onLine
             ) {
               const res = await api.getToken(address);

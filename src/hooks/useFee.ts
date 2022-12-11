@@ -103,4 +103,4 @@ export const useFee = (txOptions?: CreateTxOptions) => {
   }, [connectedWallet, lcd.tx, lcd.auth, txOptions]);
 
   return { fee, isLoading, isFailed, errMsg };
-}
+};

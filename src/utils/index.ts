@@ -5,7 +5,7 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
   return t.includes(".") && (t.split(".").pop()?.length || 0) > decimals
     ? t.slice(0, t.indexOf(".")) +
-    t.slice(t.indexOf("."), t.indexOf(".") + decimals + 1)
+        t.slice(t.indexOf("."), t.indexOf(".") + decimals + 1)
     : t;
 };
 

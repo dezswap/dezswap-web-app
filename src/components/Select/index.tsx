@@ -28,7 +28,7 @@ interface WrapperProps {
 
 const Wrapper = styled.button<WrapperProps>`
   ${({ theme, outline, isOpen }) => {
-  return css`
+    return css`
       display: inline-flex;
       flex-direction: column;
       width: auto;
@@ -47,7 +47,7 @@ const Wrapper = styled.button<WrapperProps>`
       overflow: hidden;
 
       ${outline &&
-  css`
+      css`
         border: 3px solid ${theme.colors.primary};
       `}
 
@@ -75,7 +75,7 @@ const Wrapper = styled.button<WrapperProps>`
           background-repeat: no-repeat;
 
           ${isOpen &&
-  css`
+          css`
             transform: rotateX(-180deg);
           `}
         }
@@ -90,7 +90,7 @@ const Wrapper = styled.button<WrapperProps>`
         }
       }
     `;
-}}
+  }}
 `;
 
 Wrapper.defaultProps = {
@@ -115,12 +115,12 @@ const OptionWrapper = styled.button`
 `;
 
 function Select({
-                  options,
-                  value: selectedValue,
-                  onChange,
-                  onClick,
-                  ...buttonProps
-                }: SelectProps) {
+  options,
+  value: selectedValue,
+  onChange,
+  onClick,
+  ...buttonProps
+}: SelectProps) {
   const select = useModal(false);
   const selectedOption = useMemo(
     () => options?.find(({ value }) => value === selectedValue) ?? options?.[0],
