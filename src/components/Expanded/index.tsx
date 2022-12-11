@@ -38,7 +38,7 @@ const Label = styled.button`
     width: 24px;
     height: 24px;
     position: absolute;
-    right: 28px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%) rotate(0deg);
     transition: transform 0.3s ease;
@@ -68,6 +68,7 @@ const Content = styled.div`
   background-color: ${({ theme }) => theme.colors.text.background};
   max-height: 0px;
   overflow: hidden;
+  padding: 0px 16px;
   transition: max-height 0.25s cubic-bezier(0, 1, 0, 1),
     padding-top 1s cubic-bezier(0, 1, 0, 1),
     padding-bottom 1s cubic-bezier(0, 1, 0, 1);
@@ -79,10 +80,6 @@ const Content = styled.div`
       padding: 12px 16px;
       max-height: 300px;
     }
-  }
-
-  .mobile & {
-    padding: 0px 16px;
   }
 `;
 
