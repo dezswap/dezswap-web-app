@@ -9,11 +9,15 @@ export type TokenInfo = {
   total_supply: string;
 };
 
-export type AllowedTokenInfo = {
+export type VerifiedTokenInfo = {
   decimals: number;
   icon: string;
   name: string;
   protocol: string;
   symbol: string;
   token: string;
+};
+
+export type VerifiedAssets = {
+  [K in NetworkName]?: { [address: string]: VerifiedTokenInfo | undefined };
 };

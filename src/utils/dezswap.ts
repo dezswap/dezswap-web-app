@@ -1,10 +1,8 @@
-import { Numeric } from "@xpla/xpla.js";
+import { Coins, MsgExecuteContract, Numeric } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
+import { isNativeTokenAddress } from "utils";
 
 export type Amount = string | number;
-
-export const isNativeTokenAddress = (token: string) =>
-  !token.startsWith("xpla");
 
 export const generatePairsMsg = (options: {
   limit?: number;
@@ -77,4 +75,55 @@ export const generateReverseSimulationMsg = (
       },
     },
   };
+};
+
+export const generateSwapMsg = (
+  senderAddress: string,
+  contractAddress: string,
+  fromAssetAddress: string,
+  amount: Numeric.Input,
+  beliefPrice: Numeric.Input,
+  maxSpread = "0.1",
+) => {
+  const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
+
+  if (isNativeTokenAddress(fromAssetAddress)) {
+    return new MsgExecuteContract(
+      senderAddress,
+      contractAddress,
+      {
+        swap: {
+          offer_asset: {
+            info: { native_token: { denom: fromAssetAddress } },
+            amount: Numeric.parse(amount).toString(),
+          },
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+        },
+      },
+      new Coins({ [fromAssetAddress]: amount }),
+    );
+  }
+
+  const sendMsg = window.btoa(
+    JSON.stringify({
+      swap: {
+        max_spread: `${maxSpreadFixed}`,
+        belief_price: `${beliefPrice}`,
+      },
+    }),
+  );
+
+  return new MsgExecuteContract(
+    senderAddress,
+    fromAssetAddress,
+    {
+      send: {
+        msg: sendMsg,
+        amount: Numeric.parse(amount).toString(),
+        contract: contractAddress,
+      },
+    },
+    [],
+  );
 };
