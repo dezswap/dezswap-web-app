@@ -25,7 +25,6 @@ import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
 import Panel from "components/Panel";
 import { useNavigate } from "react-router-dom";
-import SelectAssetForm from "components/SelectAssetForm";
 import { Col, Row } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
@@ -40,6 +39,7 @@ import Select from "components/Select";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Expand from "components/Expanded";
 import styled from "@emotion/styled";
+import SelectAssetForm from "components/SelectAssetForm";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -312,22 +312,24 @@ function SwapPage() {
                   {
                     label: (
                       <>
-                        <div
-                          css={css`
-                            display: inline-block;
-                            width: 20px;
-                            height: 20px;
-                            position: relative;
-                            background-image: ${`url(${
-                              asset1?.iconSrc || iconDefaultAsset
-                            })`};
-                            background-position: 50% 50%;
-                            background-size: contain;
-                            background-repeat: no-repeat;
-                          `}
-                        />
+                        {asset1 && (
+                          <div
+                            css={css`
+                              display: inline-block;
+                              width: 20px;
+                              height: 20px;
+                              position: relative;
+                              background-image: ${`url(${
+                                asset1?.iconSrc || iconDefaultAsset
+                              })`};
+                              background-position: 50% 50%;
+                              background-size: contain;
+                              background-repeat: no-repeat;
+                            `}
+                          />
+                        )}
                         <Typography size={16} weight="bold">
-                          {asset1?.symbol || "Select"}
+                          {asset1?.symbol || "Select token"}
                         </Typography>
                       </>
                     ),
@@ -510,20 +512,22 @@ function SwapPage() {
                   {
                     label: (
                       <>
-                        <div
-                          css={css`
-                            display: inline-block;
-                            width: 20px;
-                            height: 20px;
-                            position: relative;
-                            background-image: ${`url(${
-                              asset2?.iconSrc || iconDefaultAsset
-                            })`};
-                            background-position: 50% 50%;
-                            background-size: contain;
-                            background-repeat: no-repeat;
-                          `}
-                        />
+                        {asset2 && (
+                          <div
+                            css={css`
+                              display: inline-block;
+                              width: 20px;
+                              height: 20px;
+                              position: relative;
+                              background-image: ${`url(${
+                                asset2?.iconSrc || iconDefaultAsset
+                              })`};
+                              background-position: 50% 50%;
+                              background-size: contain;
+                              background-repeat: no-repeat;
+                            `}
+                          />
+                        )}
                         <Typography size={16} weight="bold">
                           {asset2?.symbol || "Select"}
                         </Typography>
