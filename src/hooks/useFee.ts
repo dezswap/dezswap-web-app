@@ -20,7 +20,7 @@ export const useFee = (txOptions?: CreateTxOptions) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!connectedWallet || !txOptions) {
+    if (!connectedWallet || !deferredCreateTxOptions) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -100,7 +100,7 @@ export const useFee = (txOptions?: CreateTxOptions) => {
         clearTimeout(timerId);
       }
     };
-  }, [connectedWallet, lcd.tx, lcd.auth, txOptions]);
+  }, [connectedWallet, lcd, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { fee, isLoading, isFailed, errMsg };
 };
