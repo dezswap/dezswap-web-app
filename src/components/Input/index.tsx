@@ -31,12 +31,17 @@ const Wrapper = styled.div<WrapperProps>`
   position: relative;
   gap: 4px;
 
-  ${({ size }) => {
+  ${({ size, variant }) => {
     switch (size) {
       case "large":
         return css`
           border-width: 3px;
           border-radius: 12px;
+
+          ${variant !== "base" &&
+          css`
+            padding: 14px 16px;
+          `}
 
           &,
           & > input {
@@ -52,6 +57,11 @@ const Wrapper = styled.div<WrapperProps>`
         return css`
           border-width: 1px;
           border-radius: 8px;
+
+          ${variant !== "base" &&
+          css`
+            padding: 8px 16px;
+          `}
 
           &,
           & > input {
