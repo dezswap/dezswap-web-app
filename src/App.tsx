@@ -7,6 +7,7 @@ import {
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
+import MainLayout from "layout/Main";
 
 setGridConfiguration(gridConfiguration);
 
@@ -37,7 +38,9 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      <Routes>{routes.map(renderRoute)}</Routes>
+      <MainLayout>
+        <Routes>{routes.map(renderRoute)}</Routes>
+      </MainLayout>
     </>
   );
 }
