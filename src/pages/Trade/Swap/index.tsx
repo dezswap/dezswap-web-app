@@ -40,6 +40,7 @@ import iconQuestion from "assets/icons/icon-question.svg";
 import Expand from "components/Expanded";
 import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
+import Box from "components/Box";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -113,6 +114,7 @@ function SwapPage() {
   const createTxOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (
       !simulationResult?.estimatedAmount ||
+      simulationResult?.isLoading ||
       !connectedWallet ||
       !selectedPair ||
       !asset1?.address ||
@@ -287,9 +289,7 @@ function SwapPage() {
         </Panel>
       </Drawer>
       <Wrapper onSubmit={handleSubmit}>
-        <Panel
-          inner
-          border={false}
+        <Box
           css={css`
             margin-bottom: 5px;
           `}
@@ -401,6 +401,7 @@ function SwapPage() {
                 placeholder="0.000000"
                 align="right"
                 size="large"
+                variant="base"
                 {...register(FormKey.asset1Value, {
                   onChange: () => {
                     setIsReversed(false);
@@ -449,7 +450,7 @@ function SwapPage() {
               </Typography>
             </Col>
           </Row>
-        </Panel>
+        </Box>
         <Row
           align="center"
           justify="center"
@@ -483,9 +484,7 @@ function SwapPage() {
             />
           </Col>
         </Row>
-        <Panel
-          inner
-          border={false}
+        <Box
           css={css`
             margin-top: 5px;
             margin-bottom: 24px;
@@ -591,6 +590,7 @@ function SwapPage() {
                 placeholder="0.000000"
                 align="right"
                 size="large"
+                variant="base"
                 {...register(FormKey.asset2Value, {
                   onChange: () => {
                     setIsReversed(true);
@@ -630,7 +630,7 @@ function SwapPage() {
               </Typography>
             </Col>
           </Row>
-        </Panel>
+        </Box>
         <div style={{ marginBottom: "10px" }}>
           <Expand
             label={

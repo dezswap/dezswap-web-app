@@ -1,6 +1,5 @@
 import { Col, Hidden, Row } from "react-grid-system";
 import styled from "@emotion/styled";
-import Panel from "components/Panel";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
@@ -15,6 +14,7 @@ import Input from "components/Input";
 import colors from "styles/theme/colors";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
+import Box from "components/Box";
 
 type Asset = OrgAsset & { disabled?: boolean };
 export type LPAsset = {
@@ -347,8 +347,7 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
         )}
         {title}
       </Typography>
-      <Panel
-        inner
+      <Box
         css={css`
           margin-bottom: 22px;
           padding: 12.5px;
@@ -371,7 +370,7 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
             setSearchKeyword(event.target.value);
           }}
         />
-      </Panel>
+      </Box>
       <Hr />
       <Row
         justify="center"
