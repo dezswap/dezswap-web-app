@@ -24,8 +24,11 @@ function GlobalStyles() {
             }
           }
 
-          * {
+          *,
+          *::after,
+          *::before {
             box-sizing: border-box;
+            font-family: "Nunito", sans-serif;
 
             scrollbar-width: thin;
             scrollbar-color: ${theme.colors.secondary} transparent;

@@ -1,39 +1,25 @@
+import { Coins, MsgExecuteContract, Numeric } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
+import { isNativeTokenAddress } from "utils";
 
 export type Amount = string | number;
 
-export const isNativeTokenAddress = (token: string) =>
-  !token.startsWith("xpla");
-
-export const generatePairsMsg = (startAfter?: string[]) => {
-  return startAfter
-    ? {
-        pairs: {
-          start_after: startAfter.map((asset) => {
-            if (isNativeTokenAddress(asset)) {
-              return {
-                native_token: {
-                  denom: `${asset}`,
-                },
-              };
-            }
-            return {
-              token: {
-                contract_addr: `${asset}`,
-              },
-            };
-          }),
-        },
-      }
-    : { pairs: {} };
+export const generatePairsMsg = (options: {
+  limit?: number;
+  start_after?: [Asset | NativeAsset, Asset | NativeAsset];
+}) => {
+  return { pairs: options };
 };
 
-export const generateSimulationMsg = (offerAsset: string, amount: Amount) => {
+export const generateSimulationMsg = (
+  offerAsset: string,
+  amount: Numeric.Input,
+) => {
   if (isNativeTokenAddress(offerAsset)) {
     return {
       simulation: {
         offer_asset: {
-          amount: `${amount}`,
+          amount: `${Numeric.parse(amount).toString()}`,
           info: {
             native_token: {
               denom: offerAsset,
@@ -47,7 +33,7 @@ export const generateSimulationMsg = (offerAsset: string, amount: Amount) => {
   return {
     simulation: {
       offer_asset: {
-        amount: `${amount}`,
+        amount: `${Numeric.parse(amount).toString()}`,
         info: {
           token: {
             contract_addr: offerAsset,
@@ -60,13 +46,13 @@ export const generateSimulationMsg = (offerAsset: string, amount: Amount) => {
 
 export const generateReverseSimulationMsg = (
   askAsset: string,
-  amount: Amount,
+  amount: Numeric.Input,
 ) => {
   if (isNativeTokenAddress(askAsset)) {
     return {
       reverse_simulation: {
         ask_asset: {
-          amount: `${amount}`,
+          amount: `${Numeric.parse(amount).toString()}`,
           info: {
             native_token: {
               denom: askAsset,
@@ -80,7 +66,7 @@ export const generateReverseSimulationMsg = (
   return {
     reverse_simulation: {
       ask_asset: {
-        amount: `${amount}`,
+        amount: `${Numeric.parse(amount).toString()}`,
         info: {
           token: {
             contract_addr: askAsset,
@@ -89,4 +75,55 @@ export const generateReverseSimulationMsg = (
       },
     },
   };
+};
+
+export const generateSwapMsg = (
+  senderAddress: string,
+  contractAddress: string,
+  fromAssetAddress: string,
+  amount: Numeric.Input,
+  beliefPrice: Numeric.Input,
+  maxSpread = "0.1",
+) => {
+  const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
+
+  if (isNativeTokenAddress(fromAssetAddress)) {
+    return new MsgExecuteContract(
+      senderAddress,
+      contractAddress,
+      {
+        swap: {
+          offer_asset: {
+            info: { native_token: { denom: fromAssetAddress } },
+            amount: Numeric.parse(amount).toString(),
+          },
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+        },
+      },
+      new Coins({ [fromAssetAddress]: amount }),
+    );
+  }
+
+  const sendMsg = window.btoa(
+    JSON.stringify({
+      swap: {
+        max_spread: `${maxSpreadFixed}`,
+        belief_price: `${beliefPrice}`,
+      },
+    }),
+  );
+
+  return new MsgExecuteContract(
+    senderAddress,
+    fromAssetAddress,
+    {
+      send: {
+        msg: sendMsg,
+        amount: Numeric.parse(amount).toString(),
+        contract: contractAddress,
+      },
+    },
+    [],
+  );
 };

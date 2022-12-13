@@ -19,7 +19,7 @@ const Button = styled.button<ButtonProps>`
   ${({ size }) => {
     if (size === "large") {
       return css`
-        height: 47.5px;
+        height: 48px;
         font-size: 16px;
         font-weight: 900;
       `;

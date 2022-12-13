@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useAPI } from "hooks/useAPI";
-import { isNativeTokenAddress } from "utils/dezswap";
+import { isNativeTokenAddress } from "utils";
 
 const UPDATE_INTERVAL = 2500;
 

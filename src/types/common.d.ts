@@ -6,6 +6,8 @@ import {
   TxFailed,
   TxUnspecifiedError,
 } from "@xpla/wallet-provider";
+import { TokenInfo } from "types/token";
+import { Pair } from "types/pair";
 
 export type TxError =
   | UserDenied
@@ -16,3 +18,13 @@ export type TxError =
   | TxUnspecifiedError;
 
 export type NetworkName = "testnet" | "mainnet";
+
+export interface Asset extends TokenInfo {
+  address: string;
+  iconSrc?: string;
+  updatedAt?: Date | string | number;
+}
+
+export interface PairExtended extends Pair {
+  asset_addresses: string[];
+}

@@ -1,6 +1,7 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { formatDecimals } from "utils";
 
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";
@@ -29,15 +30,18 @@ const Wrapper = styled.div<WrapperProps>`
   height: auto;
   position: relative;
   gap: 4px;
-  border-style: solid;
 
-  ${({ size, theme }) => {
+  ${({ size, variant }) => {
     switch (size) {
       case "large":
         return css`
-          padding: 14px 16px;
           border-width: 3px;
           border-radius: 12px;
+
+          ${variant !== "base" &&
+          css`
+            padding: 14px 16px;
+          `}
 
           &,
           & > input {
@@ -51,9 +55,13 @@ const Wrapper = styled.div<WrapperProps>`
         `;
       default:
         return css`
-          padding: 8px 16px;
           border-width: 1px;
           border-radius: 8px;
+
+          ${variant !== "base" &&
+          css`
+            padding: 8px 16px;
+          `}
 
           &,
           & > input {
@@ -127,3 +135,43 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 export default Input;
+
+interface NumberInput extends InputProps {
+  decimals?: number;
+}
+
+export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
+  ({ decimals = 18, ...InputProps }, ref) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
+    useEffect(() => {
+      const elInput = inputRef.current;
+      const handleKeydown = (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        if (Number.isNaN(Number(target.value))) {
+          event.preventDefault();
+          target.value = target.value.replace(/\D/g, "");
+        }
+        if (
+          target.value.includes(".") &&
+          (target.value?.split(".").pop()?.length || 0) > decimals
+        ) {
+          event.preventDefault();
+          target.value = formatDecimals(target.value, decimals);
+        }
+      };
+      elInput?.addEventListener("keydown", handleKeydown);
+      elInput?.addEventListener("keyup", handleKeydown);
+      elInput?.addEventListener("keypress", handleKeydown);
+      return () => {
+        if (elInput) {
+          elInput.removeEventListener("keydown", handleKeydown);
+          elInput.removeEventListener("keyup", handleKeydown);
+          elInput.removeEventListener("keypress", handleKeydown);
+        }
+      };
+    }, [decimals]);
+
+    return <Input ref={inputRef} type="text" {...InputProps} />;
+  },
+);

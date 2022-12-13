@@ -21,7 +21,7 @@ export interface Pool {
 }
 
 export interface Pair {
-  asset_infos: (Asset | NativeAsset)[];
+  asset_infos: [Asset | NativeAsset, Asset | NativeAsset];
   contract_addr: string;
   liquidity_token: string;
   asset_decimals: [number, number];
