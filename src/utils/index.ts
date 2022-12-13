@@ -9,6 +9,9 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
+export const ceil = (value: Numeric.Input, decimals: number) =>
+  Math.ceil(Number(value) * 10 ** decimals) / 10 ** decimals;
+
 export const isNativeTokenAddress = (address: string) =>
   nativeTokens.filter((n) => n.address === address).length > 0;
 

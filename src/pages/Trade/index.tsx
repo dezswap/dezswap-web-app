@@ -14,8 +14,7 @@ const Wrapper = styled.div`
   width: 100%;
   height: auto;
   position: relative;
-  padding-top: 48px;
-  padding-bottom: 30px;
+  padding-top: 30px;
 
   .mobile & {
     padding-top: 26px;

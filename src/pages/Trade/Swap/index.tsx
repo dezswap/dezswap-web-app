@@ -9,7 +9,7 @@ import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
 import useAssets from "hooks/useAssets";
-import { amountToNumber, amountToValue, valueToAmount } from "utils";
+import { amountToNumber, amountToValue, ceil, valueToAmount } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
@@ -41,6 +41,7 @@ import Expand from "components/Expanded";
 import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
 import Box from "components/Box";
+import { Colors } from "styles/theme/colors";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -102,6 +103,40 @@ function SwapPage() {
       ? valueToAmount(asset2Value, asset2?.decimals)
       : valueToAmount(asset1Value, asset1?.decimals),
   });
+
+  const spread = useMemo<{
+    rate: number;
+    color: string;
+    message?: "error" | "warning";
+  }>(() => {
+    const percentage = simulationResult
+      ? ceil(
+          (Number(simulationResult.spreadAmount) * 100) /
+            Number(simulationResult.estimatedAmount),
+          DISPLAY_DECIMAL,
+        )
+      : 0;
+
+    if (percentage >= 0.5) {
+      return {
+        rate: percentage,
+        color: theme.colors.danger,
+        message: "error",
+      };
+    }
+    if (percentage >= 0.3) {
+      return {
+        rate: percentage,
+        color: theme.colors.warning,
+        message: "warning",
+      };
+    }
+    return {
+      rate: percentage,
+      color: theme.colors.text.primary,
+      message: undefined,
+    };
+  }, [simulationResult]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);
@@ -295,7 +330,7 @@ function SwapPage() {
           `}
         >
           <Row
-            nogutter
+            gutterWidth={2}
             justify="between"
             align="center"
             css={css`
@@ -494,7 +529,7 @@ function SwapPage() {
           `}
         >
           <Row
-            nogutter
+            gutterWidth={2}
             justify="between"
             align="center"
             css={css`
@@ -635,7 +670,17 @@ function SwapPage() {
           <Expand
             label={
               <Typography size={14} weight="bold">
-                1{asset1?.symbol} = 1{asset2?.symbol}
+                1{asset1?.symbol} ={" "}
+                {simulationResult?.estimatedAmount
+                  ? ceil(
+                      (amountToNumber(
+                        simulationResult.estimatedAmount,
+                        asset2?.decimals,
+                      ) || 0) / Number(asset1Value),
+                      DISPLAY_DECIMAL,
+                    )
+                  : ""}
+                {asset2?.symbol}
               </Typography>
             }
             isExpanded={false}
@@ -654,13 +699,20 @@ function SwapPage() {
                 <IconButton size={22} icons={{ default: iconQuestion }} />
               </Col>
               <Col
+                width="auto"
                 css={css`
                   display: flex;
                   justify-content: flex-end;
                 `}
               >
                 <Typography color={theme.colors.text.primary}>
-                  1.02{asset1?.symbol}
+                  {simulationResult?.estimatedAmount
+                    ? amountToValue(
+                        simulationResult?.estimatedAmount,
+                        asset2?.decimals,
+                      )
+                    : ""}
+                  {asset2?.symbol}
                 </Typography>
               </Col>
             </Row>
@@ -683,8 +735,8 @@ function SwapPage() {
                   justify-content: flex-end;
                 `}
               >
-                <Typography weight="bold" color={theme.colors.danger}>
-                  0.5%
+                <Typography weight="bold" color={spread.color as keyof Colors}>
+                  {spread.rate}%
                 </Typography>
               </Col>
             </Row>
@@ -700,13 +752,16 @@ function SwapPage() {
                 <IconButton size={22} icons={{ default: iconQuestion }} />
               </Col>
               <Col
+                width="auto"
                 css={css`
                   display: flex;
                   justify-content: flex-end;
                 `}
               >
                 <Typography color={theme.colors.text.primary}>
-                  1.02XPLA
+                  {feeAmount
+                    ? `${amountToValue(feeAmount) || ""}${XPLA_SYMBOL}`
+                    : ""}
                 </Typography>
               </Col>
             </Row>
@@ -735,37 +790,39 @@ function SwapPage() {
             </Row>
           </Expand>
         </div>
-        <Message variant="error">
-          <Row
-            justify="between"
-            nogutter
-            css={css`
-              width: 100%;
-            `}
-          >
-            <Col
+        {spread.message && (
+          <Message variant={spread.message}>
+            <Row
+              justify="between"
+              nogutter
               css={css`
-                text-align: left;
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
+                width: 100%;
               `}
             >
-              Spread Warning
-            </Col>
-            <Col
-              css={css`
-                text-align: right;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-              `}
-            >
-              0.5%
-              <IconButton size={22} icons={{ default: iconInfo }} />
-            </Col>
-          </Row>
-        </Message>
+              <Col
+                css={css`
+                  text-align: left;
+                  display: flex;
+                  justify-content: flex-start;
+                  align-items: center;
+                `}
+              >
+                Spread Warning
+              </Col>
+              <Col
+                css={css`
+                  text-align: right;
+                  display: flex;
+                  justify-content: flex-end;
+                  align-items: center;
+                `}
+              >
+                {spread.rate}%
+                <IconButton size={22} icons={{ default: iconInfo }} />
+              </Col>
+            </Row>
+          </Message>
+        )}
         {connectedWallet ? (
           <Button
             type="submit"
