@@ -5,7 +5,7 @@ import { VerifiedAssets } from "types/token";
 
 const assetsAtom = atomWithStorage<{
   [K in NetworkName]?: Asset[];
-}>("assets", {});
+}>("assets", { mainnet: [], testnet: [] });
 
 export const verifiedAssetsAtom = atom<VerifiedAssets | undefined>(undefined);
 

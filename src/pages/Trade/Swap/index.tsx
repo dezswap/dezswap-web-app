@@ -46,6 +46,8 @@ import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Asset } from "types/common";
+import { useAtom } from "jotai";
+import assetsAtom from "stores/assets";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -68,7 +70,8 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { availableAssetAddresses, getPairedAddresses, findPair, pairs } =
     usePairs();
-  const { assets, getAsset } = useAssets();
+  const { getAsset } = useAssets();
+  const [assetStore] = useAtom(assetsAtom);
   const [isReversed, setIsReversed] = useState(false);
   const network = useNetwork();
   const connectWalletModal = useModal(false);
@@ -115,10 +118,12 @@ function SwapPage() {
     message?: "error" | "warning";
   }>(() => {
     const percentage = simulationResult
-      ? ceil(
-          (Number(simulationResult.spreadAmount) * 100) /
-            Number(simulationResult.estimatedAmount),
-          DISPLAY_DECIMAL,
+      ? Number(
+          ceil(
+            (Number(simulationResult.spreadAmount) * 100) /
+              Number(simulationResult.estimatedAmount),
+            DISPLAY_DECIMAL,
+          ),
         )
       : 0;
 
@@ -315,7 +320,9 @@ function SwapPage() {
         >
           <SelectAssetForm
             goBackOnSelect
-            assets={assets?.map((a) => getAsset(a.address) as Asset)}
+            assets={assetStore[network.name]?.map(
+              (a) => getAsset(a.address) as Asset,
+            )}
             hasBackButton
             selectedAssetAddress={
               selectAsset1Modal.isOpen ? asset1?.address : asset2?.address
@@ -423,7 +430,10 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {amountToValue(asset1Balance, DISPLAY_DECIMAL) || ""}
+                    {ceil(
+                      amountToValue(asset1Balance || 0, asset1?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -611,7 +621,10 @@ function SwapPage() {
                       cursor: pointer;
                     `}
                   >
-                    {amountToValue(asset2Balance, DISPLAY_DECIMAL) || ""}
+                    {ceil(
+                      amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -684,7 +697,7 @@ function SwapPage() {
           <Expand
             label={
               <Typography size={14} weight="bold">
-                1{asset1?.symbol} ={" "}
+                {asset1 && `1 ${asset1.symbol} = `}
                 {simulationResult?.estimatedAmount
                   ? ceil(
                       (amountToNumber(
