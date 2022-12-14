@@ -42,6 +42,9 @@ import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
 import Box from "components/Box";
 import { Colors } from "styles/theme/colors";
+import { useModal } from "hooks/useModal";
+import ConnectWalletModal from "components/ConnectWalletModal";
+import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -67,6 +70,7 @@ function SwapPage() {
   const { assets, getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const network = useNetwork();
+  const connectWalletModal = useModal(false);
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
@@ -200,6 +204,17 @@ function SwapPage() {
     asset1Balance,
     feeAmount,
   );
+
+  const buttonMsg = useMemo(() => {
+    if (asset1Value && Number(asset1Value) > 0) {
+      if (Number(asset1Value) > Number(asset1BalanceMinusFee)) {
+        return `Insufficient ${asset1?.name} balance`;
+      }
+      return "swap";
+    }
+
+    return "Enter an amount";
+  }, [asset1Value]);
 
   useEffect(() => {
     if (
@@ -444,7 +459,7 @@ function SwapPage() {
                   required: "Required",
                   min: {
                     value: Number(amountToValue(1, asset1?.decimals) || 0),
-                    message: "Please enter a number greater than zero.",
+                    message: "",
                   },
                   max: {
                     value: asset1BalanceMinusFee
@@ -453,8 +468,7 @@ function SwapPage() {
                           asset1?.decimals,
                         ) || 0
                       : Infinity,
-                    message:
-                      "Please enter a number equal to or less than balance.",
+                    message: "",
                   },
                 })}
                 readOnly={isReversed && simulationResult.isLoading}
@@ -633,8 +647,7 @@ function SwapPage() {
                   required: "Required",
                   min: {
                     value: Number(amountToValue(1, asset2?.decimals) || 0),
-                    message:
-                      "The amount of received asset should be greater than zero.",
+                    message: "",
                   },
                 })}
                 readOnly={!isReversed && simulationResult.isLoading}
@@ -696,7 +709,13 @@ function SwapPage() {
                 <Typography color={theme.colors.text.primary}>
                   Expected Amount
                 </Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Expected quantity to be received based on the current price, maximum spread and trading fee"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 width="auto"
@@ -727,7 +746,13 @@ function SwapPage() {
                 <Typography color={theme.colors.text.primary}>
                   Spread
                 </Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Fee paid due to the difference between market price and estimated price"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 css={css`
@@ -749,7 +774,13 @@ function SwapPage() {
                 `}
               >
                 <Typography color={theme.colors.text.primary}>Gas</Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Fee paid to execute this transaction"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 width="auto"
@@ -774,7 +805,13 @@ function SwapPage() {
                 `}
               >
                 <Typography color={theme.colors.text.primary}>Route</Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Optimized route for your optimal gain"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 width="auto"
@@ -840,7 +877,7 @@ function SwapPage() {
               margin-top: 20px;
             `}
           >
-            Swap
+            {buttonMsg}
           </Button>
         ) : (
           <Button
@@ -850,10 +887,15 @@ function SwapPage() {
             css={css`
               margin-top: 20px;
             `}
+            onClick={() => connectWalletModal.open()}
           >
             Connect Wallet
           </Button>
         )}
+        <ConnectWalletModal
+          isOpen={connectWalletModal.isOpen}
+          onRequestClose={() => connectWalletModal.close()}
+        />
       </Wrapper>
     </>
   );

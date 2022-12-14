@@ -17,6 +17,9 @@ import {
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
+import { useModal } from "hooks/useModal";
+import ConnectWalletModal from "components/ConnectWalletModal";
+import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -110,6 +113,9 @@ const navLinks = [
 function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
+  const wallet = useWallet();
+  const connectedWallet = useConnectedWallet();
+  const connectWalletModal = useModal(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -164,11 +170,29 @@ function Header() {
                   />
                 </Col>
                 <Col width="auto">
-                  <Button variant="primary">Connect Wallet</Button>
+                  {connectedWallet ? (
+                    <Button
+                      variant="primary"
+                      onClick={() => wallet.disconnect()}
+                    >
+                      Disconnect
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      onClick={() => connectWalletModal.open()}
+                    >
+                      Connect Wallet
+                    </Button>
+                  )}
                 </Col>
               </Row>
             </Col>
           </Row>
+          <ConnectWalletModal
+            isOpen={connectWalletModal.isOpen}
+            onRequestClose={() => connectWalletModal.close()}
+          />
         </Container>
       </div>
     </Wrapper>
