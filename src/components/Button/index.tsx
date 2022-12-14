@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
 interface ButtonProps {
-  size?: "default" | "large";
+  size?: "default" | "large" | "xLarge";
   variant?: "default" | "primary" | "secondary" | "link" | "gradient";
   block?: boolean;
 }
@@ -17,6 +17,13 @@ const Button = styled.button<ButtonProps>`
   border: 3px solid ${({ theme }) => theme.colors.primary};
   border-radius: 12px;
   ${({ size }) => {
+    if (size === "xLarge") {
+      return css`
+        height: 70px;
+        font-size: 22px;
+        font-weight: 900;
+      `;
+    }
     if (size === "large") {
       return css`
         height: 48px;
