@@ -45,6 +45,7 @@ import { Colors } from "styles/theme/colors";
 import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
+import { Asset } from "types/common";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -314,7 +315,7 @@ function SwapPage() {
         >
           <SelectAssetForm
             goBackOnSelect
-            assets={assets}
+            assets={assets?.map((a) => getAsset(a.address) as Asset)}
             hasBackButton
             selectedAssetAddress={
               selectAsset1Modal.isOpen ? asset1?.address : asset2?.address
@@ -456,7 +457,7 @@ function SwapPage() {
                   onChange: () => {
                     setIsReversed(false);
                   },
-                  required: "Required",
+                  required: true,
                   min: {
                     value: Number(amountToValue(1, asset1?.decimals) || 0),
                     message: "",
@@ -577,7 +578,7 @@ function SwapPage() {
                           />
                         )}
                         <Typography size={16} weight="bold">
-                          {asset2?.symbol || "Select"}
+                          {asset2?.symbol || "Select token"}
                         </Typography>
                       </>
                     ),
@@ -644,7 +645,7 @@ function SwapPage() {
                   onChange: () => {
                     setIsReversed(true);
                   },
-                  required: "Required",
+                  required: true,
                   min: {
                     value: Number(amountToValue(1, asset2?.decimals) || 0),
                     message: "",
