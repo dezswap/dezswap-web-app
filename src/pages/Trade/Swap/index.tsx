@@ -46,8 +46,6 @@ import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Asset } from "types/common";
-import { useAtom } from "jotai";
-import assetsAtom from "stores/assets";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -71,7 +69,6 @@ function SwapPage() {
   const { availableAssetAddresses, getPairedAddresses, findPair, pairs } =
     usePairs();
   const { getAsset } = useAssets();
-  const [assetStore] = useAtom(assetsAtom);
   const [isReversed, setIsReversed] = useState(false);
   const network = useNetwork();
   const connectWalletModal = useModal(false);
@@ -318,32 +315,39 @@ function SwapPage() {
             }
           `}
         >
-          <SelectAssetForm
-            goBackOnSelect
-            assets={assetStore[network.name]?.map(
-              (a) => getAsset(a.address) as Asset,
-            )}
-            hasBackButton
-            selectedAssetAddress={
-              selectAsset1Modal.isOpen ? asset1?.address : asset2?.address
-            }
-            onSelect={(asset) => {
-              const target = selectAsset1Modal.isOpen
-                ? FormKey.asset1Address
-                : FormKey.asset2Address;
-              const oppositeTarget = selectAsset1Modal.isOpen
-                ? FormKey.asset2Address
-                : FormKey.asset1Address;
-              if (
-                formData[oppositeTarget] === asset.address ||
-                !findPair([asset.address, formData[oppositeTarget] || ""])
-              ) {
-                form.setValue(oppositeTarget, "");
+          {isSelectAssetOpen && (
+            <SelectAssetForm
+              goBackOnSelect
+              addressList={availableAssetAddresses.addresses?.map(
+                (address) => ({
+                  address,
+                  isLP: false,
+                }),
+              )}
+              hasBackButton
+              selectedAssetAddress={
+                selectAsset1Modal.isOpen
+                  ? asset1?.address || ""
+                  : asset2?.address || ""
               }
-              form.setValue(target, asset.address);
-            }}
-            onGoBack={() => navigate(-1)}
-          />
+              onSelect={(address) => {
+                const target = selectAsset1Modal.isOpen
+                  ? FormKey.asset1Address
+                  : FormKey.asset2Address;
+                const oppositeTarget = selectAsset1Modal.isOpen
+                  ? FormKey.asset2Address
+                  : FormKey.asset1Address;
+                if (
+                  formData[oppositeTarget] === address ||
+                  !findPair([address, formData[oppositeTarget] || ""])
+                ) {
+                  form.setValue(oppositeTarget, "");
+                }
+                form.setValue(target, address);
+              }}
+              onGoBack={() => navigate(-1)}
+            />
+          )}
         </Panel>
       </Drawer>
       <Wrapper onSubmit={handleSubmit}>

@@ -15,32 +15,24 @@ import colors from "styles/theme/colors";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
 import Box from "components/Box";
+import useAssets from "hooks/useAssets";
+import usePairs from "hooks/usePair";
 
-type Asset = OrgAsset & { disabled?: boolean };
+type Asset = Partial<OrgAsset & { disabled?: boolean }>;
 export type LPAsset = {
   address: string;
   assets: [Asset, Asset];
   disabled?: boolean;
 };
-interface DefaultSelectAssetFormProps {
+interface SelectAssetFormProps {
   title?: React.ReactNode;
   selectedAssetAddress?: string;
   hasBackButton?: boolean;
   onGoBack?(): void;
   goBackOnSelect?: boolean;
-  onSelect?(
-    asset: Asset | LPAsset,
-    index: number,
-    assets: Asset[] | LPAsset[],
-  ): void;
-}
+  onSelect?(address: string): void;
 
-interface SelectAssetFormProps extends DefaultSelectAssetFormProps {
-  assets?: Asset[];
-}
-
-interface SelectLPAssetFormProps extends DefaultSelectAssetFormProps {
-  lpAssets?: LPAsset[];
+  addressList?: { address: string; isLP?: boolean }[];
 }
 
 const Wrapper = styled.div`
@@ -131,7 +123,7 @@ const AssetIcon = styled.div<{ src?: string }>`
   background-repeat: no-repeat;
 `;
 
-function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
+function SelectAssetForm(props: SelectAssetFormProps) {
   const {
     title = "Select a Token",
     onSelect: handleSelect,
@@ -143,34 +135,37 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
+  const { getAsset } = useAssets();
+  const { findPairByLpAddress } = usePairs();
 
-  const assets = useMemo(() => {
-    if ("assets" in props) {
-      return props?.assets?.map((asset, index, array) => {
+  const assetList = useMemo(() => {
+    return props?.addressList?.map(({ address, isLP }) => {
+      if (!isLP) {
+        const asset = getAsset(address);
         return (
           <AssetItem
-            key={asset.address}
+            key={address}
             onClick={() => {
               if (handleSelect) {
-                handleSelect(asset, index, array);
+                handleSelect(address);
               }
               if (goBackOnSelect && onGoBack) {
                 onGoBack();
               }
             }}
-            selected={selectedAssetAddress === asset.address}
+            selected={selectedAssetAddress === address}
             invisible={
               !!deferredSearchKeyword &&
-              [asset.name, asset.address, asset.symbol].findIndex((item) =>
+              [asset?.name, asset?.address, asset?.symbol].findIndex((item) =>
                 item
-                  .toLowerCase()
+                  ?.toLowerCase()
                   .includes(deferredSearchKeyword.toLowerCase()),
               ) < 0
             }
           >
             <Row gutterWidth={10} justify="between" align="start" wrap="nowrap">
               <Col xs="content">
-                <AssetIcon src={asset.iconSrc} />
+                <AssetIcon src={asset?.iconSrc} />
               </Col>
               <Col
                 css={css`
@@ -183,7 +178,7 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
                   color={theme.colors.text.primary}
                   css={{ marginBottom: 3 }}
                 >
-                  {asset.name}
+                  {asset?.name}
                 </Typography>
                 <Typography
                   size={12}
@@ -192,133 +187,133 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
                   as="span"
                   css={{ wordBreak: "break-all", opacity: 0.5 }}
                 >
-                  {asset.address?.length > 23
-                    ? ellipsisCenter(asset.address, 10)
-                    : asset.address}
+                  {address?.length > 23 ? ellipsisCenter(address, 10) : address}
                 </Typography>
               </Col>
             </Row>
-            <Copy value={asset.address}>
+            <Copy value={address}>
               <IconButton size={32} icons={{ default: iconCopy }} />
             </Copy>
           </AssetItem>
         );
-      });
-    }
-    if ("lpAssets" in props) {
-      return props?.lpAssets?.map((lp, index, array) => {
-        return (
-          <AssetItem
-            key={lp.address}
-            onClick={() => {
-              if (handleSelect) {
-                handleSelect(lp, index, array);
-              }
-              if (goBackOnSelect && onGoBack) {
-                onGoBack();
-              }
-            }}
-            selected={selectedAssetAddress === lp.address}
-            invisible={
-              !!deferredSearchKeyword &&
-              (!lp.address
-                .toLowerCase()
-                .includes(deferredSearchKeyword.toLowerCase()) ||
-                lp.assets.findIndex(
-                  (asset) =>
-                    asset.address
-                      .toLowerCase()
-                      .includes(deferredSearchKeyword.toLowerCase()) ||
-                    asset.symbol
-                      .toLowerCase()
-                      .includes(deferredSearchKeyword.toLowerCase()) ||
-                    asset.name
-                      .toLowerCase()
-                      .includes(deferredSearchKeyword.toLowerCase()),
-                ) < 0)
+      }
+
+      const pair = findPairByLpAddress(address);
+      const assets = pair?.asset_addresses.map((item) => getAsset(item)) || [];
+
+      return (
+        <AssetItem
+          key={address}
+          onClick={() => {
+            if (handleSelect) {
+              handleSelect(address);
             }
+            if (goBackOnSelect && onGoBack) {
+              onGoBack();
+            }
+          }}
+          selected={selectedAssetAddress === address}
+          invisible={
+            !!deferredSearchKeyword &&
+            (!address
+              .toLowerCase()
+              .includes(deferredSearchKeyword.toLowerCase()) ||
+              assets.findIndex(
+                (asset) =>
+                  asset?.address
+                    ?.toLowerCase()
+                    .includes(deferredSearchKeyword.toLowerCase()) ||
+                  asset?.symbol
+                    ?.toLowerCase()
+                    .includes(deferredSearchKeyword.toLowerCase()) ||
+                  asset?.name
+                    ?.toLowerCase()
+                    .includes(deferredSearchKeyword.toLowerCase()),
+              ) < 0)
+          }
+        >
+          <div
+            css={css`
+              flex: 1;
+            `}
           >
-            <div
+            <Row
+              gutterWidth={3}
+              justify="between"
+              align="start"
               css={css`
-                flex: 1;
+                & > div:last-child {
+                  display: none;
+                }
               `}
             >
-              <Row
-                gutterWidth={3}
-                justify="between"
-                align="start"
-                css={css`
-                  & > div:last-child {
-                    display: none;
-                  }
-                `}
-              >
-                {lp.assets.map((asset) => (
-                  <React.Fragment key={asset.address}>
-                    <Col xs="content">
-                      <AssetIcon
-                        src={asset.iconSrc}
-                        css={css`
-                          width: 20px;
-                          height: 20px;
-                        `}
-                      />
-                    </Col>
-                    <Col
+              {assets.map((asset) => (
+                <React.Fragment key={asset?.address}>
+                  <Col xs="content">
+                    <AssetIcon
+                      src={asset?.iconSrc}
                       css={css`
-                        flex: 1;
+                        width: 20px;
+                        height: 20px;
                       `}
+                    />
+                  </Col>
+                  <Col
+                    css={css`
+                      flex: 1;
+                    `}
+                  >
+                    <Typography
+                      size={16}
+                      weight={700}
+                      color="white"
+                      css={{ marginBottom: 3 }}
                     >
+                      {asset?.name}
+                    </Typography>
+                  </Col>
+                  <Col xs={12} sm="content">
+                    <Hidden xs>
                       <Typography
                         size={16}
                         weight={700}
                         color="white"
                         css={{ marginBottom: 3 }}
                       >
-                        {asset.name}
+                        &nbsp;-&nbsp;
                       </Typography>
-                    </Col>
-                    <Col xs={12} sm="content">
-                      <Hidden xs>
-                        <Typography
-                          size={16}
-                          weight={700}
-                          color="white"
-                          css={{ marginBottom: 3 }}
-                        >
-                          &nbsp;-&nbsp;
-                        </Typography>
-                      </Hidden>
-                    </Col>
-                  </React.Fragment>
-                ))}
-              </Row>
-              <Row>
-                <Col>
-                  <Typography
-                    size={14}
-                    weight={500}
-                    color="white"
-                    as="span"
-                    css={{ wordBreak: "break-all" }}
-                  >
-                    {ellipsisCenter(lp.address, 10)}
-                  </Typography>
-                </Col>
-              </Row>
-            </div>
-          </AssetItem>
-        );
-      });
-    }
-    return [];
+                    </Hidden>
+                  </Col>
+                </React.Fragment>
+              ))}
+            </Row>
+            <Row>
+              <Col>
+                <Typography
+                  size={14}
+                  weight={500}
+                  color="white"
+                  as="span"
+                  css={{ wordBreak: "break-all" }}
+                >
+                  {ellipsisCenter(address, 10)}
+                </Typography>
+              </Col>
+            </Row>
+          </div>
+        </AssetItem>
+      );
+    });
   }, [
-    goBackOnSelect,
-    handleSelect,
-    onGoBack,
     props,
+    findPairByLpAddress,
     selectedAssetAddress,
     deferredSearchKeyword,
+    getAsset,
+    theme,
+    handleSelect,
+    goBackOnSelect,
+    onGoBack,
   ]);
   return (
     <Wrapper>
@@ -396,7 +391,7 @@ function SelectAssetForm(props: SelectAssetFormProps | SelectLPAssetFormProps) {
         </Col>
       </Row>
       <Hr />
-      <AssetList>{assets}</AssetList>
+      <AssetList>{assetList}</AssetList>
     </Wrapper>
   );
 }
