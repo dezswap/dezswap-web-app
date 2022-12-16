@@ -47,7 +47,7 @@ import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import Modal from "components/Modal";
-import { isMobile } from "react-device-detect";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -72,7 +72,7 @@ function SelectAssetDrawer({
   children: ReactNode;
 }) {
   const screenClass = useScreenClass();
-  return screenClass === "xs" ? (
+  return screenClass === MOBILE_SCREEN_CLASS ? (
     <Modal drawer isOpen={isOpen} noPadding>
       {isOpen && children}
     </Modal>
@@ -570,7 +570,7 @@ function SwapPage() {
           css={css`
             margin-top: 5px;
             margin-bottom: 24px;
-            .mobile & {
+            .xs & {
               margin-bottom: 20px;
             }
           `}

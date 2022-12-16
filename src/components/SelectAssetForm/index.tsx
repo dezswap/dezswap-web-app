@@ -75,7 +75,7 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
   height: auto;
   position: relative;
   padding: 15px 27px;
-  .mobile & {
+  .xs & {
     padding: 15px 13px;
   }
 

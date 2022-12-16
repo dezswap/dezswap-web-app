@@ -37,6 +37,7 @@ const defaultOverlayStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "transparent",
+  height: "100%",
 };
 
 const ModalHeader = styled.div`
@@ -104,6 +105,8 @@ function Modal({
       <Container
         css={css`
           width: 100%;
+          display: block;
+          height: 100%;
         `}
       >
         <Panel
@@ -112,6 +115,8 @@ function Modal({
             drawer
               ? {
                   paddingBottom: 0,
+                  height: "100%",
+                  display: "block",
                 }
               : {}
           }
@@ -123,7 +128,6 @@ function Modal({
                 }
               : {}),
             maxHeight: "80vh",
-            overflowY: "auto",
             ...(noPadding && { padding: 0 }),
           }}
         >
