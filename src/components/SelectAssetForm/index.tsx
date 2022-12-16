@@ -12,7 +12,6 @@ import Input from "components/Input";
 import colors from "styles/theme/colors";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
-import Box from "components/Box";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePair";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -353,31 +352,22 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         )}
         {title}
       </Typography>
-      <Box
+      <Input
+        size="large"
+        variant="primary"
+        align="center"
+        style={{ fontSize: "16px", fontWeight: "bold" }}
+        borderStyle="solid"
+        placeholder="Search name or paste address"
+        onChange={(event) => {
+          setSearchKeyword(event.target.value);
+        }}
+      />
+      <Hr
         css={css`
-          margin-bottom: 22px;
-          padding: 12.5px;
+          margin-top: 19px;
         `}
-      >
-        <Input
-          variant="primary"
-          align="center"
-          css={css`
-            font-size: 16px;
-            font-weight: bold;
-            font-stretch: normal;
-            font-style: normal;
-            line-height: normal;
-            letter-spacing: normal;
-            text-align: justify;
-          `}
-          placeholder="Search name or paste address"
-          onChange={(event) => {
-            setSearchKeyword(event.target.value);
-          }}
-        />
-      </Box>
-      <Hr />
+      />
       <Row
         justify="center"
         align="center"
