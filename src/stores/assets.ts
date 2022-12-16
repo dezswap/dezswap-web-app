@@ -9,4 +9,8 @@ const assetsAtom = atomWithStorage<{
 
 export const verifiedAssetsAtom = atom<VerifiedAssets | undefined>(undefined);
 
+export const bookmarksAtom = atomWithStorage<{
+  [K in NetworkName]?: string[];
+}>("bookmarks", { mainnet: [], testnet: [] });
+
 export default assetsAtom;
