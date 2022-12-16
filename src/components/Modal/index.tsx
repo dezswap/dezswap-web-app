@@ -16,6 +16,7 @@ interface ModalProps extends ReactModal.Props {
   drawer?: boolean;
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
+  noPadding?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
 }
@@ -65,6 +66,7 @@ function Modal({
   children,
   hasCloseButton,
   hasGoBackButton,
+  noPadding,
   onGoBack,
   title,
   drawer,
@@ -122,6 +124,7 @@ function Modal({
               : {}),
             maxHeight: "80vh",
             overflowY: "auto",
+            ...(noPadding && { padding: 0 }),
           }}
         >
           <ModalHeader>
