@@ -1,3 +1,4 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
 interface IconButtonProps {
@@ -67,6 +68,16 @@ const IconButton = styled.button<IconButtonProps>`
   &:active::after {
     opacity: 1;
   }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  ${({ onClick }) =>
+    !onClick &&
+    css`
+      cursor: default;
+    `}
 `;
 
 IconButton.defaultProps = { type: "button" };
