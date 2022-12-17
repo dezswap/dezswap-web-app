@@ -9,7 +9,6 @@ import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-xpla-32px.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
-import colors from "styles/theme/colors";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
 import useAssets from "hooks/useAssets";
@@ -18,6 +17,7 @@ import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import useBookmark from "hooks/useBookmark";
 import Panel from "components/Panel";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 type Asset = Partial<OrgAsset & { disabled?: boolean }>;
 export type LPAsset = {
@@ -42,9 +42,13 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: ${colors.white};
+  background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
+
+  .${MOBILE_SCREEN_CLASS} & {
+    max-height: calc(80vh - 6px);
+  }
 `;
 
 const AssetList = styled.div`
@@ -76,12 +80,12 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
   max-height: 1280px;
 
   &:hover {
-    background-color: ${colors.text.background};
+    background-color: ${({ theme }) => theme.colors.text.background};
   }
-  ${({ selected }) =>
+  ${({ selected, theme }) =>
     selected &&
     css`
-      background-color: ${colors.text.background};
+      background-color: ${theme.colors.text.background};
     `}
   ${({ invisible }) =>
     invisible &&
@@ -112,6 +116,11 @@ const AssetIcon = styled.div<{ src?: string }>`
   background-repeat: no-repeat;
 `;
 
+const tabs = [
+  { label: "All", value: "all" },
+  { label: "Bookmark", value: "bookmark" },
+];
+
 function SelectAssetForm(props: SelectAssetFormProps) {
   const {
     title = "Select a Token",
@@ -120,6 +129,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     hasBackButton,
     onGoBack,
     goBackOnSelect,
+    addressList,
   } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -127,17 +137,13 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { bookmarks, toggleBookmark } = useBookmark();
-  const tabs = [
-    { label: "All Tokens", value: "all tokens" },
-    { label: "Bookmark", value: "bookmark" },
-  ];
   const [tabIdx, setTabIdx] = useState(0);
 
   const assetList = useMemo(() => {
     return (
       tabs[tabIdx].value === "bookmark"
         ? bookmarks?.map((b) => ({ address: b, isLP: false }))
-        : props?.addressList
+        : addressList
     )?.map(({ address, isLP }) => {
       if (!isLP) {
         const asset = getAsset(address);
@@ -314,18 +320,18 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       );
     });
   }, [
-    tabs,
     bookmarks,
-    toggleBookmark,
-    props,
-    findPairByLpAddress,
-    selectedAssetAddress,
     deferredSearchKeyword,
+    findPairByLpAddress,
     getAsset,
-    theme,
-    handleSelect,
     goBackOnSelect,
+    handleSelect,
     onGoBack,
+    addressList,
+    selectedAssetAddress,
+    tabIdx,
+    theme,
+    toggleBookmark,
   ]);
   return (
     <Wrapper>
@@ -342,8 +348,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           {hasBackButton && (
             <IconButton
               icons={{ default: iconBack }}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              size={30 as any}
+              size={30}
               css={css`
                 position: absolute;
                 left: 0;
@@ -375,15 +380,11 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           justify="center"
           align="center"
           css={css`
-            display: flex;
+            margin: 20px 0px;
           `}
+          gutterWidth={0}
         >
-          <Col
-            width={200}
-            css={css`
-              margin: 20px 0px;
-            `}
-          >
+          <Col width={194}>
             <TabButton
               selectedIndex={tabIdx}
               defaultSelectedIndex={tabIdx}
