@@ -47,7 +47,7 @@ const useAssets = () => {
                 };
                 setAssetStore((current) => ({
                   ...current,
-                  [networkName]: assetStore[networkName],
+                  [networkName]: store,
                 }));
               } else if (!fetchQueue.current[networkName]?.includes(address)) {
                 fetchQueue.current[networkName]?.push(address);
@@ -66,7 +66,7 @@ const useAssets = () => {
         fetchAsset();
       }
     }, 100);
-  }, [api, verifiedAssets, network.name, setAssetStore]);
+  }, [network, assetStore, api, verifiedAssets, setAssetStore]);
 
   const addFetchQueue = useCallback(
     (address: string, networkName: NetworkName) => {
