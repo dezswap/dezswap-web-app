@@ -51,19 +51,6 @@ const AssetList = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 0;
-
-  scrollbar-width: thin;
-  scrollbar-color: ${colors.secondary} transparent;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: ${colors.secondary};
-    border-radius: 30px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
 `;
 
 const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
