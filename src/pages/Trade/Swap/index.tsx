@@ -188,7 +188,7 @@ function SwapPage() {
       color: theme.colors.text.primary,
       message: undefined,
     };
-  }, [simulationResult]);
+  }, [simulationResult, theme]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);
@@ -225,7 +225,7 @@ function SwapPage() {
       ],
     };
   }, [
-    simulationResult.estimatedAmount,
+    simulationResult,
     connectedWallet,
     selectedPair,
     asset1,
@@ -262,7 +262,7 @@ function SwapPage() {
     }
 
     return "Enter an amount";
-  }, [asset1Value]);
+  }, [asset1, asset1BalanceMinusFee, asset1Value]);
 
   useEffect(() => {
     if (
@@ -279,13 +279,13 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee]);
+  }, [asset1, asset1Address, asset1BalanceMinusFee, asset1Value, form]);
 
   useEffect(() => {
     setTimeout(() => {
       form.trigger();
     }, 100);
-  }, [asset1Balance, asset2Balance]);
+  }, [asset1Balance, asset2Balance, form]);
 
   useEffect(() => {
     if (simulationResult?.estimatedAmount) {
