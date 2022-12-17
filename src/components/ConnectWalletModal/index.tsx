@@ -7,7 +7,6 @@ import Modal from "components/Modal";
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
 import { MouseEventHandler } from "react";
 import Typography from "components/Typography";
-import isMobile from "react-device-detect";
 
 const WalletButton = styled.button`
   width: 100%;
@@ -53,11 +52,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
             iconSrc: icon,
             isInstalled: true,
             onClick: (event) => {
-              if (isMobile) {
-                connect(type, identifier, false);
-              } else {
-                connect(type, identifier);
-              }
+              connect(type, identifier, false);
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
