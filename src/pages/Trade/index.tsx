@@ -16,7 +16,7 @@ const Wrapper = styled.div`
   position: relative;
   padding-top: 30px;
 
-  .mobile & {
+  .xs & {
     padding-top: 26px;
   }
 `;

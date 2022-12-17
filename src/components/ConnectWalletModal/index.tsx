@@ -6,8 +6,8 @@ import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
 import { MouseEventHandler } from "react";
-import { isMobile } from "react-device-detect";
 import Typography from "components/Typography";
+import isMobile from "react-device-detect";
 
 const WalletButton = styled.button`
   width: 100%;

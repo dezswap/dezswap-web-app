@@ -8,7 +8,6 @@ import {
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
 import { useSetAtom } from "jotai";
-import useMobileSize from "hooks/useMobileSize";
 import { verifiedAssetsAtom } from "stores/assets";
 import { useAPI } from "hooks/useAPI";
 import MainLayout from "layout/Main";
@@ -17,7 +16,6 @@ setGridConfiguration(gridConfiguration);
 
 function App() {
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
-  const isMobileSize = useMobileSize();
   const api = useAPI();
   const screenClass = useScreenClass();
 
@@ -32,16 +30,6 @@ function App() {
       setKnownAssets(assets);
     });
   }, [api, setKnownAssets]);
-
-  useLayoutEffect(() => {
-    if (isMobileSize) {
-      document.body.classList.add("mobile");
-      document.body.classList.remove("desktop");
-    } else {
-      document.body.classList.add("desktop");
-      document.body.classList.remove("mobile");
-    }
-  }, [isMobileSize]);
 
   const renderRoute = useCallback(
     ({ children, element, index, ...props }: RouteObject) => {

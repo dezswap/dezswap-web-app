@@ -5,18 +5,19 @@ import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
 import { ellipsisCenter } from "utils";
 import iconBack from "assets/icons/icon-back.svg";
-import iconCopy from "assets/icons/icon-copy.svg";
 import { Asset as OrgAsset } from "types/common";
-import Copy from "components/Copy";
 import iconToken from "assets/icons/icon-xpla-32px.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
 import colors from "styles/theme/colors";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
-import Box from "components/Box";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePair";
+import iconBookmark from "assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
+import useBookmark from "hooks/useBookmark";
+import Panel from "components/Panel";
 
 type Asset = Partial<OrgAsset & { disabled?: boolean }>;
 export type LPAsset = {
@@ -43,23 +44,41 @@ const Wrapper = styled.div`
   flex-direction: column;
   background-color: ${colors.white};
   text-align: center;
+  border-radius: 12px;
 `;
 
 const AssetList = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 0;
+
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.secondary} transparent;
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: ${colors.secondary};
+    border-radius: 30px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
 `;
 
 const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 
   width: 100%;
   height: auto;
   position: relative;
-  padding: 15px 16px;
+  padding: 15px 27px;
+  .xs & {
+    padding: 15px 13px;
+  }
+
   background-color: transparent;
   cursor: pointer;
   border: none;
@@ -86,23 +105,6 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
       opacity: 0;
       pointer-events: none;
     `}
-
-  /* Copy button */
-  & button {
-    opacity: 0;
-    ${({ selected }) =>
-      selected &&
-      css`
-        opacity: 1;
-      `}
-    .xs & {
-      opacity: 1;
-    }
-  }
-
-  &:hover button {
-    opacity: 1;
-  }
 `;
 
 AssetItem.defaultProps = {
@@ -110,8 +112,8 @@ AssetItem.defaultProps = {
 };
 
 const AssetIcon = styled.div<{ src?: string }>`
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   position: relative;
   display: inline-block;
 
@@ -137,22 +139,24 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
+  const { bookmarks, toggleBookmark } = useBookmark();
+  const tabs = [
+    { label: "All Tokens", value: "all tokens" },
+    { label: "Bookmark", value: "bookmark" },
+  ];
+  const [tabIdx, setTabIdx] = useState(0);
 
   const assetList = useMemo(() => {
-    return props?.addressList?.map(({ address, isLP }) => {
+    return (
+      tabs[tabIdx].value === "bookmark"
+        ? bookmarks?.map((b) => ({ address: b, isLP: false }))
+        : props?.addressList
+    )?.map(({ address, isLP }) => {
       if (!isLP) {
         const asset = getAsset(address);
         return (
           <AssetItem
             key={address}
-            onClick={() => {
-              if (handleSelect) {
-                handleSelect(address);
-              }
-              if (goBackOnSelect && onGoBack) {
-                onGoBack();
-              }
-            }}
             selected={selectedAssetAddress === address}
             invisible={
               !!deferredSearchKeyword &&
@@ -163,7 +167,29 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               ) < 0
             }
           >
-            <Row gutterWidth={10} justify="between" align="start" wrap="nowrap">
+            <IconButton
+              size={32}
+              style={{ alignItems: "center", marginBottom: "5px" }}
+              icons={{
+                default: bookmarks?.includes(address)
+                  ? iconBookmarkSelected
+                  : iconBookmark,
+              }}
+              onClick={() => toggleBookmark(address)}
+            />
+            <Row
+              gutterWidth={6}
+              style={{ alignItems: "center" }}
+              justify="start"
+              onClick={() => {
+                if (handleSelect) {
+                  handleSelect(address);
+                }
+                if (goBackOnSelect && onGoBack) {
+                  onGoBack();
+                }
+              }}
+            >
               <Col xs="content">
                 <AssetIcon src={asset?.iconSrc} />
               </Col>
@@ -176,7 +202,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   size={16}
                   weight="bold"
                   color={theme.colors.text.primary}
-                  css={{ marginBottom: 3 }}
                 >
                   {asset?.name}
                 </Typography>
@@ -191,9 +216,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 </Typography>
               </Col>
             </Row>
-            <Copy value={address}>
-              <IconButton size={32} icons={{ default: iconCopy }} />
-            </Copy>
           </AssetItem>
         );
       }
@@ -305,6 +327,9 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       );
     });
   }, [
+    tabs,
+    bookmarks,
+    toggleBookmark,
     props,
     findPairByLpAddress,
     selectedAssetAddress,
@@ -317,80 +342,71 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   ]);
   return (
     <Wrapper>
-      <Typography
-        size={20}
-        color={theme.colors.primary}
-        weight={900}
-        css={css`
-          margin-bottom: 30px;
-          position: relative;
-        `}
-      >
-        {hasBackButton && (
-          <IconButton
-            icons={{ default: iconBack }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            size={30 as any}
-            css={css`
-              position: absolute;
-              left: 0;
-              top: 50%;
-              transform: translateY(-50%);
-            `}
-            onClick={() => onGoBack && onGoBack()}
-          />
-        )}
-        {title}
-      </Typography>
-      <Box
-        css={css`
-          margin-bottom: 22px;
-          padding: 12.5px;
-        `}
-      >
+      <Panel border={false} style={{ paddingBottom: 0 }}>
+        <Typography
+          size={20}
+          color={theme.colors.primary}
+          weight={900}
+          css={css`
+            margin-bottom: 30px;
+            position: relative;
+          `}
+        >
+          {hasBackButton && (
+            <IconButton
+              icons={{ default: iconBack }}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              size={30 as any}
+              css={css`
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+              `}
+              onClick={() => onGoBack && onGoBack()}
+            />
+          )}
+          {title}
+        </Typography>
         <Input
+          size="large"
           variant="primary"
           align="center"
-          css={css`
-            font-size: 16px;
-            font-weight: bold;
-            font-stretch: normal;
-            font-style: normal;
-            line-height: normal;
-            letter-spacing: normal;
-            text-align: justify;
-          `}
+          style={{ fontSize: "16px", fontWeight: "bold" }}
+          borderStyle="solid"
           placeholder="Search name or paste address"
           onChange={(event) => {
             setSearchKeyword(event.target.value);
           }}
         />
-      </Box>
-      <Hr />
-      <Row
-        justify="center"
-        align="center"
-        css={css`
-          display: flex;
-        `}
-      >
-        <Col
-          width={200}
+        <Hr
           css={css`
-            margin: 20px 0px;
+            margin-top: 19px;
+          `}
+        />
+        <Row
+          justify="center"
+          align="center"
+          css={css`
+            display: flex;
           `}
         >
-          <TabButton
-            selectedIndex={0}
-            defaultSelectedIndex={0}
-            items={[
-              { label: "All Tokens", value: "all tokens" },
-              { label: "Bookmark", value: "boomark" },
-            ]}
-          />
-        </Col>
-      </Row>
-      <Hr />
+          <Col
+            width={200}
+            css={css`
+              margin: 20px 0px;
+            `}
+          >
+            <TabButton
+              selectedIndex={tabIdx}
+              defaultSelectedIndex={tabIdx}
+              items={tabs}
+              onChange={(idx) => setTabIdx(idx)}
+            />
+          </Col>
+        </Row>
+        <Hr />
+      </Panel>
       <AssetList>{assetList}</AssetList>
     </Wrapper>
   );

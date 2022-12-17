@@ -1,5 +1,6 @@
 import {
   FormEventHandler,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -25,7 +26,7 @@ import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
 import Panel from "components/Panel";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -45,7 +46,8 @@ import { Colors } from "styles/theme/colors";
 import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
-import { Asset } from "types/common";
+import Modal from "components/Modal";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -61,6 +63,49 @@ enum FormKey {
 }
 
 const DISPLAY_DECIMAL = 3;
+
+function SelectAssetDrawer({
+  isOpen,
+  children,
+}: {
+  isOpen: boolean;
+  children: ReactNode;
+}) {
+  const screenClass = useScreenClass();
+  return screenClass === MOBILE_SCREEN_CLASS ? (
+    <Modal drawer isOpen={isOpen} noPadding>
+      {isOpen && children}
+    </Modal>
+  ) : (
+    <Drawer isOpen={isOpen} position="absolute" anchor="right">
+      <Panel
+        noPadding
+        wrapperStyle={{ height: "100%", display: "block" }}
+        css={css`
+          height: 100%;
+          background-color: transparent;
+          border: none;
+
+          & > * {
+            transition: transform 1s cubic-bezier(0, 1, 0, 1),
+              opacity 1s cubic-bezier(0, 1, 0, 1);
+            ${isOpen
+              ? css`
+                  transform: scale(1);
+                  opacity: 1;
+                `
+              : css`
+                  transform: scale(1.2);
+                  opacity: 0;
+                `}
+          }
+        `}
+      >
+        {isOpen && children}
+      </Panel>
+    </Drawer>
+  );
+}
 
 function SwapPage() {
   const navigate = useNavigate();
@@ -292,64 +337,37 @@ function SwapPage() {
 
   return (
     <>
-      <Drawer isOpen={isSelectAssetOpen} position="absolute" anchor="right">
-        <Panel
-          css={css`
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            border: none;
-
-            & > * {
-              transition: transform 1s cubic-bezier(0, 1, 0, 1),
-                opacity 1s cubic-bezier(0, 1, 0, 1);
-              ${isSelectAssetOpen
-                ? css`
-                    transform: scale(1);
-                    opacity: 1;
-                  `
-                : css`
-                    transform: scale(1.2);
-                    opacity: 0;
-                  `}
+      <SelectAssetDrawer isOpen={isSelectAssetOpen}>
+        <SelectAssetForm
+          goBackOnSelect
+          addressList={availableAssetAddresses.addresses?.map((address) => ({
+            address,
+            isLP: false,
+          }))}
+          hasBackButton
+          selectedAssetAddress={
+            selectAsset1Modal.isOpen
+              ? asset1?.address || ""
+              : asset2?.address || ""
+          }
+          onSelect={(address) => {
+            const target = selectAsset1Modal.isOpen
+              ? FormKey.asset1Address
+              : FormKey.asset2Address;
+            const oppositeTarget = selectAsset1Modal.isOpen
+              ? FormKey.asset2Address
+              : FormKey.asset1Address;
+            if (
+              formData[oppositeTarget] === address ||
+              !findPair([address, formData[oppositeTarget] || ""])
+            ) {
+              form.setValue(oppositeTarget, "");
             }
-          `}
-        >
-          {isSelectAssetOpen && (
-            <SelectAssetForm
-              goBackOnSelect
-              addressList={availableAssetAddresses.addresses?.map(
-                (address) => ({
-                  address,
-                  isLP: false,
-                }),
-              )}
-              hasBackButton
-              selectedAssetAddress={
-                selectAsset1Modal.isOpen
-                  ? asset1?.address || ""
-                  : asset2?.address || ""
-              }
-              onSelect={(address) => {
-                const target = selectAsset1Modal.isOpen
-                  ? FormKey.asset1Address
-                  : FormKey.asset2Address;
-                const oppositeTarget = selectAsset1Modal.isOpen
-                  ? FormKey.asset2Address
-                  : FormKey.asset1Address;
-                if (
-                  formData[oppositeTarget] === address ||
-                  !findPair([address, formData[oppositeTarget] || ""])
-                ) {
-                  form.setValue(oppositeTarget, "");
-                }
-                form.setValue(target, address);
-              }}
-              onGoBack={() => navigate(-1)}
-            />
-          )}
-        </Panel>
-      </Drawer>
+            form.setValue(target, address);
+          }}
+          onGoBack={() => navigate(-1)}
+        />
+      </SelectAssetDrawer>
       <Wrapper onSubmit={handleSubmit}>
         <Box
           css={css`
@@ -552,7 +570,7 @@ function SwapPage() {
           css={css`
             margin-top: 5px;
             margin-bottom: 24px;
-            .mobile & {
+            .xs & {
               margin-bottom: 20px;
             }
           `}
