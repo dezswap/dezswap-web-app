@@ -21,7 +21,7 @@ const useBookmark = () => {
           [network.name]: [...(current[network.name] || []), address],
         };
       }),
-    [bookmarkStore, network.name, setBookmarkStore],
+    [network.name, setBookmarkStore],
   );
 
   return useMemo(
