@@ -128,6 +128,7 @@ function Modal({
                 }
               : {}),
             maxHeight: "80vh",
+            overflowY: "auto",
             ...(noPadding && { padding: 0 }),
           }}
         >
