@@ -90,6 +90,7 @@ function Modal({
     <ReactModal
       className={className}
       closeTimeoutMS={200}
+      onRequestClose={onGoBack}
       style={{
         overlay: {
           ...defaultOverlayStyle,
