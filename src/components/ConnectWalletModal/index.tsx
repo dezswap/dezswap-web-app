@@ -1,27 +1,28 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
 import { MouseEventHandler } from "react";
 import Typography from "components/Typography";
+import Hr from "components/Hr";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import iconInstall from "assets/icons/icon-install.svg";
+import iconInstalled from "assets/icons/icon-installed.svg";
 
 const WalletButton = styled.button`
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 89px;
   position: relative;
-  box-sizing: border-box;
-  border-radius: 12px;
   background-color: transparent;
   margin: 0;
-  padding: 18px 20px;
+  border: none;
   font-style: normal;
   font-weight: 600;
   font-size: 13px;
-  line-height: 20px;
-  text-align: justify;
+  text-align: center;
 
   cursor: pointer;
 `;
@@ -41,6 +42,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
   const theme = useTheme();
+  const screenClass = useScreenClass();
 
   const buttons: WalletButtonProps[] = [
     ...availableConnections
@@ -62,7 +64,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ icon, name, url }) => ({
-        label: `Install ${name}`,
+        label: `${name}`,
         iconSrc: icon,
         onClick: () => {
           window.open(url);
@@ -71,50 +73,87 @@ function ConnectWalletModal(props: ReactModal.Props) {
   ];
 
   return (
-    <Modal {...props}>
+    <Modal
+      drawer={screenClass === MOBILE_SCREEN_CLASS}
+      hasCloseButton
+      title="Connect to a wallet"
+      {...props}
+    >
+      <Hr size={1} />
       <Typography
         color={theme.colors.primary}
-        size={20}
-        weight={900}
+        size={16}
+        weight="normal"
         css={css`
-          text-align: center;
-          margin-bottom: 25px;
+          padding-top: 20px;
         `}
       >
-        Connect to a wallet
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In efficitur
+        mauris sed convallis vehicula. Cras pharetra euismod tempus.Cras
+        pharetra euismod tempus.
       </Typography>
-      <div
-        css={css`
-          width: 100%;
-          height: auto;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          row-gap: 8px;
-        `}
+      <Row
+        justify="between"
+        gutterWidth={1}
+        style={{
+          flexWrap: "wrap",
+          height: "100%",
+          paddingBottom: "20px",
+          paddingLeft: screenClass === MOBILE_SCREEN_CLASS ? "16px" : "0px",
+          paddingRight: screenClass === MOBILE_SCREEN_CLASS ? "16px" : "0px",
+        }}
       >
         {buttons.map((item) => (
-          <WalletButton key={item.label} onClick={item.onClick}>
-            <Row justify="between" align="center">
-              <Col>{item.label}</Col>
-              <Col width="auto" css={{ height: 24 }}>
-                <div
-                  css={css`
-                    width: 24px;
-                    height: 24px;
-                    position: relative;
-                    display: inline-block;
-                    background-size: contain;
-                    background-position: 50% 50%;
-                    background-repeat: no-repeat;
-                    background-image: url(${item.iconSrc});
-                  `}
-                />
-              </Col>
-            </Row>
-          </WalletButton>
+          <Col
+            width="auto"
+            style={{
+              paddingTop: screenClass === MOBILE_SCREEN_CLASS ? "30px" : "20px",
+            }}
+          >
+            <WalletButton
+              key={item.label}
+              onClick={item.onClick}
+              style={{ justifyContent: "center" }}
+            >
+              <Row direction="column" style={{ height: "100%" }}>
+                <Col style={{ flex: "unset" }}>
+                  <div
+                    css={css`
+                      width: 60px;
+                      height: 60px;
+                      display: inline-block;
+                      background-size: contain;
+                      background-position: 50% 50%;
+                      background-repeat: no-repeat;
+                      background-image: url(${item.iconSrc});
+                      text-align: right;
+                    `}
+                  >
+                    <div
+                      css={css`
+                        width: 60px;
+                        height: 60px;
+                        display: inline-block;
+                        background-size: 22px 22px;
+                        background-repeat: no-repeat;
+                        background-position: bottom right;
+                        background-image: url(${item.isInstalled
+                          ? iconInstalled
+                          : iconInstall});
+                      `}
+                    />
+                  </div>
+                </Col>
+                <Col style={{ height: "20px" }}>
+                  <Typography color={theme.colors.primary} weight={900}>
+                    {item.label}
+                  </Typography>
+                </Col>
+              </Row>
+            </WalletButton>
+          </Col>
         ))}
-      </div>
+      </Row>
     </Modal>
   );
 }
