@@ -8,6 +8,8 @@ import { Asset, NetworkName } from "types/common";
 import { isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 
+const UPDATE_INTERVAL_SEC = 5000;
+
 const useAssets = () => {
   const [assetStore, setAssetStore] = useAtom(assetsAtom);
   const verifiedAssets = useAtomValue(verifiedAssetsAtom);
@@ -26,28 +28,47 @@ const useAssets = () => {
       const store = assetStore[networkName] || [];
       const address = fetchQueue.current[networkName]?.[0];
 
-      if (address && AccAddress.validate(address)) {
+      if (address) {
         const index = store.findIndex((item) => item.address === address);
         if (index >= 0) {
           const currentAsset = store[index];
           if (
             new Date((currentAsset as Asset).updatedAt || 0)?.getTime() <
-              Date.now() - 5 * 1000 &&
+              Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            const res = await api.getToken(address);
-            if (res) {
+            if (isNativeTokenAddress(address)) {
+              const asset = nativeTokens?.find(
+                (item) => item.address === address,
+              );
+              const balance = await api.getNativeTokenBalance(address);
+              if (asset) {
+                store[index] = {
+                  ...asset,
+                  balance: balance || "0",
+                  updatedAt: new Date(),
+                };
+                setAssetStore((current) => ({
+                  ...current,
+                  [networkName]: assetStore[networkName],
+                }));
+              }
+            } else {
+              const token = await api.getToken(address);
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[networkName]?.[address];
+                const balance = await api.getTokenBalance(address);
+
                 store[index] = {
-                  ...res,
+                  ...token,
                   address,
+                  balance: balance || "0",
                   iconSrc: verifiedAsset?.icon,
                   updatedAt: new Date(),
                 };
                 setAssetStore((current) => ({
                   ...current,
-                  [networkName]: store,
+                  [networkName]: assetStore[networkName],
                 }));
               } else if (!fetchQueue.current[networkName]?.includes(address)) {
                 fetchQueue.current[networkName]?.push(address);
@@ -70,7 +91,10 @@ const useAssets = () => {
 
   const addFetchQueue = useCallback(
     (address: string, networkName: NetworkName) => {
-      if (AccAddress.validate(address)) {
+      if (
+        nativeTokens?.some((item) => item.address === address) ||
+        AccAddress.validate(address)
+      ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);
         }
@@ -84,10 +108,6 @@ const useAssets = () => {
 
   const getAsset = useCallback(
     (address: string): Partial<Asset> | undefined => {
-      if (isNativeTokenAddress(address)) {
-        return nativeTokens?.find((item) => item.address === address);
-      }
-
       const asset = assetStore[network.name]?.find(
         (item) => item.address === address,
       );

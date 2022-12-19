@@ -150,7 +150,17 @@ export const useAPI = () => {
       getTokenBalance,
       getVerifiedTokenInfo,
     }),
-    [getPool],
+    [
+      getToken,
+      getPairs,
+      getPair,
+      getPool,
+      simulate,
+      reverseSimulate,
+      getNativeTokenBalance,
+      getTokenBalance,
+      getVerifiedTokenInfo,
+    ],
   );
 
   return api;

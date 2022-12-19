@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
-import { ellipsisCenter } from "utils";
+import { amountToValue, ceil, ellipsisCenter } from "utils";
 import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-xpla-32px.svg";
@@ -172,7 +172,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
             />
             <Row
               gutterWidth={6}
-              style={{ alignItems: "center" }}
+              style={{ display: "flex", flexGrow: 1, alignItems: "center" }}
               justify="start"
               onClick={() => {
                 if (handleSelect) {
@@ -209,6 +209,12 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 </Typography>
               </Col>
             </Row>
+            <Typography>
+              {ceil(
+                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                3,
+              )}
+            </Typography>
           </AssetItem>
         );
       }
