@@ -16,6 +16,7 @@ interface ModalProps extends ReactModal.Props {
   drawer?: boolean;
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
+  noPadding?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
 }
@@ -36,6 +37,7 @@ const defaultOverlayStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "transparent",
+  height: "100%",
 };
 
 const ModalHeader = styled.div`
@@ -65,6 +67,7 @@ function Modal({
   children,
   hasCloseButton,
   hasGoBackButton,
+  noPadding,
   onGoBack,
   title,
   drawer,
@@ -102,6 +105,8 @@ function Modal({
       <Container
         css={css`
           width: 100%;
+          display: block;
+          height: 100%;
         `}
       >
         <Panel
@@ -110,6 +115,8 @@ function Modal({
             drawer
               ? {
                   paddingBottom: 0,
+                  height: "100%",
+                  display: "block",
                 }
               : {}
           }
@@ -122,6 +129,7 @@ function Modal({
               : {}),
             maxHeight: "80vh",
             overflowY: "auto",
+            ...(noPadding && { padding: 0 }),
           }}
         >
           <ModalHeader>

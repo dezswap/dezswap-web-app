@@ -5,8 +5,12 @@ import { VerifiedAssets } from "types/token";
 
 const assetsAtom = atomWithStorage<{
   [K in NetworkName]?: Asset[];
-}>("assets", {});
+}>("assets", { mainnet: [], testnet: [] });
 
 export const verifiedAssetsAtom = atom<VerifiedAssets | undefined>(undefined);
+
+export const bookmarksAtom = atomWithStorage<{
+  [K in NetworkName]?: string[];
+}>("bookmarks", { mainnet: [], testnet: [] });
 
 export default assetsAtom;

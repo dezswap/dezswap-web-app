@@ -28,7 +28,7 @@ const Label = styled.button`
   text-align: left;
   cursor: pointer;
 
-  .mobile & {
+  .xs & {
     padding: 16px;
     padding-bottom: 14px;
   }
@@ -51,7 +51,7 @@ const Label = styled.button`
       transform: translateY(-50%) rotate(180deg);
     }
 
-    .mobile & {
+    .xs & {
       right: 16px;
     }
   }
@@ -76,7 +76,7 @@ const Content = styled.div`
     padding-top: 5px;
     padding-bottom: 12px;
     max-height: 600px;
-    .mobile & {
+    .xs & {
       padding: 12px 16px;
       max-height: 300px;
     }

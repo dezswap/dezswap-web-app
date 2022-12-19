@@ -1,5 +1,6 @@
 import {
   FormEventHandler,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -25,7 +26,7 @@ import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
 import Panel from "components/Panel";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -45,7 +46,8 @@ import { Colors } from "styles/theme/colors";
 import { useModal } from "hooks/useModal";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
-import { Asset } from "types/common";
+import Modal from "components/Modal";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -62,13 +64,56 @@ enum FormKey {
 
 const DISPLAY_DECIMAL = 3;
 
+function SelectAssetDrawer({
+  isOpen,
+  children,
+}: {
+  isOpen: boolean;
+  children: ReactNode;
+}) {
+  const screenClass = useScreenClass();
+  return screenClass === MOBILE_SCREEN_CLASS ? (
+    <Modal drawer isOpen={isOpen} noPadding>
+      {isOpen && children}
+    </Modal>
+  ) : (
+    <Drawer isOpen={isOpen} position="absolute" anchor="right">
+      <Panel
+        noPadding
+        wrapperStyle={{ height: "100%", display: "block" }}
+        css={css`
+          height: 100%;
+          background-color: transparent;
+          border: none;
+
+          & > * {
+            transition: transform 1s cubic-bezier(0, 1, 0, 1),
+              opacity 1s cubic-bezier(0, 1, 0, 1);
+            ${isOpen
+              ? css`
+                  transform: scale(1);
+                  opacity: 1;
+                `
+              : css`
+                  transform: scale(1.2);
+                  opacity: 0;
+                `}
+          }
+        `}
+      >
+        {isOpen && children}
+      </Panel>
+    </Drawer>
+  );
+}
+
 function SwapPage() {
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { availableAssetAddresses, getPairedAddresses, findPair, pairs } =
     usePairs();
-  const { assets, getAsset } = useAssets();
+  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const network = useNetwork();
   const connectWalletModal = useModal(false);
@@ -115,10 +160,12 @@ function SwapPage() {
     message?: "error" | "warning";
   }>(() => {
     const percentage = simulationResult
-      ? ceil(
-          (Number(simulationResult.spreadAmount) * 100) /
-            Number(simulationResult.estimatedAmount),
-          DISPLAY_DECIMAL,
+      ? Number(
+          ceil(
+            (Number(simulationResult.spreadAmount) * 100) /
+              Number(simulationResult.estimatedAmount),
+            DISPLAY_DECIMAL,
+          ),
         )
       : 0;
 
@@ -141,7 +188,7 @@ function SwapPage() {
       color: theme.colors.text.primary,
       message: undefined,
     };
-  }, [simulationResult]);
+  }, [simulationResult, theme]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);
@@ -178,7 +225,7 @@ function SwapPage() {
       ],
     };
   }, [
-    simulationResult.estimatedAmount,
+    simulationResult,
     connectedWallet,
     selectedPair,
     asset1,
@@ -215,7 +262,7 @@ function SwapPage() {
     }
 
     return "Enter an amount";
-  }, [asset1Value]);
+  }, [asset1, asset1BalanceMinusFee, asset1Value]);
 
   useEffect(() => {
     if (
@@ -232,13 +279,13 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee]);
+  }, [asset1, asset1Address, asset1BalanceMinusFee, asset1Value, form]);
 
   useEffect(() => {
     setTimeout(() => {
       form.trigger();
     }, 100);
-  }, [asset1Balance, asset2Balance]);
+  }, [asset1Balance, asset2Balance, form]);
 
   useEffect(() => {
     if (simulationResult?.estimatedAmount) {
@@ -290,55 +337,37 @@ function SwapPage() {
 
   return (
     <>
-      <Drawer isOpen={isSelectAssetOpen} position="absolute" anchor="right">
-        <Panel
-          css={css`
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            border: none;
-
-            & > * {
-              transition: transform 1s cubic-bezier(0, 1, 0, 1),
-                opacity 1s cubic-bezier(0, 1, 0, 1);
-              ${isSelectAssetOpen
-                ? css`
-                    transform: scale(1);
-                    opacity: 1;
-                  `
-                : css`
-                    transform: scale(1.2);
-                    opacity: 0;
-                  `}
+      <SelectAssetDrawer isOpen={isSelectAssetOpen}>
+        <SelectAssetForm
+          goBackOnSelect
+          addressList={availableAssetAddresses.addresses?.map((address) => ({
+            address,
+            isLP: false,
+          }))}
+          hasBackButton
+          selectedAssetAddress={
+            selectAsset1Modal.isOpen
+              ? asset1?.address || ""
+              : asset2?.address || ""
+          }
+          onSelect={(address) => {
+            const target = selectAsset1Modal.isOpen
+              ? FormKey.asset1Address
+              : FormKey.asset2Address;
+            const oppositeTarget = selectAsset1Modal.isOpen
+              ? FormKey.asset2Address
+              : FormKey.asset1Address;
+            if (
+              formData[oppositeTarget] === address ||
+              !findPair([address, formData[oppositeTarget] || ""])
+            ) {
+              form.setValue(oppositeTarget, "");
             }
-          `}
-        >
-          <SelectAssetForm
-            goBackOnSelect
-            assets={assets?.map((a) => getAsset(a.address) as Asset)}
-            hasBackButton
-            selectedAssetAddress={
-              selectAsset1Modal.isOpen ? asset1?.address : asset2?.address
-            }
-            onSelect={(asset) => {
-              const target = selectAsset1Modal.isOpen
-                ? FormKey.asset1Address
-                : FormKey.asset2Address;
-              const oppositeTarget = selectAsset1Modal.isOpen
-                ? FormKey.asset2Address
-                : FormKey.asset1Address;
-              if (
-                formData[oppositeTarget] === asset.address ||
-                !findPair([asset.address, formData[oppositeTarget] || ""])
-              ) {
-                form.setValue(oppositeTarget, "");
-              }
-              form.setValue(target, asset.address);
-            }}
-            onGoBack={() => navigate(-1)}
-          />
-        </Panel>
-      </Drawer>
+            form.setValue(target, address);
+          }}
+          onGoBack={() => navigate(-1)}
+        />
+      </SelectAssetDrawer>
       <Wrapper onSubmit={handleSubmit}>
         <Box
           css={css`
@@ -423,7 +452,10 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {amountToValue(asset1Balance, DISPLAY_DECIMAL) || ""}
+                    {ceil(
+                      amountToValue(asset1Balance || 0, asset1?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -538,7 +570,7 @@ function SwapPage() {
           css={css`
             margin-top: 5px;
             margin-bottom: 24px;
-            .mobile & {
+            .xs & {
               margin-bottom: 20px;
             }
           `}
@@ -611,7 +643,10 @@ function SwapPage() {
                       cursor: pointer;
                     `}
                   >
-                    {amountToValue(asset2Balance, DISPLAY_DECIMAL) || ""}
+                    {ceil(
+                      amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -684,7 +719,7 @@ function SwapPage() {
           <Expand
             label={
               <Typography size={14} weight="bold">
-                1{asset1?.symbol} ={" "}
+                {asset1 && `1 ${asset1.symbol} = `}
                 {simulationResult?.estimatedAmount
                   ? ceil(
                       (amountToNumber(
