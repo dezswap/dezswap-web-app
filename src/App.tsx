@@ -1,23 +1,32 @@
 import { Route, Routes } from "react-router-dom";
 import routes, { RouteObject } from "routes";
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 import {
   setConfiguration as setGridConfiguration,
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { verifiedAssetsAtom } from "stores/assets";
 import { useAPI } from "hooks/useAPI";
 import MainLayout from "layout/Main";
+import disclaimerLastSeenAtom from "stores/disclaimer";
+import DisclaimerModal from "components/Modal/DisclaimerModal";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
+  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
   const api = useAPI();
   const screenClass = useScreenClass();
+  const isDisclaimerAgreed = useMemo(() => {
+    if (!disclaimerLastSeen) return false;
+    const date = new Date();
+    date.setDate(date.getDate() - 3);
+    return disclaimerLastSeen > date;
+  }, [disclaimerLastSeen]);
 
   useEffect(() => {
     SCREEN_CLASSES.forEach((item) => {
@@ -51,7 +60,8 @@ function App() {
     <>
       <GlobalStyles />
       <MainLayout>
-        <Routes>{routes.map(renderRoute)}</Routes>
+        <DisclaimerModal isOpen={!isDisclaimerAgreed} />
+        {isDisclaimerAgreed && <Routes>{routes.map(renderRoute)}</Routes>}
       </MainLayout>
     </>
   );
