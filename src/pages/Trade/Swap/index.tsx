@@ -10,7 +10,12 @@ import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
 import useAssets from "hooks/useAssets";
-import { amountToNumber, amountToValue, ceil, valueToAmount } from "utils";
+import {
+  amountToNumber,
+  amountToValue,
+  cutDecimal,
+  valueToAmount,
+} from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
@@ -161,7 +166,7 @@ function SwapPage() {
   }>(() => {
     const percentage = simulationResult
       ? Number(
-          ceil(
+          cutDecimal(
             (Number(simulationResult.spreadAmount) * 100) /
               Number(simulationResult.estimatedAmount),
             DISPLAY_DECIMAL,
@@ -452,7 +457,7 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {ceil(
+                    {cutDecimal(
                       amountToValue(asset1Balance || 0, asset1?.decimals) || 0,
                       DISPLAY_DECIMAL,
                     )}
@@ -643,7 +648,7 @@ function SwapPage() {
                       cursor: pointer;
                     `}
                   >
-                    {ceil(
+                    {cutDecimal(
                       amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
                       DISPLAY_DECIMAL,
                     )}
@@ -721,7 +726,7 @@ function SwapPage() {
               <Typography size={14} weight="bold">
                 {asset1 && `1 ${asset1.symbol} = `}
                 {simulationResult?.estimatedAmount
-                  ? ceil(
+                  ? cutDecimal(
                       (amountToNumber(
                         simulationResult.estimatedAmount,
                         asset2?.decimals,

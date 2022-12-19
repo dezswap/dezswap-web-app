@@ -9,8 +9,8 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
-export const ceil = (value: Numeric.Input, decimals: number) =>
-  (Math.ceil(Number(value) * 10 ** decimals) / 10 ** decimals).toFixed(
+export const cutDecimal = (value: Numeric.Input, decimals: number) =>
+  (Math.floor(Number(value) * 10 ** decimals) / 10 ** decimals).toFixed(
     decimals,
   );
 
