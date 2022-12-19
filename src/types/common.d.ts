@@ -22,6 +22,7 @@ export type NetworkName = "testnet" | "mainnet";
 export interface Asset extends TokenInfo {
   address: string;
   iconSrc?: string;
+  balance: string;
   updatedAt?: Date | string | number;
 }
 
