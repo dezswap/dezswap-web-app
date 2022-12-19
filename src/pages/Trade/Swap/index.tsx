@@ -71,14 +71,16 @@ const DISPLAY_DECIMAL = 3;
 
 function SelectAssetDrawer({
   isOpen,
+  onGoBack,
   children,
 }: {
   isOpen: boolean;
+  onGoBack?(): void;
   children: ReactNode;
 }) {
   const screenClass = useScreenClass();
   return screenClass === MOBILE_SCREEN_CLASS ? (
-    <Modal drawer isOpen={isOpen} noPadding>
+    <Modal drawer isOpen={isOpen} noPadding onGoBack={onGoBack}>
       {isOpen && children}
     </Modal>
   ) : (
@@ -342,7 +344,10 @@ function SwapPage() {
 
   return (
     <>
-      <SelectAssetDrawer isOpen={isSelectAssetOpen}>
+      <SelectAssetDrawer
+        isOpen={isSelectAssetOpen}
+        onGoBack={() => navigate(-1)}
+      >
         <SelectAssetForm
           goBackOnSelect
           addressList={availableAssetAddresses.addresses?.map((address) => ({
