@@ -538,7 +538,7 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$0
+                =$-
               </Typography>
             </Col>
           </Row>
@@ -720,7 +720,7 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$0
+                =$-
               </Typography>
             </Col>
           </Row>
