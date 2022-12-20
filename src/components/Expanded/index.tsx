@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
 const Label = styled.button`
   width: 100%;
-  height: auto;
+  height: 48px;
   position: relative;
   background-color: ${({ theme }) => theme.colors.text.background};
   border: none;

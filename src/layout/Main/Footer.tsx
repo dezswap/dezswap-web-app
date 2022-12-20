@@ -26,6 +26,9 @@ const Wrapper = styled.footer`
   height: auto;
   position: relative;
   padding: 30px 0;
+  .${MOBILE_SCREEN_CLASS} & {
+    padding: 22px 0;
+  }
 `;
 
 const Content = styled.div`
