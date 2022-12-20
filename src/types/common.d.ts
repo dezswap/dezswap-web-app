@@ -29,3 +29,16 @@ export interface Asset extends TokenInfo {
 export interface PairExtended extends Pair {
   asset_addresses: string[];
 }
+
+export interface BlockHeader {
+  height: string;
+}
+
+export interface BlockInfo {
+  header: BlockHeader;
+}
+
+export interface LatestBlock {
+  blockId: string;
+  block: BlockInfo;
+}

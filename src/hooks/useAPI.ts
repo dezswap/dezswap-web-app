@@ -12,6 +12,7 @@ import axios from "axios";
 import { TokenInfo, VerifiedTokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
+import { LatestBlock } from "types/common";
 
 interface TokenBalance {
   balance: string;
@@ -138,6 +139,13 @@ export const useAPI = () => {
     return data;
   }, []);
 
+  const getLatestBlockHeight = useCallback(async () => {
+    const { data } = await axios.get<LatestBlock>(
+      `${network.lcd}/blocks/latest`,
+    );
+    return data.block.header.height;
+  }, [network.lcd]);
+
   const api = useMemo(
     () => ({
       getToken,
@@ -149,6 +157,7 @@ export const useAPI = () => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getLatestBlockHeight,
     }),
     [
       getToken,
@@ -160,6 +169,7 @@ export const useAPI = () => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getLatestBlockHeight,
     ],
   );
 
