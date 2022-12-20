@@ -39,10 +39,12 @@ import { useNetwork } from "hooks/useNetwork";
 import Box from "components/Box";
 import Modal from "components/Modal";
 import Copy from "components/Copy";
+import Banner from "components/Banner";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
 export const MOBILE_HEADER_HEIGHT = 65;
+export const BANNER_HEIGHT = 31;
 export const DISPLAY_DECIMAL = 2;
 
 const Wrapper = styled.header`
@@ -225,240 +227,257 @@ function Header() {
   }, []);
 
   return (
-    <Wrapper ref={wrapperRef}>
-      <div>
-        <Container>
-          <Row justify="between" align="center" gutterWidth={10}>
-            <Col xs="content">
-              <Logo />
-            </Col>
-            {[SMALL_BROWSER_SCREEN_CLASS, LARGE_BROWSER_SCREEN_CLASS].includes(
-              screenClass,
-            ) && (
-              <Col width={293}>
-                <NavBar
-                  items={navLinks.map((item) => ({
-                    key: item.path,
-                    to: item.path,
-                    children: (
-                      <Typography size={18} weight={900} color="primary">
-                        {item.label}
-                      </Typography>
-                    ),
-                  }))}
-                  flex={false}
-                />
+    <>
+      {connectedWallet?.network.name === "testnet" && (
+        <Banner>
+          <span
+            css={css`
+              font-style: normal;
+              font-weight: 900;
+              font-size: 14px;
+              line-height: ${BANNER_HEIGHT}px;
+            `}
+          >
+            TESTNET
+          </span>
+        </Banner>
+      )}
+      <Wrapper ref={wrapperRef}>
+        <div>
+          <Container>
+            <Row justify="between" align="center" gutterWidth={10}>
+              <Col xs="content">
+                <Logo />
               </Col>
-            )}
-            <Col xs="content">
-              <Row justify="end" align="center" gutterWidth={10}>
-                <Col width="auto">
-                  <IconButton
-                    title="Notification"
-                    size={45}
-                    icons={{
-                      default: iconNotification,
-                      hover: iconNotificationHover,
-                    }}
+              {[
+                SMALL_BROWSER_SCREEN_CLASS,
+                LARGE_BROWSER_SCREEN_CLASS,
+              ].includes(screenClass) && (
+                <Col width={293}>
+                  <NavBar
+                    items={navLinks.map((item) => ({
+                      key: item.path,
+                      to: item.path,
+                      children: (
+                        <Typography size={18} weight={900} color="primary">
+                          {item.label}
+                        </Typography>
+                      ),
+                    }))}
+                    flex={false}
                   />
                 </Col>
-                <Col width="auto">
-                  {connectedWallet ? (
-                    <WalletInfo
-                      title="My wallet"
-                      isOpen={walletPopover.isOpen}
-                      onGoBack={() => walletPopover.close()}
-                      connectButton={
-                        <Button onClick={walletPopover.toggle}>
-                          {screenClass === MOBILE_SCREEN_CLASS
-                            ? ellipsisCenter(connectedWallet.walletAddress)
-                            : `${ellipsisCenter(
-                                connectedWallet.walletAddress,
-                              )} | ${cutDecimal(
-                                amountToValue(balance) || 0,
-                                DISPLAY_DECIMAL,
-                              )}${XPLA_SYMBOL}`}
-                          <IconButton
-                            size={22}
-                            icons={{ default: iconDropdown }}
-                          />
-                        </Button>
-                      }
-                    >
-                      <>
-                        <Hr size={1} />
-                        <Row
-                          direction="column"
-                          nogutter
-                          css={css`
-                            padding-top: 11px;
-                            text-align: left;
-                          `}
-                        >
-                          <Col
-                            style={{
-                              flex: "unset",
-                              paddingTop:
-                                screenClass === MOBILE_SCREEN_CLASS
-                                  ? "9px"
-                                  : "0px",
-                            }}
+              )}
+              <Col xs="content">
+                <Row justify="end" align="center" gutterWidth={10}>
+                  <Col width="auto">
+                    <IconButton
+                      title="Notification"
+                      size={45}
+                      icons={{
+                        default: iconNotification,
+                        hover: iconNotificationHover,
+                      }}
+                    />
+                  </Col>
+                  <Col width="auto">
+                    {connectedWallet ? (
+                      <WalletInfo
+                        title="My wallet"
+                        isOpen={walletPopover.isOpen}
+                        onGoBack={() => walletPopover.close()}
+                        connectButton={
+                          <Button onClick={walletPopover.toggle}>
+                            {screenClass === MOBILE_SCREEN_CLASS
+                              ? ellipsisCenter(connectedWallet.walletAddress)
+                              : `${ellipsisCenter(
+                                  connectedWallet.walletAddress,
+                                )} | ${cutDecimal(
+                                  amountToValue(balance) || 0,
+                                  DISPLAY_DECIMAL,
+                                )}${XPLA_SYMBOL}`}
+                            <IconButton
+                              size={22}
+                              icons={{ default: iconDropdown }}
+                            />
+                          </Button>
+                        }
+                      >
+                        <>
+                          <Hr size={1} />
+                          <Row
+                            direction="column"
+                            nogutter
+                            css={css`
+                              padding-top: 11px;
+                              text-align: left;
+                            `}
                           >
-                            <Typography
-                              color={theme.colors.primary}
-                              weight={900}
+                            <Col
+                              style={{
+                                flex: "unset",
+                                paddingTop:
+                                  screenClass === MOBILE_SCREEN_CLASS
+                                    ? "9px"
+                                    : "0px",
+                              }}
                             >
-                              Your address
-                            </Typography>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "10px" }}>
-                            <Row nogutter align="center">
-                              <Col width="auto">
-                                <IconButton
-                                  size={24}
-                                  icons={{ default: iconXpla }}
-                                />
-                              </Col>
-                              <Col style={{ paddingLeft: "4px" }}>
-                                <Typography
-                                  size={16}
-                                  color={theme.colors.primary}
-                                  weight="bold"
-                                >
-                                  Wallet name
-                                </Typography>
-                              </Col>
-                              <Col width="auto">
-                                <a
-                                  href={getWalletLink(
-                                    connectedWallet.walletAddress,
-                                    network.name,
-                                  )}
-                                >
+                              <Typography
+                                color={theme.colors.primary}
+                                weight={900}
+                              >
+                                Your address
+                              </Typography>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "10px" }}>
+                              <Row nogutter align="center">
+                                <Col width="auto">
                                   <IconButton
-                                    size={18}
-                                    icons={{ default: iconLink }}
+                                    size={24}
+                                    icons={{ default: iconXpla }}
                                   />
-                                </a>
-                              </Col>
-                            </Row>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "4px" }}>
-                            <Box
-                              css={css`
-                                padding: 12px;
-                                font-weight: bold;
-                                text-align: center;
-                              `}
-                            >
-                              {screenClass === MOBILE_SCREEN_CLASS ? (
-                                <Row
-                                  justify="center"
-                                  align="center"
-                                  css={css`
-                                    display: flex;
-                                    justify-content: space-between;
-                                  `}
-                                >
-                                  <Col>
-                                    {ellipsisCenter(
-                                      connectedWallet?.walletAddress,
-                                      10,
+                                </Col>
+                                <Col style={{ paddingLeft: "4px" }}>
+                                  <Typography
+                                    size={16}
+                                    color={theme.colors.primary}
+                                    weight="bold"
+                                  >
+                                    Wallet name
+                                  </Typography>
+                                </Col>
+                                <Col width="auto">
+                                  <a
+                                    href={getWalletLink(
+                                      connectedWallet.walletAddress,
+                                      network.name,
                                     )}
-                                  </Col>
-                                  <Col width="auto">
-                                    <Copy
-                                      value={connectedWallet?.walletAddress}
+                                  >
+                                    <IconButton
+                                      size={18}
+                                      icons={{ default: iconLink }}
                                     />
-                                  </Col>
-                                </Row>
-                              ) : (
-                                ellipsisCenter(
-                                  connectedWallet?.walletAddress,
-                                  10,
-                                )
-                              )}
-                            </Box>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "20px" }}>
-                            <Typography
-                              color={theme.colors.primary}
-                              weight={900}
-                            >
-                              Balance
-                            </Typography>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "20px" }}>
-                            <Row nogutter justify="start" align="center">
-                              <Col width="auto">
-                                <IconButton
-                                  size={24}
-                                  icons={{ default: iconXpla }}
-                                />
-                              </Col>
-                              <Col style={{ paddingLeft: "4px" }}>
+                                  </a>
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "4px" }}>
+                              <Box
+                                css={css`
+                                  padding: 12px;
+                                  font-weight: bold;
+                                  text-align: center;
+                                `}
+                              >
+                                {screenClass === MOBILE_SCREEN_CLASS ? (
+                                  <Row
+                                    justify="center"
+                                    align="center"
+                                    css={css`
+                                      display: flex;
+                                      justify-content: space-between;
+                                    `}
+                                  >
+                                    <Col>
+                                      {ellipsisCenter(
+                                        connectedWallet?.walletAddress,
+                                        10,
+                                      )}
+                                    </Col>
+                                    <Col width="auto">
+                                      <Copy
+                                        value={connectedWallet?.walletAddress}
+                                      />
+                                    </Col>
+                                  </Row>
+                                ) : (
+                                  ellipsisCenter(
+                                    connectedWallet?.walletAddress,
+                                    10,
+                                  )
+                                )}
+                              </Box>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "20px" }}>
+                              <Typography
+                                color={theme.colors.primary}
+                                weight={900}
+                              >
+                                Balance
+                              </Typography>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "20px" }}>
+                              <Row nogutter justify="start" align="center">
+                                <Col width="auto">
+                                  <IconButton
+                                    size={24}
+                                    icons={{ default: iconXpla }}
+                                  />
+                                </Col>
+                                <Col style={{ paddingLeft: "4px" }}>
+                                  <Typography
+                                    size={16}
+                                    color={theme.colors.primary}
+                                    weight="bold"
+                                  >
+                                    {XPLA_SYMBOL}
+                                  </Typography>
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "4px" }}>
+                              <Box>
                                 <Typography
-                                  size={16}
-                                  color={theme.colors.primary}
+                                  size={18}
+                                  color={theme.colors.text.primary}
                                   weight="bold"
                                 >
-                                  {XPLA_SYMBOL}
+                                  {amountToValue(balance)}
                                 </Typography>
-                              </Col>
-                            </Row>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "4px" }}>
-                            <Box>
-                              <Typography
-                                size={18}
-                                color={theme.colors.text.primary}
-                                weight="bold"
+                                <Typography
+                                  color={theme.colors.text.secondary}
+                                  weight="normal"
+                                >
+                                  = $-
+                                </Typography>
+                              </Box>
+                            </Col>
+                            <Col style={{ flex: "unset", paddingTop: "20px" }}>
+                              <Button
+                                variant="secondary"
+                                css={css`
+                                  width: 100%;
+                                  background-color: ${theme.colors.text
+                                    .background};
+                                `}
+                                onClick={() => wallet.disconnect()}
                               >
-                                {amountToValue(balance)}
-                              </Typography>
-                              <Typography
-                                color={theme.colors.text.secondary}
-                                weight="normal"
-                              >
-                                = $-
-                              </Typography>
-                            </Box>
-                          </Col>
-                          <Col style={{ flex: "unset", paddingTop: "20px" }}>
-                            <Button
-                              variant="secondary"
-                              css={css`
-                                width: 100%;
-                                background-color: ${theme.colors.text
-                                  .background};
-                              `}
-                              onClick={() => wallet.disconnect()}
-                            >
-                              Disconnect
-                            </Button>
-                          </Col>
-                        </Row>
-                      </>
-                    </WalletInfo>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      onClick={() => connectWalletModal.open()}
-                    >
-                      Connect Wallet
-                    </Button>
-                  )}
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-          <ConnectWalletModal
-            isOpen={connectWalletModal.isOpen}
-            onRequestClose={() => connectWalletModal.close()}
-          />
-        </Container>
-      </div>
-    </Wrapper>
+                                Disconnect
+                              </Button>
+                            </Col>
+                          </Row>
+                        </>
+                      </WalletInfo>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        onClick={() => connectWalletModal.open()}
+                      >
+                        Connect Wallet
+                      </Button>
+                    )}
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <ConnectWalletModal
+              isOpen={connectWalletModal.isOpen}
+              onRequestClose={() => connectWalletModal.close()}
+            />
+          </Container>
+        </div>
+      </Wrapper>
+    </>
   );
 }
 

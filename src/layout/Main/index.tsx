@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import Header, {
   DEFAULT_HEADER_HEIGHT,
   MOBILE_HEADER_HEIGHT,
+  BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
 import IconButton from "components/IconButton";
@@ -17,10 +18,12 @@ import Footer from "./Footer";
 const Wrapper = styled.div`
   position: relative;
   padding-bottom: 96px;
-  min-height: ${`calc(100vh - ${DEFAULT_HEADER_HEIGHT}px)`};
+  min-height: ${`calc(100vh - ${
+    DEFAULT_HEADER_HEIGHT + BANNER_HEIGHT + 96
+  }px)`};
   .${MOBILE_SCREEN_CLASS} & {
     padding-bottom: unset;
-    min-height: ${`calc(100vh - ${MOBILE_HEADER_HEIGHT}px)`};
+    min-height: ${`calc(100vh - ${MOBILE_HEADER_HEIGHT + BANNER_HEIGHT}px)`};
   }
 `;
 
