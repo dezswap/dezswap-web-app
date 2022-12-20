@@ -318,25 +318,6 @@ function SwapPage() {
   );
 
   useEffect(() => {
-    if (!asset1Address && !asset2Address) {
-      const pair = pairs?.[0];
-      if (pair) {
-        form.setValue(FormKey.asset1Address, pair.asset_addresses[0]);
-        form.setValue(FormKey.asset2Address, pair.asset_addresses[1]);
-      }
-    }
-  }, [asset1Address, asset2Address, form, pairs]);
-
-  useEffect(() => {
-    const pair = pairs?.[0];
-    if (pair) {
-      form.setValue(FormKey.asset1Address, pair.asset_addresses[0]);
-      form.setValue(FormKey.asset2Address, pair.asset_addresses[1]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network.name]);
-
-  useEffect(() => {
     if (asset1Address === XPLA_ADDRESS) {
       form.trigger(FormKey.asset1Value);
     }
@@ -418,7 +399,11 @@ function SwapPage() {
                             `}
                           />
                         )}
-                        <Typography size={16} weight="bold">
+                        <Typography
+                          size={16}
+                          weight="bold"
+                          style={{ paddingLeft: asset1 ? "0px" : "5px" }}
+                        >
                           {asset1?.symbol || "Select token"}
                         </Typography>
                       </>
@@ -619,7 +604,11 @@ function SwapPage() {
                             `}
                           />
                         )}
-                        <Typography size={16} weight="bold">
+                        <Typography
+                          size={16}
+                          weight="bold"
+                          style={{ paddingLeft: asset2 ? "0px" : "5px" }}
+                        >
                           {asset2?.symbol || "Select token"}
                         </Typography>
                       </>
