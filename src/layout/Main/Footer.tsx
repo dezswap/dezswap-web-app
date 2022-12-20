@@ -16,6 +16,10 @@ import iconDocsHover from "assets/icons/icon-docs-hover.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
+import { useLatestBlock } from "hooks/useLatestBlock";
+import { getBlockLink } from "utils";
+import { useNetwork } from "hooks/useNetwork";
+import Tooltip from "../../components/Tooltip";
 
 const Wrapper = styled.footer`
   width: 100%;
@@ -96,30 +100,46 @@ const socialMediaLinks = [
 ];
 
 function Footer() {
+  const network = useNetwork();
+  const latestBlock = useLatestBlock();
   return (
     <Wrapper>
       <Container>
         <Content>
-          <div>
-            <Button
-              variant="default"
+          <Tooltip
+            arrow
+            placement="top"
+            content="The most recent block number on this network. Prices update on every block."
+            css={css`
+              width: 250px;
+            `}
+          >
+            <a
+              href={latestBlock ? getBlockLink(latestBlock, network.name) : ""}
               css={css`
-                height: 36px;
+                text-decoration: none;
               `}
             >
-              <Badge />
-              &nbsp;
-              <span
+              <Button
+                variant="default"
                 css={css`
-                  font-size: 12px;
+                  height: 36px;
                 `}
               >
-                #1234567
-              </span>
-              &nbsp;
-              <IconButton icons={{ default: iconLink }} size={16} />
-            </Button>
-          </div>
+                <Badge />
+                &nbsp;
+                <span
+                  css={css`
+                    font-size: 12px;
+                  `}
+                >
+                  #{latestBlock}
+                </span>
+                &nbsp;
+                <IconButton icons={{ default: iconLink }} size={16} />
+              </Button>
+            </a>
+          </Tooltip>
           <div>
             <SocialMediaLinks>
               {socialMediaLinks.map((item) => (

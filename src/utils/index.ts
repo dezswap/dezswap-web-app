@@ -72,5 +72,8 @@ export const amountToNumber = (value?: Numeric.Input, decimals = 18) => {
   }
 };
 
+export const getBlockLink = (height?: string, network?: string) =>
+  `https://explorer.xpla.io/${network}/block/${height}`;
+
 export const getTransactionLink = (txHash?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/tx/${txHash}`;
