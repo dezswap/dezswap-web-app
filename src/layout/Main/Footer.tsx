@@ -19,7 +19,7 @@ import { css } from "@emotion/react";
 import { useLatestBlock } from "hooks/useLatestBlock";
 import { getBlockLink } from "utils";
 import { useNetwork } from "hooks/useNetwork";
-import Tooltip from "../../components/Tooltip";
+import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.footer`
   width: 100%;
@@ -59,7 +59,7 @@ const SocialMediaLinks = styled.div`
 const socialMediaLinks = [
   {
     name: "Medium",
-    url: "#", // TODO: Add Medium link
+    url: "https://medium.com/@dezswap",
     icons: {
       default: iconMedium,
       hover: iconMediumHover,
@@ -67,7 +67,7 @@ const socialMediaLinks = [
   },
   {
     name: "Twitter",
-    url: "#", // TODO: Add Twitter link
+    url: "https://twitter.com/dezswap",
     icons: {
       default: iconTwitter,
       hover: iconTwitterHover,
@@ -83,7 +83,7 @@ const socialMediaLinks = [
   },
   {
     name: "GitHub",
-    url: "#", // TODO: Add GitHub link
+    url: "https://github.com/dezswap",
     icons: {
       default: iconGitHub,
       hover: iconGitHubHover,
@@ -91,7 +91,7 @@ const socialMediaLinks = [
   },
   {
     name: "Documents",
-    url: "#", // TODO: Add Documents link
+    url: "https://docs.dezswap.io",
     icons: {
       default: iconDocs,
       hover: iconDocsHover,
