@@ -392,12 +392,11 @@ function SwapPage() {
                               width: 20px;
                               height: 20px;
                               position: relative;
-                              background-image: ${`url(${
-                                asset1?.iconSrc || iconDefaultAsset
-                              })`};
-                              background-position: 50% 50%;
-                              background-size: contain;
-                              background-repeat: no-repeat;
+                              background-image: url(${asset1?.iconSrc}),
+                                url(${iconDefaultAsset});
+                              background-position: 50% 50%, 50% 50%;
+                              background-size: auto 15px, contain;
+                              background-repeat: no-repeat, no-repeat;
                             `}
                           />
                         )}
@@ -597,12 +596,11 @@ function SwapPage() {
                               width: 20px;
                               height: 20px;
                               position: relative;
-                              background-image: ${`url(${
-                                asset2?.iconSrc || iconDefaultAsset
-                              })`};
-                              background-position: 50% 50%;
-                              background-size: contain;
-                              background-repeat: no-repeat;
+                              background-image: url(${asset2?.iconSrc}),
+                                url(${iconDefaultAsset});
+                              background-position: 50% 50%, 50% 50%;
+                              background-size: auto 15px, contain;
+                              background-repeat: no-repeat, no-repeat;
                             `}
                           />
                         )}

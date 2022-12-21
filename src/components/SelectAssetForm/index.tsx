@@ -6,7 +6,7 @@ import Typography from "components/Typography";
 import { amountToValue, cutDecimal, ellipsisCenter } from "utils";
 import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
-import iconToken from "assets/icons/icon-xpla-32px.svg";
+import iconToken from "assets/icons/icon-default-token.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
 import Hr from "components/Hr";
@@ -109,11 +109,11 @@ const AssetIcon = styled.div<{ src?: string }>`
   display: inline-block;
 
   ${({ src }) => css`
-    background-image: url(${src || iconToken});
+    background-image: url(${src}), url(${iconToken});
   `};
-  background-size: contain;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
+  background-size: auto 24px, contain;
+  background-position: 50% 50%, 50% 50%;
+  background-repeat: no-repeat, no-repeat;
 `;
 
 const tabs = [
