@@ -261,6 +261,11 @@ function SwapPage() {
     asset1Balance,
     feeAmount,
   );
+  const asset2BalanceMinusFee = useBalanceMinusFee(
+    asset2Address,
+    asset2Balance,
+    feeAmount,
+  );
 
   const buttonMsg = useMemo(() => {
     if (asset1Value && Number(asset1Value) > 0) {
@@ -477,7 +482,7 @@ function SwapPage() {
           <Row justify="between" align="center">
             <Col>
               <NumberInput
-                placeholder="0.000000"
+                placeholder="0"
                 align="right"
                 size="large"
                 variant="base"
@@ -544,13 +549,7 @@ function SwapPage() {
                 const prevData = form.getValues();
                 form.setValue(FormKey.asset1Address, prevData.asset2Address);
                 form.setValue(FormKey.asset2Address, prevData.asset1Address);
-                if (!isReversed) {
-                  form.setValue(FormKey.asset2Value, prevData.asset1Value);
-                  setIsReversed(true);
-                } else {
-                  form.setValue(FormKey.asset1Value, prevData.asset2Value);
-                  setIsReversed(false);
-                }
+                setIsReversed(false);
 
                 setTimeout(() => {
                   form.trigger();
@@ -641,6 +640,17 @@ function SwapPage() {
                     css={css`
                       cursor: pointer;
                     `}
+                    onClick={() => {
+                      setIsReversed(true);
+                      form.setValue(
+                        FormKey.asset2Value,
+                        amountToValue(
+                          asset2BalanceMinusFee,
+                          asset2?.decimals,
+                        ) || "",
+                        { shouldValidate: true },
+                      );
+                    }}
                   >
                     {cutDecimal(
                       amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
@@ -671,7 +681,7 @@ function SwapPage() {
           <Row justify="between" align="center">
             <Col>
               <NumberInput
-                placeholder="0.000000"
+                placeholder="0"
                 align="right"
                 size="large"
                 variant="base"
