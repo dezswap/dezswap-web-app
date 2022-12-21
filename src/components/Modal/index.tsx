@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
@@ -14,6 +14,7 @@ ReactModal.setAppElement("#root");
 
 interface ModalProps extends ReactModal.Props {
   drawer?: boolean;
+  error?: boolean;
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
   noPadding?: boolean;
@@ -71,9 +72,11 @@ function Modal({
   onGoBack,
   title,
   drawer,
+  error,
   className: _className,
   ...modalProps
 }: ModalProps) {
+  const theme = useTheme();
   const className = useMemo(() => {
     if (drawer) {
       if (typeof _className === "string" || !_className) {
@@ -127,7 +130,11 @@ function Modal({
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
                 }
-              : {}),
+              : {
+                  borderColor: error
+                    ? theme.colors.danger
+                    : theme.colors.primary,
+                }),
             maxHeight: "80vh",
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
@@ -138,7 +145,7 @@ function Modal({
               <Typography
                 size={20}
                 weight={900}
-                color="primary"
+                color={error ? "danger" : "primary"}
                 css={{ textAlign: "center" }}
               >
                 {title}
