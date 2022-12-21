@@ -17,7 +17,7 @@ import {
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import { TxResult, useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
 import useSlippageTolerance from "hooks/stores/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
@@ -25,7 +25,6 @@ import { useBalance } from "hooks/useBalance";
 import { useFee } from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { useNetwork } from "hooks/useNetwork";
 import useHashModal from "hooks/useHashModal";
 import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
@@ -53,6 +52,8 @@ import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import Modal from "components/Modal";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import TxBroadcastingModal from "components/Modal/TxBroadcastingModal";
+import { TxError } from "types/common";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -115,6 +116,8 @@ function SelectAssetDrawer({
 }
 
 function SwapPage() {
+  const [txResult, setTxResult] = useState<TxResult>();
+  const [txError, setTxError] = useState<TxError>();
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
@@ -122,7 +125,6 @@ function SwapPage() {
     usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
-  const network = useNetwork();
   const connectWalletModal = useModal(false);
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
@@ -930,6 +932,21 @@ function SwapPage() {
         <ConnectWalletModal
           isOpen={connectWalletModal.isOpen}
           onRequestClose={() => connectWalletModal.close()}
+        />
+        <TxBroadcastingModal
+          isOpen={!!(txResult || txError)}
+          txHash={txResult?.result?.txhash}
+          txError={txError}
+          onDoneClick={() => {
+            setTxResult(undefined);
+            setTxError(undefined);
+            form.reset();
+            window.location.reload();
+          }}
+          onRetryClick={() => {
+            setTxResult(undefined);
+            setTxError(undefined);
+          }}
         />
       </Wrapper>
     </>
