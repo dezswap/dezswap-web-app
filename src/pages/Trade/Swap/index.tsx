@@ -121,8 +121,7 @@ function SwapPage() {
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
-  const { availableAssetAddresses, getPairedAddresses, findPair, pairs } =
-    usePairs();
+  const { availableAssetAddresses, findPair } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useModal(false);
@@ -249,7 +248,6 @@ function SwapPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-    errMsg,
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
