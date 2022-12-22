@@ -9,7 +9,7 @@ import {
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
-import { TokenInfo, VerifiedTokenInfo } from "types/token";
+import { TokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
 import { LatestBlock } from "types/common";
@@ -50,7 +50,7 @@ export const useAPI = () => {
 
       return res;
     },
-    [lcd],
+    [lcd.wasm, network.name],
   );
 
   const getPair = useCallback(

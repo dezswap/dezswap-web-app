@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "@emotion/styled";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
