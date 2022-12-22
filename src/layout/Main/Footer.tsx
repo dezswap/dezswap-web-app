@@ -14,7 +14,7 @@ import iconGitHubHover from "assets/icons/icon-github-hover.svg";
 import iconDocs from "assets/icons/icon-docs.svg";
 import iconDocsHover from "assets/icons/icon-docs-hover.svg";
 import iconLink from "assets/icons/icon-link.svg";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
 import { useLatestBlock } from "hooks/useLatestBlock";
 import { getBlockLink } from "utils";
@@ -26,7 +26,8 @@ const Wrapper = styled.footer`
   height: auto;
   position: relative;
   padding: 30px 0;
-  .${MOBILE_SCREEN_CLASS} & {
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
     padding: 22px 0;
   }
 `;
@@ -41,7 +42,8 @@ const Content = styled.div`
   align-items: center;
   gap: 30px;
 
-  .${MOBILE_SCREEN_CLASS} & {
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
     flex-direction: column;
   }
 `;
@@ -119,11 +121,14 @@ function Footer() {
           >
             <a
               href={latestBlock ? getBlockLink(latestBlock, network.name) : ""}
+              target="_blank"
+              rel="noreferrer noopener"
               css={css`
                 text-decoration: none;
               `}
             >
               <Button
+                as="span"
                 variant="default"
                 css={css`
                   height: 36px;
@@ -139,7 +144,7 @@ function Footer() {
                   #{latestBlock}
                 </span>
                 &nbsp;
-                <IconButton icons={{ default: iconLink }} size={16} />
+                <IconButton as="span" icons={{ default: iconLink }} size={16} />
               </Button>
             </a>
           </Tooltip>
