@@ -117,6 +117,17 @@ const Logo = styled.div`
   }
 `;
 
+const NavBarWrapper = styled.div`
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 293px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
 const navLinks = [
   {
     path: "/",
@@ -228,17 +239,22 @@ function Header() {
 
   return (
     <>
-      {connectedWallet?.network.name === "testnet" && (
-        <Banner>
+      {connectedWallet?.network.name !== "mainnet" && (
+        <Banner
+          css={css`
+            padding: 0;
+          `}
+        >
           <span
             css={css`
               font-style: normal;
               font-weight: 900;
               font-size: 14px;
               line-height: ${BANNER_HEIGHT}px;
+              text-transform: uppercase;
             `}
           >
-            TESTNET
+            {connectedWallet?.network.name}
           </span>
         </Banner>
       )}
@@ -253,7 +269,7 @@ function Header() {
                 SMALL_BROWSER_SCREEN_CLASS,
                 LARGE_BROWSER_SCREEN_CLASS,
               ].includes(screenClass) && (
-                <Col width={293}>
+                <NavBarWrapper>
                   <NavBar
                     items={navLinks.map((item) => ({
                       key: item.path,
@@ -266,7 +282,7 @@ function Header() {
                     }))}
                     flex={false}
                   />
-                </Col>
+                </NavBarWrapper>
               )}
               <Col xs="content">
                 <Row justify="end" align="center" gutterWidth={10}>

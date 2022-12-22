@@ -13,17 +13,20 @@ import iconTrade from "assets/icons/icon-trade.svg";
 import iconPool from "assets/icons/icon-pool.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import Footer from "./Footer";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
   padding-bottom: 96px;
-  min-height: ${`calc(100vh - ${
-    DEFAULT_HEADER_HEIGHT + BANNER_HEIGHT + 96
-  }px)`};
+  min-height: ${({ hasBanner }) =>
+    `calc(100vh - ${
+      DEFAULT_HEADER_HEIGHT + (hasBanner ? BANNER_HEIGHT : 0)
+    }px)`};
+  .${TABLET_SCREEN_CLASS} &,
   .${MOBILE_SCREEN_CLASS} & {
     padding-bottom: unset;
-    min-height: ${`calc(100vh - ${MOBILE_HEADER_HEIGHT + BANNER_HEIGHT}px)`};
+    min-height: unset;
   }
 `;
 
@@ -53,7 +56,8 @@ const FooterWrapper = styled.div`
   left: 0;
   bottom: 0;
 
-  .${MOBILE_SCREEN_CLASS} & {
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
     position: relative;
   }
 `;
@@ -94,10 +98,11 @@ const navBar = (
 
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
+  const connectedWallet = useConnectedWallet();
   return (
     <>
       <Header />
-      <Wrapper>
+      <Wrapper hasBanner={connectedWallet?.network.name !== "mainnet"}>
         {children}
         <FooterWrapper>
           <Footer />
