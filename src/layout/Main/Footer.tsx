@@ -80,7 +80,7 @@ const socialMediaLinks = [
   },
   {
     name: "Discord",
-    url: "#", // TODO: Add Discord link
+    url: "https://discord.gg/ZQ2ps5H64t",
     icons: {
       default: iconDiscord,
       hover: iconDiscordHover,

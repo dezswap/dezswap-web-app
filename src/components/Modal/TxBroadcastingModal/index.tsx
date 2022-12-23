@@ -16,6 +16,7 @@ import { useNetwork } from "hooks/useNetwork";
 import Typography from "components/Typography";
 import { Col, Row } from "react-grid-system";
 import IconButton from "components/IconButton";
+import Hr from "components/Hr";
 
 interface TxBroadcastingModalProps {
   txHash?: string;
@@ -69,7 +70,12 @@ function TxBroadcastingModal({
   return (
     <>
       {!txInfo && txHash && (
-        <Modal isOpen={isOpen} title="Broadcasting transaction" {...modalProps}>
+        <Modal
+          isOpen={isOpen}
+          title="Broadcasting transaction"
+          onRequestClose={onDoneClick}
+          {...modalProps}
+        >
           <div
             css={css`
               text-align: center;
@@ -78,7 +84,7 @@ function TxBroadcastingModal({
             <object
               type="image/svg+xml"
               data={BroadcastingSvg}
-              style={{ height: "166px", margin: "-10px 0px" }}
+              style={{ height: "170px", margin: "-10px 0px" }}
             >
               broadcasting
             </object>
@@ -100,11 +106,15 @@ function TxBroadcastingModal({
                   </Typography>
                 </Col>
               </Row>
-              <Row style={{ justifyContent: "space-between" }}>
-                <Col width="auto">
+              <Row
+                direction="row"
+                wrap="nowrap"
+                style={{ justifyContent: "space-between" }}
+              >
+                <Col width="auto" style={{ flexShrink: "0" }}>
                   <Typography>Tx Hash</Typography>
                 </Col>
-                <Col width="auto">
+                <Col>
                   <a
                     href={getTransactionLink(txHash, network.name)}
                     target="_blank"
@@ -127,14 +137,16 @@ function TxBroadcastingModal({
                           weight="bold"
                           color={theme.colors.link}
                           css={css`
-                            border-bottom: 1px solid ${theme.colors.link};
-                            padding-bottom: 0px;
+                            text-decoration: underline;
+                            text-underline-offset: 3px;
+                            word-break: break-all;
+                            text-align: right;
                           `}
                         >
                           {ellipsisCenter(txHash, 10)}
                         </Typography>
                       </Col>
-                      <Col width="auto">
+                      <Col width="auto" style={{ flexShrink: "0" }}>
                         <IconButton size={24} icons={{ default: iconLink }} />
                       </Col>
                     </Row>
@@ -146,7 +158,12 @@ function TxBroadcastingModal({
         </Modal>
       )}
       {txInfo && txHash && (
-        <Modal isOpen={isOpen} title="Complete" {...modalProps}>
+        <Modal
+          isOpen={isOpen}
+          title="Complete"
+          onRequestClose={onDoneClick}
+          {...modalProps}
+        >
           <div
             css={css`
               text-align: center;
@@ -155,7 +172,7 @@ function TxBroadcastingModal({
             <object
               type="image/svg+xml"
               data={Success}
-              style={{ width: "450px", margin: "-20px 0px" }}
+              style={{ height: "170px", margin: "-10px 0px" }}
             >
               broadcasting
             </object>
@@ -166,8 +183,8 @@ function TxBroadcastingModal({
                 background-color: ${theme.colors.text.background};
               `}
             >
-              <Row style={{ justifyContent: "space-between" }}>
-                <Col width="auto">
+              <Row wrap="nowrap" style={{ justifyContent: "space-between" }}>
+                <Col width="auto" style={{ flexShrink: "0" }}>
                   <Typography>Tx Hash</Typography>
                 </Col>
                 <Col width="auto">
@@ -193,8 +210,10 @@ function TxBroadcastingModal({
                           weight="bold"
                           color={theme.colors.link}
                           css={css`
-                            border-bottom: 1px solid ${theme.colors.link};
-                            padding-bottom: 0px;
+                            text-decoration: underline;
+                            text-underline-offset: 3px;
+                            word-break: break-all;
+                            text-align: right;
                           `}
                         >
                           {ellipsisCenter(txHash, 10)}
@@ -212,7 +231,13 @@ function TxBroadcastingModal({
         </Modal>
       )}
       {txError && (
-        <Modal error isOpen={isOpen} title="Something wrong" {...modalProps}>
+        <Modal
+          error
+          isOpen={isOpen}
+          title="Something wrong"
+          onRequestClose={onDoneClick}
+          {...modalProps}
+        >
           <div
             css={css`
               text-align: center;
@@ -221,7 +246,7 @@ function TxBroadcastingModal({
             <object
               type="image/svg+xml"
               data={Failed}
-              style={{ width: "450px", margin: "-20px 0px" }}
+              style={{ height: "170px", margin: "-10px 0px" }}
             >
               broadcasting
             </object>
@@ -233,8 +258,25 @@ function TxBroadcastingModal({
                 border-color: ${theme.colors.danger};
               `}
             >
-              <Typography size={16} color={theme.colors.danger} weight="normal">
-                User denied
+              <Typography
+                color={theme.colors.danger}
+                weight="bold"
+                css={css`
+                  padding-bottom: 10px;
+                `}
+              >
+                The transaction failed. Please check the message below.
+              </Typography>
+              <Hr color="danger" size={1} />
+              <Typography
+                size={16}
+                color={theme.colors.danger}
+                weight="normal"
+                css={css`
+                  padding-top: 10px;
+                `}
+              >
+                {txError.message}
               </Typography>
             </Panel>
           </div>
