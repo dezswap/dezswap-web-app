@@ -20,7 +20,7 @@ const useBalanceMinusFee = (
     } else {
       setAsset1BalanceMinusFee("0");
     }
-  }, [address, balance, feeAmount]);
+  }, [balance, feeAmount]);
 
   return useMemo(() => {
     return balanceMinusFee;

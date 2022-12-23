@@ -186,6 +186,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       };
     }, [decimals]);
 
-    return <Input ref={inputRef} type="text" {...InputProps} />;
+    return <Input ref={inputRef} {...InputProps} />;
   },
 );
