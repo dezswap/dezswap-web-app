@@ -256,15 +256,13 @@ function SwapPage() {
     asset1Balance,
     feeAmount,
   );
-  const asset2BalanceMinusFee = useBalanceMinusFee(
-    asset2Address,
-    asset2Balance,
-    feeAmount,
-  );
 
   const buttonMsg = useMemo(() => {
     if (asset1Value && Number(asset1Value) > 0) {
-      if (Number(asset1Value) > Number(asset1BalanceMinusFee)) {
+      if (
+        Number(asset1Value) >
+        Number(amountToValue(asset1BalanceMinusFee, asset1?.decimals))
+      ) {
         return `Insufficient ${asset1?.name} balance`;
       }
       return "swap";
@@ -275,7 +273,9 @@ function SwapPage() {
 
   useEffect(() => {
     if (
+      !isReversed &&
       asset1Address === XPLA_ADDRESS &&
+      !Number.isNaN(Number(asset1Value)) &&
       Numeric.parse(asset1Value || 0)
         .mul(10 ** (asset1?.decimals || 0))
         .gt(Numeric.parse(asset1BalanceMinusFee || 0))
@@ -288,7 +288,7 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1, asset1Address, asset1BalanceMinusFee, asset1Value, form]);
+  }, [asset1BalanceMinusFee, asset1Value, form]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -546,8 +546,8 @@ function SwapPage() {
               icons={{ default: iconSwap, hover: iconSwapHover }}
               onClick={() => {
                 const prevData = form.getValues();
-                form.setValue(FormKey.asset1Address, prevData.asset2Address);
                 form.setValue(FormKey.asset2Address, prevData.asset1Address);
+                form.setValue(FormKey.asset1Address, prevData.asset2Address);
                 setIsReversed(false);
 
                 setTimeout(() => {
@@ -639,17 +639,6 @@ function SwapPage() {
                     css={css`
                       cursor: pointer;
                     `}
-                    onClick={() => {
-                      setIsReversed(true);
-                      form.setValue(
-                        FormKey.asset2Value,
-                        amountToValue(
-                          asset2BalanceMinusFee,
-                          asset2?.decimals,
-                        ) || "",
-                        { shouldValidate: true },
-                      );
-                    }}
                   >
                     {cutDecimal(
                       amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
@@ -817,7 +806,7 @@ function SwapPage() {
                   align-items: center;
                 `}
               >
-                <Typography color={theme.colors.text.primary}>Gas</Typography>
+                <Typography color={theme.colors.text.primary}>Fee</Typography>
                 <Tooltip
                   arrow
                   placement="right"
@@ -899,7 +888,13 @@ function SwapPage() {
                 `}
               >
                 {spread.rate}%
-                <IconButton size={22} icons={{ default: iconInfo }} />
+                <Tooltip
+                  arrow
+                  placement="top"
+                  content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
+                >
+                  <IconButton size={22} icons={{ default: iconInfo }} />
+                </Tooltip>
               </Col>
             </Row>
           </Message>

@@ -37,6 +37,17 @@ function App() {
   }, [screenClass]);
 
   useEffect(() => {
+    document.addEventListener("wheel", () => {
+      if (
+        document.activeElement instanceof HTMLInputElement &&
+        document.activeElement.type === "number"
+      ) {
+        document.activeElement.blur();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     api.getVerifiedTokenInfo().then((assets) => {
       setKnownAssets(assets);
     });
