@@ -18,6 +18,7 @@ interface ModalProps extends ReactModal.Props {
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
   noPadding?: boolean;
+  overlay?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
 }
@@ -72,11 +73,25 @@ function Modal({
   onGoBack,
   title,
   drawer,
+  overlay = true,
   error,
   className: _className,
+  overlayClassName: _overlayClassName,
   ...modalProps
 }: ModalProps) {
   const theme = useTheme();
+  const overlayClassName = useMemo(() => {
+    if (!overlay) {
+      if (typeof _overlayClassName === "string" || !_overlayClassName) {
+        return `${_overlayClassName || ""} no-overlay`;
+      }
+      return {
+        ..._overlayClassName,
+        base: `${_overlayClassName.base || ""} no-overlay`,
+      };
+    }
+    return _overlayClassName;
+  }, [_overlayClassName, overlay]);
   const className = useMemo(() => {
     if (drawer) {
       if (typeof _className === "string" || !_className) {
@@ -92,6 +107,7 @@ function Modal({
   return (
     <ReactModal
       className={className}
+      overlayClassName={overlayClassName}
       closeTimeoutMS={200}
       onRequestClose={onGoBack}
       style={{

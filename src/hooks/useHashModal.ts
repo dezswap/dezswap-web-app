@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const useHashModal = (customId?: string) => {
@@ -14,17 +14,20 @@ const useHashModal = (customId?: string) => {
     return location.hash === `#${hookId}`;
   }, [location, hookId]);
 
-  const open = (flag = true) => {
-    if (flag) {
-      if (!isOpen) {
-        navigate({ hash: hookId });
+  const open = useCallback(
+    (flag = true) => {
+      if (flag) {
+        if (!isOpen) {
+          navigate({ hash: hookId });
+        }
+        return;
       }
-      return;
-    }
-    navigate({ hash: undefined });
-  };
+      navigate({ hash: undefined });
+    },
+    [hookId, isOpen, navigate],
+  );
 
-  const close = () => open(false);
+  const close = useCallback(() => open(false), [open]);
 
   return { isOpen, open, close };
 };

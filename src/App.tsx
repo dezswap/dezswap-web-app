@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import routes, { RouteObject } from "routes";
-import { useCallback, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 import {
   setConfiguration as setGridConfiguration,
@@ -13,12 +13,14 @@ import { useAPI } from "hooks/useAPI";
 import MainLayout from "layout/Main";
 import disclaimerLastSeenAtom from "stores/disclaimer";
 import DisclaimerModal from "components/Modal/DisclaimerModal";
+import globalElementsAtom from "stores/globalElements";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
   const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
+  const globalElements = useAtomValue(globalElementsAtom);
   const api = useAPI();
   const screenClass = useScreenClass();
   const isDisclaimerAgreed = useMemo(() => {
@@ -63,6 +65,9 @@ function App() {
         <DisclaimerModal isOpen={!isDisclaimerAgreed} />
         {isDisclaimerAgreed && <Routes>{routes.map(renderRoute)}</Routes>}
       </MainLayout>
+      {globalElements.map(({ element, id }) => (
+        <Fragment key={id}>{element}</Fragment>
+      ))}
     </>
   );
 }

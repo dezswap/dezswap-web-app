@@ -18,7 +18,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import { useModal } from "hooks/useModal";
-import ConnectWalletModal from "components/ConnectWalletModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
 import {
   amountToValue,
@@ -40,6 +39,7 @@ import Box from "components/Box";
 import Modal from "components/Modal";
 import Copy from "components/Copy";
 import Banner from "components/Banner";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -217,11 +217,11 @@ function Header() {
   const screenClass = useScreenClass();
   const wallet = useWallet();
   const connectedWallet = useConnectedWallet();
-  const connectWalletModal = useModal(false);
   const balance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const theme = useTheme();
   const network = useNetwork();
+  const connectWalletModal = useConnectWalletModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -359,7 +359,7 @@ function Header() {
                                     color={theme.colors.primary}
                                     weight="bold"
                                   >
-                                    Wallet name
+                                    {connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
@@ -486,10 +486,6 @@ function Header() {
                 </Row>
               </Col>
             </Row>
-            <ConnectWalletModal
-              isOpen={connectWalletModal.isOpen}
-              onRequestClose={() => connectWalletModal.close()}
-            />
           </Container>
         </div>
       </Wrapper>

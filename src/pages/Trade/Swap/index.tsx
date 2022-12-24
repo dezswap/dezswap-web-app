@@ -17,9 +17,9 @@ import {
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { TxResult, useConnectedWallet } from "@xpla/wallet-provider";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
-import useSlippageTolerance from "hooks/stores/useSlippageTolerance";
+import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import { useBalance } from "hooks/useBalance";
 import { useFee } from "hooks/useFee";
@@ -47,13 +47,11 @@ import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
 import Box from "components/Box";
 import { Colors } from "styles/theme/colors";
-import { useModal } from "hooks/useModal";
-import ConnectWalletModal from "components/ConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import Modal from "components/Modal";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import TxBroadcastingModal from "components/Modal/TxBroadcastingModal";
-import { TxError } from "types/common";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useRequestPost from "hooks/useRequestPost";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -116,18 +114,17 @@ function SelectAssetDrawer({
 }
 
 function SwapPage() {
-  const [txResult, setTxResult] = useState<TxResult>();
-  const [txError, setTxError] = useState<TxError>();
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { availableAssetAddresses, findPair } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
-  const connectWalletModal = useModal(false);
+  const connectWalletModal = useConnectWalletModal();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
+  const { requestPost } = useRequestPost();
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -315,11 +312,15 @@ function SwapPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target) {
-        /* TODO: implement */
+      if (event.target && createTxOptions && fee) {
+        requestPost({
+          txOptions: createTxOptions,
+          fee,
+          formElement: event.target as HTMLFormElement,
+        });
       }
     },
-    [],
+    [createTxOptions, fee, requestPost],
   );
 
   useEffect(() => {
@@ -416,7 +417,7 @@ function SwapPage() {
                 ]}
               />
             </Col>
-            <Col>
+            <Col className="cm-hidden">
               <Copy value={asset1Address} />
             </Col>
             <Col
@@ -614,7 +615,7 @@ function SwapPage() {
                 ]}
               />
             </Col>
-            <Col>
+            <Col className="cm-hidden">
               <Copy value={asset2Address} />
             </Col>
             <Col
@@ -935,25 +936,6 @@ function SwapPage() {
             Connect Wallet
           </Button>
         )}
-        <ConnectWalletModal
-          isOpen={connectWalletModal.isOpen}
-          onRequestClose={() => connectWalletModal.close()}
-        />
-        <TxBroadcastingModal
-          isOpen={!!(txResult || txError)}
-          txHash={txResult?.result?.txhash}
-          txError={txError}
-          onDoneClick={() => {
-            setTxResult(undefined);
-            setTxError(undefined);
-            form.reset();
-            window.location.reload();
-          }}
-          onRetryClick={() => {
-            setTxResult(undefined);
-            setTxError(undefined);
-          }}
-        />
       </Wrapper>
     </>
   );

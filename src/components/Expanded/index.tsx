@@ -51,6 +51,10 @@ const Label = styled.button`
       transform: translateY(-50%) rotate(180deg);
     }
 
+    .cm & {
+      display: none;
+    }
+
     .xs & {
       right: 16px;
     }
@@ -72,7 +76,8 @@ const Content = styled.div`
   transition: max-height 0.25s cubic-bezier(0, 1, 0, 1),
     padding-top 1s cubic-bezier(0, 1, 0, 1),
     padding-bottom 1s cubic-bezier(0, 1, 0, 1);
-  .expanded & {
+  .expanded &,
+  .cm & {
     padding-top: 5px;
     padding-bottom: 12px;
     max-height: 600px;

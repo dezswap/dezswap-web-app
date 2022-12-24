@@ -78,6 +78,9 @@ const Wrapper = styled.button<WrapperProps>`
           css`
             transform: rotateX(-180deg);
           `}
+          .cm & {
+            display: none;
+          }
         }
       }
 

@@ -9,6 +9,7 @@ import iconOverview from "assets/icons/icon-overview-38px.svg";
 import iconOverviewHover from "assets/icons/icon-overview-38px-hover.svg";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import useSettingsModal from "hooks/modals/useSettingsModal";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -22,11 +23,12 @@ const Wrapper = styled.div`
 `;
 
 function TradePage() {
+  const settingsModal = useSettingsModal();
   return (
     <Wrapper>
       <Container>
-        <Row justify="center">
-          <Col width={500} xs={322}>
+        <Row justify="center" gutterWidth={0}>
+          <Col width={512} xs={12}>
             <Panel shadow border>
               <Row
                 css={css`
@@ -53,6 +55,7 @@ function TradePage() {
                   <IconButton
                     size={38}
                     icons={{ default: iconSetting, hover: iconSettingHover }}
+                    onClick={() => settingsModal.open()}
                   />
                 </Col>
               </Row>

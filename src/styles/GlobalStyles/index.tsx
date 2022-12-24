@@ -58,6 +58,8 @@ function GlobalStyles() {
             transition: opacity 0.125s ease-in-out, transform 0.125s ease-in-out;
             z-index: 6000;
             backdrop-filter: blur(4px);
+            position: fixed;
+            inset: 0;
             &::before {
               content: "";
               width: 100%;
@@ -86,6 +88,13 @@ function GlobalStyles() {
                   padding-left: 0 !important;
                   padding-right: 0 !important;
                 }
+              }
+            }
+
+            &.no-overlay {
+              backdrop-filter: unset;
+              &::before {
+                content: unset;
               }
             }
           }
