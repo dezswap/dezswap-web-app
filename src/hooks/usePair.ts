@@ -90,22 +90,28 @@ const usePairs = () => {
   );
 
   const availableAssetAddresses = useMemo(() => {
-    return pairs[network.name]?.data
-      ?.reduce((acc, pair) => {
-        return [...acc, ...pair.asset_addresses];
-      }, [] as string[])
-      ?.filter((asset, index, array) => array.indexOf(asset) === index);
-  }, [network, pairs]);
+    return {
+      addresses:
+        pairs[network.name]?.data
+          ?.reduce((acc, pair) => {
+            return [...acc, ...pair.asset_addresses];
+          }, [] as string[])
+          ?.filter((asset, index, array) => array.indexOf(asset) === index) ||
+        [],
+      networkName: network.name,
+    };
+  }, [pairs, network.name]);
 
   useEffect(() => {
     if (availableAssetAddresses) {
       setAssets((current) => {
-        const currentAssetList = current[network.name] || [];
+        const { addresses, networkName } = availableAssetAddresses;
+        const currentAssetList = current[networkName] || [];
         return {
           ...current,
-          [network.name]: [
+          [networkName]: [
             ...currentAssetList,
-            ...availableAssetAddresses
+            ...addresses
               .filter(
                 (address) =>
                   currentAssetList.findIndex(
@@ -119,7 +125,7 @@ const usePairs = () => {
         };
       });
     }
-  }, [availableAssetAddresses, network.name, setAssets]);
+  }, [availableAssetAddresses, setAssets]);
 
   const findPair = useCallback(
     (addresses: [string, string]) => {

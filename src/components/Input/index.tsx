@@ -6,10 +6,12 @@ import { formatDecimals } from "utils";
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";
 type InputAlign = "left" | "center" | "right" | "justify";
+type InputBorder = "none" | "solid";
 
 interface WrapperProps {
   variant?: InputVariant;
   size?: InputSize;
+  borderStyle?: InputBorder;
   align?: InputAlign;
 }
 
@@ -30,6 +32,10 @@ const Wrapper = styled.div<WrapperProps>`
   height: auto;
   position: relative;
   gap: 4px;
+
+  ${({ borderStyle = "none" }) => css`
+    border-style: ${borderStyle};
+  `}
 
   ${({ size, variant }) => {
     switch (size) {
@@ -123,9 +129,17 @@ const Wrapper = styled.div<WrapperProps>`
 `;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ variant, size, align, prefix, suffix, ...inputProps }, ref) => {
+  (
+    { variant, size, borderStyle, align, prefix, suffix, ...inputProps },
+    ref,
+  ) => {
     return (
-      <Wrapper variant={variant} size={size} align={align}>
+      <Wrapper
+        variant={variant}
+        size={size}
+        borderStyle={borderStyle}
+        align={align}
+      >
         {prefix}
         <input ref={ref} {...inputProps} />
         {suffix}

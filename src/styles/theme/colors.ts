@@ -8,6 +8,7 @@ const colors = {
   selected: "#DEE7FF",
   background: "#FFD2D9",
   white: "#ffffff",
+  link: "#5493f7",
   text: {
     primary: "#1a1a1a",
     secondary: "rgba(26, 26, 26, 0.7)",

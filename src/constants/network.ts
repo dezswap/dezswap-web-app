@@ -27,6 +27,7 @@ export const nativeTokens: Asset[] = [
     symbol: XPLA_SYMBOL,
     total_supply: "",
     iconSrc: "https://assets.xpla.io/icon/svg/XPLA.svg",
+    balance: "0",
   },
 ];
 

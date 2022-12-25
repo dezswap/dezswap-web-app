@@ -1,25 +1,34 @@
 import { Route, Routes } from "react-router-dom";
 import routes, { RouteObject } from "routes";
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 import {
   setConfiguration as setGridConfiguration,
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
-import { useSetAtom } from "jotai";
-import useMobileSize from "hooks/useMobileSize";
+import { useAtomValue, useSetAtom } from "jotai";
 import { verifiedAssetsAtom } from "stores/assets";
 import { useAPI } from "hooks/useAPI";
 import MainLayout from "layout/Main";
+import disclaimerLastSeenAtom from "stores/disclaimer";
+import DisclaimerModal from "components/Modal/DisclaimerModal";
+import globalElementsAtom from "stores/globalElements";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
-  const isMobileSize = useMobileSize();
+  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
+  const globalElements = useAtomValue(globalElementsAtom);
   const api = useAPI();
   const screenClass = useScreenClass();
+  const isDisclaimerAgreed = useMemo(() => {
+    if (!disclaimerLastSeen) return false;
+    const date = new Date();
+    date.setDate(date.getDate() - 3);
+    return disclaimerLastSeen > date;
+  }, [disclaimerLastSeen]);
 
   useEffect(() => {
     SCREEN_CLASSES.forEach((item) => {
@@ -32,16 +41,6 @@ function App() {
       setKnownAssets(assets);
     });
   }, [api, setKnownAssets]);
-
-  useLayoutEffect(() => {
-    if (isMobileSize) {
-      document.body.classList.add("mobile");
-      document.body.classList.remove("desktop");
-    } else {
-      document.body.classList.add("desktop");
-      document.body.classList.remove("mobile");
-    }
-  }, [isMobileSize]);
 
   const renderRoute = useCallback(
     ({ children, element, index, ...props }: RouteObject) => {
@@ -63,8 +62,12 @@ function App() {
     <>
       <GlobalStyles />
       <MainLayout>
-        <Routes>{routes.map(renderRoute)}</Routes>
+        <DisclaimerModal isOpen={!isDisclaimerAgreed} />
+        {isDisclaimerAgreed && <Routes>{routes.map(renderRoute)}</Routes>}
       </MainLayout>
+      {globalElements.map(({ element, id }) => (
+        <Fragment key={id}>{element}</Fragment>
+      ))}
     </>
   );
 }

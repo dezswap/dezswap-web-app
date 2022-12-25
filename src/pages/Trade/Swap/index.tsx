@@ -1,5 +1,6 @@
 import {
   FormEventHandler,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -9,23 +10,27 @@ import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
 import useAssets from "hooks/useAssets";
-import { amountToNumber, amountToValue, valueToAmount } from "utils";
+import {
+  amountToNumber,
+  amountToValue,
+  cutDecimal,
+  valueToAmount,
+} from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
-import useSlippageTolerance from "hooks/stores/useSlippageTolerance";
+import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import { useBalance } from "hooks/useBalance";
 import { useFee } from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { useNetwork } from "hooks/useNetwork";
 import useHashModal from "hooks/useHashModal";
 import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
 import Panel from "components/Panel";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -41,6 +46,12 @@ import Expand from "components/Expanded";
 import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
 import Box from "components/Box";
+import { Colors } from "styles/theme/colors";
+import Tooltip from "components/Tooltip";
+import Modal from "components/Modal";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useRequestPost from "hooks/useRequestPost";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -57,18 +68,63 @@ enum FormKey {
 
 const DISPLAY_DECIMAL = 3;
 
+function SelectAssetDrawer({
+  isOpen,
+  onGoBack,
+  children,
+}: {
+  isOpen: boolean;
+  onGoBack?(): void;
+  children: ReactNode;
+}) {
+  const screenClass = useScreenClass();
+  return screenClass === MOBILE_SCREEN_CLASS ? (
+    <Modal drawer isOpen={isOpen} noPadding onGoBack={onGoBack}>
+      {isOpen && children}
+    </Modal>
+  ) : (
+    <Drawer isOpen={isOpen} position="absolute" anchor="right">
+      <Panel
+        noPadding
+        wrapperStyle={{ height: "100%", display: "block" }}
+        css={css`
+          height: 100%;
+          background-color: transparent;
+          border: none;
+
+          & > * {
+            transition: transform 1s cubic-bezier(0, 1, 0, 1),
+              opacity 1s cubic-bezier(0, 1, 0, 1);
+            ${isOpen
+              ? css`
+                  transform: scale(1);
+                  opacity: 1;
+                `
+              : css`
+                  transform: scale(1.2);
+                  opacity: 0;
+                `}
+          }
+        `}
+      >
+        {isOpen && children}
+      </Panel>
+    </Drawer>
+  );
+}
+
 function SwapPage() {
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
-  const { availableAssetAddresses, getPairedAddresses, findPair, pairs } =
-    usePairs();
-  const { assets, getAsset } = useAssets();
+  const { availableAssetAddresses, findPair } = usePairs();
+  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
-  const network = useNetwork();
+  const connectWalletModal = useConnectWalletModal();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
+  const { requestPost } = useRequestPost();
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -102,6 +158,42 @@ function SwapPage() {
       ? valueToAmount(asset2Value, asset2?.decimals)
       : valueToAmount(asset1Value, asset1?.decimals),
   });
+
+  const spread = useMemo<{
+    rate: number;
+    color: string;
+    message?: "error" | "warning";
+  }>(() => {
+    const percentage = simulationResult
+      ? Number(
+          cutDecimal(
+            (Number(simulationResult.spreadAmount) * 100) /
+              Number(simulationResult.estimatedAmount),
+            DISPLAY_DECIMAL,
+          ),
+        )
+      : 0;
+
+    if (percentage >= 0.5) {
+      return {
+        rate: percentage,
+        color: theme.colors.danger,
+        message: "error",
+      };
+    }
+    if (percentage >= 0.3) {
+      return {
+        rate: percentage,
+        color: theme.colors.warning,
+        message: "warning",
+      };
+    }
+    return {
+      rate: percentage,
+      color: theme.colors.text.primary,
+      message: undefined,
+    };
+  }, [simulationResult, theme]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);
@@ -138,7 +230,7 @@ function SwapPage() {
       ],
     };
   }, [
-    simulationResult.estimatedAmount,
+    simulationResult,
     connectedWallet,
     selectedPair,
     asset1,
@@ -153,7 +245,6 @@ function SwapPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-    errMsg,
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
@@ -165,6 +256,22 @@ function SwapPage() {
     asset1Balance,
     feeAmount,
   );
+  const asset2BalanceMinusFee = useBalanceMinusFee(
+    asset2Address,
+    asset2Balance,
+    feeAmount,
+  );
+
+  const buttonMsg = useMemo(() => {
+    if (asset1Value && Number(asset1Value) > 0) {
+      if (Number(asset1Value) > Number(asset1BalanceMinusFee)) {
+        return `Insufficient ${asset1?.name} balance`;
+      }
+      return "swap";
+    }
+
+    return "Enter an amount";
+  }, [asset1, asset1BalanceMinusFee, asset1Value]);
 
   useEffect(() => {
     if (
@@ -181,13 +288,13 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee]);
+  }, [asset1, asset1Address, asset1BalanceMinusFee, asset1Value, form]);
 
   useEffect(() => {
     setTimeout(() => {
       form.trigger();
     }, 100);
-  }, [asset1Balance, asset2Balance]);
+  }, [asset1Balance, asset2Balance, form]);
 
   useEffect(() => {
     if (simulationResult?.estimatedAmount) {
@@ -205,31 +312,16 @@ function SwapPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target) {
-        /* TODO: implement */
+      if (event.target && createTxOptions && fee) {
+        requestPost({
+          txOptions: createTxOptions,
+          fee,
+          formElement: event.target as HTMLFormElement,
+        });
       }
     },
-    [],
+    [createTxOptions, fee, requestPost],
   );
-
-  useEffect(() => {
-    if (!asset1Address && !asset2Address) {
-      const pair = pairs?.[0];
-      if (pair) {
-        form.setValue(FormKey.asset1Address, pair.asset_addresses[0]);
-        form.setValue(FormKey.asset2Address, pair.asset_addresses[1]);
-      }
-    }
-  }, [asset1Address, asset2Address, form, pairs]);
-
-  useEffect(() => {
-    const pair = pairs?.[0];
-    if (pair) {
-      form.setValue(FormKey.asset1Address, pair.asset_addresses[0]);
-      form.setValue(FormKey.asset2Address, pair.asset_addresses[1]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network.name]);
 
   useEffect(() => {
     if (asset1Address === XPLA_ADDRESS) {
@@ -239,55 +331,40 @@ function SwapPage() {
 
   return (
     <>
-      <Drawer isOpen={isSelectAssetOpen} position="absolute" anchor="right">
-        <Panel
-          css={css`
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            border: none;
-
-            & > * {
-              transition: transform 1s cubic-bezier(0, 1, 0, 1),
-                opacity 1s cubic-bezier(0, 1, 0, 1);
-              ${isSelectAssetOpen
-                ? css`
-                    transform: scale(1);
-                    opacity: 1;
-                  `
-                : css`
-                    transform: scale(1.2);
-                    opacity: 0;
-                  `}
+      <SelectAssetDrawer
+        isOpen={isSelectAssetOpen}
+        onGoBack={() => navigate(-1)}
+      >
+        <SelectAssetForm
+          goBackOnSelect
+          addressList={availableAssetAddresses.addresses?.map((address) => ({
+            address,
+            isLP: false,
+          }))}
+          hasBackButton
+          selectedAssetAddress={
+            selectAsset1Modal.isOpen
+              ? asset1?.address || ""
+              : asset2?.address || ""
+          }
+          onSelect={(address) => {
+            const target = selectAsset1Modal.isOpen
+              ? FormKey.asset1Address
+              : FormKey.asset2Address;
+            const oppositeTarget = selectAsset1Modal.isOpen
+              ? FormKey.asset2Address
+              : FormKey.asset1Address;
+            if (
+              formData[oppositeTarget] === address ||
+              !findPair([address, formData[oppositeTarget] || ""])
+            ) {
+              form.setValue(oppositeTarget, "");
             }
-          `}
-        >
-          <SelectAssetForm
-            goBackOnSelect
-            assets={assets}
-            hasBackButton
-            selectedAssetAddress={
-              selectAsset1Modal.isOpen ? asset1?.address : asset2?.address
-            }
-            onSelect={(asset) => {
-              const target = selectAsset1Modal.isOpen
-                ? FormKey.asset1Address
-                : FormKey.asset2Address;
-              const oppositeTarget = selectAsset1Modal.isOpen
-                ? FormKey.asset2Address
-                : FormKey.asset1Address;
-              if (
-                formData[oppositeTarget] === asset.address ||
-                !findPair([asset.address, formData[oppositeTarget] || ""])
-              ) {
-                form.setValue(oppositeTarget, "");
-              }
-              form.setValue(target, asset.address);
-            }}
-            onGoBack={() => navigate(-1)}
-          />
-        </Panel>
-      </Drawer>
+            form.setValue(target, address);
+          }}
+          onGoBack={() => navigate(-1)}
+        />
+      </SelectAssetDrawer>
       <Wrapper onSubmit={handleSubmit}>
         <Box
           css={css`
@@ -295,7 +372,7 @@ function SwapPage() {
           `}
         >
           <Row
-            nogutter
+            gutterWidth={2}
             justify="between"
             align="center"
             css={css`
@@ -319,16 +396,19 @@ function SwapPage() {
                               width: 20px;
                               height: 20px;
                               position: relative;
-                              background-image: ${`url(${
-                                asset1?.iconSrc || iconDefaultAsset
-                              })`};
-                              background-position: 50% 50%;
-                              background-size: contain;
-                              background-repeat: no-repeat;
+                              background-image: url(${asset1?.iconSrc}),
+                                url(${iconDefaultAsset});
+                              background-position: 50% 50%, 50% 50%;
+                              background-size: auto 15px, contain;
+                              background-repeat: no-repeat, no-repeat;
                             `}
                           />
                         )}
-                        <Typography size={16} weight="bold">
+                        <Typography
+                          size={16}
+                          weight="bold"
+                          style={{ paddingLeft: asset1 ? "0px" : "5px" }}
+                        >
                           {asset1?.symbol || "Select token"}
                         </Typography>
                       </>
@@ -337,7 +417,7 @@ function SwapPage() {
                 ]}
               />
             </Col>
-            <Col>
+            <Col className="cm-hidden">
               <Copy value={asset1Address} />
             </Col>
             <Col
@@ -372,7 +452,10 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {amountToValue(asset1Balance, DISPLAY_DECIMAL) || ""}
+                    {cutDecimal(
+                      amountToValue(asset1Balance || 0, asset1?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -398,7 +481,7 @@ function SwapPage() {
           <Row justify="between" align="center">
             <Col>
               <NumberInput
-                placeholder="0.000000"
+                placeholder="0"
                 align="right"
                 size="large"
                 variant="base"
@@ -406,10 +489,10 @@ function SwapPage() {
                   onChange: () => {
                     setIsReversed(false);
                   },
-                  required: "Required",
+                  required: true,
                   min: {
                     value: Number(amountToValue(1, asset1?.decimals) || 0),
-                    message: "Please enter a number greater than zero.",
+                    message: "",
                   },
                   max: {
                     value: asset1BalanceMinusFee
@@ -418,8 +501,7 @@ function SwapPage() {
                           asset1?.decimals,
                         ) || 0
                       : Infinity,
-                    message:
-                      "Please enter a number equal to or less than balance.",
+                    message: "",
                   },
                 })}
                 readOnly={isReversed && simulationResult.isLoading}
@@ -446,7 +528,7 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$0
+                =$-
               </Typography>
             </Col>
           </Row>
@@ -466,13 +548,7 @@ function SwapPage() {
                 const prevData = form.getValues();
                 form.setValue(FormKey.asset1Address, prevData.asset2Address);
                 form.setValue(FormKey.asset2Address, prevData.asset1Address);
-                if (!isReversed) {
-                  form.setValue(FormKey.asset2Value, prevData.asset1Value);
-                  setIsReversed(true);
-                } else {
-                  form.setValue(FormKey.asset1Value, prevData.asset2Value);
-                  setIsReversed(false);
-                }
+                setIsReversed(false);
 
                 setTimeout(() => {
                   form.trigger();
@@ -488,13 +564,13 @@ function SwapPage() {
           css={css`
             margin-top: 5px;
             margin-bottom: 24px;
-            .mobile & {
+            .xs & {
               margin-bottom: 20px;
             }
           `}
         >
           <Row
-            nogutter
+            gutterWidth={2}
             justify="between"
             align="center"
             css={css`
@@ -518,17 +594,20 @@ function SwapPage() {
                               width: 20px;
                               height: 20px;
                               position: relative;
-                              background-image: ${`url(${
-                                asset2?.iconSrc || iconDefaultAsset
-                              })`};
-                              background-position: 50% 50%;
-                              background-size: contain;
-                              background-repeat: no-repeat;
+                              background-image: url(${asset2?.iconSrc}),
+                                url(${iconDefaultAsset});
+                              background-position: 50% 50%, 50% 50%;
+                              background-size: auto 15px, contain;
+                              background-repeat: no-repeat, no-repeat;
                             `}
                           />
                         )}
-                        <Typography size={16} weight="bold">
-                          {asset2?.symbol || "Select"}
+                        <Typography
+                          size={16}
+                          weight="bold"
+                          style={{ paddingLeft: asset2 ? "0px" : "5px" }}
+                        >
+                          {asset2?.symbol || "Select token"}
                         </Typography>
                       </>
                     ),
@@ -536,7 +615,7 @@ function SwapPage() {
                 ]}
               />
             </Col>
-            <Col>
+            <Col className="cm-hidden">
               <Copy value={asset2Address} />
             </Col>
             <Col
@@ -560,8 +639,22 @@ function SwapPage() {
                     css={css`
                       cursor: pointer;
                     `}
+                    onClick={() => {
+                      setIsReversed(true);
+                      form.setValue(
+                        FormKey.asset2Value,
+                        amountToValue(
+                          asset2BalanceMinusFee,
+                          asset2?.decimals,
+                        ) || "",
+                        { shouldValidate: true },
+                      );
+                    }}
                   >
-                    {amountToValue(asset2Balance, DISPLAY_DECIMAL) || ""}
+                    {cutDecimal(
+                      amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
+                      DISPLAY_DECIMAL,
+                    )}
                   </Typography>
                 </Col>
               </Row>
@@ -587,7 +680,7 @@ function SwapPage() {
           <Row justify="between" align="center">
             <Col>
               <NumberInput
-                placeholder="0.000000"
+                placeholder="0"
                 align="right"
                 size="large"
                 variant="base"
@@ -595,11 +688,10 @@ function SwapPage() {
                   onChange: () => {
                     setIsReversed(true);
                   },
-                  required: "Required",
+                  required: true,
                   min: {
                     value: Number(amountToValue(1, asset2?.decimals) || 0),
-                    message:
-                      "The amount of received asset should be greater than zero.",
+                    message: "",
                   },
                 })}
                 readOnly={!isReversed && simulationResult.isLoading}
@@ -626,7 +718,7 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$0
+                =$-
               </Typography>
             </Col>
           </Row>
@@ -635,7 +727,17 @@ function SwapPage() {
           <Expand
             label={
               <Typography size={14} weight="bold">
-                1{asset1?.symbol} = 1{asset2?.symbol}
+                {asset1 && `1 ${asset1.symbol} = `}
+                {simulationResult?.estimatedAmount
+                  ? cutDecimal(
+                      (amountToNumber(
+                        simulationResult.estimatedAmount,
+                        asset2?.decimals,
+                      ) || 0) / Number(asset1Value),
+                      DISPLAY_DECIMAL,
+                    )
+                  : ""}
+                {asset2?.symbol}
               </Typography>
             }
             isExpanded={false}
@@ -651,16 +753,29 @@ function SwapPage() {
                 <Typography color={theme.colors.text.primary}>
                   Expected Amount
                 </Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Expected quantity to be received based on the current price, maximum spread and trading fee"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
+                width="auto"
                 css={css`
                   display: flex;
                   justify-content: flex-end;
                 `}
               >
                 <Typography color={theme.colors.text.primary}>
-                  1.02{asset1?.symbol}
+                  {simulationResult?.estimatedAmount
+                    ? amountToValue(
+                        simulationResult?.estimatedAmount,
+                        asset2?.decimals,
+                      )
+                    : ""}
+                  {asset2?.symbol}
                 </Typography>
               </Col>
             </Row>
@@ -675,7 +790,13 @@ function SwapPage() {
                 <Typography color={theme.colors.text.primary}>
                   Spread
                 </Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Fee paid due to the difference between market price and estimated price"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 css={css`
@@ -683,8 +804,8 @@ function SwapPage() {
                   justify-content: flex-end;
                 `}
               >
-                <Typography weight="bold" color={theme.colors.danger}>
-                  0.5%
+                <Typography weight="bold" color={spread.color as keyof Colors}>
+                  {spread.rate}%
                 </Typography>
               </Col>
             </Row>
@@ -697,16 +818,25 @@ function SwapPage() {
                 `}
               >
                 <Typography color={theme.colors.text.primary}>Gas</Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Fee paid to execute this transaction"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
+                width="auto"
                 css={css`
                   display: flex;
                   justify-content: flex-end;
                 `}
               >
                 <Typography color={theme.colors.text.primary}>
-                  1.02XPLA
+                  {feeAmount
+                    ? `${amountToValue(feeAmount) || ""}${XPLA_SYMBOL}`
+                    : ""}
                 </Typography>
               </Col>
             </Row>
@@ -719,7 +849,13 @@ function SwapPage() {
                 `}
               >
                 <Typography color={theme.colors.text.primary}>Route</Typography>
-                <IconButton size={22} icons={{ default: iconQuestion }} />
+                <Tooltip
+                  arrow
+                  placement="right"
+                  content="Optimized route for your optimal gain"
+                >
+                  <IconButton size={22} icons={{ default: iconQuestion }} />
+                </Tooltip>
               </Col>
               <Col
                 width="auto"
@@ -735,37 +871,39 @@ function SwapPage() {
             </Row>
           </Expand>
         </div>
-        <Message variant="error">
-          <Row
-            justify="between"
-            nogutter
-            css={css`
-              width: 100%;
-            `}
-          >
-            <Col
+        {spread.message && (
+          <Message variant={spread.message}>
+            <Row
+              justify="between"
+              nogutter
               css={css`
-                text-align: left;
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
+                width: 100%;
               `}
             >
-              Spread Warning
-            </Col>
-            <Col
-              css={css`
-                text-align: right;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-              `}
-            >
-              0.5%
-              <IconButton size={22} icons={{ default: iconInfo }} />
-            </Col>
-          </Row>
-        </Message>
+              <Col
+                css={css`
+                  text-align: left;
+                  display: flex;
+                  justify-content: flex-start;
+                  align-items: center;
+                `}
+              >
+                Spread Warning
+              </Col>
+              <Col
+                css={css`
+                  text-align: right;
+                  display: flex;
+                  justify-content: flex-end;
+                  align-items: center;
+                `}
+              >
+                {spread.rate}%
+                <IconButton size={22} icons={{ default: iconInfo }} />
+              </Col>
+            </Row>
+          </Message>
+        )}
         {connectedWallet ? (
           <Button
             type="submit"
@@ -783,7 +921,7 @@ function SwapPage() {
               margin-top: 20px;
             `}
           >
-            Swap
+            {buttonMsg}
           </Button>
         ) : (
           <Button
@@ -793,6 +931,7 @@ function SwapPage() {
             css={css`
               margin-top: 20px;
             `}
+            onClick={() => connectWalletModal.open()}
           >
             Connect Wallet
           </Button>

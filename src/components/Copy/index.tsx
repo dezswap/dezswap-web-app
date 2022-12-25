@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import iconCopy from "assets/icons/icon-copy.svg";
+import iconCopyHover from "assets/icons/icon-copy-hover.svg";
 import { useCallback, useRef } from "react";
+import Tooltip from "components/Tooltip";
 
 type CopyProps = React.PropsWithChildren<{
   value?: string;
@@ -33,10 +35,15 @@ const CopyIcon = styled.div`
   width: 32px;
   height: 32px;
   position: relative;
+  cursor: pointer;
   background-image: url(${iconCopy});
   background-position: 50% 50%;
   background-size: contain;
   background-repeat: no-repeat;
+
+  &:hover {
+    background-image: url(${iconCopyHover});
+  }
 `;
 
 function Copy({ value, children }: CopyProps) {
@@ -63,7 +70,11 @@ function Copy({ value, children }: CopyProps) {
   return (
     <Wrapper onClick={handleClick}>
       <textarea ref={inputRef} value={value} readOnly />
-      {children || <CopyIcon />}
+      {children || (
+        <Tooltip arrow content="Copied!" trigger="click">
+          <CopyIcon />
+        </Tooltip>
+      )}
     </Wrapper>
   );
 }

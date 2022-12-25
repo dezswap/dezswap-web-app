@@ -9,9 +9,10 @@ import {
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
-import { TokenInfo, VerifiedTokenInfo } from "types/token";
+import { TokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
+import { LatestBlock } from "types/common";
 
 interface TokenBalance {
   balance: string;
@@ -49,7 +50,7 @@ export const useAPI = () => {
 
       return res;
     },
-    [lcd],
+    [lcd.wasm, network.name],
   );
 
   const getPair = useCallback(
@@ -138,6 +139,13 @@ export const useAPI = () => {
     return data;
   }, []);
 
+  const getLatestBlockHeight = useCallback(async () => {
+    const { data } = await axios.get<LatestBlock>(
+      `${network.lcd}/blocks/latest`,
+    );
+    return data.block.header.height;
+  }, [network.lcd]);
+
   const api = useMemo(
     () => ({
       getToken,
@@ -149,8 +157,20 @@ export const useAPI = () => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getLatestBlockHeight,
     }),
-    [getPool],
+    [
+      getToken,
+      getPairs,
+      getPair,
+      getPool,
+      simulate,
+      reverseSimulate,
+      getNativeTokenBalance,
+      getTokenBalance,
+      getVerifiedTokenInfo,
+      getLatestBlockHeight,
+    ],
   );
 
   return api;

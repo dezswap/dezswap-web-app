@@ -1,61 +1,77 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useAPI } from "hooks/useAPI";
 import { useNetwork } from "hooks/useNetwork";
 import assetsAtom, { verifiedAssetsAtom } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
-import { Asset } from "types/common";
+import { Asset, NetworkName } from "types/common";
 import { isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
+
+const UPDATE_INTERVAL_SEC = 5000;
 
 const useAssets = () => {
   const [assetStore, setAssetStore] = useAtom(assetsAtom);
   const verifiedAssets = useAtomValue(verifiedAssetsAtom);
   const api = useAPI();
   const network = useNetwork();
-  const assets = useMemo(
-    () => assetStore[network.name],
-    [assetStore, network.name],
-  );
-
-  const assetsRef = useRef<typeof assets>(undefined);
-  const fetchQueue = useRef<AccAddress[]>([]);
+  const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
+    mainnet: [],
+    testnet: [],
+  });
   const isFetching = useRef(false);
 
   const fetchAsset = useCallback(async () => {
     isFetching.current = true;
     try {
-      const address = fetchQueue.current[0];
-      if (address && AccAddress.validate(address)) {
-        if (assetsRef.current) {
-          const index = assetsRef.current.findIndex(
-            (item) => item.address === address,
-          );
-          if (index >= 0) {
-            const currentAsset = assetsRef.current[index];
-            if (
-              new Date((currentAsset as Asset).updatedAt || 0)?.getTime() <
-                Date.now() - 5 * 1000 &&
-              window.navigator.onLine
-            ) {
-              const res = await api.getToken(address);
-              if (res) {
-                if (verifiedAssets) {
-                  const verifiedAsset =
-                    verifiedAssets?.[network.name]?.[address];
-                  assetsRef.current[index] = {
-                    ...res,
-                    address,
-                    iconSrc: verifiedAsset?.icon,
-                    updatedAt: new Date(),
-                  };
-                  setAssetStore((current) => ({
-                    ...current,
-                    [network.name]: assetsRef.current,
-                  }));
-                } else if (!fetchQueue.current.includes(address)) {
-                  fetchQueue.current.push(address);
-                }
+      const networkName = network.name;
+      const store = assetStore[networkName] || [];
+      const address = fetchQueue.current[networkName]?.[0];
+
+      if (address) {
+        const index = store.findIndex((item) => item.address === address);
+        if (index >= 0) {
+          const currentAsset = store[index];
+          if (
+            new Date((currentAsset as Asset).updatedAt || 0)?.getTime() <
+              Date.now() - UPDATE_INTERVAL_SEC &&
+            window.navigator.onLine
+          ) {
+            if (isNativeTokenAddress(address)) {
+              const asset = nativeTokens?.find(
+                (item) => item.address === address,
+              );
+              const balance = await api.getNativeTokenBalance(address);
+              if (asset) {
+                store[index] = {
+                  ...asset,
+                  balance: balance || "0",
+                  updatedAt: new Date(),
+                };
+                setAssetStore((current) => ({
+                  ...current,
+                  [networkName]: assetStore[networkName],
+                }));
+              }
+            } else {
+              const token = await api.getToken(address);
+              if (verifiedAssets) {
+                const verifiedAsset = verifiedAssets?.[networkName]?.[address];
+                const balance = await api.getTokenBalance(address);
+
+                store[index] = {
+                  ...token,
+                  address,
+                  balance: balance || "0",
+                  iconSrc: verifiedAsset?.icon,
+                  updatedAt: new Date(),
+                };
+                setAssetStore((current) => ({
+                  ...current,
+                  [networkName]: assetStore[networkName],
+                }));
+              } else if (!fetchQueue.current[networkName]?.includes(address)) {
+                fetchQueue.current[networkName]?.push(address);
               }
             }
           }
@@ -66,20 +82,21 @@ const useAssets = () => {
     }
     isFetching.current = false;
     setTimeout(() => {
-      fetchQueue.current.shift();
-      if (fetchQueue.current.length) {
+      fetchQueue.current[network.name]?.shift();
+      if (fetchQueue.current[network.name]?.length) {
         fetchAsset();
       }
     }, 100);
-  }, [api, verifiedAssets, network.name, setAssetStore]);
+  }, [network, assetStore, api, verifiedAssets, setAssetStore]);
 
   const addFetchQueue = useCallback(
-    (address: string) => {
-      if (AccAddress.validate(address)) {
-        if (assetsRef.current) {
-          if (!fetchQueue.current.includes(address)) {
-            fetchQueue.current.push(address);
-          }
+    (address: string, networkName: NetworkName) => {
+      if (
+        nativeTokens?.some((item) => item.address === address) ||
+        AccAddress.validate(address)
+      ) {
+        if (!fetchQueue.current[networkName]?.includes(address)) {
+          fetchQueue.current[networkName]?.push(address);
         }
       }
       if (!isFetching.current && window.navigator.onLine) {
@@ -91,29 +108,21 @@ const useAssets = () => {
 
   const getAsset = useCallback(
     (address: string): Partial<Asset> | undefined => {
-      if (isNativeTokenAddress(address)) {
-        return nativeTokens?.find((item) => item.address === address);
-      }
-
-      const asset = assets?.find((item) => item.address === address);
+      const asset = assetStore[network.name]?.find(
+        (item) => item.address === address,
+      );
       if (!asset?.address) {
         return undefined;
       }
       if (window.navigator.onLine) {
-        addFetchQueue(asset.address);
+        addFetchQueue(asset.address, network.name);
       }
       return asset;
     },
-    [assets, network, addFetchQueue],
+    [assetStore, network, addFetchQueue],
   );
 
-  useEffect(() => {
-    if (assets) {
-      assetsRef.current = assets;
-    }
-  }, [assets]);
-
-  return useMemo(() => ({ assets, getAsset }), [assets, getAsset]);
+  return useMemo(() => ({ getAsset }), [getAsset]);
 };
 
 export default useAssets;

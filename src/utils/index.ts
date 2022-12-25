@@ -9,6 +9,11 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
+export const cutDecimal = (value: Numeric.Input, decimals: number) =>
+  (Math.floor(Number(value) * 10 ** decimals) / 10 ** decimals).toFixed(
+    decimals,
+  );
+
 export const isNativeTokenAddress = (address: string) =>
   nativeTokens.filter((n) => n.address === address).length > 0;
 
@@ -66,6 +71,12 @@ export const amountToNumber = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
 };
+
+export const getBlockLink = (height?: string, network?: string) =>
+  `https://explorer.xpla.io/${network}/block/${height}`;
+
+export const getWalletLink = (address?: string, network?: string) =>
+  `https://explorer.xpla.io/${network}/address/${address}`;
 
 export const getTransactionLink = (txHash?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/tx/${txHash}`;

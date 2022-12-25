@@ -14,14 +14,22 @@ import iconGitHubHover from "assets/icons/icon-github-hover.svg";
 import iconDocs from "assets/icons/icon-docs.svg";
 import iconDocsHover from "assets/icons/icon-docs-hover.svg";
 import iconLink from "assets/icons/icon-link.svg";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
+import { useLatestBlock } from "hooks/useLatestBlock";
+import { getBlockLink } from "utils";
+import { useNetwork } from "hooks/useNetwork";
+import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.footer`
   width: 100%;
   height: auto;
   position: relative;
   padding: 30px 0;
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    padding: 22px 0;
+  }
 `;
 
 const Content = styled.div`
@@ -34,7 +42,8 @@ const Content = styled.div`
   align-items: center;
   gap: 30px;
 
-  .${MOBILE_SCREEN_CLASS} & {
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
     flex-direction: column;
   }
 `;
@@ -55,7 +64,7 @@ const SocialMediaLinks = styled.div`
 const socialMediaLinks = [
   {
     name: "Medium",
-    url: "#", // TODO: Add Medium link
+    url: "https://medium.com/@dezswap",
     icons: {
       default: iconMedium,
       hover: iconMediumHover,
@@ -63,7 +72,7 @@ const socialMediaLinks = [
   },
   {
     name: "Twitter",
-    url: "#", // TODO: Add Twitter link
+    url: "https://twitter.com/dezswap",
     icons: {
       default: iconTwitter,
       hover: iconTwitterHover,
@@ -79,7 +88,7 @@ const socialMediaLinks = [
   },
   {
     name: "GitHub",
-    url: "#", // TODO: Add GitHub link
+    url: "https://github.com/dezswap",
     icons: {
       default: iconGitHub,
       hover: iconGitHubHover,
@@ -87,7 +96,7 @@ const socialMediaLinks = [
   },
   {
     name: "Documents",
-    url: "#", // TODO: Add Documents link
+    url: "https://docs.dezswap.io",
     icons: {
       default: iconDocs,
       hover: iconDocsHover,
@@ -96,30 +105,49 @@ const socialMediaLinks = [
 ];
 
 function Footer() {
+  const network = useNetwork();
+  const latestBlock = useLatestBlock();
   return (
     <Wrapper>
       <Container>
         <Content>
-          <div>
-            <Button
-              variant="default"
+          <Tooltip
+            arrow
+            placement="top"
+            content="The most recent block number on this network. Prices update on every block."
+            css={css`
+              width: 250px;
+            `}
+          >
+            <a
+              href={latestBlock ? getBlockLink(latestBlock, network.name) : ""}
+              target="_blank"
+              rel="noreferrer noopener"
               css={css`
-                height: 36px;
+                text-decoration: none;
               `}
             >
-              <Badge />
-              &nbsp;
-              <span
+              <Button
+                as="span"
+                variant="default"
                 css={css`
-                  font-size: 12px;
+                  height: 36px;
                 `}
               >
-                #1234567
-              </span>
-              &nbsp;
-              <IconButton icons={{ default: iconLink }} size={16} />
-            </Button>
-          </div>
+                <Badge />
+                &nbsp;
+                <span
+                  css={css`
+                    font-size: 12px;
+                  `}
+                >
+                  #{latestBlock}
+                </span>
+                &nbsp;
+                <IconButton as="span" icons={{ default: iconLink }} size={16} />
+              </Button>
+            </a>
+          </Tooltip>
           <div>
             <SocialMediaLinks>
               {socialMediaLinks.map((item) => (

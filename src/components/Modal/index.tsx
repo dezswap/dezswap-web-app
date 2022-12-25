@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
@@ -14,8 +14,11 @@ ReactModal.setAppElement("#root");
 
 interface ModalProps extends ReactModal.Props {
   drawer?: boolean;
+  error?: boolean;
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
+  noPadding?: boolean;
+  overlay?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
 }
@@ -36,6 +39,7 @@ const defaultOverlayStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "transparent",
+  height: "100%",
 };
 
 const ModalHeader = styled.div`
@@ -65,12 +69,29 @@ function Modal({
   children,
   hasCloseButton,
   hasGoBackButton,
+  noPadding,
   onGoBack,
   title,
   drawer,
+  overlay = true,
+  error,
   className: _className,
+  overlayClassName: _overlayClassName,
   ...modalProps
 }: ModalProps) {
+  const theme = useTheme();
+  const overlayClassName = useMemo(() => {
+    if (!overlay) {
+      if (typeof _overlayClassName === "string" || !_overlayClassName) {
+        return `${_overlayClassName || ""} no-overlay`;
+      }
+      return {
+        ..._overlayClassName,
+        base: `${_overlayClassName.base || ""} no-overlay`,
+      };
+    }
+    return _overlayClassName;
+  }, [_overlayClassName, overlay]);
   const className = useMemo(() => {
     if (drawer) {
       if (typeof _className === "string" || !_className) {
@@ -86,7 +107,9 @@ function Modal({
   return (
     <ReactModal
       className={className}
+      overlayClassName={overlayClassName}
       closeTimeoutMS={200}
+      onRequestClose={onGoBack}
       style={{
         overlay: {
           ...defaultOverlayStyle,
@@ -102,6 +125,8 @@ function Modal({
       <Container
         css={css`
           width: 100%;
+          display: block;
+          height: 100%;
         `}
       >
         <Panel
@@ -110,6 +135,8 @@ function Modal({
             drawer
               ? {
                   paddingBottom: 0,
+                  height: "100%",
+                  display: "block",
                 }
               : {}
           }
@@ -119,9 +146,14 @@ function Modal({
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
                 }
-              : {}),
+              : {
+                  borderColor: error
+                    ? theme.colors.danger
+                    : theme.colors.primary,
+                }),
             maxHeight: "80vh",
             overflowY: "auto",
+            ...(noPadding && { padding: 0 }),
           }}
         >
           <ModalHeader>
@@ -129,7 +161,7 @@ function Modal({
               <Typography
                 size={20}
                 weight={900}
-                color="primary"
+                color={error ? "danger" : "primary"}
                 css={{ textAlign: "center" }}
               >
                 {title}
