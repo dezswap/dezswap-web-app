@@ -23,6 +23,7 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
+  formatNumber,
   getWalletLink,
 } from "utils";
 import { useBalance } from "hooks/useBalance";
@@ -197,8 +198,8 @@ function WalletInfo({
             color={theme.colors.primary}
             weight={900}
             css={css`
-              padding-top: 9px;
-              padding-bottom: 20px;
+              text-align: center;
+              padding-bottom: 9px;
             `}
           >
             My Wallet
@@ -308,9 +309,11 @@ function Header() {
                               ? ellipsisCenter(connectedWallet.walletAddress)
                               : `${ellipsisCenter(
                                   connectedWallet.walletAddress,
-                                )} | ${cutDecimal(
-                                  amountToValue(balance) || 0,
-                                  DISPLAY_DECIMAL,
+                                )} | ${formatNumber(
+                                  cutDecimal(
+                                    amountToValue(balance) || 0,
+                                    DISPLAY_DECIMAL,
+                                  ),
                                 )}${XPLA_SYMBOL}`}
                             <img src={iconDropdown} width={22} alt="dropdown" />
                           </Button>
@@ -322,7 +325,7 @@ function Header() {
                             direction="column"
                             nogutter
                             css={css`
-                              padding-top: 11px;
+                              padding-top: 20px;
                               text-align: left;
                             `}
                           >
@@ -377,7 +380,7 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px;
+                                  padding: 12px 18px;
                                   font-weight: bold;
                                   text-align: center;
                                 `}
@@ -439,13 +442,17 @@ function Header() {
                               </Row>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
-                              <Box>
+                              <Box
+                                css={css`
+                                  padding: 12px 18px;
+                                `}
+                              >
                                 <Typography
                                   size={18}
                                   color={theme.colors.text.primary}
                                   weight="bold"
                                 >
-                                  {amountToValue(balance)}
+                                  {formatNumber(amountToValue(balance) || 0)}
                                 </Typography>
                                 <Typography
                                   color={theme.colors.text.secondary}
