@@ -68,6 +68,9 @@ enum FormKey {
 
 const DISPLAY_DECIMAL = 3;
 
+const MOBILE_DISPLAY_NUMBER_CNT = 20;
+const BROWSER_DISPLAY_NUMBER_CNT = 31;
+
 function SelectAssetDrawer({
   isOpen,
   onGoBack,
@@ -125,6 +128,7 @@ function SwapPage() {
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
   const { requestPost } = useRequestPost();
+  const screenClass = useScreenClass();
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -485,9 +489,24 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                onFocus={(e) => {
+                  e.target.value = asset1Value;
+                }}
                 {...register(FormKey.asset1Value, {
                   onChange: () => {
                     setIsReversed(false);
+                  },
+                  onBlur: (e) => {
+                    const numberCnt =
+                      screenClass === MOBILE_SCREEN_CLASS
+                        ? MOBILE_DISPLAY_NUMBER_CNT
+                        : BROWSER_DISPLAY_NUMBER_CNT;
+                    if (e.target.value.length > numberCnt) {
+                      e.target.value = `${e.target.value.slice(
+                        0,
+                        numberCnt - 2,
+                      )}...`;
+                    }
                   },
                   required: true,
                   min: {
@@ -673,9 +692,24 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                onFocus={(e) => {
+                  e.target.value = asset2Value;
+                }}
                 {...register(FormKey.asset2Value, {
                   onChange: () => {
                     setIsReversed(true);
+                  },
+                  onBlur: (e) => {
+                    const numberCnt =
+                      screenClass === MOBILE_SCREEN_CLASS
+                        ? MOBILE_DISPLAY_NUMBER_CNT
+                        : BROWSER_DISPLAY_NUMBER_CNT;
+                    if (e.target.value.length > numberCnt) {
+                      e.target.value = `${e.target.value.slice(
+                        0,
+                        numberCnt - 2,
+                      )}...`;
+                    }
                   },
                   required: true,
                   min: {
