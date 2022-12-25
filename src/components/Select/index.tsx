@@ -54,7 +54,7 @@ const Wrapper = styled.button<WrapperProps>`
       cursor: pointer;
       user-select: none;
 
-      & > div:first-child {
+      & > div:first-of-type {
         padding: 5px;
         display: inline-flex;
         justify-content: flex-start;

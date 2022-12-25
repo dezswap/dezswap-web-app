@@ -312,10 +312,7 @@ function Header() {
                                   amountToValue(balance) || 0,
                                   DISPLAY_DECIMAL,
                                 )}${XPLA_SYMBOL}`}
-                            <IconButton
-                              size={22}
-                              icons={{ default: iconDropdown }}
-                            />
+                            <img src={iconDropdown} width={22} alt="dropdown" />
                           </Button>
                         }
                       >

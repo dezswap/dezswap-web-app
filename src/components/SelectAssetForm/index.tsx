@@ -57,7 +57,7 @@ const AssetList = styled.div`
   padding: 0;
 `;
 
-const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
+const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -97,10 +97,6 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
       pointer-events: none;
     `}
 `;
-
-AssetItem.defaultProps = {
-  type: "button",
-};
 
 const AssetIcon = styled.div<{ src?: string }>`
   width: 32px;
@@ -225,14 +221,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       return (
         <AssetItem
           key={address}
-          onClick={() => {
-            if (handleSelect) {
-              handleSelect(address);
-            }
-            if (goBackOnSelect && onGoBack) {
-              onGoBack();
-            }
-          }}
           selected={selectedAssetAddress === address}
           invisible={
             !!deferredSearchKeyword &&
