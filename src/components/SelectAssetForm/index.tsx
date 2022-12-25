@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
-import { amountToValue, cutDecimal, ellipsisCenter } from "utils";
+import { amountToValue, cutDecimal, ellipsisCenter, formatNumber } from "utils";
 import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
@@ -206,9 +206,11 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               </Col>
             </Row>
             <Typography>
-              {cutDecimal(
-                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                3,
+              {formatNumber(
+                cutDecimal(
+                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                  3,
+                ),
               )}
             </Typography>
           </AssetItem>

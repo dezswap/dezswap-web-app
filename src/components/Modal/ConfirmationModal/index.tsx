@@ -59,6 +59,7 @@ function ConfirmationModal({
         variant="primary"
         onClick={() => onConfirm && onConfirm()}
         css={css`
+          margin-top: 10px;
           margin-bottom: 10px;
         `}
       >

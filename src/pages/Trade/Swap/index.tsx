@@ -14,6 +14,7 @@ import {
   amountToNumber,
   amountToValue,
   cutDecimal,
+  formatNumber,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -456,9 +457,12 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {cutDecimal(
-                      amountToValue(asset1Balance || 0, asset1?.decimals) || 0,
-                      DISPLAY_DECIMAL,
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(asset1Balance || 0, asset1?.decimals) ||
+                          0,
+                        DISPLAY_DECIMAL,
+                      ),
                     )}
                   </Typography>
                 </Col>
@@ -659,9 +663,12 @@ function SwapPage() {
                       cursor: pointer;
                     `}
                   >
-                    {cutDecimal(
-                      amountToValue(asset2Balance || 0, asset2?.decimals) || 0,
-                      DISPLAY_DECIMAL,
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(asset2Balance || 0, asset2?.decimals) ||
+                          0,
+                        DISPLAY_DECIMAL,
+                      ),
                     )}
                   </Typography>
                 </Col>
@@ -828,7 +835,7 @@ function SwapPage() {
                 `}
               >
                 <Typography weight="bold" color={spread.color as keyof Colors}>
-                  {spread.rate}%
+                  {formatNumber(spread.rate)}%
                 </Typography>
               </Col>
             </Row>
@@ -858,7 +865,9 @@ function SwapPage() {
               >
                 <Typography color={theme.colors.text.primary}>
                   {feeAmount
-                    ? `${amountToValue(feeAmount) || ""}${XPLA_SYMBOL}`
+                    ? `${formatNumber(
+                        amountToValue(feeAmount) || 0,
+                      )}${XPLA_SYMBOL}`
                     : ""}
                 </Typography>
               </Col>
@@ -921,7 +930,7 @@ function SwapPage() {
                   align-items: center;
                 `}
               >
-                {spread.rate}%
+                {formatNumber(spread.rate)}%
                 <Tooltip
                   arrow
                   placement="top"
