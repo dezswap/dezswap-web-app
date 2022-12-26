@@ -45,6 +45,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
+  max-height: calc(690px - 6px);
 
   .${MOBILE_SCREEN_CLASS} & {
     max-height: calc(80vh - 6px);
@@ -66,7 +67,7 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   height: auto;
   position: relative;
   padding: 15px 27px;
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     padding: 15px 13px;
   }
 

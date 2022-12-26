@@ -145,13 +145,14 @@ function Modal({
               ? {
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
+                  maxHeight: "80vh",
                 }
               : {
                   borderColor: error
                     ? theme.colors.danger
                     : theme.colors.primary,
+                  maxHeight: "690px",
                 }),
-            maxHeight: "80vh",
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
           }}
