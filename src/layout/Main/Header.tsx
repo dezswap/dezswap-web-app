@@ -382,38 +382,32 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 15px 18px;
+                                  padding: 12px;
                                   font-weight: bold;
                                   text-align: center;
                                 `}
                               >
-                                {screenClass === MOBILE_SCREEN_CLASS ? (
-                                  <Row
-                                    justify="center"
-                                    align="center"
-                                    css={css`
-                                      display: flex;
-                                      justify-content: space-between;
-                                    `}
-                                  >
-                                    <Col>
-                                      {ellipsisCenter(
-                                        connectedWallet?.walletAddress,
-                                        10,
-                                      )}
-                                    </Col>
-                                    <Col width="auto">
-                                      <Copy
-                                        value={connectedWallet?.walletAddress}
-                                      />
-                                    </Col>
-                                  </Row>
-                                ) : (
-                                  ellipsisCenter(
-                                    connectedWallet?.walletAddress,
-                                    10,
-                                  )
-                                )}
+                                <Row
+                                  nogutter
+                                  justify="center"
+                                  align="center"
+                                  css={css`
+                                    display: flex;
+                                    justify-content: space-between;
+                                  `}
+                                >
+                                  <Col>
+                                    {ellipsisCenter(
+                                      connectedWallet?.walletAddress,
+                                      10,
+                                    )}
+                                  </Col>
+                                  <Col width="auto">
+                                    <Copy
+                                      value={connectedWallet?.walletAddress}
+                                    />
+                                  </Col>
+                                </Row>
                               </Box>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
