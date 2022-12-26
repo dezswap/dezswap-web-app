@@ -85,12 +85,16 @@ const Wrapper = styled.button<WrapperProps>`
       }
 
       & > button {
-        &:hover {
+        &::hover {
           background-color: ${theme.colors.primary};
           & * {
             color: ${theme.colors.secondary};
           }
         }
+      }
+
+      &:hover {
+        background-color: ${theme.colors.white};
       }
     `;
   }}

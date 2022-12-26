@@ -83,38 +83,15 @@ function SelectAssetDrawer({
   children: ReactNode;
 }) {
   const screenClass = useScreenClass();
-  return screenClass === MOBILE_SCREEN_CLASS ? (
-    <Modal drawer isOpen={isOpen} noPadding onGoBack={onGoBack}>
+  return (
+    <Modal
+      drawer={screenClass === MOBILE_SCREEN_CLASS}
+      isOpen={isOpen}
+      noPadding
+      onGoBack={onGoBack}
+    >
       {isOpen && children}
     </Modal>
-  ) : (
-    <Drawer isOpen={isOpen} position="absolute" anchor="right">
-      <Panel
-        noPadding
-        wrapperStyle={{ height: "100%", display: "block" }}
-        css={css`
-          height: 100%;
-          background-color: transparent;
-          border: none;
-
-          & > * {
-            transition: transform 1s cubic-bezier(0, 1, 0, 1),
-              opacity 1s cubic-bezier(0, 1, 0, 1);
-            ${isOpen
-              ? css`
-                  transform: scale(1);
-                  opacity: 1;
-                `
-              : css`
-                  transform: scale(1.2);
-                  opacity: 0;
-                `}
-          }
-        `}
-      >
-        {isOpen && children}
-      </Panel>
-    </Drawer>
   );
 }
 
@@ -274,7 +251,7 @@ function SwapPage() {
       ) {
         return `Insufficient ${asset1?.name} balance`;
       }
-      return "swap";
+      return "Swap";
     }
 
     return "Enter an amount";
@@ -416,6 +393,7 @@ function SwapPage() {
                         <Typography
                           size={16}
                           weight="bold"
+                          color={theme.colors.primary}
                           style={{ paddingLeft: asset1 ? "0px" : "5px" }}
                         >
                           {asset1?.symbol || "Select token"}
@@ -448,6 +426,8 @@ function SwapPage() {
                     color="primary"
                     css={css`
                       cursor: pointer;
+                      text-decoration: underline;
+                      text-underline-offset: 3px;
                     `}
                     onClick={() => {
                       setIsReversed(false);
@@ -470,23 +450,6 @@ function SwapPage() {
                     )}
                   </Typography>
                 </Col>
-              </Row>
-              <Row
-                css={css`
-                  padding-right: 15px;
-                `}
-              >
-                <Col
-                  css={css`
-                    background: linear-gradient(
-                      ${theme.colors.primary},
-                      ${theme.colors.primary} 100%
-                    );
-                    background-size: 38px 1px;
-                    background-position: right top;
-                    background-repeat: no-repeat;
-                  `}
-                />
               </Row>
             </Col>
           </Row>
@@ -555,7 +518,7 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$-
+                -
               </Typography>
             </Col>
           </Row>
@@ -590,10 +553,7 @@ function SwapPage() {
         <Box
           css={css`
             margin-top: 5px;
-            margin-bottom: 24px;
-            .xs & {
-              margin-bottom: 20px;
-            }
+            margin-bottom: 10px;
           `}
         >
           <Row
@@ -632,6 +592,7 @@ function SwapPage() {
                         <Typography
                           size={16}
                           weight="bold"
+                          color={theme.colors.primary}
                           style={{ paddingLeft: asset2 ? "0px" : "5px" }}
                         >
                           {asset2?.symbol || "Select token"}
@@ -665,6 +626,8 @@ function SwapPage() {
                     color="primary"
                     css={css`
                       cursor: pointer;
+                      text-decoration: underline;
+                      text-underline-offset: 3px;
                     `}
                   >
                     {formatNumber(
@@ -676,23 +639,6 @@ function SwapPage() {
                     )}
                   </Typography>
                 </Col>
-              </Row>
-              <Row
-                css={css`
-                  padding-right: 15px;
-                `}
-              >
-                <Col
-                  css={css`
-                    background: linear-gradient(
-                      ${theme.colors.primary},
-                      ${theme.colors.primary} 100%
-                    );
-                    background-size: 38px 1px;
-                    background-position: right top;
-                    background-repeat: no-repeat;
-                  `}
-                />
               </Row>
             </Col>
           </Row>
@@ -752,161 +698,168 @@ function SwapPage() {
               `}
             >
               <Typography color={theme.colors.text.secondary} size={14}>
-                =$-
+                -
               </Typography>
             </Col>
           </Row>
         </Box>
-        <div style={{ marginBottom: "10px" }}>
-          <Expand
-            label={
-              <Typography size={14} weight="bold">
-                {asset1 && `1 ${asset1.symbol} = `}
-                {simulationResult?.estimatedAmount
-                  ? cutDecimal(
-                      (amountToNumber(
-                        simulationResult.estimatedAmount,
-                        asset2?.decimals,
-                      ) || 0) / Number(asset1Value),
-                      DISPLAY_DECIMAL,
-                    )
-                  : ""}
-                {asset2?.symbol}
-              </Typography>
-            }
-            isExpanded={false}
-          >
-            <Row justify="between">
-              <Col
-                css={css`
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>
-                  Expected Amount
-                </Typography>
-                <Tooltip
-                  arrow
-                  placement="right"
-                  content="Expected quantity to be received based on the current price, maximum spread and trading fee"
-                >
-                  <IconButton size={22} icons={{ default: iconQuestion }} />
-                </Tooltip>
-              </Col>
-              <Col
-                width="auto"
-                css={css`
-                  display: flex;
-                  justify-content: flex-end;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>
+        {asset1 && asset2 && (
+          <div style={{ marginBottom: "10px" }}>
+            <Expand
+              label={
+                <Typography size={14} weight="bold">
+                  {asset1 && `1 ${asset1.symbol} = `}
                   {simulationResult?.estimatedAmount
-                    ? amountToValue(
-                        simulationResult?.estimatedAmount,
-                        asset2?.decimals,
+                    ? cutDecimal(
+                        (amountToNumber(
+                          simulationResult.estimatedAmount,
+                          asset2?.decimals,
+                        ) || 0) / Number(asset1Value),
+                        DISPLAY_DECIMAL,
                       )
                     : ""}
                   {asset2?.symbol}
                 </Typography>
-              </Col>
-            </Row>
-            <Row justify="between">
-              <Col
-                css={css`
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>
-                  Spread
-                </Typography>
-                <Tooltip
-                  arrow
-                  placement="right"
-                  content="Fee paid due to the difference between market price and estimated price"
+              }
+              isExpanded={false}
+            >
+              <Row justify="between">
+                <Col
+                  css={css`
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
                 >
-                  <IconButton size={22} icons={{ default: iconQuestion }} />
-                </Tooltip>
-              </Col>
-              <Col
-                css={css`
-                  display: flex;
-                  justify-content: flex-end;
-                `}
-              >
-                <Typography weight="bold" color={spread.color as keyof Colors}>
-                  {formatNumber(spread.rate)}%
-                </Typography>
-              </Col>
-            </Row>
-            <Row justify="between">
-              <Col
-                css={css`
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>Fee</Typography>
-                <Tooltip
-                  arrow
-                  placement="right"
-                  content="Fee paid to execute this transaction"
+                  <Typography color={theme.colors.text.primary}>
+                    Expected Amount
+                  </Typography>
+                  <Tooltip
+                    arrow
+                    placement="right"
+                    content="Expected quantity to be received based on the current price, maximum spread and trading fee"
+                  >
+                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                  </Tooltip>
+                </Col>
+                <Col
+                  width="auto"
+                  css={css`
+                    display: flex;
+                    justify-content: flex-end;
+                  `}
                 >
-                  <IconButton size={22} icons={{ default: iconQuestion }} />
-                </Tooltip>
-              </Col>
-              <Col
-                width="auto"
-                css={css`
-                  display: flex;
-                  justify-content: flex-end;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>
-                  {feeAmount
-                    ? `${formatNumber(
-                        amountToValue(feeAmount) || 0,
-                      )}${XPLA_SYMBOL}`
-                    : ""}
-                </Typography>
-              </Col>
-            </Row>
-            <Row justify="between">
-              <Col
-                css={css`
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>Route</Typography>
-                <Tooltip
-                  arrow
-                  placement="right"
-                  content="Optimized route for your optimal gain"
+                  <Typography color={theme.colors.text.primary}>
+                    {simulationResult?.estimatedAmount
+                      ? amountToValue(
+                          simulationResult?.estimatedAmount,
+                          asset2?.decimals,
+                        )
+                      : ""}
+                    {asset2?.symbol}
+                  </Typography>
+                </Col>
+              </Row>
+              <Row justify="between">
+                <Col
+                  css={css`
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
                 >
-                  <IconButton size={22} icons={{ default: iconQuestion }} />
-                </Tooltip>
-              </Col>
-              <Col
-                width="auto"
-                css={css`
-                  display: flex;
-                  justify-content: flex-end;
-                `}
-              >
-                <Typography color={theme.colors.text.primary}>
-                  {asset1?.symbol} → {asset2?.symbol}
-                </Typography>
-              </Col>
-            </Row>
-          </Expand>
-        </div>
+                  <Typography color={theme.colors.text.primary}>
+                    Spread
+                  </Typography>
+                  <Tooltip
+                    arrow
+                    placement="right"
+                    content="Fee paid due to the difference between market price and estimated price"
+                  >
+                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                  </Tooltip>
+                </Col>
+                <Col
+                  css={css`
+                    display: flex;
+                    justify-content: flex-end;
+                  `}
+                >
+                  <Typography
+                    weight="bold"
+                    color={spread.color as keyof Colors}
+                  >
+                    {formatNumber(spread.rate)}%
+                  </Typography>
+                </Col>
+              </Row>
+              <Row justify="between">
+                <Col
+                  css={css`
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
+                >
+                  <Typography color={theme.colors.text.primary}>Fee</Typography>
+                  <Tooltip
+                    arrow
+                    placement="right"
+                    content="Fee paid to execute this transaction"
+                  >
+                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                  </Tooltip>
+                </Col>
+                <Col
+                  width="auto"
+                  css={css`
+                    display: flex;
+                    justify-content: flex-end;
+                  `}
+                >
+                  <Typography color={theme.colors.text.primary}>
+                    {feeAmount
+                      ? `${formatNumber(
+                          amountToValue(feeAmount) || 0,
+                        )}${XPLA_SYMBOL}`
+                      : ""}
+                  </Typography>
+                </Col>
+              </Row>
+              <Row justify="between">
+                <Col
+                  css={css`
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
+                >
+                  <Typography color={theme.colors.text.primary}>
+                    Route
+                  </Typography>
+                  <Tooltip
+                    arrow
+                    placement="right"
+                    content="Optimized route for your optimal gain"
+                  >
+                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                  </Tooltip>
+                </Col>
+                <Col
+                  width="auto"
+                  css={css`
+                    display: flex;
+                    justify-content: flex-end;
+                  `}
+                >
+                  <Typography color={theme.colors.text.primary}>
+                    {asset1?.symbol} → {asset2?.symbol}
+                  </Typography>
+                </Col>
+              </Row>
+            </Expand>
+          </div>
+        )}
         {spread.message && (
           <Message variant={spread.message}>
             <Row

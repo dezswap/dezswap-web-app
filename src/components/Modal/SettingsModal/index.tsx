@@ -4,6 +4,7 @@ import Modal from "components/Modal";
 import SettingsForm from "components/SettingsForm";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 function SettingsModal({ ...modalProps }: ReactModal.Props) {
   const screenClass = useScreenClass();
@@ -33,7 +34,7 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
       <div
         css={css`
           min-height: 383px;
-          .xs {
+          .${MOBILE_SCREEN_CLASS} {
             min-height: unset;
           }
         `}

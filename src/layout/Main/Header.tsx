@@ -82,7 +82,7 @@ const Wrapper = styled.header`
     padding-top: 16px;
     padding-bottom: 24px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -90,7 +90,7 @@ const Wrapper = styled.header`
   &.scrolled > div {
     padding-bottom: 16px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -108,12 +108,12 @@ const Logo = styled.div`
   transition: all 0.2s cubic-bezier(0, 1, 0, 1);
 
   .scrolled &,
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     height: 45px;
     background-image: url(${imgSymbol});
   }
 
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     width: 40px;
   }
 `;
