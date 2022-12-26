@@ -50,7 +50,7 @@ function GlobalStyles() {
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open {
+          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)) {
             overflow: hidden;
           }
           .ReactModal__Overlay {

@@ -80,18 +80,34 @@ function Modal({
   ...modalProps
 }: ModalProps) {
   const theme = useTheme();
+  const isInnerModal = useMemo(
+    () => !!modalProps.parentSelector,
+    [modalProps.parentSelector],
+  );
+  const parentElement = useMemo(
+    () => (modalProps.parentSelector ? modalProps.parentSelector() : null),
+    [modalProps],
+  );
+
   const overlayClassName = useMemo(() => {
+    const additionalClasses = [];
     if (!overlay) {
+      additionalClasses.push("no-overlay");
+    }
+    if (isInnerModal) {
+      additionalClasses.push("inner-modal");
+    }
+    if (additionalClasses.length) {
       if (typeof _overlayClassName === "string" || !_overlayClassName) {
-        return `${_overlayClassName || ""} no-overlay`;
+        return `${_overlayClassName || ""} ${additionalClasses.join(" ")}`;
       }
       return {
         ..._overlayClassName,
-        base: `${_overlayClassName.base || ""} no-overlay`,
+        base: `${_overlayClassName.base || ""} ${additionalClasses.join(" ")}`,
       };
     }
     return _overlayClassName;
-  }, [_overlayClassName, overlay]);
+  }, [_overlayClassName, isInnerModal, overlay]);
   const className = useMemo(() => {
     if (drawer) {
       if (typeof _className === "string" || !_className) {
@@ -114,6 +130,12 @@ function Modal({
         overlay: {
           ...defaultOverlayStyle,
           ...modalProps.style?.overlay,
+          ...(isInnerModal
+            ? {
+                position: "absolute",
+                zIndex: "unset",
+              }
+            : {}),
         },
         content: {
           ...defaultContentStyle,
@@ -127,6 +149,10 @@ function Modal({
           width: 100%;
           display: block;
           height: 100%;
+          ${isInnerModal &&
+          css`
+            padding: 0 !important;
+          `}
         `}
       >
         <Panel
@@ -151,7 +177,7 @@ function Modal({
                     ? theme.colors.danger
                     : theme.colors.primary,
                 }),
-            maxHeight: "80vh",
+            maxHeight: parentElement ? parentElement.clientHeight : "80vh",
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
           }}
