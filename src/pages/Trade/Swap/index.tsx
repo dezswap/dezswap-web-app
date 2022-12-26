@@ -27,9 +27,7 @@ import { useFee } from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useHashModal from "hooks/useHashModal";
-import Drawer from "components/Drawer";
 import { css, useTheme } from "@emotion/react";
-import Panel from "components/Panel";
 import { useNavigate } from "react-router-dom";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
@@ -244,6 +242,10 @@ function SwapPage() {
   );
 
   const buttonMsg = useMemo(() => {
+    if (asset1 === undefined || asset2 === undefined) {
+      return "Select tokens";
+    }
+
     if (asset1Value && Number(asset1Value) > 0) {
       if (
         Number(asset1Value) >
@@ -255,7 +257,7 @@ function SwapPage() {
     }
 
     return "Enter an amount";
-  }, [asset1, asset1BalanceMinusFee, asset1Value]);
+  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value]);
 
   useEffect(() => {
     if (
@@ -723,7 +725,10 @@ function SwapPage() {
               }
               isExpanded={false}
             >
-              <Row justify="between">
+              <Row
+                justify="between"
+                style={{ paddingBottom: "3px", alignItems: "center" }}
+              >
                 <Col
                   css={css`
                     display: flex;
@@ -751,16 +756,21 @@ function SwapPage() {
                 >
                   <Typography color={theme.colors.text.primary}>
                     {simulationResult?.estimatedAmount
-                      ? amountToValue(
-                          simulationResult?.estimatedAmount,
-                          asset2?.decimals,
+                      ? formatNumber(
+                          amountToValue(
+                            simulationResult?.estimatedAmount,
+                            asset2?.decimals,
+                          ) || 0,
                         )
                       : ""}
                     {asset2?.symbol}
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between">
+              <Row
+                justify="between"
+                style={{ paddingBottom: "3px", alignItems: "center" }}
+              >
                 <Col
                   css={css`
                     display: flex;
@@ -769,7 +779,7 @@ function SwapPage() {
                   `}
                 >
                   <Typography color={theme.colors.text.primary}>
-                    Spread
+                    Price impact
                   </Typography>
                   <Tooltip
                     arrow
@@ -793,7 +803,10 @@ function SwapPage() {
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between">
+              <Row
+                justify="between"
+                style={{ paddingBottom: "3px", alignItems: "center" }}
+              >
                 <Col
                   css={css`
                     display: flex;
@@ -826,7 +839,7 @@ function SwapPage() {
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between">
+              <Row justify="between" style={{ alignItems: "center" }}>
                 <Col
                   css={css`
                     display: flex;
@@ -877,7 +890,7 @@ function SwapPage() {
                   align-items: center;
                 `}
               >
-                Spread Warning
+                Price impact Warning
               </Col>
               <Col
                 css={css`

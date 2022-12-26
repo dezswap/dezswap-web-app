@@ -162,6 +162,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       const elInput = inputRef.current;
       const handleKeydown = (event: Event) => {
         const target = event.target as HTMLInputElement;
+
         if (Number.isNaN(Number(target.value))) {
           event.preventDefault();
           target.value = target.value.replace(/\D/g, "");

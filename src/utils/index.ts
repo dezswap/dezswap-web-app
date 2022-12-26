@@ -9,9 +9,10 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
-export const formatNumber = (value: number | string) => 
-  !!!value ? "-" : Intl.NumberFormat("en-US").format(Number(value))
-  
+export const formatNumber = (value: number | string) =>
+  Intl.NumberFormat("en-US", { maximumFractionDigits: 20 }).format(
+    Number(value),
+  );
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   (Math.floor(Number(value) * 10 ** decimals) / 10 ** decimals).toFixed(
