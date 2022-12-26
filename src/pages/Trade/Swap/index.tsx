@@ -185,6 +185,31 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
+  const beliefPrice = useMemo(() => {
+    if (isReversed) {
+      if (Number(simulationResult?.estimatedAmount) > 0 && asset2Value) {
+        return (
+          Number(simulationResult.estimatedAmount || 1) /
+          (Number(asset2Value) * 10 ** (asset2?.decimals || 0))
+        );
+      }
+    } else if (Number(asset1Value) > 0 && simulationResult?.estimatedAmount) {
+      return (
+        (Number(asset1Value) * 10 ** (asset1?.decimals || 0)) /
+        Number(simulationResult.estimatedAmount || 0)
+      );
+    }
+
+    return 0;
+  }, [
+    isReversed,
+    asset1Value,
+    asset2Value,
+    simulationResult.estimatedAmount,
+    asset1?.decimals,
+    asset2?.decimals,
+  ]);
+
   const createTxOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (
       !simulationResult?.estimatedAmount ||
@@ -204,9 +229,7 @@ function SwapPage() {
           selectedPair.contract_addr,
           asset1.address,
           valueToAmount(asset1Value, asset1?.decimals) || "",
-          isReversed
-            ? valueToAmount(asset2Value, asset2?.decimals) || ""
-            : simulationResult.estimatedAmount,
+          beliefPrice || "",
           `${slippageTolerance}`,
           txDeadlineMinutes * 60,
         ),
@@ -222,6 +245,7 @@ function SwapPage() {
     asset2Value,
     asset2,
     slippageTolerance,
+    beliefPrice,
     txDeadlineMinutes,
   ]);
 
@@ -285,7 +309,7 @@ function SwapPage() {
   }, [asset1Balance, asset2Balance, form]);
 
   useEffect(() => {
-    if (simulationResult?.estimatedAmount) {
+    if (simulationResult) {
       form.setValue(
         simulationResult.isReversed ? FormKey.asset1Value : FormKey.asset2Value,
         amountToValue(
@@ -711,7 +735,7 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {simulationResult?.estimatedAmount
+                  {Number(asset1Value) > 0 && simulationResult?.estimatedAmount
                     ? cutDecimal(
                         (amountToNumber(
                           simulationResult.estimatedAmount,
@@ -719,7 +743,7 @@ function SwapPage() {
                         ) || 0) / Number(asset1Value),
                         DISPLAY_DECIMAL,
                       )
-                    : ""}
+                    : "-"}
                   {asset2?.symbol}
                 </Typography>
               }
