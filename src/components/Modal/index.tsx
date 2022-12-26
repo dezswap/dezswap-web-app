@@ -148,11 +148,9 @@ function Modal({
                   maxHeight: "80vh",
                 }
               : {
-                  borderColor: error
-                    ? theme.colors.danger
-                    : theme.colors.primary,
                   maxHeight: "690px",
                 }),
+            borderColor: error ? theme.colors.danger : theme.colors.primary,
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
           }}

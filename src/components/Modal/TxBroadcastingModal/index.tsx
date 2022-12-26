@@ -14,9 +14,11 @@ import Panel from "components/Panel";
 import Modal from "components/Modal";
 import { useNetwork } from "hooks/useNetwork";
 import Typography from "components/Typography";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import IconButton from "components/IconButton";
 import Hr from "components/Hr";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import Button from "components/Button";
 
 interface TxBroadcastingModalProps {
   txHash?: string;
@@ -36,6 +38,7 @@ function TxBroadcastingModal({
   const network = useNetwork();
   const lcd = useLCDClient();
   const theme = useTheme();
+  const screenClass = useScreenClass();
 
   const [timeAfterQueued, setTimeAfterQueued] = useState(0);
 
@@ -71,6 +74,7 @@ function TxBroadcastingModal({
     <>
       {!txInfo && txHash && (
         <Modal
+          drawer={screenClass === MOBILE_SCREEN_CLASS}
           isOpen={isOpen}
           title="Broadcasting transaction"
           onRequestClose={onDoneClick}
@@ -159,6 +163,7 @@ function TxBroadcastingModal({
       )}
       {txInfo && txHash && (
         <Modal
+          drawer={screenClass === MOBILE_SCREEN_CLASS}
           isOpen={isOpen}
           title="Complete"
           onRequestClose={onDoneClick}
@@ -227,11 +232,23 @@ function TxBroadcastingModal({
                 </Col>
               </Row>
             </Panel>
+            <Button
+              size="large"
+              variant="primary"
+              css={css`
+                width: 100%;
+                margin-top: 20px;
+              `}
+              onClick={onDoneClick}
+            >
+              Done
+            </Button>
           </div>
         </Modal>
       )}
       {txError && (
         <Modal
+          drawer={screenClass === MOBILE_SCREEN_CLASS}
           error
           isOpen={isOpen}
           title="Something wrong"
@@ -279,6 +296,17 @@ function TxBroadcastingModal({
                 {txError.message}
               </Typography>
             </Panel>
+            <Button
+              size="large"
+              variant="error"
+              css={css`
+                width: 100%;
+                margin-top: 20px;
+              `}
+              onClick={onDoneClick}
+            >
+              Return
+            </Button>
           </div>
         </Modal>
       )}

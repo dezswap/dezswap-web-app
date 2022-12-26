@@ -723,9 +723,10 @@ function SwapPage() {
             >
               <Row
                 justify="between"
-                style={{ paddingBottom: "3px", alignItems: "center" }}
+                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
+                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -744,13 +745,18 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
-                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-end;
                   `}
                 >
-                  <Typography color={theme.colors.text.primary}>
+                  <Typography
+                    color={theme.colors.text.primary}
+                    css={css`
+                      text-align: right;
+                      word-break: break-word;
+                    `}
+                  >
                     {simulationResult?.estimatedAmount
                       ? formatNumber(
                           amountToValue(
@@ -765,9 +771,10 @@ function SwapPage() {
               </Row>
               <Row
                 justify="between"
-                style={{ paddingBottom: "3px", alignItems: "center" }}
+                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
+                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -794,6 +801,10 @@ function SwapPage() {
                   <Typography
                     weight="bold"
                     color={spread.color as keyof Colors}
+                    css={css`
+                      text-align: right;
+                      word-break: break-word;
+                    `}
                   >
                     {formatNumber(spread.rate)}%
                   </Typography>
@@ -801,9 +812,10 @@ function SwapPage() {
               </Row>
               <Row
                 justify="between"
-                style={{ paddingBottom: "3px", alignItems: "center" }}
+                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
+                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -820,13 +832,18 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
-                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-end;
                   `}
                 >
-                  <Typography color={theme.colors.text.primary}>
+                  <Typography
+                    color={theme.colors.text.primary}
+                    css={css`
+                      text-align: right;
+                      word-break: break-word;
+                    `}
+                  >
                     {feeAmount
                       ? `${formatNumber(
                           amountToValue(feeAmount) || 0,
@@ -835,8 +852,9 @@ function SwapPage() {
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between" style={{ alignItems: "center" }}>
+              <Row justify="between" style={{ alignItems: "flex-start" }}>
                 <Col
+                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -855,13 +873,18 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
-                  width="auto"
                   css={css`
                     display: flex;
                     justify-content: flex-end;
                   `}
                 >
-                  <Typography color={theme.colors.text.primary}>
+                  <Typography
+                    color={theme.colors.text.primary}
+                    css={css`
+                      text-align: right;
+                      word-break: break-word;
+                    `}
+                  >
                     {asset1?.symbol} → {asset2?.symbol}
                   </Typography>
                 </Col>
