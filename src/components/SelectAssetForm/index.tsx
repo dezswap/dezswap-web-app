@@ -1,4 +1,4 @@
-import { Col, Hidden, Row } from "react-grid-system";
+import { Col, Hidden, Row, useScreenClass } from "react-grid-system";
 import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
@@ -137,8 +137,28 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const [tabIdx, setTabIdx] = useState(0);
 
   const assetList = useMemo(() => {
+    const isBookmark = tabs[tabIdx].value === "bookmark";
+
+    if (isBookmark && (bookmarks === undefined || bookmarks?.length < 1)) {
+      return (
+        <Typography
+          size={22}
+          weight={900}
+          color={theme.colors.text.placeholder}
+          css={css`
+            padding: 123px 0px;
+            .${MOBILE_SCREEN_CLASS} {
+              padding: 157px 0px;
+            }
+          `}
+        >
+          No bookmarked tokens
+        </Typography>
+      );
+    }
+
     return (
-      tabs[tabIdx].value === "bookmark"
+      isBookmark
         ? bookmarks?.map((b) => ({ address: b, isLP: false }))
         : addressList
     )?.map(({ address, isLP }) => {
