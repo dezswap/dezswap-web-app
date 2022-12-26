@@ -55,7 +55,7 @@ const Wrapper = styled.button<WrapperProps>`
       user-select: none;
 
       & > div:first-of-type {
-        padding: 5px;
+        padding: 7px 12px;
         display: inline-flex;
         justify-content: flex-start;
         align-items: center;

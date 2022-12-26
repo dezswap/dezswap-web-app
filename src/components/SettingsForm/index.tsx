@@ -52,7 +52,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Slippage Tolerance</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>
@@ -114,7 +117,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Transaction Deadline</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>
@@ -132,7 +138,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Auto Router</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>
