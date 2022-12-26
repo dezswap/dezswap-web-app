@@ -82,7 +82,7 @@ const Wrapper = styled.header`
     padding-top: 16px;
     padding-bottom: 24px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -90,7 +90,7 @@ const Wrapper = styled.header`
   &.scrolled > div {
     padding-bottom: 16px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -108,12 +108,12 @@ const Logo = styled.div`
   transition: all 0.2s cubic-bezier(0, 1, 0, 1);
 
   .scrolled &,
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     height: 45px;
     background-image: url(${imgSymbol});
   }
 
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     width: 40px;
   }
 `;
@@ -189,7 +189,7 @@ function WalletInfo({
             paddingBottom: "0px",
           }}
           css={css`
-            width: 100%;
+            width: 281px;
             margin-top: 6px;
             padding: 16px;
           `}
@@ -368,6 +368,8 @@ function Header() {
                                       connectedWallet.walletAddress,
                                       network.name,
                                     )}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
                                   >
                                     <IconButton
                                       size={18}
@@ -380,7 +382,7 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px 18px;
+                                  padding: 15px 18px;
                                   font-weight: bold;
                                   text-align: center;
                                 `}
@@ -422,7 +424,7 @@ function Header() {
                                 Balance
                               </Typography>
                             </Col>
-                            <Col style={{ flex: "unset", paddingTop: "20px" }}>
+                            <Col style={{ flex: "unset", paddingTop: "10px" }}>
                               <Row nogutter justify="start" align="center">
                                 <Col width="auto">
                                   <IconButton
@@ -448,7 +450,7 @@ function Header() {
                                 `}
                               >
                                 <Typography
-                                  size={18}
+                                  size={16}
                                   color={theme.colors.text.primary}
                                   weight="bold"
                                 >
@@ -458,7 +460,7 @@ function Header() {
                                   color={theme.colors.text.secondary}
                                   weight="normal"
                                 >
-                                  = $-
+                                  -
                                 </Typography>
                               </Box>
                             </Col>

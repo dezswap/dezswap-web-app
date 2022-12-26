@@ -55,7 +55,7 @@ const Wrapper = styled.button<WrapperProps>`
       user-select: none;
 
       & > div:first-of-type {
-        padding: 5px;
+        padding: 7px 12px;
         display: inline-flex;
         justify-content: flex-start;
         align-items: center;
@@ -85,12 +85,16 @@ const Wrapper = styled.button<WrapperProps>`
       }
 
       & > button {
-        &:hover {
+        &::hover {
           background-color: ${theme.colors.primary};
           & * {
             color: ${theme.colors.secondary};
           }
         }
+      }
+
+      &:hover {
+        background-color: ${theme.colors.white};
       }
     `;
   }}

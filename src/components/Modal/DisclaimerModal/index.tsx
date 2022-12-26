@@ -22,6 +22,9 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           border: 3px solid ${theme.colors.primary};
           height: 200px;
           overflow-y: auto;
+          &::-webkit-scrollbar-track {
+            margin: 5px;
+          }
         `}
       >
         <Typography color={theme.colors.primary} size={16} weight="normal">

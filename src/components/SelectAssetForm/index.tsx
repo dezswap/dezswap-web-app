@@ -45,6 +45,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
+  max-height: calc(690px - 6px);
 
   .${MOBILE_SCREEN_CLASS} & {
     max-height: calc(80vh - 6px);
@@ -65,8 +66,8 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   width: 100%;
   height: auto;
   position: relative;
-  padding: 15px 27px;
-  .xs & {
+  padding: 16px 27px;
+  .${MOBILE_SCREEN_CLASS} & {
     padding: 15px 13px;
   }
 
@@ -205,7 +206,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 </Typography>
               </Col>
             </Row>
-            <Typography>
+            <Typography size={16}>
               {formatNumber(
                 cutDecimal(
                   amountToValue(asset?.balance || 0, asset?.decimals) || 0,

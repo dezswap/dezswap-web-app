@@ -23,16 +23,16 @@ const routes: RouteObject[] = [
       { path: "*", element: <Navigate replace to="swap" /> },
     ],
   },
-  {
-    path: "pool",
-    element: <PoolPage />,
-    children: [
-      { path: "add-liquidity", element: <ProvidePage /> },
-      { path: "withdraw", element: <WithdrawPage /> },
-      { index: true, element: <Navigate replace to="add-liquidity" /> },
-      { path: "*", element: <Navigate replace to="add-liquidity" /> },
-    ],
-  },
+  // {
+  //   path: "pool",
+  //   element: <PoolPage />,
+  //   children: [
+  //     { path: "add-liquidity", element: <ProvidePage /> },
+  //     { path: "withdraw", element: <WithdrawPage /> },
+  //     { index: true, element: <Navigate replace to="add-liquidity" /> },
+  //     { path: "*", element: <Navigate replace to="add-liquidity" /> },
+  //   ],
+  // },
   { index: true, element: <Navigate replace to="trade" /> },
   { path: "*", element: <Navigate replace to="trade" /> },
 ];
