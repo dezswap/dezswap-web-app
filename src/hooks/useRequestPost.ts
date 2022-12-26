@@ -34,7 +34,6 @@ const useRequestPost = () => {
       txBroadcastModal.open();
     }
   }, [connectedWallet, fee, txOptions, txBroadcastModal]);
-  const [formElement, setFormElement] = useState<HTMLFormElement>();
 
   const [node, setNode] = useState<Node>();
   const confirmationModal = useConfirmationModal({
@@ -42,30 +41,38 @@ const useRequestPost = () => {
     onConfirm: handleConfirm,
   });
 
-  useEffect(() => {
-    if (formElement) {
-      const newNode = document.importNode(formElement, true);
-      newNode.addEventListener("submit", (e) => {
-        e.preventDefault();
-      });
-      setNode(newNode);
-    }
-  }, [formElement]);
-
   const [, startTransition] = useTransition();
 
-  const requestPost = async (args: {
-    txOptions: CreateTxOptions;
-    fee: Fee;
-    formElement: HTMLFormElement;
-  }) => {
-    startTransition(() => {
-      setTxOptions(args.txOptions);
-      setFee(args.fee);
-      setFormElement(args.formElement);
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!confirmationModal.isOpen) {
+        setNode(undefined);
+      }
+    }, 300);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [confirmationModal.isOpen]);
+
+  const requestPost = useCallback(
+    (args: {
+      txOptions: CreateTxOptions;
+      fee: Fee;
+      formElement: HTMLFormElement;
+    }) => {
+      startTransition(() => {
+        setTxOptions(args.txOptions);
+        setFee(args.fee);
+        const newNode = document.importNode(args.formElement, true);
+        newNode.addEventListener("submit", (e) => {
+          e.preventDefault();
+        });
+        setNode(newNode);
+      });
       confirmationModal.open();
-    });
-  };
+    },
+    [confirmationModal],
+  );
 
   return { requestPost };
 };
