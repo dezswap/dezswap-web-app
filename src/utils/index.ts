@@ -9,8 +9,8 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
-export const formatNumber = (value: number | string) => 
-  !!!value
+export const formatNumber = (value: number | string) =>
+  !value
     ? "-"
     : Intl.NumberFormat("en-US", { maximumFractionDigits: 20 }).format(
         Number(value),
