@@ -28,18 +28,16 @@ function ConfirmationModal({
   const divRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
   useEffect(() => {
-    if (node && modalProps.isOpen) {
-      setTimeout(() => {
-        if (divRef.current) {
-          divRef.current.innerHTML = "";
-          divRef.current.appendChild(node);
-          const inputs = divRef.current.getElementsByTagName("input");
-          Array.from(inputs).forEach((elInput) => {
-            // eslint-disable-next-line no-param-reassign
-            elInput.size = elInput.value.length;
-          });
-        }
-      }, 100);
+    if (divRef.current) {
+      divRef.current.innerHTML = "";
+      if (node) {
+        divRef.current.appendChild(node);
+        const inputs = divRef.current.getElementsByTagName("input");
+        Array.from(inputs).forEach((elInput) => {
+          // eslint-disable-next-line no-param-reassign
+          elInput.size = elInput.value.length;
+        });
+      }
     }
   }, [node, modalProps.isOpen]);
   return (
