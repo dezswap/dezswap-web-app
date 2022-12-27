@@ -57,7 +57,14 @@ function ConfirmationModal({
         block
         size="large"
         variant="primary"
-        onClick={() => onConfirm && onConfirm()}
+        onClick={async (event) => {
+          if (onConfirm) {
+            await onConfirm();
+          }
+          if (modalProps.onRequestClose) {
+            modalProps.onRequestClose(event);
+          }
+        }}
         css={css`
           margin-bottom: 10px;
         `}
