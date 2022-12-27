@@ -147,8 +147,9 @@ function SwapPage() {
     const percentage = simulationResult
       ? Number(
           cutDecimal(
-            (Number(simulationResult.spreadAmount) * 100) /
-              Number(simulationResult.estimatedAmount),
+            Numeric.parse(simulationResult.spreadAmount || 0)
+              .mul(100)
+              .div(Numeric.parse(simulationResult.estimatedAmount || 1)),
             DISPLAY_DECIMAL,
           ),
         )
@@ -185,16 +186,24 @@ function SwapPage() {
 
   const beliefPrice = useMemo(() => {
     if (isReversed) {
-      if (Number(simulationResult?.estimatedAmount) > 0 && asset2Value) {
-        return (
-          Number(simulationResult.estimatedAmount || 1) /
-          (Number(asset2Value) * 10 ** (asset2?.decimals || 0))
-        );
+      if (
+        Numeric.parse(simulationResult?.estimatedAmount || 0).isPos() &&
+        asset2Value
+      ) {
+        return Numeric.parse(
+          amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
+            0,
+        ).div(asset2Value);
       }
-    } else if (Number(asset1Value) > 0 && simulationResult?.estimatedAmount) {
-      return (
-        (Number(asset1Value) * 10 ** (asset1?.decimals || 0)) /
-        Number(simulationResult.estimatedAmount || 0)
+    } else if (
+      Numeric.parse(asset1Value || 0).isPos() &&
+      simulationResult?.estimatedAmount
+    ) {
+      return Numeric.parse(asset1Value || 0).div(
+        Numeric.parse(
+          amountToValue(simulationResult.estimatedAmount, asset2?.decimals) ||
+            1,
+        ),
       );
     }
 
@@ -215,8 +224,8 @@ function SwapPage() {
       !connectedWallet ||
       !selectedPair ||
       !asset1?.address ||
-      !Number(asset1Value) ||
-      Number.isNaN(Number(asset1Value))
+      !asset1Value ||
+      Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
     }
@@ -266,10 +275,13 @@ function SwapPage() {
       return "Select tokens";
     }
 
-    if (asset1Value && Number(asset1Value) > 0) {
+    if (asset1Value && Numeric.parse(asset1Value).isPos()) {
       if (
-        Number(asset1Value) >
-        Number(amountToValue(asset1BalanceMinusFee, asset1?.decimals))
+        Numeric.parse(asset1Value).gt(
+          Numeric.parse(
+            amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
+          ),
+        )
       ) {
         return `Insufficient ${asset1?.name} balance`;
       }
@@ -283,7 +295,7 @@ function SwapPage() {
     if (
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
-      !Number.isNaN(Number(asset1Value)) &&
+      !asset1Value &&
       Numeric.parse(asset1Value || 0)
         .mul(10 ** (asset1?.decimals || 0))
         .gt(Numeric.parse(asset1BalanceMinusFee || 0))
@@ -503,7 +515,7 @@ function SwapPage() {
                   },
                   required: true,
                   min: {
-                    value: Number(amountToValue(1, asset1?.decimals) || 0),
+                    value: amountToValue(1, asset1?.decimals) || 0,
                     message: "",
                   },
                   max: {
@@ -692,7 +704,7 @@ function SwapPage() {
                   },
                   required: true,
                   min: {
-                    value: Number(amountToValue(1, asset2?.decimals) || 0),
+                    value: amountToValue(1, asset2?.decimals) || 0,
                     message: "",
                   },
                 })}
@@ -731,12 +743,16 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {Number(asset1Value) > 0 && simulationResult?.estimatedAmount
+                  {asset1Value &&
+                  Numeric.parse(asset1Value || 0).isPos() &&
+                  simulationResult?.estimatedAmount
                     ? cutDecimal(
-                        (amountToNumber(
-                          simulationResult.estimatedAmount,
-                          asset2?.decimals,
-                        ) || 0) / Number(asset1Value),
+                        Numeric.parse(
+                          amountToNumber(
+                            simulationResult.estimatedAmount,
+                            asset2?.decimals,
+                          ) || "0",
+                        ).div(asset1Value),
                         DISPLAY_DECIMAL,
                       )
                     : "-"}
