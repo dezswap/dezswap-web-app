@@ -16,7 +16,13 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
   const theme = useTheme();
 
   return (
-    <Modal isOpen={isOpen} title="Disclaimer" hasCloseButton={false}>
+    <Modal
+      isOpen={isOpen}
+      title="Disclaimer"
+      hasCloseButton={false}
+      shouldCloseOnEsc={false}
+      shouldCloseOnOverlayClick={false}
+    >
       <Box
         css={css`
           border: 3px solid ${theme.colors.primary};
@@ -68,12 +74,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
               setDisclaimerLastSeen(new Date());
             }}
           >
-            Agree
-          </Button>
-        </Col>
-        <Col style={{ flex: "unset" }}>
-          <Button variant="secondary" size="large" block>
-            Cancel
+            Agree and continue
           </Button>
         </Col>
       </Row>
