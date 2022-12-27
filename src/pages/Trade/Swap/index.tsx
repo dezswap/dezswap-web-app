@@ -742,7 +742,9 @@ function SwapPage() {
                   </Typography>
                   <Tooltip
                     arrow
-                    placement="right"
+                    placement={
+                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
+                    }
                     content="Expected quantity to be received based on the current price, maximum spread and trading fee"
                   >
                     <IconButton size={22} icons={{ default: iconQuestion }} />
@@ -790,7 +792,9 @@ function SwapPage() {
                   </Typography>
                   <Tooltip
                     arrow
-                    placement="right"
+                    placement={
+                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
+                    }
                     content="Fee paid due to the difference between market price and estimated price"
                   >
                     <IconButton size={22} icons={{ default: iconQuestion }} />
@@ -829,7 +833,9 @@ function SwapPage() {
                   <Typography color={theme.colors.text.primary}>Fee</Typography>
                   <Tooltip
                     arrow
-                    placement="right"
+                    placement={
+                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
+                    }
                     content="Fee paid to execute this transaction"
                   >
                     <IconButton size={22} icons={{ default: iconQuestion }} />
@@ -870,7 +876,9 @@ function SwapPage() {
                   </Typography>
                   <Tooltip
                     arrow
-                    placement="right"
+                    placement={
+                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
+                    }
                     content="Optimized route for your optimal gain"
                   >
                     <IconButton size={22} icons={{ default: iconQuestion }} />

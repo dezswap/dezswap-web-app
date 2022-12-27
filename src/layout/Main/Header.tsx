@@ -460,6 +460,7 @@ function Header() {
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
                               <Button
+                                size="large"
                                 variant="secondary"
                                 css={css`
                                   width: 100%;

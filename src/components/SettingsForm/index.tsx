@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
 import { NumberInput } from "components/Input";
@@ -40,6 +40,7 @@ const RadioGroup = styled.div`
 function SettingsForm() {
   const slippageTolerance = useSlippageTolerance();
   const txDeadlineMinutes = useTxDeadlineMinutes();
+  const theme = useTheme();
   return (
     <Wrapper>
       <Row
@@ -77,6 +78,7 @@ function SettingsForm() {
       >
         {slippagePresets.map((preset) => (
           <RadioButton
+            height={40}
             key={preset}
             value={preset}
             name="preset"
@@ -102,9 +104,14 @@ function SettingsForm() {
           onChange={(e) => {
             slippageTolerance.setCustomValue(Number(e.target.value));
           }}
-          suffix="%"
+          suffix={
+            <Typography color={theme.colors.text.secondary} weight="bold">
+              %
+            </Typography>
+          }
           align="right"
           placeholder="0.5"
+          height={40}
         />
       </RadioGroup>
       <Row
@@ -131,8 +138,13 @@ function SettingsForm() {
           <NumberInput
             borderStyle="solid"
             placeholder="20"
-            suffix="mins"
+            suffix={
+              <Typography color={theme.colors.text.secondary} weight="bold">
+                mins
+              </Typography>
+            }
             align="right"
+            height={40}
             value={txDeadlineMinutes.value}
             onChange={(e) => {
               txDeadlineMinutes.setValue(Number(e.target.value));

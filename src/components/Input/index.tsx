@@ -11,6 +11,7 @@ type InputBorder = "none" | "solid";
 interface WrapperProps {
   variant?: InputVariant;
   size?: InputSize;
+  height?: number;
   borderStyle?: InputBorder;
   align?: InputAlign;
 }
@@ -32,6 +33,10 @@ const Wrapper = styled.div<WrapperProps>`
   height: auto;
   position: relative;
   gap: 4px;
+
+  ${({ height }) => css`
+    height: ${height}px;
+  `}
 
   ${({ borderStyle = "none" }) => css`
     border-style: ${borderStyle};
@@ -130,13 +135,23 @@ const Wrapper = styled.div<WrapperProps>`
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { variant, size, borderStyle, align, prefix, suffix, ...inputProps },
+    {
+      variant,
+      size,
+      height,
+      borderStyle,
+      align,
+      prefix,
+      suffix,
+      ...inputProps
+    },
     ref,
   ) => {
     return (
       <Wrapper
         variant={variant}
         size={size}
+        height={height}
         borderStyle={borderStyle}
         align={align}
       >
