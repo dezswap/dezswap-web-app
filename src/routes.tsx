@@ -1,9 +1,9 @@
 import { Navigate, RouteProps } from "react-router-dom";
 import PlaygroundPage from "pages/Playground";
 import SwapPage from "pages/Trade/Swap";
-import ProvidePage from "pages/Pool/Provide";
-import WithdrawPage from "pages/Pool/Withdraw";
-import PoolPage from "pages/Pool";
+// import ProvidePage from "pages/Pool/Provide";
+// import WithdrawPage from "pages/Pool/Withdraw";
+// import PoolPage from "pages/Pool";
 import TradePage from "pages/Trade";
 
 export interface RouteObject extends Omit<RouteProps, "children"> {

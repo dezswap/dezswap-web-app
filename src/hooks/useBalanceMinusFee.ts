@@ -20,6 +20,7 @@ const useBalanceMinusFee = (
     } else {
       setAsset1BalanceMinusFee("0");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [balance, feeAmount]);
 
   return useMemo(() => {
