@@ -84,9 +84,9 @@ export const generateSwapMsg = (
   amount: Numeric.Input,
   beliefPrice: Numeric.Input,
   maxSpread = "0.1",
+  txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
-
   if (isNativeTokenAddress(fromAssetAddress)) {
     return new MsgExecuteContract(
       senderAddress,
@@ -99,6 +99,7 @@ export const generateSwapMsg = (
           },
           max_spread: `${maxSpreadFixed}`,
           belief_price: `${beliefPrice}`,
+          deadline: `${txDeadlineSeconds}`,
         },
       },
       new Coins({ [fromAssetAddress]: amount }),
@@ -122,6 +123,7 @@ export const generateSwapMsg = (
         msg: sendMsg,
         amount: Numeric.parse(amount).toString(),
         contract: contractAddress,
+        deadline: `${txDeadlineSeconds}`,
       },
     },
     [],

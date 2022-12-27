@@ -52,6 +52,7 @@ import Modal from "components/Modal";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
+import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -117,6 +118,7 @@ function SwapPage() {
   const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
+  const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
@@ -226,6 +228,7 @@ function SwapPage() {
             ? valueToAmount(asset2Value, asset2?.decimals) || ""
             : simulationResult.estimatedAmount,
           `${slippageTolerance}`,
+          txDeadlineMinutes * 60,
         ),
       ],
     };
@@ -239,6 +242,7 @@ function SwapPage() {
     asset2Value,
     asset2,
     slippageTolerance,
+    txDeadlineMinutes,
   ]);
 
   const {

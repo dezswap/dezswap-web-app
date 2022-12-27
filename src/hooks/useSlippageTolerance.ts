@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import {
   selectedSlippagePresetAtom,
   customSlippageToleranceAtom,
-} from "stores/slippageTolerance";
+} from "stores/settings";
 
 const useSlippageTolerance = () => {
   const [selectedPreset, setSelectedPreset] = useAtom(
