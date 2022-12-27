@@ -68,7 +68,7 @@ function Copy({ value, children }: CopyProps) {
   );
 
   return (
-    <Wrapper onClick={handleClick}>
+    <Wrapper onClick={handleClick} type="button">
       <textarea ref={inputRef} value={value} readOnly />
       {children || (
         <Tooltip arrow content="Copied!" trigger="click">
