@@ -10,3 +10,5 @@ export const customSlippageToleranceAtom = atomWithStorage<number | undefined>(
   "slippageTolerance",
   undefined,
 );
+
+export const txDeadlineMinutesAtom = atomWithStorage("txDeadline", 20);

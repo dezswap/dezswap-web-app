@@ -6,11 +6,12 @@ import RadioButton from "components/RadioButton";
 import Tooltip from "components/Tooltip";
 import Typography from "components/Typography";
 import { Col, Row } from "react-grid-system";
-import { slippagePresets } from "stores/slippageTolerance";
+import { slippagePresets } from "stores/settings";
 
 import iconQuestion from "assets/icons/icon-question.svg";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import ToggleButton from "components/ToggleButton";
+import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -38,6 +39,7 @@ const RadioGroup = styled.div`
 
 function SettingsForm() {
   const slippageTolerance = useSlippageTolerance();
+  const txDeadlineMinutes = useTxDeadlineMinutes();
   return (
     <Wrapper>
       <Row
@@ -125,6 +127,14 @@ function SettingsForm() {
             placeholder="20"
             suffix="mins"
             align="right"
+            value={txDeadlineMinutes.value}
+            onChange={(e) => {
+              txDeadlineMinutes.setValue(Number(e.target.value));
+            }}
+            step={1}
+            min={0}
+            max={99}
+            maxLength={2}
           />
         </Col>
       </Row>
