@@ -43,6 +43,16 @@ function ConfirmationModal({
   return (
     <Modal
       {...modalProps}
+      parentSelector={
+        screenClass !== "xs"
+          ? () => {
+              return (
+                document.querySelector("#main") ||
+                (document.querySelector("#root") as HTMLElement)
+              );
+            }
+          : undefined
+      }
       title="Confirmation"
       drawer={screenClass === "xs"}
       overlay={screenClass === "xs"}

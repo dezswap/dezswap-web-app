@@ -16,6 +16,13 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
       hasCloseButton={screenClass === "xs"}
       hasGoBackButton={screenClass !== "xs"}
       onGoBack={modalProps.onRequestClose}
+      parentSelector={
+        screenClass !== "xs"
+          ? () =>
+              document.querySelector("#main") ||
+              (document.querySelector("#root") as HTMLElement)
+          : undefined
+      }
       {...modalProps}
     >
       <Hr

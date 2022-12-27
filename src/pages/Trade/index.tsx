@@ -20,6 +20,10 @@ const Wrapper = styled.div`
   .xs & {
     padding-top: 26px;
   }
+
+  & #main:has(.inner-modal) > div:first-of-type {
+    opacity: 0;
+  }
 `;
 
 function TradePage() {
@@ -28,7 +32,7 @@ function TradePage() {
     <Wrapper>
       <Container>
         <Row justify="center" gutterWidth={0}>
-          <Col width={512} xs={12}>
+          <Col width={512} xs={12} id="main">
             <Panel shadow border>
               <Row
                 css={css`
