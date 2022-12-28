@@ -34,7 +34,7 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
       <div
         css={css`
           min-height: 383px;
-          .${MOBILE_SCREEN_CLASS} {
+          .${MOBILE_SCREEN_CLASS} & {
             min-height: unset;
           }
         `}
