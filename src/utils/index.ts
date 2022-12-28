@@ -37,9 +37,16 @@ export const valueToAmount = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    return Numeric.parse(value || 0)
+    const n = Numeric.parse(value || 0);
+    const d = n.toFixed(0);
+
+    const e = n
+      .minus(d)
       .mul(10 ** decimals)
-      .toFixed(0);
+      .toString()
+      .padStart(decimals, "0");
+
+    return d + e;
   } catch (error) {
     return undefined;
   }
