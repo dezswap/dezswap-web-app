@@ -3,9 +3,11 @@ import iconCopy from "assets/icons/icon-copy.svg";
 import iconCopyHover from "assets/icons/icon-copy-hover.svg";
 import { useCallback, useRef } from "react";
 import Tooltip from "components/Tooltip";
+import { css } from "@emotion/react";
 
 type CopyProps = React.PropsWithChildren<{
   value?: string;
+  size?: React.CSSProperties["width"];
 }>;
 
 const Wrapper = styled.button`
@@ -31,9 +33,14 @@ const Wrapper = styled.button`
   }
 `;
 
-const CopyIcon = styled.div`
-  width: 32px;
-  height: 32px;
+const CopyIcon = styled.div<Pick<CopyProps, "size">>`
+  ${({ size = 32 }) => {
+    const computedSize = typeof size === "number" ? `${size}px` : size;
+    return css`
+      width: ${computedSize};
+      height: ${computedSize};
+    `;
+  }}
   position: relative;
   cursor: pointer;
   background-image: url(${iconCopy});
@@ -46,7 +53,7 @@ const CopyIcon = styled.div`
   }
 `;
 
-function Copy({ value, children }: CopyProps) {
+function Copy({ value, size, children }: CopyProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (event) => {
@@ -72,7 +79,7 @@ function Copy({ value, children }: CopyProps) {
       <textarea ref={inputRef} value={value} readOnly />
       {children || (
         <Tooltip arrow content="Copied!" trigger="click">
-          <CopyIcon />
+          <CopyIcon size={size} />
         </Tooltip>
       )}
     </Wrapper>
