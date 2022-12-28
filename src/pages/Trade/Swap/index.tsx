@@ -13,8 +13,8 @@ import useAssets from "hooks/useAssets";
 import {
   amountToValue,
   cutDecimal,
+  filterNumberFormat,
   formatNumber,
-  isValidAssetNumber,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -188,13 +188,13 @@ function SwapPage() {
 
   const beliefPrice = useMemo(() => {
     if (isReversed) {
-      if (isValidAssetNumber(asset2Value)) {
+      if (asset2Value && simulationResult.estimatedAmount) {
         return Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
             0,
         ).div(asset2Value);
       }
-    } else if (isValidAssetNumber(asset1Value)) {
+    } else if (asset1Value && simulationResult.estimatedAmount) {
       return Numeric.parse(asset1Value || 0).div(
         Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset2?.decimals) ||
@@ -220,7 +220,7 @@ function SwapPage() {
       !connectedWallet ||
       !selectedPair ||
       !asset1?.address ||
-      !isValidAssetNumber(asset1Value) ||
+      !asset1Value ||
       Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
@@ -273,7 +273,7 @@ function SwapPage() {
       return "Select tokens";
     }
 
-    if (isValidAssetNumber(asset1Value)) {
+    if (asset1Value) {
       if (
         Numeric.parse(asset1Value).gt(
           Numeric.parse(
@@ -522,6 +522,8 @@ function SwapPage() {
                   e.target.value = asset1Value;
                 }}
                 {...register(FormKey.asset1Value, {
+                  setValueAs: (value) =>
+                    filterNumberFormat(value, asset1?.decimals),
                   onChange: () => {
                     setIsReversed(false);
                   },
@@ -535,6 +537,8 @@ function SwapPage() {
                         0,
                         numberCnt - 2,
                       )}...`;
+                    } else {
+                      e.target.value = asset1Value;
                     }
                   },
                   required: true,
@@ -730,6 +734,8 @@ function SwapPage() {
                   e.target.value = asset2Value;
                 }}
                 {...register(FormKey.asset2Value, {
+                  setValueAs: (value) =>
+                    filterNumberFormat(value, asset2?.decimals),
                   onChange: () => {
                     setIsReversed(true);
                   },
@@ -743,6 +749,8 @@ function SwapPage() {
                         0,
                         numberCnt - 2,
                       )}...`;
+                    } else {
+                      e.target.value = asset2Value;
                     }
                   },
                   required: true,
@@ -786,8 +794,7 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {isValidAssetNumber(asset1Value) &&
-                  simulationResult?.estimatedAmount
+                  {asset1Value && simulationResult?.estimatedAmount
                     ? cutDecimal(
                         Numeric.parse(
                           amountToValue(

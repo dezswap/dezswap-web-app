@@ -37,6 +37,7 @@ const useSimulate = ({
           !fromAddress ||
           !toAddress ||
           !deferredAmount ||
+          Numeric.parse(deferredAmount).isZero() ||
           Numeric.parse(deferredAmount).isNaN()
         ) {
           setIsLoading(false);
