@@ -10,7 +10,13 @@ import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
 import useAssets from "hooks/useAssets";
-import { amountToValue, cutDecimal, formatNumber, valueToAmount } from "utils";
+import {
+  amountToValue,
+  cutDecimal,
+  formatNumber,
+  isValidAssetNumber,
+  valueToAmount,
+} from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
@@ -182,22 +188,13 @@ function SwapPage() {
 
   const beliefPrice = useMemo(() => {
     if (isReversed) {
-      if (
-        asset2Value &&
-        !asset2Value.match(/[^0-9.]/g) &&
-        Numeric.parse(simulationResult?.estimatedAmount || 0).isPos()
-      ) {
+      if (isValidAssetNumber(asset2Value)) {
         return Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
             0,
         ).div(asset2Value);
       }
-    } else if (
-      asset1Value &&
-      !asset1Value.match(/[^0-9.]/g) &&
-      Numeric.parse(asset1Value || 0).isPos() &&
-      simulationResult?.estimatedAmount
-    ) {
+    } else if (isValidAssetNumber(asset1Value)) {
       return Numeric.parse(asset1Value || 0).div(
         Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset2?.decimals) ||
@@ -223,8 +220,7 @@ function SwapPage() {
       !connectedWallet ||
       !selectedPair ||
       !asset1?.address ||
-      !asset1Value ||
-      asset1Value.match(/[^0-9.]/g) ||
+      !isValidAssetNumber(asset1Value) ||
       Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
@@ -277,11 +273,7 @@ function SwapPage() {
       return "Select tokens";
     }
 
-    if (
-      asset1Value &&
-      !asset1Value.match(/[^0-9.]/g) &&
-      Numeric.parse(asset1Value).isPos()
-    ) {
+    if (isValidAssetNumber(asset1Value)) {
       if (
         Numeric.parse(asset1Value).gt(
           Numeric.parse(
@@ -794,9 +786,7 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {asset1Value &&
-                  !asset1Value.match(/[^0-9.]/g) &&
-                  Numeric.parse(asset1Value || 0).isPos() &&
+                  {isValidAssetNumber(asset1Value) &&
                   simulationResult?.estimatedAmount
                     ? cutDecimal(
                         Numeric.parse(
