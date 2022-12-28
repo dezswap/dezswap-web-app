@@ -19,21 +19,29 @@ interface SelectProps
   options?: Option[];
   onChange?(value: Value, option: Option): void;
   outline?: boolean;
+  block?: boolean;
 }
 
 interface WrapperProps {
   outline?: boolean;
   isOpen?: boolean;
+  block?: boolean;
 }
 
 const Wrapper = styled.button<WrapperProps>`
-  ${({ theme, outline, isOpen }) => {
+  ${({ theme, outline, isOpen, block }) => {
     return css`
       display: inline-flex;
       flex-direction: column;
       width: auto;
       height: auto;
       position: relative;
+
+      ${block &&
+      css`
+        display: flex;
+        width: 100%;
+      `}
 
       margin: 0;
       font-weight: bold;
@@ -61,6 +69,16 @@ const Wrapper = styled.button<WrapperProps>`
         align-items: center;
         gap: 3px;
 
+        ${block &&
+        css`
+          display: flex;
+          width: 100%;
+        `}
+
+        &:hover {
+          background-color: ${theme.colors.white};
+        }
+
         &::after {
           content: "";
           display: inline-block;
@@ -68,6 +86,7 @@ const Wrapper = styled.button<WrapperProps>`
           width: 20px;
           height: 20px;
           vertical-align: middle;
+          margin-left: auto;
 
           background-image: url(${iconDropdown});
           background-size: contain;
