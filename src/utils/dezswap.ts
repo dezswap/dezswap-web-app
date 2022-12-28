@@ -99,7 +99,9 @@ export const generateSwapMsg = (
           },
           max_spread: `${maxSpreadFixed}`,
           belief_price: `${beliefPrice}`,
-          deadline: `${txDeadlineSeconds}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
         },
       },
       new Coins({ [fromAssetAddress]: amount }),
@@ -123,7 +125,9 @@ export const generateSwapMsg = (
         msg: sendMsg,
         amount: amount.toString(),
         contract: contractAddress,
-        deadline: `${txDeadlineSeconds}`,
+        deadline: Number(
+          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+        ),
       },
     },
     [],
