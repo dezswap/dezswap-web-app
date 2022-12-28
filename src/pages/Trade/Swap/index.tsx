@@ -286,8 +286,12 @@ function SwapPage() {
       return "Swap";
     }
 
+    if (asset2Value && !asset1Value) {
+      return `Not enough pool`;
+    }
+
     return "Enter an amount";
-  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value]);
+  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
 
   useEffect(() => {
     if (
