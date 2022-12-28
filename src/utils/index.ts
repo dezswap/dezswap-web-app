@@ -1,4 +1,4 @@
-import { Numeric } from "@xpla/xpla.js";
+import { Dec, Numeric } from "@xpla/xpla.js";
 import { nativeTokens } from "constants/network";
 import { Decimal } from "decimal.js";
 
@@ -38,7 +38,7 @@ export const valueToAmount = (value?: Numeric.Input, decimals = 18) => {
   }
   try {
     const n = Numeric.parse(value || 0);
-    const d = n.toFixed(0);
+    const d = n.toFixed(0, Decimal.ROUND_FLOOR);
 
     const e = n
       .minus(d)
@@ -57,27 +57,14 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    return Numeric.parse(value || 0)
-      .mul(10 ** -decimals)
-      .toFixed(decimals, Decimal.ROUND_FLOOR);
-  } catch (error) {
-    return undefined;
-  }
-};
-
-export const amountToNumber = (value?: Numeric.Input, decimals = 18) => {
-  if (typeof value === "undefined") {
-    return undefined;
-  }
-  try {
-    const parsed = Numeric.parse(value || 0).mul(10 ** -decimals);
-    const intAndDec = parsed.toString().split(".");
-    const decimalCount =
-      intAndDec.length > 1 && intAndDec[1].length > 1
-        ? intAndDec[1].length - 1
-        : 0;
-    /* ceiling last decimal for minimum accuracy */
-    return parsed.toFixed(decimalCount, Decimal.ROUND_FLOOR);
+    const s = value.toString();
+    if (s.length < decimals) {
+      return Dec.withPrec(value, decimals).toString();
+    }
+    return `${s.substring(0, s.length - decimals)}.${s.substring(
+      s.length - decimals,
+      s.length,
+    )}`;
   } catch (error) {
     return undefined;
   }

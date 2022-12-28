@@ -10,13 +10,7 @@ import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
 import useAssets from "hooks/useAssets";
-import {
-  amountToNumber,
-  amountToValue,
-  cutDecimal,
-  formatNumber,
-  valueToAmount,
-} from "utils";
+import { amountToValue, cutDecimal, formatNumber, valueToAmount } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
@@ -300,9 +294,11 @@ function SwapPage() {
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
       !asset1Value &&
-      Numeric.parse(asset1Value || 0)
-        .mul(10 ** (asset1?.decimals || 0))
-        .gt(Numeric.parse(asset1BalanceMinusFee || 0))
+      Numeric.parse(asset1Value || 0).gt(
+        Numeric.parse(
+          amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
+        ),
+      )
     ) {
       form.setValue(
         FormKey.asset1Value,
@@ -524,7 +520,7 @@ function SwapPage() {
                   },
                   max: {
                     value: asset1BalanceMinusFee
-                      ? amountToNumber(
+                      ? amountToValue(
                           asset1BalanceMinusFee,
                           asset1?.decimals,
                         ) || 0
@@ -752,7 +748,7 @@ function SwapPage() {
                   simulationResult?.estimatedAmount
                     ? cutDecimal(
                         Numeric.parse(
-                          amountToNumber(
+                          amountToValue(
                             simulationResult.estimatedAmount,
                             asset2?.decimals,
                           ) || "0",

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
 import { XPLA_ADDRESS } from "constants/network";
+import { amountToValue, valueToAmount } from "utils";
 
 const useBalanceMinusFee = (
   address?: string,
@@ -12,10 +13,12 @@ const useBalanceMinusFee = (
   useEffect(() => {
     if (balance) {
       if (address === XPLA_ADDRESS && feeAmount !== undefined) {
-        const res = Numeric.parse(balance).minus(feeAmount);
-        setAsset1BalanceMinusFee(res.gt(0) ? res.toString() : "0");
+        const res = Numeric.parse(amountToValue(balance) || 0).minus(
+          amountToValue(feeAmount) || 0,
+        );
+        setAsset1BalanceMinusFee(res.gt(0) ? valueToAmount(res) : "0");
       } else {
-        setAsset1BalanceMinusFee(Numeric.parse(balance).toString());
+        setAsset1BalanceMinusFee(balance);
       }
     } else {
       setAsset1BalanceMinusFee("0");
