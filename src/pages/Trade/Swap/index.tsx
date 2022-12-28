@@ -192,6 +192,7 @@ function SwapPage() {
         ).div(asset2Value);
       }
     } else if (
+      !asset1Value &&
       Numeric.parse(asset1Value || 0).isPos() &&
       simulationResult?.estimatedAmount
     ) {

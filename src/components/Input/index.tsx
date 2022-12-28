@@ -183,9 +183,15 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       const handleKeydown = (event: Event) => {
         const target = event.target as HTMLInputElement;
 
-        if (Number.isNaN(Number(target.value))) {
+        // eslint-disable-next-line prettier/prettier
+        target.value = target.value.replace(/[a-zA-Zㄱ-힣`~!@#$%^&*()_|+\-=?;:'"<>\{\}\[\]\\\/ ]/g, "");
+
+        if (target.value?.split(".").length > 2) {
           event.preventDefault();
-          target.value = target.value.replace(/\D/g, "");
+          const index = target.value.lastIndexOf(".");
+          target.value =
+            target.value.substring(0, index) +
+            target.value.substring(index + 1, target.value.length);
         }
         if (
           target.value.includes(".") &&
