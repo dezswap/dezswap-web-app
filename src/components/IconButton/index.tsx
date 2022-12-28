@@ -14,6 +14,8 @@ const IconButton = styled.button<IconButtonProps>`
   position: relative;
   width: ${({ size }) => `${size}px`};
   height: ${({ size }) => `${size}px`};
+  min-width: ${({ size }) => `${size}px`};
+  min-height: ${({ size }) => `${size}px`};
   border: none;
   outline: none;
   background: none;
