@@ -70,6 +70,10 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
   }
 };
 
+export const isValidAssetNumber = (value: string) => {
+  return value && !value.match(/[^0-9.]/g);
+};
+
 export const getBlockLink = (height?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/block/${height}`;
 
