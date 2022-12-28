@@ -33,7 +33,6 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
-import iconInfo from "assets/icons/icon-info-white.svg";
 import { NumberInput } from "components/Input";
 import Button from "components/Button";
 import Copy from "components/Copy";
