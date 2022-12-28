@@ -301,7 +301,7 @@ function SwapPage() {
     if (
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
-      !asset1Value &&
+      asset1Value &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
           amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
@@ -546,19 +546,6 @@ function SwapPage() {
                     }
                   },
                   required: true,
-                  min: {
-                    value: amountToValue(1, asset1?.decimals) || 0,
-                    message: "",
-                  },
-                  max: {
-                    value: asset1BalanceMinusFee
-                      ? amountToValue(
-                          asset1BalanceMinusFee,
-                          asset1?.decimals,
-                        ) || 0
-                      : Infinity,
-                    message: "",
-                  },
                 })}
                 readOnly={isReversed && simulationResult.isLoading}
               />
@@ -758,10 +745,6 @@ function SwapPage() {
                     }
                   },
                   required: true,
-                  min: {
-                    value: amountToValue(1, asset2?.decimals) || 0,
-                    message: "",
-                  },
                 })}
                 readOnly={!isReversed && simulationResult.isLoading}
               />
