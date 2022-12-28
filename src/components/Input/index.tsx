@@ -184,7 +184,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
         const target = event.target as HTMLInputElement;
 
         // eslint-disable-next-line prettier/prettier
-        target.value = target.value.replace(/[a-zA-Zㄱ-힣`~!@#$%^&*()_|+\-=?;:'"<>\{\}\[\]\\\/ ]/g, "");
+        target.value = target.value.replace(/[^0-9.]/g, "");
 
         if (target.value?.split(".").length > 2) {
           event.preventDefault();

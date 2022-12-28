@@ -183,8 +183,9 @@ function SwapPage() {
   const beliefPrice = useMemo(() => {
     if (isReversed) {
       if (
-        Numeric.parse(simulationResult?.estimatedAmount || 0).isPos() &&
-        asset2Value
+        asset2Value &&
+        !asset2Value.match(/[^0-9.]/g) &&
+        Numeric.parse(simulationResult?.estimatedAmount || 0).isPos()
       ) {
         return Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
@@ -192,7 +193,8 @@ function SwapPage() {
         ).div(asset2Value);
       }
     } else if (
-      !asset1Value &&
+      asset1Value &&
+      !asset1Value.match(/[^0-9.]/g) &&
       Numeric.parse(asset1Value || 0).isPos() &&
       simulationResult?.estimatedAmount
     ) {
@@ -222,6 +224,7 @@ function SwapPage() {
       !selectedPair ||
       !asset1?.address ||
       !asset1Value ||
+      asset1Value.match(/[^0-9.]/g) ||
       Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
@@ -274,7 +277,11 @@ function SwapPage() {
       return "Select tokens";
     }
 
-    if (asset1Value && Numeric.parse(asset1Value).isPos()) {
+    if (
+      asset1Value &&
+      !asset1Value.match(/[^0-9.]/g) &&
+      Numeric.parse(asset1Value).isPos()
+    ) {
       if (
         Numeric.parse(asset1Value).gt(
           Numeric.parse(
@@ -788,6 +795,7 @@ function SwapPage() {
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
                   {asset1Value &&
+                  !asset1Value.match(/[^0-9.]/g) &&
                   Numeric.parse(asset1Value || 0).isPos() &&
                   simulationResult?.estimatedAmount
                     ? cutDecimal(
