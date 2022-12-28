@@ -103,11 +103,11 @@ function Modal({
       }
       return {
         ..._overlayClassName,
-        base: `${_overlayClassName.base || ""} no-overlay`,
+        base: `${_overlayClassName.base || ""} ${additionalClasses.join(" ")}`,
       };
     }
     return _overlayClassName;
-  }, [_overlayClassName, overlay]);
+  }, [_overlayClassName, isInnerModal, overlay]);
   const className = useMemo(() => {
     if (drawer) {
       if (typeof _className === "string" || !_className) {

@@ -34,9 +34,14 @@ const Wrapper = styled.div<WrapperProps>`
   position: relative;
   gap: 4px;
 
-  ${({ height }) => css`
-    height: ${height}px;
-  `}
+  ${({ height }) =>
+    height
+      ? css`
+          height: ${height}px;
+        `
+      : css`
+          height: auto;
+        `}
 
   ${({ borderStyle = "none" }) => css`
     border-style: ${borderStyle};

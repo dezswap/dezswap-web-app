@@ -29,7 +29,6 @@ const Wrapper = styled.label<StyledRadioButtonProps>`
 
   & > div {
     width: 100%;
-    height: auto;
     position: relative;
     display: block;
 
@@ -46,9 +45,14 @@ const Wrapper = styled.label<StyledRadioButtonProps>`
     border-radius: 8px;
     border: 1px solid ${({ theme }) => theme.colors.disabled};
 
-    ${({ height }) => css`
-      height: ${height}px;
-    `}
+    ${({ height }) =>
+      height
+        ? css`
+            height: ${height}px;
+          `
+        : css`
+            height: auto;
+          `}
   }
 
   & > input {
