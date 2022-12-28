@@ -45,11 +45,8 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
-  max-height: calc(690px - 6px);
-
-  .${MOBILE_SCREEN_CLASS} & {
-    max-height: calc(80vh - 6px);
-  }
+  min-height: 512px;
+  max-height: calc(min(60vh, 690px) - 6px);
 `;
 
 const AssetList = styled.div`

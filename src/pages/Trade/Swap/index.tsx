@@ -48,7 +48,7 @@ import Box from "components/Box";
 import { Colors } from "styles/theme/colors";
 import Tooltip from "components/Tooltip";
 import Modal from "components/Modal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
@@ -81,18 +81,46 @@ function SelectAssetDrawer({
   children: ReactNode;
 }) {
   const screenClass = useScreenClass();
+  const [showChildren, setShowChildren] = useState(false);
+  useEffect(() => {
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+    if (isOpen) {
+      setShowChildren(true);
+    } else {
+      timerId = setTimeout(() => {
+        setShowChildren(false);
+      }, MODAL_CLOSE_TIMEOUT_MS);
+    }
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [isOpen]);
   return (
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       isOpen={isOpen}
       noPadding
       onGoBack={onGoBack}
-      css={css`
-        min-height: 690px;
-        max-height: 500px;
-      `}
+      style={{
+        panel: {
+          maxHeight: "unset",
+          overflowY: "visible",
+        },
+      }}
+      closeTimeoutMS={
+        screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
+      }
+      parentSelector={
+        screenClass !== MOBILE_SCREEN_CLASS
+          ? () =>
+              document.querySelector("#main") ||
+              (document.querySelector("#root") as HTMLElement)
+          : undefined
+      }
     >
-      {isOpen && children}
+      {showChildren && children}
     </Modal>
   );
 }

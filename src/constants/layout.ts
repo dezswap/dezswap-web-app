@@ -22,3 +22,5 @@ export const gridConfiguration: Configuration = {
   containerWidths: [940, 1180, 1300],
   maxScreenClass: LARGE_BROWSER_SCREEN_CLASS,
 };
+
+export const MODAL_CLOSE_TIMEOUT_MS = 125;

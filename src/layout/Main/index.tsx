@@ -28,6 +28,7 @@ const Wrapper = styled.div<{ hasBanner?: boolean }>`
     padding-bottom: unset;
     min-height: unset;
   }
+  overflow: visible !important;
 `;
 
 const NavBarWrapper = styled.div`
