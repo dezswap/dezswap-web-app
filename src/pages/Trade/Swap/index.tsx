@@ -401,52 +401,72 @@ function SwapPage() {
             align="center"
             css={css`
               margin-bottom: 5px;
+              row-gap: 12px;
             `}
           >
-            <Col width="auto">
-              <Select
-                outline
-                onClick={() => {
-                  selectAsset1Modal.open();
-                }}
-                options={[
-                  {
-                    label: (
-                      <>
-                        {asset1 && (
-                          <div
-                            css={css`
-                              display: inline-block;
-                              width: 20px;
-                              height: 20px;
-                              position: relative;
-                              background-image: url(${asset1?.iconSrc}),
-                                url(${iconDefaultAsset});
-                              background-position: 50% 50%, 50% 50%;
-                              background-size: auto 15px, contain;
-                              background-repeat: no-repeat, no-repeat;
-                            `}
-                          />
-                        )}
-                        <Typography
-                          size={16}
-                          weight="bold"
-                          color={theme.colors.primary}
-                          style={{ paddingLeft: asset1 ? "0px" : "5px" }}
-                        >
-                          {asset1?.symbol || "Select token"}
-                        </Typography>
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            </Col>
-            <Col className="cm-hidden">
-              <Copy value={asset1Address} />
+            <Col xs={12} sm="content">
+              <Row
+                gutterWidth={screenClass === MOBILE_SCREEN_CLASS ? 10 : 2}
+                justify="between"
+                align="center"
+                wrap="nowrap"
+              >
+                <div
+                  css={css`
+                    position: relative;
+                    flex: 1;
+                  `}
+                >
+                  <Select
+                    block
+                    outline
+                    onClick={() => {
+                      selectAsset1Modal.open();
+                    }}
+                    options={[
+                      {
+                        label: (
+                          <>
+                            {asset1 && (
+                              <div
+                                css={css`
+                                  display: inline-block;
+                                  width: 20px;
+                                  height: 20px;
+                                  position: relative;
+                                  background-image: url(${asset1?.iconSrc}),
+                                    url(${iconDefaultAsset});
+                                  background-position: 50% 50%, 50% 50%;
+                                  background-size: auto 15px, contain;
+                                  background-repeat: no-repeat, no-repeat;
+                                `}
+                              />
+                            )}
+                            <Typography
+                              size={16}
+                              weight="bold"
+                              color={theme.colors.primary}
+                              style={{
+                                paddingLeft: asset1 ? "0px" : "5px",
+                                lineHeight: 1,
+                              }}
+                            >
+                              {asset1?.symbol || "Select token"}
+                            </Typography>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+                <Col xs="content" className="cm-hidden">
+                  <Copy size={38} value={asset1Address} />
+                </Col>
+              </Row>
             </Col>
             <Col
-              width="auto"
+              xs={12}
+              sm="content"
               css={css`
                 opacity: 0.5;
                 &:hover {
@@ -454,11 +474,11 @@ function SwapPage() {
                 }
               `}
             >
-              <Row gutterWidth={0}>
-                <Col>
+              <Row gutterWidth={0} justify="end">
+                <Col width="auto">
                   <Typography weight="bold">Balance:&nbsp;</Typography>
                 </Col>
-                <Col>
+                <Col width="auto">
                   <Typography
                     weight="bold"
                     color="primary"
@@ -600,52 +620,72 @@ function SwapPage() {
             align="center"
             css={css`
               margin-bottom: 5px;
+              row-gap: 12px;
             `}
           >
-            <Col width="auto">
-              <Select
-                outline
-                onClick={() => {
-                  selectAsset2Modal.open();
-                }}
-                options={[
-                  {
-                    label: (
-                      <>
-                        {asset2 && (
-                          <div
-                            css={css`
-                              display: inline-block;
-                              width: 20px;
-                              height: 20px;
-                              position: relative;
-                              background-image: url(${asset2?.iconSrc}),
-                                url(${iconDefaultAsset});
-                              background-position: 50% 50%, 50% 50%;
-                              background-size: auto 15px, contain;
-                              background-repeat: no-repeat, no-repeat;
-                            `}
-                          />
-                        )}
-                        <Typography
-                          size={16}
-                          weight="bold"
-                          color={theme.colors.primary}
-                          style={{ paddingLeft: asset2 ? "0px" : "5px" }}
-                        >
-                          {asset2?.symbol || "Select token"}
-                        </Typography>
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            </Col>
-            <Col className="cm-hidden">
-              <Copy value={asset2Address} />
+            <Col xs={12} sm="content">
+              <Row
+                gutterWidth={screenClass === MOBILE_SCREEN_CLASS ? 10 : 2}
+                justify="between"
+                align="center"
+                wrap="nowrap"
+              >
+                <div
+                  css={css`
+                    position: relative;
+                    flex: 1;
+                  `}
+                >
+                  <Select
+                    block
+                    outline
+                    onClick={() => {
+                      selectAsset2Modal.open();
+                    }}
+                    options={[
+                      {
+                        label: (
+                          <>
+                            {asset2 && (
+                              <div
+                                css={css`
+                                  display: inline-block;
+                                  width: 20px;
+                                  height: 20px;
+                                  position: relative;
+                                  background-image: url(${asset2?.iconSrc}),
+                                    url(${iconDefaultAsset});
+                                  background-position: 50% 50%, 50% 50%;
+                                  background-size: auto 15px, contain;
+                                  background-repeat: no-repeat, no-repeat;
+                                `}
+                              />
+                            )}
+                            <Typography
+                              size={16}
+                              weight="bold"
+                              color={theme.colors.primary}
+                              style={{
+                                paddingLeft: asset2 ? "0px" : "5px",
+                                lineHeight: 1,
+                              }}
+                            >
+                              {asset2?.symbol || "Select token"}
+                            </Typography>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+                <Col xs="content" className="cm-hidden">
+                  <Copy size={38} value={asset2Address} />
+                </Col>
+              </Row>
             </Col>
             <Col
-              width="auto"
+              xs={12}
+              sm="content"
               css={css`
                 opacity: 0.5;
                 text-align: right;
@@ -654,16 +694,15 @@ function SwapPage() {
                 }
               `}
             >
-              <Row nogutter>
-                <Col>
+              <Row gutterWidth={0} justify="end">
+                <Col width="auto">
                   <Typography weight="bold">Balance:&nbsp;</Typography>
                 </Col>
-                <Col>
+                <Col width="auto">
                   <Typography
                     weight="bold"
                     color="primary"
                     css={css`
-                      cursor: pointer;
                       text-decoration: underline;
                       text-underline-offset: 3px;
                     `}
