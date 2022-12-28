@@ -96,6 +96,10 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
       padding-bottom: 0;
       opacity: 0;
       pointer-events: none;
+      .${MOBILE_SCREEN_CLASS} & {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
     `}
 `;
 
@@ -104,11 +108,12 @@ const AssetIcon = styled.div<{ src?: string }>`
   height: 32px;
   position: relative;
   display: inline-block;
+  padding: 0px 6px;
 
-  ${({ src }) => css`
+  ${({ src = iconToken }) => css`
     background-image: url(${src}), url(${iconToken});
   `};
-  background-size: auto 24px, contain;
+  background-size: 32px 32px, 32px 32px;
   background-position: 50% 50%, 50% 50%;
   background-repeat: no-repeat, no-repeat;
 `;
@@ -120,7 +125,7 @@ const tabs = [
 
 function SelectAssetForm(props: SelectAssetFormProps) {
   const {
-    title = "Select a Token",
+    title = "Select a token",
     onSelect: handleSelect,
     selectedAssetAddress,
     hasBackButton,
@@ -157,7 +162,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       );
     }
 
-    return (
+    const items = (
       isBookmark
         ? bookmarks?.map((b) => ({ address: b, isLP: false }))
         : addressList
@@ -179,7 +184,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           >
             <IconButton
               size={32}
-              style={{ alignItems: "center", marginBottom: "5px" }}
+              style={{ alignItems: "center" }}
               icons={{
                 default: bookmarks?.includes(address)
                   ? iconBookmarkSelected
@@ -200,7 +205,12 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 }
               }}
             >
-              <Col xs="content">
+              <Col
+                xs="content"
+                css={css`
+                  vertical-align: middle;
+                `}
+              >
                 <AssetIcon src={asset?.iconSrc} />
               </Col>
               <Col
@@ -213,7 +223,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   weight="bold"
                   color={theme.colors.text.primary}
                 >
-                  {asset?.name}
+                  {asset?.symbol}
                 </Typography>
                 <Typography
                   size={12}
@@ -222,7 +232,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   as="span"
                   css={{ wordBreak: "break-all", opacity: 0.5 }}
                 >
-                  {address?.length > 23 ? ellipsisCenter(address, 10) : address}
+                  {asset?.name}
                 </Typography>
               </Col>
             </Row>
@@ -336,6 +346,26 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </AssetItem>
       );
     });
+
+    return deferredSearchKeyword &&
+      (items === undefined ||
+        items?.filter((i) => !i.props.invisible)?.length < 1) ? (
+      <Typography
+        size={22}
+        weight={900}
+        color={theme.colors.text.placeholder}
+        css={css`
+          padding: 123px 0px;
+          .${MOBILE_SCREEN_CLASS} {
+            padding: 157px 0px;
+          }
+        `}
+      >
+        No result found
+      </Typography>
+    ) : (
+      items
+    );
   }, [
     bookmarks,
     deferredSearchKeyword,

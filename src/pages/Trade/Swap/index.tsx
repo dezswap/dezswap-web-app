@@ -87,6 +87,10 @@ function SelectAssetDrawer({
       isOpen={isOpen}
       noPadding
       onGoBack={onGoBack}
+      css={css`
+        min-height: 690px;
+        max-height: 500px;
+      `}
     >
       {isOpen && children}
     </Modal>
