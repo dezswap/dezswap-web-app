@@ -1,5 +1,6 @@
 import { Numeric } from "@xpla/xpla.js";
 import { nativeTokens } from "constants/network";
+import { Decimal } from "decimal.js";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
@@ -11,15 +12,13 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
 
 export const formatNumber = (value: number | string) =>
   !value
-    ? "-"
+    ? "0"
     : Intl.NumberFormat("en-US", { maximumFractionDigits: 20 }).format(
         Number(value),
       );
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
-  (Math.floor(Number(value) * 10 ** decimals) / 10 ** decimals).toFixed(
-    decimals,
-  );
+  Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
 
 export const isNativeTokenAddress = (address: string) =>
   nativeTokens.filter((n) => n.address === address).length > 0;
@@ -53,7 +52,7 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
   try {
     return Numeric.parse(value || 0)
       .mul(10 ** -decimals)
-      .toFixed(decimals);
+      .toFixed(decimals, Decimal.ROUND_FLOOR);
   } catch (error) {
     return undefined;
   }
@@ -64,16 +63,14 @@ export const amountToNumber = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    const parsed = Numeric.parse(value || 0)
-      .mul(10 ** -decimals)
-      .toNumber();
+    const parsed = Numeric.parse(value || 0).mul(10 ** -decimals);
     const intAndDec = parsed.toString().split(".");
     const decimalCount =
       intAndDec.length > 1 && intAndDec[1].length > 1
         ? intAndDec[1].length - 1
         : 0;
     /* ceiling last decimal for minimum accuracy */
-    return Math.ceil(parsed * 10 ** decimalCount) / 10 ** decimalCount;
+    return parsed.toFixed(decimalCount, Decimal.ROUND_FLOOR);
   } catch (error) {
     return undefined;
   }

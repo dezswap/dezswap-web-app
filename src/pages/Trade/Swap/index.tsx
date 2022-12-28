@@ -149,8 +149,9 @@ function SwapPage() {
     const percentage = simulationResult
       ? Number(
           cutDecimal(
-            (Number(simulationResult.spreadAmount) * 100) /
-              Number(simulationResult.estimatedAmount),
+            Numeric.parse(simulationResult.spreadAmount || 0)
+              .mul(100)
+              .div(Numeric.parse(simulationResult.estimatedAmount || 1)),
             DISPLAY_DECIMAL,
           ),
         )
@@ -185,6 +186,39 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
+  const beliefPrice = useMemo(() => {
+    if (isReversed) {
+      if (
+        Numeric.parse(simulationResult?.estimatedAmount || 0).isPos() &&
+        asset2Value
+      ) {
+        return Numeric.parse(
+          amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
+            0,
+        ).div(asset2Value);
+      }
+    } else if (
+      Numeric.parse(asset1Value || 0).isPos() &&
+      simulationResult?.estimatedAmount
+    ) {
+      return Numeric.parse(asset1Value || 0).div(
+        Numeric.parse(
+          amountToValue(simulationResult.estimatedAmount, asset2?.decimals) ||
+            1,
+        ),
+      );
+    }
+
+    return 0;
+  }, [
+    isReversed,
+    asset1Value,
+    asset2Value,
+    simulationResult.estimatedAmount,
+    asset1?.decimals,
+    asset2?.decimals,
+  ]);
+
   const createTxOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (
       !simulationResult?.estimatedAmount ||
@@ -192,8 +226,8 @@ function SwapPage() {
       !connectedWallet ||
       !selectedPair ||
       !asset1?.address ||
-      !Number(asset1Value) ||
-      Number.isNaN(Number(asset1Value))
+      !asset1Value ||
+      Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
     }
@@ -204,9 +238,7 @@ function SwapPage() {
           selectedPair.contract_addr,
           asset1.address,
           valueToAmount(asset1Value, asset1?.decimals) || "",
-          isReversed
-            ? valueToAmount(asset2Value, asset2?.decimals) || ""
-            : simulationResult.estimatedAmount,
+          beliefPrice || "",
           `${slippageTolerance}`,
           txDeadlineMinutes * 60,
         ),
@@ -222,6 +254,7 @@ function SwapPage() {
     asset2Value,
     asset2,
     slippageTolerance,
+    beliefPrice,
     txDeadlineMinutes,
   ]);
 
@@ -246,10 +279,13 @@ function SwapPage() {
       return "Select tokens";
     }
 
-    if (asset1Value && Number(asset1Value) > 0) {
+    if (asset1Value && Numeric.parse(asset1Value).isPos()) {
       if (
-        Number(asset1Value) >
-        Number(amountToValue(asset1BalanceMinusFee, asset1?.decimals))
+        Numeric.parse(asset1Value).gt(
+          Numeric.parse(
+            amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
+          ),
+        )
       ) {
         return `Insufficient ${asset1?.name} balance`;
       }
@@ -263,7 +299,7 @@ function SwapPage() {
     if (
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
-      !Number.isNaN(Number(asset1Value)) &&
+      !asset1Value &&
       Numeric.parse(asset1Value || 0)
         .mul(10 ** (asset1?.decimals || 0))
         .gt(Numeric.parse(asset1BalanceMinusFee || 0))
@@ -285,7 +321,7 @@ function SwapPage() {
   }, [asset1Balance, asset2Balance, form]);
 
   useEffect(() => {
-    if (simulationResult?.estimatedAmount) {
+    if (simulationResult) {
       form.setValue(
         simulationResult.isReversed ? FormKey.asset1Value : FormKey.asset2Value,
         amountToValue(
@@ -483,7 +519,7 @@ function SwapPage() {
                   },
                   required: true,
                   min: {
-                    value: Number(amountToValue(1, asset1?.decimals) || 0),
+                    value: amountToValue(1, asset1?.decimals) || 0,
                     message: "",
                   },
                   max: {
@@ -672,7 +708,7 @@ function SwapPage() {
                   },
                   required: true,
                   min: {
-                    value: Number(amountToValue(1, asset2?.decimals) || 0),
+                    value: amountToValue(1, asset2?.decimals) || 0,
                     message: "",
                   },
                 })}
@@ -711,15 +747,19 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {simulationResult?.estimatedAmount
+                  {asset1Value &&
+                  Numeric.parse(asset1Value || 0).isPos() &&
+                  simulationResult?.estimatedAmount
                     ? cutDecimal(
-                        (amountToNumber(
-                          simulationResult.estimatedAmount,
-                          asset2?.decimals,
-                        ) || 0) / Number(asset1Value),
+                        Numeric.parse(
+                          amountToNumber(
+                            simulationResult.estimatedAmount,
+                            asset2?.decimals,
+                          ) || "0",
+                        ).div(asset1Value),
                         DISPLAY_DECIMAL,
                       )
-                    : ""}
+                    : "-"}
                   {asset2?.symbol}
                 </Typography>
               }

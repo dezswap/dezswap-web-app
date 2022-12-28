@@ -95,7 +95,7 @@ export const generateSwapMsg = (
         swap: {
           offer_asset: {
             info: { native_token: { denom: fromAssetAddress } },
-            amount: Numeric.parse(amount).toString(),
+            amount: amount.toString(),
           },
           max_spread: `${maxSpreadFixed}`,
           belief_price: `${beliefPrice}`,
@@ -121,7 +121,7 @@ export const generateSwapMsg = (
     {
       send: {
         msg: sendMsg,
-        amount: Numeric.parse(amount).toString(),
+        amount: amount.toString(),
         contract: contractAddress,
         deadline: `${txDeadlineSeconds}`,
       },
