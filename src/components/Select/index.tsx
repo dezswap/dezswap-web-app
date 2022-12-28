@@ -49,6 +49,7 @@ const Wrapper = styled.button<WrapperProps>`
       font-size: 16;
       letter-spacing: normal;
 
+      background: none;
       padding: 0;
       border-radius: 30px;
       border: none;
@@ -63,7 +64,7 @@ const Wrapper = styled.button<WrapperProps>`
       user-select: none;
 
       & > div:first-of-type {
-        padding: 7px 12px;
+        padding: 6px 12px;
         display: inline-flex;
         justify-content: flex-start;
         align-items: center;
@@ -172,7 +173,13 @@ function Select({
         {["string", "number"].includes(typeof selectedOption?.label) ? (
           <>&nbsp;</>
         ) : undefined}
-        <Typography>{selectedOption?.label}</Typography>
+        <Typography
+          css={css`
+            line-height: 1;
+          `}
+        >
+          {selectedOption?.label}
+        </Typography>
         {select.isOpen &&
           options
             ?.filter((option) => option.value !== selectedOption?.value)
@@ -187,7 +194,13 @@ function Select({
                   select.close();
                 }}
               >
-                <Typography>{label}</Typography>
+                <Typography
+                  css={css`
+                    line-height: 1;
+                  `}
+                >
+                  {label}
+                </Typography>
               </OptionWrapper>
             ))}
       </Wrapper>
@@ -204,7 +217,14 @@ function Select({
         {["string", "number"].includes(typeof selectedOption?.label) ? (
           <>&nbsp;</>
         ) : undefined}
-        <Typography color="unset">{selectedOption?.label}</Typography>
+        <Typography
+          css={css`
+            line-height: 1;
+          `}
+          color="unset"
+        >
+          {selectedOption?.label}
+        </Typography>
       </Wrapper>
     </>
   );
