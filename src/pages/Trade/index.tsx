@@ -17,6 +17,7 @@ const Wrapper = styled.div`
   height: auto;
   position: relative;
   padding-top: 30px;
+  z-index: 10;
 
   .${MOBILE_SCREEN_CLASS} & {
     padding-top: 26px;

@@ -266,7 +266,7 @@ function SwapPage() {
           valueToAmount(asset1Value, asset1?.decimals) || "",
           beliefPrice || "",
           `${slippageTolerance}`,
-          txDeadlineMinutes * 60,
+          txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
         ),
       ],
     };
@@ -826,11 +826,12 @@ function SwapPage() {
               isExpanded={false}
             >
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -838,7 +839,7 @@ function SwapPage() {
                   `}
                 >
                   <Typography color={theme.colors.text.primary}>
-                    Expected Amount
+                    Expected amount
                   </Typography>
                   <Tooltip
                     arrow
@@ -851,6 +852,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -876,11 +878,12 @@ function SwapPage() {
                 </Col>
               </Row>
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -901,6 +904,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -919,11 +923,12 @@ function SwapPage() {
                 </Col>
               </Row>
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -942,6 +947,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -962,9 +968,13 @@ function SwapPage() {
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between" style={{ alignItems: "flex-start" }}>
+              <Row
+                gutterWidth={10}
+                justify="between"
+                style={{ alignItems: "flex-start" }}
+              >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -985,6 +995,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -1005,43 +1016,44 @@ function SwapPage() {
           </div>
         )}
         {spread.message && (
-          <Message variant={spread.message}>
-            <Row
-              justify="between"
-              nogutter
-              css={css`
-                width: 100%;
-              `}
-            >
-              <Col
-                css={css`
-                  text-align: left;
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                Price impact Warning
-              </Col>
-              <Col
-                css={css`
-                  text-align: right;
-                  display: flex;
-                  justify-content: flex-end;
-                  align-items: center;
-                `}
-              >
-                {formatNumber(spread.rate)}%
-                <Tooltip
-                  arrow
-                  placement="top"
-                  content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
+          <Tooltip
+            arrow
+            placement="top"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
+          >
+            <div>
+              <Message variant={spread.message}>
+                <Row
+                  justify="between"
+                  nogutter
+                  css={css`
+                    width: 100%;
+                  `}
                 >
-                  <IconButton size={22} icons={{ default: iconInfo }} />
-                </Tooltip>
-              </Col>
-            </Row>
-          </Message>
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Price impact Warning
+                  </Col>
+                  <Col
+                    css={css`
+                      text-align: right;
+                      display: flex;
+                      justify-content: flex-end;
+                      align-items: center;
+                    `}
+                  >
+                    {formatNumber(spread.rate)}%
+                  </Col>
+                </Row>
+              </Message>
+            </div>
+          </Tooltip>
         )}
         {connectedWallet ? (
           <Button

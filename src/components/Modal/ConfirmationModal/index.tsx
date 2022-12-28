@@ -87,7 +87,7 @@ function ConfirmationModal({
       <Button
         block
         size="large"
-        variant="default"
+        variant="secondary"
         onClick={modalProps.onRequestClose}
       >
         Cancel

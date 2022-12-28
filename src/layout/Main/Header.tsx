@@ -493,7 +493,12 @@ function Header() {
                                   background-color: ${theme.colors.text
                                     .background};
                                 `}
-                                onClick={() => wallet.disconnect()}
+                                onClick={() => {
+                                  wallet.disconnect();
+                                  setTimeout(() => {
+                                    window.location.reload();
+                                  }, 100);
+                                }}
                               >
                                 Disconnect
                               </Button>

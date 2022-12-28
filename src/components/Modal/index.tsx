@@ -3,12 +3,12 @@ import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
-import { Container } from "react-grid-system";
+import { Container, useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 
 import iconClose from "assets/icons/icon-close-28px.svg";
 import iconBack from "assets/icons/icon-back.svg";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
 ReactModal.setAppElement("#root");
@@ -68,6 +68,7 @@ const ModalHeader = styled.div`
 `;
 
 function Modal({
+  isOpen,
   children,
   hasCloseButton,
   hasGoBackButton,
@@ -83,13 +84,10 @@ function Modal({
   ...modalProps
 }: ModalProps) {
   const theme = useTheme();
+  const screenClass = useScreenClass();
   const isInnerModal = useMemo(
     () => !!modalProps.parentSelector,
     [modalProps.parentSelector],
-  );
-  const parentElement = useMemo(
-    () => (modalProps.parentSelector ? modalProps.parentSelector() : null),
-    [modalProps],
   );
 
   const overlayClassName = useMemo(() => {
@@ -123,8 +121,27 @@ function Modal({
     }
     return _className;
   }, [_className, drawer]);
+
+  const [resizeTrigger, setResizeTrigger] = useState(false);
+
+  useEffect(() => {
+    setResizeTrigger(true);
+  }, [screenClass]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (resizeTrigger) {
+        setResizeTrigger(false);
+      }
+    }, 1);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [resizeTrigger]);
+
   return (
     <ReactModal
+      isOpen={resizeTrigger ? false : isOpen}
       className={className}
       overlayClassName={overlayClassName}
       closeTimeoutMS={MODAL_CLOSE_TIMEOUT_MS}
@@ -181,7 +198,7 @@ function Modal({
                     ? theme.colors.danger
                     : theme.colors.primary,
                 }),
-            maxHeight: parentElement ? parentElement.clientHeight : "80vh",
+            maxHeight: "80vh",
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
             ...style?.panel,

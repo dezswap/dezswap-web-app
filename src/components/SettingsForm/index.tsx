@@ -64,7 +64,7 @@ function SettingsForm() {
           </Row>
         </Col>
         <Col xs="content">
-          {(!slippageTolerance.value || slippageTolerance.value <= 0.5) && (
+          {(!slippageTolerance.value || slippageTolerance.value < 5) && (
             <Typography size={14} color="danger">
               Too low, TX may fail
             </Typography>

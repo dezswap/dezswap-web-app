@@ -144,7 +144,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       variant,
       size,
       height,
-      placeholder,
       borderStyle,
       align,
       prefix,
@@ -162,18 +161,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         align={align}
       >
         {prefix}
-        <input
-          ref={ref}
-          placeholder={placeholder}
-          onFocus={(e) => {
-            e.target.placeholder = "";
-          }}
-          onBlur={(e) => {
-            e.target.placeholder =
-              placeholder && typeof placeholder === "string" ? placeholder : "";
-          }}
-          {...inputProps}
-        />
+        <input ref={ref} {...inputProps} />
         {suffix}
       </Wrapper>
     );

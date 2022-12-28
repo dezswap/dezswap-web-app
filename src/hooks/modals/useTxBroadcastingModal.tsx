@@ -18,7 +18,7 @@ const useTxBroadcastingModal = ({
         txHash={txHash}
         txError={txError}
         isOpen={modal.isOpen}
-        onDoneClick={modal.close}
+        onDoneClick={() => window.location.reload()}
         onRetryClick={modal.close}
       />
     ),
