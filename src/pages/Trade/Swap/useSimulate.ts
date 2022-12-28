@@ -73,6 +73,7 @@ const useSimulate = ({
           isSimulated.current = true;
         }
       } catch (error) {
+        setIsLoading(false);
         console.log(error);
       }
     };
