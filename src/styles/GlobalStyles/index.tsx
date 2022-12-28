@@ -58,6 +58,7 @@ function GlobalStyles() {
             opacity: 0;
             transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-in-out;
             z-index: 6000;
+            backdrop-filter: blur(4px);
             position: fixed;
             inset: 0;
             &::before {
@@ -67,6 +68,7 @@ function GlobalStyles() {
               position: absolute;
               left: 0;
               top: 0;
+              background-color: ${theme.colors.background};
               opacity: 0.8;
               pointer-events: none;
             }
