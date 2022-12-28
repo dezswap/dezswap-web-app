@@ -20,7 +20,8 @@ const useBalanceMinusFee = (
     } else {
       setAsset1BalanceMinusFee("0");
     }
-  }, [address, balance, feeAmount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [balance, feeAmount]);
 
   return useMemo(() => {
     return balanceMinusFee;

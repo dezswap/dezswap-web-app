@@ -62,8 +62,8 @@ const Wrapper = styled.button<WrapperProps>`
       cursor: pointer;
       user-select: none;
 
-      & > div:first-child {
-        padding: 5px;
+      & > div:first-of-type {
+        padding: 7px 12px;
         display: inline-flex;
         justify-content: flex-start;
         align-items: center;
@@ -110,6 +110,10 @@ const Wrapper = styled.button<WrapperProps>`
             color: ${theme.colors.secondary};
           }
         }
+      }
+
+      &:hover {
+        background-color: ${theme.colors.white};
       }
     `;
   }}

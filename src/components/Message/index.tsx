@@ -16,7 +16,7 @@ const Wrapper = styled.div<Pick<MessageProps, "variant">>`
   gap: 4px;
   padding: 12px 16px;
   border-radius: 12px;
-  opacity: 0.6;
+  opacity: 0.8;
   font-size: 14px;
   font-weight: 700;
 

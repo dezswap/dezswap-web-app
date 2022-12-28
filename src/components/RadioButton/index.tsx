@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 
 interface StyledRadioButtonProps {
   block?: boolean;
+  height?: number;
 }
 
 type RadioButtonProps = React.PropsWithChildren<
@@ -28,7 +29,6 @@ const Wrapper = styled.label<StyledRadioButtonProps>`
 
   & > div {
     width: 100%;
-    height: auto;
     position: relative;
     display: block;
 
@@ -44,6 +44,15 @@ const Wrapper = styled.label<StyledRadioButtonProps>`
     padding: 8px 16px;
     border-radius: 8px;
     border: 1px solid ${({ theme }) => theme.colors.disabled};
+
+    ${({ height }) =>
+      height
+        ? css`
+            height: ${height}px;
+          `
+        : css`
+            height: auto;
+          `}
   }
 
   & > input {
@@ -62,9 +71,9 @@ const Wrapper = styled.label<StyledRadioButtonProps>`
 `;
 
 const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(
-  ({ children, block = false, ...inputProps }, ref) => {
+  ({ children, block = false, height, ...inputProps }, ref) => {
     return (
-      <Wrapper block={block}>
+      <Wrapper block={block} height={height}>
         <input type="radio" {...inputProps} ref={ref} />
         <div>{children}</div>
       </Wrapper>

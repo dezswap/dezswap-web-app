@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import iconDropdown from "assets/icons/icon-dropdown-24px.svg";
 import { useEffect, useState } from "react";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   label?: React.ReactNode;
@@ -28,7 +29,7 @@ const Label = styled.button`
   text-align: left;
   cursor: pointer;
 
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     padding: 16px;
     padding-bottom: 14px;
   }
@@ -55,7 +56,7 @@ const Label = styled.button`
       display: none;
     }
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       right: 16px;
     }
   }
@@ -81,7 +82,7 @@ const Content = styled.div`
     padding-top: 5px;
     padding-bottom: 12px;
     max-height: 600px;
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding: 12px 16px;
       max-height: 300px;
     }

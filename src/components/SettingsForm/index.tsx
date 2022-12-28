@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
 import { NumberInput } from "components/Input";
@@ -40,6 +40,7 @@ const RadioGroup = styled.div`
 function SettingsForm() {
   const slippageTolerance = useSlippageTolerance();
   const txDeadlineMinutes = useTxDeadlineMinutes();
+  const theme = useTheme();
   return (
     <Wrapper>
       <Row
@@ -54,7 +55,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Slippage Tolerance</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>
@@ -74,6 +78,7 @@ function SettingsForm() {
       >
         {slippagePresets.map((preset) => (
           <RadioButton
+            height={40}
             key={preset}
             value={preset}
             name="preset"
@@ -99,9 +104,14 @@ function SettingsForm() {
           onChange={(e) => {
             slippageTolerance.setCustomValue(Number(e.target.value));
           }}
-          suffix="%"
+          suffix={
+            <Typography color={theme.colors.text.secondary} weight="bold">
+              %
+            </Typography>
+          }
           align="right"
           placeholder="0.5"
+          height={40}
         />
       </RadioGroup>
       <Row
@@ -116,7 +126,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Transaction Deadline</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>
@@ -125,8 +138,13 @@ function SettingsForm() {
           <NumberInput
             borderStyle="solid"
             placeholder="20"
-            suffix="mins"
+            suffix={
+              <Typography color={theme.colors.text.secondary} weight="bold">
+                mins
+              </Typography>
+            }
             align="right"
+            height={40}
             value={txDeadlineMinutes.value}
             onChange={(e) => {
               txDeadlineMinutes.setValue(Number(e.target.value));
@@ -142,7 +160,10 @@ function SettingsForm() {
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
             <Label>Auto Router</Label>
-            <Tooltip content="">
+            <Tooltip
+              arrow
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+            >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
           </Row>

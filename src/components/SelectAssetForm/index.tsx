@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
-import { amountToValue, cutDecimal, ellipsisCenter } from "utils";
+import { amountToValue, cutDecimal, ellipsisCenter, formatNumber } from "utils";
 import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
@@ -45,6 +45,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
+  max-height: calc(690px - 6px);
 
   .${MOBILE_SCREEN_CLASS} & {
     max-height: calc(80vh - 6px);
@@ -57,7 +58,7 @@ const AssetList = styled.div`
   padding: 0;
 `;
 
-const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
+const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -65,8 +66,8 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
   width: 100%;
   height: auto;
   position: relative;
-  padding: 15px 27px;
-  .xs & {
+  padding: 16px 27px;
+  .${MOBILE_SCREEN_CLASS} & {
     padding: 15px 13px;
   }
 
@@ -97,10 +98,6 @@ const AssetItem = styled.button<{ selected?: boolean; invisible?: boolean }>`
       pointer-events: none;
     `}
 `;
-
-AssetItem.defaultProps = {
-  type: "button",
-};
 
 const AssetIcon = styled.div<{ src?: string }>`
   width: 32px;
@@ -140,8 +137,28 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const [tabIdx, setTabIdx] = useState(0);
 
   const assetList = useMemo(() => {
+    const isBookmark = tabs[tabIdx].value === "bookmark";
+
+    if (isBookmark && (bookmarks === undefined || bookmarks?.length < 1)) {
+      return (
+        <Typography
+          size={22}
+          weight={900}
+          color={theme.colors.text.placeholder}
+          css={css`
+            padding: 123px 0px;
+            .${MOBILE_SCREEN_CLASS} {
+              padding: 157px 0px;
+            }
+          `}
+        >
+          No bookmarked tokens
+        </Typography>
+      );
+    }
+
     return (
-      tabs[tabIdx].value === "bookmark"
+      isBookmark
         ? bookmarks?.map((b) => ({ address: b, isLP: false }))
         : addressList
     )?.map(({ address, isLP }) => {
@@ -209,10 +226,12 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 </Typography>
               </Col>
             </Row>
-            <Typography>
-              {cutDecimal(
-                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                3,
+            <Typography size={16}>
+              {formatNumber(
+                cutDecimal(
+                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                  3,
+                ),
               )}
             </Typography>
           </AssetItem>
@@ -225,14 +244,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       return (
         <AssetItem
           key={address}
-          onClick={() => {
-            if (handleSelect) {
-              handleSelect(address);
-            }
-            if (goBackOnSelect && onGoBack) {
-              onGoBack();
-            }
-          }}
           selected={selectedAssetAddress === address}
           invisible={
             !!deferredSearchKeyword &&

@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 
 interface ButtonProps {
   size?: "default" | "large" | "xLarge";
-  variant?: "default" | "primary" | "secondary" | "link" | "gradient";
+  variant?: "default" | "primary" | "secondary" | "link" | "gradient" | "error";
   block?: boolean;
 }
 
@@ -90,6 +90,21 @@ const Button = styled.button<ButtonProps>`
             background-image: unset;
             background-color: ${theme.colors.disabled};
             border-color: ${theme.colors.selected};
+          }
+        `;
+      case "error":
+        return css`
+          background-color: ${theme.colors.danger};
+          border-color: ${theme.colors.danger};
+          color: ${theme.colors.white};
+          &:hover {
+            opacity: 0.7;
+          }
+          &:disabled {
+            background-color: ${theme.colors.disabled};
+            border-color: ${theme.colors.disabled};
+            color: ${theme.colors.white};
+            opacity: 0.7;
           }
         `;
       default:

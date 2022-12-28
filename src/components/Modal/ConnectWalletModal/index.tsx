@@ -106,12 +106,12 @@ function ConnectWalletModal(props: ReactModal.Props) {
         {buttons.map((item) => (
           <Col
             width="auto"
+            key={item.label}
             style={{
               paddingTop: screenClass === MOBILE_SCREEN_CLASS ? "30px" : "20px",
             }}
           >
             <WalletButton
-              key={item.label}
               onClick={item.onClick}
               style={{ justifyContent: "center" }}
             >

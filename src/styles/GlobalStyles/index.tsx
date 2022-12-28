@@ -55,7 +55,7 @@ function GlobalStyles() {
           }
           .ReactModal__Overlay {
             opacity: 0;
-            transition: opacity 0.125s ease-in-out, transform 0.125s ease-in-out;
+            transition: transform 0.125s ease-in-out;
             z-index: 6000;
             backdrop-filter: blur(4px);
             position: fixed;
@@ -74,8 +74,7 @@ function GlobalStyles() {
 
             & .ReactModal__Content {
               transform: translateY(-16px) scale(0.9);
-              transition: opacity 0.125s ease-in-out,
-                transform 0.125s ease-in-out;
+              transition: transform 0.125s ease-in-out;
               display: flex;
               align-items: center;
               justify-content: center;

@@ -11,6 +11,7 @@ type InputBorder = "none" | "solid";
 interface WrapperProps {
   variant?: InputVariant;
   size?: InputSize;
+  height?: number;
   borderStyle?: InputBorder;
   align?: InputAlign;
 }
@@ -32,6 +33,15 @@ const Wrapper = styled.div<WrapperProps>`
   height: auto;
   position: relative;
   gap: 4px;
+
+  ${({ height }) =>
+    height
+      ? css`
+          height: ${height}px;
+        `
+      : css`
+          height: auto;
+        `}
 
   ${({ borderStyle = "none" }) => css`
     border-style: ${borderStyle};
@@ -130,13 +140,23 @@ const Wrapper = styled.div<WrapperProps>`
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { variant, size, borderStyle, align, prefix, suffix, ...inputProps },
+    {
+      variant,
+      size,
+      height,
+      borderStyle,
+      align,
+      prefix,
+      suffix,
+      ...inputProps
+    },
     ref,
   ) => {
     return (
       <Wrapper
         variant={variant}
         size={size}
+        height={height}
         borderStyle={borderStyle}
         align={align}
       >
@@ -162,6 +182,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       const elInput = inputRef.current;
       const handleKeydown = (event: Event) => {
         const target = event.target as HTMLInputElement;
+
         if (Number.isNaN(Number(target.value))) {
           event.preventDefault();
           target.value = target.value.replace(/\D/g, "");
@@ -186,6 +207,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       };
     }, [decimals]);
 
-    return <Input ref={inputRef} type="text" {...InputProps} />;
+    return <Input ref={inputRef} {...InputProps} />;
   },
 );

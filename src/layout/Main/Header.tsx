@@ -23,6 +23,7 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
+  formatNumber,
   getWalletLink,
 } from "utils";
 import { useBalance } from "hooks/useBalance";
@@ -81,7 +82,7 @@ const Wrapper = styled.header`
     padding-top: 16px;
     padding-bottom: 24px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -89,7 +90,7 @@ const Wrapper = styled.header`
   &.scrolled > div {
     padding-bottom: 16px;
 
-    .xs & {
+    .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
     }
@@ -107,12 +108,12 @@ const Logo = styled.div`
   transition: all 0.2s cubic-bezier(0, 1, 0, 1);
 
   .scrolled &,
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     height: 45px;
     background-image: url(${imgSymbol});
   }
 
-  .xs & {
+  .${MOBILE_SCREEN_CLASS} & {
     width: 40px;
   }
 `;
@@ -188,7 +189,7 @@ function WalletInfo({
             paddingBottom: "0px",
           }}
           css={css`
-            width: 100%;
+            width: 281px;
             margin-top: 6px;
             padding: 16px;
           `}
@@ -197,8 +198,8 @@ function WalletInfo({
             color={theme.colors.primary}
             weight={900}
             css={css`
-              padding-top: 9px;
-              padding-bottom: 20px;
+              text-align: center;
+              padding-bottom: 9px;
             `}
           >
             My Wallet
@@ -308,14 +309,13 @@ function Header() {
                               ? ellipsisCenter(connectedWallet.walletAddress)
                               : `${ellipsisCenter(
                                   connectedWallet.walletAddress,
-                                )} | ${cutDecimal(
-                                  amountToValue(balance) || 0,
-                                  DISPLAY_DECIMAL,
+                                )} | ${formatNumber(
+                                  cutDecimal(
+                                    amountToValue(balance) || 0,
+                                    DISPLAY_DECIMAL,
+                                  ),
                                 )}${XPLA_SYMBOL}`}
-                            <IconButton
-                              size={22}
-                              icons={{ default: iconDropdown }}
-                            />
+                            <img src={iconDropdown} width={22} alt="dropdown" />
                           </Button>
                         }
                       >
@@ -325,7 +325,7 @@ function Header() {
                             direction="column"
                             nogutter
                             css={css`
-                              padding-top: 11px;
+                              padding-top: 20px;
                               text-align: left;
                             `}
                           >
@@ -368,6 +368,8 @@ function Header() {
                                       connectedWallet.walletAddress,
                                       network.name,
                                     )}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
                                   >
                                     <IconButton
                                       size={18}
@@ -385,33 +387,27 @@ function Header() {
                                   text-align: center;
                                 `}
                               >
-                                {screenClass === MOBILE_SCREEN_CLASS ? (
-                                  <Row
-                                    justify="center"
-                                    align="center"
-                                    css={css`
-                                      display: flex;
-                                      justify-content: space-between;
-                                    `}
-                                  >
-                                    <Col>
-                                      {ellipsisCenter(
-                                        connectedWallet?.walletAddress,
-                                        10,
-                                      )}
-                                    </Col>
-                                    <Col width="auto">
-                                      <Copy
-                                        value={connectedWallet?.walletAddress}
-                                      />
-                                    </Col>
-                                  </Row>
-                                ) : (
-                                  ellipsisCenter(
-                                    connectedWallet?.walletAddress,
-                                    10,
-                                  )
-                                )}
+                                <Row
+                                  nogutter
+                                  justify="center"
+                                  align="center"
+                                  css={css`
+                                    display: flex;
+                                    justify-content: space-between;
+                                  `}
+                                >
+                                  <Col>
+                                    {ellipsisCenter(
+                                      connectedWallet?.walletAddress,
+                                      10,
+                                    )}
+                                  </Col>
+                                  <Col width="auto">
+                                    <Copy
+                                      value={connectedWallet?.walletAddress}
+                                    />
+                                  </Col>
+                                </Row>
                               </Box>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
@@ -422,7 +418,7 @@ function Header() {
                                 Balance
                               </Typography>
                             </Col>
-                            <Col style={{ flex: "unset", paddingTop: "20px" }}>
+                            <Col style={{ flex: "unset", paddingTop: "10px" }}>
                               <Row nogutter justify="start" align="center">
                                 <Col width="auto">
                                   <IconButton
@@ -442,24 +438,29 @@ function Header() {
                               </Row>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
-                              <Box>
+                              <Box
+                                css={css`
+                                  padding: 12px 18px;
+                                `}
+                              >
                                 <Typography
-                                  size={18}
+                                  size={16}
                                   color={theme.colors.text.primary}
                                   weight="bold"
                                 >
-                                  {amountToValue(balance)}
+                                  {formatNumber(amountToValue(balance) || 0)}
                                 </Typography>
                                 <Typography
                                   color={theme.colors.text.secondary}
                                   weight="normal"
                                 >
-                                  = $-
+                                  -
                                 </Typography>
                               </Box>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
                               <Button
+                                size="large"
                                 variant="secondary"
                                 css={css`
                                   width: 100%;

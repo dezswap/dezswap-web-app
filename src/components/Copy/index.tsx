@@ -17,7 +17,7 @@ const Wrapper = styled.button`
   cursor: pointer;
   border: none;
 
-  & > textarea:first-child {
+  & > textarea:first-of-type {
     width: 0;
     height: 0;
     position: absolute;
