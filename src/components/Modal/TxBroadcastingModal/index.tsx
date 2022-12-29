@@ -72,6 +72,54 @@ function TxBroadcastingModal({
 
   return (
     <>
+      {!txHash && !txError && (
+        <Modal
+          drawer={screenClass === MOBILE_SCREEN_CLASS}
+          isOpen={isOpen}
+          title="Check your wallet"
+        >
+          <div
+            css={css`
+              text-align: center;
+            `}
+          >
+            <object
+              type="image/svg+xml"
+              data={BroadcastingSvg}
+              style={{ height: "170px", margin: "-10px 0px" }}
+            >
+              broadcasting
+            </object>
+            <Panel
+              border
+              css={css`
+                padding: 16px;
+                background-color: ${theme.colors.text.background};
+              `}
+            >
+              <Typography
+                size={14}
+                color="primary"
+                weight={700}
+                css={css`
+                  margin-bottom: 9px;
+                `}
+              >
+                Wallet sign-in is needed
+              </Typography>
+              <Hr
+                css={css`
+                  margin-bottom: 10px;
+                `}
+              />
+              <Typography size={16} color="primary" weight={400}>
+                Go to the connected wallet and sign-in to proceed with the
+                transaction
+              </Typography>
+            </Panel>
+          </div>
+        </Modal>
+      )}
       {!txInfo && txHash && (
         <Modal
           drawer={screenClass === MOBILE_SCREEN_CLASS}

@@ -20,6 +20,7 @@ const useRequestPost = () => {
   const handleConfirm = useCallback(async () => {
     if (txOptions && fee && connectedWallet?.availablePost) {
       try {
+        txBroadcastModal.open();
         const result = await connectedWallet.post({
           ...txOptions,
           fee,
@@ -31,7 +32,6 @@ const useRequestPost = () => {
           setTxError(error);
         }
       }
-      txBroadcastModal.open();
     }
   }, [connectedWallet, fee, txOptions, txBroadcastModal]);
 
