@@ -388,7 +388,10 @@ function SwapPage() {
     <>
       <SelectAssetDrawer
         isOpen={isSelectAssetOpen}
-        onGoBack={() => navigate(-1)}
+        onGoBack={() => {
+          selectAsset1Modal.close();
+          selectAsset2Modal.close();
+        }}
       >
         <SelectAssetForm
           goBackOnSelect
@@ -417,7 +420,10 @@ function SwapPage() {
             }
             form.setValue(target, address);
           }}
-          onGoBack={() => navigate(-1)}
+          onGoBack={() => {
+            selectAsset1Modal.close();
+            selectAsset2Modal.close();
+          }}
         />
       </SelectAssetDrawer>
       <Wrapper onSubmit={handleSubmit}>
