@@ -549,6 +549,7 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                decimals={asset1?.decimals}
                 onFocus={(e) => {
                   e.target.value = asset1Value;
                 }}
@@ -748,6 +749,7 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                decimals={asset2?.decimals}
                 onFocus={(e) => {
                   e.target.value = asset2Value;
                 }}
