@@ -183,7 +183,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       const handleKeydown = (event: Event) => {
         const target = event.target as HTMLInputElement;
 
-        // eslint-disable-next-line prettier/prettier
         target.value = target.value.replace(/[^0-9.]/g, "");
 
         if (target.value?.split(".").length > 2) {

@@ -43,10 +43,9 @@ export const valueToAmount = (value?: Numeric.Input, decimals = 18) => {
     const e = n
       .minus(d)
       .mul(10 ** decimals)
-      .toString()
-      .padStart(decimals, "0");
+      .toString();
 
-    return d + e;
+    return d === "0" ? e : d + e.padStart(decimals, "0");
   } catch (error) {
     return undefined;
   }
@@ -70,8 +69,34 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
   }
 };
 
-export const isValidAssetNumber = (value: string) => {
-  return value && !value.match(/[^0-9.]/g);
+export const filterNumberFormat = (value: string, decimals = 18) => {
+  if (!value || value.length < 2) {
+    return value?.replace(/[^0-9]/g, "");
+  }
+
+  let t = 0;
+  let v = 0;
+  const filtered = value.replaceAll(/[0.]/g, "").length
+    ? value
+        .replace(/[^0-9.]/g, "")
+        .replace(/[0]+[.]/g, (match: string) => {
+          v += 1;
+          return v === 1 ? "0." : match;
+        })
+        .replace(/[.]/g, (match: string) => {
+          t += 1;
+          return t === 2 ? "" : match;
+        })
+    : "0";
+
+  return filtered.includes(".") &&
+    (filtered.split(".").pop()?.length || 0) > decimals
+    ? filtered.slice(0, filtered.indexOf(".")) +
+        filtered.slice(
+          filtered.indexOf("."),
+          filtered.indexOf(".") + decimals + 1,
+        )
+    : filtered;
 };
 
 export const getBlockLink = (height?: string, network?: string) =>
