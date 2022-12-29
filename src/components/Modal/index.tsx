@@ -193,11 +193,8 @@ function Modal({
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
                 }
-              : {
-                  borderColor: error
-                    ? theme.colors.danger
-                    : theme.colors.primary,
-                }),
+              : {}),
+            borderColor: error ? theme.colors.danger : theme.colors.primary,
             maxHeight: "80vh",
             overflowY: "auto",
             ...(noPadding && { padding: 0 }),
