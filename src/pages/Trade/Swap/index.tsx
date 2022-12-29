@@ -847,7 +847,11 @@ function SwapPage() {
                     }
                     content="Expected quantity to be received based on the current price, maximum spread and trading fee"
                   >
-                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                    <IconButton
+                      className="cm-hidden"
+                      size={22}
+                      icons={{ default: iconQuestion }}
+                    />
                   </Tooltip>
                 </Col>
                 <Col
@@ -899,7 +903,11 @@ function SwapPage() {
                     }
                     content="Fee paid due to the difference between market price and estimated price"
                   >
-                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                    <IconButton
+                      className="cm-hidden"
+                      size={22}
+                      icons={{ default: iconQuestion }}
+                    />
                   </Tooltip>
                 </Col>
                 <Col
@@ -942,7 +950,11 @@ function SwapPage() {
                     }
                     content="Fee paid to execute this transaction"
                   >
-                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                    <IconButton
+                      className="cm-hidden"
+                      size={22}
+                      icons={{ default: iconQuestion }}
+                    />
                   </Tooltip>
                 </Col>
                 <Col
@@ -990,7 +1002,11 @@ function SwapPage() {
                     }
                     content="Optimized route for your optimal gain"
                   >
-                    <IconButton size={22} icons={{ default: iconQuestion }} />
+                    <IconButton
+                      className="cm-hidden"
+                      size={22}
+                      icons={{ default: iconQuestion }}
+                    />
                   </Tooltip>
                 </Col>
                 <Col
