@@ -70,11 +70,11 @@ function ConfirmationModal({
         size="large"
         variant="primary"
         onClick={async (event) => {
-          if (onConfirm) {
-            await onConfirm();
-          }
           if (modalProps.onRequestClose) {
             modalProps.onRequestClose(event);
+          }
+          if (onConfirm) {
+            await onConfirm();
           }
         }}
         css={css`
