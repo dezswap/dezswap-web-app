@@ -209,92 +209,94 @@ function TxBroadcastingModal({
           </div>
         </Modal>
       )}
-      {txInfo && txHash && (
-        <Modal
-          drawer={screenClass === MOBILE_SCREEN_CLASS}
-          isOpen={isOpen}
-          title="Complete"
-          onRequestClose={onDoneClick}
-          {...modalProps}
-        >
-          <div
-            css={css`
-              text-align: center;
-            `}
+      {txInfo &&
+        txHash &&
+        !txInfo?.code && ( // txInfo.code must be 0 when success
+          <Modal
+            drawer={screenClass === MOBILE_SCREEN_CLASS}
+            isOpen={isOpen}
+            title="Complete"
+            onRequestClose={onDoneClick}
+            {...modalProps}
           >
-            <object
-              type="image/svg+xml"
-              data={Success}
-              style={{ height: "170px", margin: "-10px 0px" }}
-            >
-              broadcasting
-            </object>
-            <Panel
-              border
+            <div
               css={css`
-                padding: 16px;
-                background-color: ${theme.colors.text.background};
+                text-align: center;
               `}
             >
-              <Row wrap="nowrap" style={{ justifyContent: "space-between" }}>
-                <Col width="auto" style={{ flexShrink: "0" }}>
-                  <Typography>Tx Hash</Typography>
-                </Col>
-                <Col width="auto">
-                  <a
-                    href={getTransactionLink(txHash, network.name)}
-                    target="_blank"
-                    rel="noreferrer"
-                    css={css`
-                      text-decoration: none;
-                    `}
-                  >
-                    <Row
-                      gutterWidth={10}
-                      align="end"
-                      style={{
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
+              <object
+                type="image/svg+xml"
+                data={Success}
+                style={{ height: "170px", margin: "-10px 0px" }}
+              >
+                broadcasting
+              </object>
+              <Panel
+                border
+                css={css`
+                  padding: 16px;
+                  background-color: ${theme.colors.text.background};
+                `}
+              >
+                <Row wrap="nowrap" style={{ justifyContent: "space-between" }}>
+                  <Col width="auto" style={{ flexShrink: "0" }}>
+                    <Typography>Tx Hash</Typography>
+                  </Col>
+                  <Col width="auto">
+                    <a
+                      href={getTransactionLink(txHash, network.name)}
+                      target="_blank"
+                      rel="noreferrer"
+                      css={css`
+                        text-decoration: none;
+                      `}
                     >
-                      <Col>
-                        <Typography
-                          size={16}
-                          weight="bold"
-                          color={theme.colors.link}
-                          css={css`
-                            text-decoration: underline;
-                            text-underline-offset: 3px;
-                            word-break: break-all;
-                            text-align: right;
-                          `}
-                        >
-                          {ellipsisCenter(txHash, 10)}
-                        </Typography>
-                      </Col>
-                      <Col width="auto">
-                        <IconButton size={24} icons={{ default: iconLink }} />
-                      </Col>
-                    </Row>
-                  </a>
-                </Col>
-              </Row>
-            </Panel>
-            <Button
-              size="large"
-              variant="primary"
-              css={css`
-                width: 100%;
-                margin-top: 20px;
-              `}
-              onClick={onDoneClick}
-            >
-              Done
-            </Button>
-          </div>
-        </Modal>
-      )}
-      {txError && (
+                      <Row
+                        gutterWidth={10}
+                        align="end"
+                        style={{
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Col>
+                          <Typography
+                            size={16}
+                            weight="bold"
+                            color={theme.colors.link}
+                            css={css`
+                              text-decoration: underline;
+                              text-underline-offset: 3px;
+                              word-break: break-all;
+                              text-align: right;
+                            `}
+                          >
+                            {ellipsisCenter(txHash, 10)}
+                          </Typography>
+                        </Col>
+                        <Col width="auto">
+                          <IconButton size={24} icons={{ default: iconLink }} />
+                        </Col>
+                      </Row>
+                    </a>
+                  </Col>
+                </Row>
+              </Panel>
+              <Button
+                size="large"
+                variant="primary"
+                css={css`
+                  width: 100%;
+                  margin-top: 20px;
+                `}
+                onClick={onDoneClick}
+              >
+                Done
+              </Button>
+            </div>
+          </Modal>
+        )}
+      {(txError || txInfo?.code) && (
         <Modal
           drawer={screenClass === MOBILE_SCREEN_CLASS}
           error
@@ -341,7 +343,7 @@ function TxBroadcastingModal({
                   padding-top: 10px;
                 `}
               >
-                {txError.message}
+                {txInfo?.raw_log ?? txError?.message}
               </Typography>
             </Panel>
             <Button
