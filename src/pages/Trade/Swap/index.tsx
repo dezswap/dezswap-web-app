@@ -259,6 +259,7 @@ function SwapPage() {
     return {
       msgs: [
         generateSwapMsg(
+          connectedWallet?.network.name,
           connectedWallet.walletAddress,
           selectedPair.contract_addr,
           asset1.address,
