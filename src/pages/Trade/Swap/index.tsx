@@ -259,6 +259,7 @@ function SwapPage() {
     return {
       msgs: [
         generateSwapMsg(
+          connectedWallet?.network.name,
           connectedWallet.walletAddress,
           selectedPair.contract_addr,
           asset1.address,
@@ -314,11 +315,15 @@ function SwapPage() {
       ) {
         return `Insufficient ${asset1?.name} balance`;
       }
+
+      if (asset1Value && !asset2Value) {
+        return `Insufficient ${asset2?.symbol} in the pool`;
+      }
       return "Swap";
     }
 
     if (asset2Value && !asset1Value) {
-      return `Not enough pool`;
+      return `Insufficient ${asset2?.symbol} in the pool`;
     }
 
     return "Enter an amount";
@@ -555,6 +560,7 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                decimals={asset1?.decimals}
                 onFocus={(e) => {
                   e.target.value = asset1Value;
                 }}
@@ -754,6 +760,7 @@ function SwapPage() {
                 align="right"
                 size="large"
                 variant="base"
+                decimals={asset2?.decimals}
                 onFocus={(e) => {
                   e.target.value = asset2Value;
                 }}

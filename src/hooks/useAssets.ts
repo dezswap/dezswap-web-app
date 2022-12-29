@@ -37,8 +37,8 @@ const useAssets = () => {
               Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            if (isNativeTokenAddress(address)) {
-              const asset = nativeTokens?.find(
+            if (isNativeTokenAddress(network.name, address)) {
+              const asset = nativeTokens[network.name]?.find(
                 (item) => item.address === address,
               );
               const balance = await api.getNativeTokenBalance(address);
@@ -92,7 +92,7 @@ const useAssets = () => {
   const addFetchQueue = useCallback(
     (address: string, networkName: NetworkName) => {
       if (
-        nativeTokens?.some((item) => item.address === address) ||
+        nativeTokens[networkName]?.some((item) => item.address === address) ||
         AccAddress.validate(address)
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {

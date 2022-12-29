@@ -16,8 +16,8 @@ export const useBalance = (asset: string) => {
         setBalance("0");
       }
 
-      if (asset) {
-        if (isNativeTokenAddress(asset)) {
+      if (asset && connectedWallet?.network.name) {
+        if (isNativeTokenAddress(connectedWallet?.network.name, asset)) {
           api
             .getNativeTokenBalance(asset)
             .then((value) =>

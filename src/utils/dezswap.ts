@@ -12,10 +12,11 @@ export const generatePairsMsg = (options: {
 };
 
 export const generateSimulationMsg = (
+  networkName: string,
   offerAsset: string,
   amount: Numeric.Input,
 ) => {
-  if (isNativeTokenAddress(offerAsset)) {
+  if (isNativeTokenAddress(networkName, offerAsset)) {
     return {
       simulation: {
         offer_asset: {
@@ -45,10 +46,11 @@ export const generateSimulationMsg = (
 };
 
 export const generateReverseSimulationMsg = (
+  networkName: string,
   askAsset: string,
   amount: Numeric.Input,
 ) => {
-  if (isNativeTokenAddress(askAsset)) {
+  if (isNativeTokenAddress(networkName, askAsset)) {
     return {
       reverse_simulation: {
         ask_asset: {
@@ -78,6 +80,7 @@ export const generateReverseSimulationMsg = (
 };
 
 export const generateSwapMsg = (
+  networkName: string,
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,
@@ -87,7 +90,7 @@ export const generateSwapMsg = (
   txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
-  if (isNativeTokenAddress(fromAssetAddress)) {
+  if (isNativeTokenAddress(networkName, fromAssetAddress)) {
     return new MsgExecuteContract(
       senderAddress,
       contractAddress,
