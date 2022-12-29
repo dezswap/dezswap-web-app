@@ -58,7 +58,7 @@ const Button = styled.button<ButtonProps>`
         return css`
           background-color: transparent;
           border-color: ${theme.colors.disabled};
-          color: ${theme.colors.primary};
+          color: ${theme.colors.text.primary}b2;
           border-width: 1px;
           padding: 0 15px;
 

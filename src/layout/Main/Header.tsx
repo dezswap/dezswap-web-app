@@ -48,18 +48,37 @@ export const MOBILE_HEADER_HEIGHT = 65;
 export const BANNER_HEIGHT = 31;
 export const DISPLAY_DECIMAL = 2;
 
-const Wrapper = styled.header`
+interface WrapperProps {
+  isTestnet?: boolean;
+}
+
+const Wrapper = styled.header<WrapperProps>`
   width: 100%;
   height: ${`${DEFAULT_HEADER_HEIGHT}px`};
   position: sticky;
   left: 0;
-  top: ${`-${DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT}px`};
   z-index: 5000;
   backdrop-filter: blur(4px);
 
+  ${({ isTestnet = false }) =>
+    isTestnet
+      ? css`
+          top: ${`-${
+            DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT - BANNER_HEIGHT
+          }px`};
+          .${MOBILE_SCREEN_CLASS} & {
+            top: ${`${BANNER_HEIGHT}px`};
+          }
+        `
+      : css`
+          top: ${`-${DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT}px`};
+          .${MOBILE_SCREEN_CLASS} & {
+            top: 0;
+          }
+        `}
+
   .${MOBILE_SCREEN_CLASS} & {
     height: ${`${MOBILE_HEADER_HEIGHT}px`};
-    top: 0;
   }
 
   &::before {
@@ -244,6 +263,10 @@ function Header() {
         <Banner
           css={css`
             padding: 0;
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 6000;
           `}
         >
           <span
@@ -259,7 +282,10 @@ function Header() {
           </span>
         </Banner>
       )}
-      <Wrapper ref={wrapperRef}>
+      <Wrapper
+        ref={wrapperRef}
+        isTestnet={connectedWallet?.network.name !== "mainnet"}
+      >
         <div>
           <Container>
             <Row justify="between" align="center" gutterWidth={10}>
@@ -467,7 +493,12 @@ function Header() {
                                   background-color: ${theme.colors.text
                                     .background};
                                 `}
-                                onClick={() => wallet.disconnect()}
+                                onClick={() => {
+                                  wallet.disconnect();
+                                  setTimeout(() => {
+                                    window.location.reload();
+                                  }, 100);
+                                }}
                               >
                                 Disconnect
                               </Button>

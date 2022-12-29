@@ -78,7 +78,16 @@ function Copy({ value, size, children }: CopyProps) {
     <Wrapper onClick={handleClick} type="button">
       <textarea ref={inputRef} value={value} readOnly />
       {children || (
-        <Tooltip arrow content="Copied!" trigger="click">
+        <Tooltip
+          arrow
+          content="Copied!"
+          trigger="click"
+          onShow={(instance) => {
+            setTimeout(() => {
+              instance.hide();
+            }, 1000);
+          }}
+        >
           <CopyIcon size={size} />
         </Tooltip>
       )}

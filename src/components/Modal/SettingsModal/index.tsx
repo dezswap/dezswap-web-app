@@ -4,21 +4,24 @@ import Modal from "components/Modal";
 import SettingsForm from "components/SettingsForm";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
 function SettingsModal({ ...modalProps }: ReactModal.Props) {
   const screenClass = useScreenClass();
 
   return (
     <Modal
-      drawer={screenClass === "xs"}
-      overlay={screenClass === "xs"}
+      drawer={screenClass === MOBILE_SCREEN_CLASS}
+      overlay={screenClass === MOBILE_SCREEN_CLASS}
       title="Settings"
-      hasCloseButton={screenClass === "xs"}
-      hasGoBackButton={screenClass !== "xs"}
+      hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
+      hasGoBackButton={screenClass !== MOBILE_SCREEN_CLASS}
       onGoBack={modalProps.onRequestClose}
+      closeTimeoutMS={
+        screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
+      }
       parentSelector={
-        screenClass !== "xs"
+        screenClass !== MOBILE_SCREEN_CLASS
           ? () =>
               document.querySelector("#main") ||
               (document.querySelector("#root") as HTMLElement)
@@ -33,7 +36,7 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
       />
       <div
         css={css`
-          min-height: 383px;
+          min-height: 340px;
           .${MOBILE_SCREEN_CLASS} & {
             min-height: unset;
           }

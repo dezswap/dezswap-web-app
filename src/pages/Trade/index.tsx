@@ -10,13 +10,14 @@ import iconOverviewHover from "assets/icons/icon-overview-38px-hover.svg";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
 const Wrapper = styled.div`
   width: 100%;
   height: auto;
   position: relative;
   padding-top: 30px;
+  z-index: 10;
 
   .${MOBILE_SCREEN_CLASS} & {
     padding-top: 26px;
@@ -24,6 +25,7 @@ const Wrapper = styled.div`
 
   & #main:has(.inner-modal) > div:first-of-type {
     opacity: 0;
+    transition: opacity ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} step-end;
   }
 `;
 

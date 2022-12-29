@@ -72,7 +72,7 @@ const socialMediaLinks = [
   },
   {
     name: "Twitter",
-    url: "https://twitter.com/dezswap",
+    url: "https://twitter.com/dezswap_io",
     icons: {
       default: iconTwitter,
       hover: iconTwitterHover,

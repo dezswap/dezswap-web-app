@@ -33,7 +33,6 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
-import iconInfo from "assets/icons/icon-info-white.svg";
 import { NumberInput } from "components/Input";
 import Button from "components/Button";
 import Copy from "components/Copy";
@@ -48,7 +47,7 @@ import Box from "components/Box";
 import { Colors } from "styles/theme/colors";
 import Tooltip from "components/Tooltip";
 import Modal from "components/Modal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
@@ -81,14 +80,46 @@ function SelectAssetDrawer({
   children: ReactNode;
 }) {
   const screenClass = useScreenClass();
+  const [showChildren, setShowChildren] = useState(false);
+  useEffect(() => {
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+    if (isOpen) {
+      setShowChildren(true);
+    } else {
+      timerId = setTimeout(() => {
+        setShowChildren(false);
+      }, MODAL_CLOSE_TIMEOUT_MS);
+    }
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [isOpen]);
   return (
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       isOpen={isOpen}
       noPadding
       onGoBack={onGoBack}
+      style={{
+        panel: {
+          maxHeight: "unset",
+          overflowY: "visible",
+        },
+      }}
+      closeTimeoutMS={
+        screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
+      }
+      parentSelector={
+        screenClass !== MOBILE_SCREEN_CLASS
+          ? () =>
+              document.querySelector("#main") ||
+              (document.querySelector("#root") as HTMLElement)
+          : undefined
+      }
     >
-      {isOpen && children}
+      {showChildren && children}
     </Modal>
   );
 }
@@ -234,7 +265,7 @@ function SwapPage() {
           valueToAmount(asset1Value, asset1?.decimals) || "",
           beliefPrice || "",
           `${slippageTolerance}`,
-          txDeadlineMinutes * 60,
+          txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
         ),
       ],
     };
@@ -297,7 +328,7 @@ function SwapPage() {
     if (
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
-      !asset1Value &&
+      asset1Value &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
           amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
@@ -542,19 +573,6 @@ function SwapPage() {
                     }
                   },
                   required: true,
-                  min: {
-                    value: amountToValue(1, asset1?.decimals) || 0,
-                    message: "",
-                  },
-                  max: {
-                    value: asset1BalanceMinusFee
-                      ? amountToValue(
-                          asset1BalanceMinusFee,
-                          asset1?.decimals,
-                        ) || 0
-                      : Infinity,
-                    message: "",
-                  },
                 })}
                 readOnly={isReversed && simulationResult.isLoading}
               />
@@ -754,10 +772,6 @@ function SwapPage() {
                     }
                   },
                   required: true,
-                  min: {
-                    value: amountToValue(1, asset2?.decimals) || 0,
-                    message: "",
-                  },
                 })}
                 readOnly={!isReversed && simulationResult.isLoading}
               />
@@ -811,11 +825,12 @@ function SwapPage() {
               isExpanded={false}
             >
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -823,7 +838,7 @@ function SwapPage() {
                   `}
                 >
                   <Typography color={theme.colors.text.primary}>
-                    Expected Amount
+                    Expected amount
                   </Typography>
                   <Tooltip
                     arrow
@@ -836,6 +851,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -861,11 +877,12 @@ function SwapPage() {
                 </Col>
               </Row>
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -886,6 +903,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -904,11 +922,12 @@ function SwapPage() {
                 </Col>
               </Row>
               <Row
+                gutterWidth={10}
                 justify="between"
                 style={{ paddingBottom: "3px", alignItems: "flex-start" }}
               >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -927,6 +946,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -947,9 +967,13 @@ function SwapPage() {
                   </Typography>
                 </Col>
               </Row>
-              <Row justify="between" style={{ alignItems: "flex-start" }}>
+              <Row
+                gutterWidth={10}
+                justify="between"
+                style={{ alignItems: "flex-start" }}
+              >
                 <Col
-                  width="auto"
+                  xs={5}
                   css={css`
                     display: flex;
                     justify-content: flex-start;
@@ -970,6 +994,7 @@ function SwapPage() {
                   </Tooltip>
                 </Col>
                 <Col
+                  xs={7}
                   css={css`
                     display: flex;
                     justify-content: flex-end;
@@ -990,43 +1015,44 @@ function SwapPage() {
           </div>
         )}
         {spread.message && (
-          <Message variant={spread.message}>
-            <Row
-              justify="between"
-              nogutter
-              css={css`
-                width: 100%;
-              `}
-            >
-              <Col
-                css={css`
-                  text-align: left;
-                  display: flex;
-                  justify-content: flex-start;
-                  align-items: center;
-                `}
-              >
-                Price impact Warning
-              </Col>
-              <Col
-                css={css`
-                  text-align: right;
-                  display: flex;
-                  justify-content: flex-end;
-                  align-items: center;
-                `}
-              >
-                {formatNumber(spread.rate)}%
-                <Tooltip
-                  arrow
-                  placement="top"
-                  content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
+          <Tooltip
+            arrow
+            placement="top"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
+          >
+            <div>
+              <Message variant={spread.message}>
+                <Row
+                  justify="between"
+                  nogutter
+                  css={css`
+                    width: 100%;
+                  `}
                 >
-                  <IconButton size={22} icons={{ default: iconInfo }} />
-                </Tooltip>
-              </Col>
-            </Row>
-          </Message>
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Price impact Warning
+                  </Col>
+                  <Col
+                    css={css`
+                      text-align: right;
+                      display: flex;
+                      justify-content: flex-end;
+                      align-items: center;
+                    `}
+                  >
+                    {formatNumber(spread.rate)}%
+                  </Col>
+                </Row>
+              </Message>
+            </div>
+          </Tooltip>
         )}
         {connectedWallet ? (
           <Button

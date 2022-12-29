@@ -38,17 +38,19 @@ interface SelectAssetFormProps {
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(min(60vh, 690px) - 6px);
   position: relative;
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
-  max-height: calc(690px - 6px);
+  min-height: 512px;
 
   .${MOBILE_SCREEN_CLASS} & {
-    max-height: calc(80vh - 6px);
+    min-height: unset;
+    max-height: unset;
+    height: 80vh;
   }
 `;
 
@@ -96,6 +98,10 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
       padding-bottom: 0;
       opacity: 0;
       pointer-events: none;
+      .${MOBILE_SCREEN_CLASS} & {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
     `}
 `;
 
@@ -104,11 +110,12 @@ const AssetIcon = styled.div<{ src?: string }>`
   height: 32px;
   position: relative;
   display: inline-block;
+  padding: 0px 6px;
 
-  ${({ src }) => css`
+  ${({ src = iconToken }) => css`
     background-image: url(${src}), url(${iconToken});
   `};
-  background-size: auto 24px, contain;
+  background-size: 32px 32px, 32px 32px;
   background-position: 50% 50%, 50% 50%;
   background-repeat: no-repeat, no-repeat;
 `;
@@ -120,7 +127,7 @@ const tabs = [
 
 function SelectAssetForm(props: SelectAssetFormProps) {
   const {
-    title = "Select a Token",
+    title = "Select a token",
     onSelect: handleSelect,
     selectedAssetAddress,
     hasBackButton,
@@ -141,23 +148,27 @@ function SelectAssetForm(props: SelectAssetFormProps) {
 
     if (isBookmark && (bookmarks === undefined || bookmarks?.length < 1)) {
       return (
-        <Typography
-          size={22}
-          weight={900}
-          color={theme.colors.text.placeholder}
+        <div
           css={css`
-            padding: 123px 0px;
-            .${MOBILE_SCREEN_CLASS} {
-              padding: 157px 0px;
-            }
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           `}
         >
-          No bookmarked tokens
-        </Typography>
+          <Typography
+            size={22}
+            weight={900}
+            color={theme.colors.text.placeholder}
+          >
+            No bookmarked tokens
+          </Typography>
+        </div>
       );
     }
 
-    return (
+    const items = (
       isBookmark
         ? bookmarks?.map((b) => ({ address: b, isLP: false }))
         : addressList
@@ -177,20 +188,28 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               ) < 0
             }
           >
-            <IconButton
-              size={32}
-              style={{ alignItems: "center", marginBottom: "5px" }}
-              icons={{
-                default: bookmarks?.includes(address)
-                  ? iconBookmarkSelected
-                  : iconBookmark,
-              }}
-              onClick={() => toggleBookmark(address)}
-            />
+            <div>
+              <IconButton
+                size={32}
+                style={{ alignItems: "center" }}
+                icons={{
+                  default: bookmarks?.includes(address)
+                    ? iconBookmarkSelected
+                    : iconBookmark,
+                }}
+                onClick={() => toggleBookmark(address)}
+              />
+            </div>
             <Row
               gutterWidth={6}
-              style={{ display: "flex", flexGrow: 1, alignItems: "center" }}
+              style={{
+                display: "flex",
+                flex: 6,
+                flexShrink: 0,
+                alignItems: "center",
+              }}
               justify="start"
+              wrap="nowrap"
               onClick={() => {
                 if (handleSelect) {
                   handleSelect(address);
@@ -200,33 +219,52 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 }
               }}
             >
-              <Col xs="content">
-                <AssetIcon src={asset?.iconSrc} />
-              </Col>
               <Col
+                xs="content"
                 css={css`
-                  flex: 1;
+                  vertical-align: middle;
                 `}
               >
+                <AssetIcon src={asset?.iconSrc} />
+              </Col>
+              <Col xs={8}>
                 <Typography
                   size={16}
                   weight="bold"
                   color={theme.colors.text.primary}
+                  css={css`
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  `}
                 >
-                  {asset?.name}
+                  {asset?.symbol}
                 </Typography>
                 <Typography
                   size={12}
                   weight="normal"
                   color={theme.colors.text.primary}
-                  as="span"
-                  css={{ wordBreak: "break-all", opacity: 0.5 }}
+                  css={css`
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    opacity: 0.5;
+                  `}
                 >
-                  {address?.length > 23 ? ellipsisCenter(address, 10) : address}
+                  {asset?.name}
                 </Typography>
               </Col>
             </Row>
-            <Typography size={16}>
+            <Typography
+              size={16}
+              css={css`
+                overflow: hidden;
+                white-space: nowrap;
+                text-align: right;
+                margin-left: auto;
+                flex: 4;
+              `}
+            >
               {formatNumber(
                 cutDecimal(
                   amountToValue(asset?.balance || 0, asset?.decimals) || 0,
@@ -336,6 +374,26 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </AssetItem>
       );
     });
+
+    return deferredSearchKeyword &&
+      (items === undefined ||
+        items?.filter((i) => !i.props.invisible)?.length < 1) ? (
+      <Typography
+        size={22}
+        weight={900}
+        color={theme.colors.text.placeholder}
+        css={css`
+          padding: 123px 0px;
+          .${MOBILE_SCREEN_CLASS} {
+            padding: 157px 0px;
+          }
+        `}
+      >
+        No result found
+      </Typography>
+    ) : (
+      items
+    );
   }, [
     bookmarks,
     deferredSearchKeyword,
@@ -380,8 +438,17 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         <Input
           size="large"
           variant="primary"
-          align="center"
+          align="left"
+          height={50}
           style={{ fontSize: "16px", fontWeight: "bold" }}
+          css={css`
+            &::placeholder {
+              text-align: center !important;
+            }
+            &:focus::placeholder {
+              opacity: 0;
+            }
+          `}
           borderStyle="solid"
           placeholder="Search name or paste address"
           onChange={(event) => {

@@ -1,4 +1,5 @@
 import { css, Global, useTheme } from "@emotion/react";
+import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import reset from "emotion-reset";
 import "tippy.js/dist/tippy.css";
 
@@ -55,7 +56,7 @@ function GlobalStyles() {
           }
           .ReactModal__Overlay {
             opacity: 0;
-            transition: transform 0.125s ease-in-out;
+            transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-in-out;
             z-index: 6000;
             backdrop-filter: blur(4px);
             position: fixed;
@@ -73,8 +74,8 @@ function GlobalStyles() {
             }
 
             & .ReactModal__Content {
-              transform: translateY(-16px) scale(0.9);
-              transition: transform 0.125s ease-in-out;
+              transform: translateY(0px) scale(1);
+              transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-in-out;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -110,9 +111,9 @@ function GlobalStyles() {
           }
 
           .ReactModal__Overlay--before-close {
-            opacity: 0;
+            opacity: 1;
             & .ReactModal__Content {
-              transform: translateY(-16px) scale(0.9);
+              transform: translateY(0px) scale(1);
 
               &.bottom-drawer {
                 transform: translateY(100%) scale(1);

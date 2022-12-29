@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Button from "components/Button";
 import Modal from "components/Modal";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import { useEffect, useRef } from "react";
 import { useScreenClass } from "react-grid-system";
 
@@ -44,7 +45,7 @@ function ConfirmationModal({
     <Modal
       {...modalProps}
       parentSelector={
-        screenClass !== "xs"
+        screenClass !== MOBILE_SCREEN_CLASS
           ? () => {
               return (
                 document.querySelector("#main") ||
@@ -53,11 +54,14 @@ function ConfirmationModal({
             }
           : undefined
       }
+      closeTimeoutMS={
+        screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
+      }
       title="Confirmation"
-      drawer={screenClass === "xs"}
-      overlay={screenClass === "xs"}
-      hasGoBackButton={screenClass !== "xs"}
-      hasCloseButton={screenClass === "xs"}
+      drawer={screenClass === MOBILE_SCREEN_CLASS}
+      overlay={screenClass === MOBILE_SCREEN_CLASS}
+      hasGoBackButton={screenClass !== MOBILE_SCREEN_CLASS}
+      hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
       onGoBack={modalProps.onRequestClose}
     >
       <Content ref={divRef} className="cm" />
@@ -83,7 +87,7 @@ function ConfirmationModal({
       <Button
         block
         size="large"
-        variant="default"
+        variant="secondary"
         onClick={modalProps.onRequestClose}
       >
         Cancel
