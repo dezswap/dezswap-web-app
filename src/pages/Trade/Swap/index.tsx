@@ -125,7 +125,6 @@ function SelectAssetDrawer({
 }
 
 function SwapPage() {
-  const navigate = useNavigate();
   const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
@@ -138,6 +137,7 @@ function SwapPage() {
   const theme = useTheme();
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
+  const [balanceApplied, setBalanceApplied] = useState(false);
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -331,6 +331,8 @@ function SwapPage() {
 
   useEffect(() => {
     if (
+      connectedWallet &&
+      balanceApplied &&
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
       asset1Value &&
@@ -531,6 +533,7 @@ function SwapPage() {
                     `}
                     onClick={() => {
                       setIsReversed(false);
+                      setBalanceApplied(true);
                       form.setValue(
                         FormKey.asset1Value,
                         amountToValue(
@@ -568,6 +571,7 @@ function SwapPage() {
                   setValueAs: (value) =>
                     filterNumberFormat(value, asset1?.decimals),
                   onChange: () => {
+                    setBalanceApplied(false);
                     setIsReversed(false);
                   },
                   onBlur: (e) => {
