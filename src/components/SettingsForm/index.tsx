@@ -57,7 +57,7 @@ function SettingsForm() {
             <Label>Slippage Tolerance</Label>
             <Tooltip
               arrow
-              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+              content="When you select asset pair and input how much you want to swap, Dezswap simulates the result and shows the expected amount. But the number can vary by the timing between you simulated and the unexpected swap transaction executed. If you set the number of it, your swap transaction raises failure if the actual result is different from the simulated result. The number is your allowance of the difference(may be loss)."
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
@@ -128,7 +128,7 @@ function SettingsForm() {
             <Label>Transaction Deadline</Label>
             <Tooltip
               arrow
-              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+              content="If the chain network is too busy to process, your transaction would not be executed and could be remain on the memory queue. But if it remains long time, the swap rate could be different and it could cause your loss. If you set this parameter, your swap transaction will only be valid within the given time range and will raise an error when your transaction is executed after the given lifetime."
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
@@ -162,7 +162,7 @@ function SettingsForm() {
             <Label>Auto Router</Label>
             <Tooltip
               arrow
-              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ligula nisl, malesuada at justo eu, rutrum pellentesque arcu."
+              content="If there is no direct pair between two assets, Dezswap helps finding the best path from the all possible multihop swaps."
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>

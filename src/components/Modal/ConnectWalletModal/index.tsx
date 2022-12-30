@@ -88,9 +88,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           padding-top: 20px;
         `}
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In efficitur
-        mauris sed convallis vehicula. Cras pharetra euismod tempus.Cras
-        pharetra euismod tempus.
+        {/* TODO: write description */}
       </Typography>
       <Row
         justify="between"
