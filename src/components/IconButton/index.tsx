@@ -78,7 +78,7 @@ const IconButton = styled.button<IconButtonProps>`
   ${({ onClick }) =>
     !onClick &&
     css`
-      cursor: default;
+      cursor: unset;
     `}
 `;
 
