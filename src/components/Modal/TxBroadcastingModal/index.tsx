@@ -127,9 +127,8 @@ function TxBroadcastingModal({
           shouldCloseOnEsc={false}
           shouldCloseOnOverlayClick={false}
           drawer={screenClass === MOBILE_SCREEN_CLASS}
-          isOpen={isOpen}
+          isOpen
           title="Broadcasting transaction"
-          onRequestClose={onDoneClick}
           {...modalProps}
         >
           <div
@@ -220,9 +219,8 @@ function TxBroadcastingModal({
             shouldCloseOnEsc={false}
             shouldCloseOnOverlayClick={false}
             drawer={screenClass === MOBILE_SCREEN_CLASS}
-            isOpen={isOpen}
+            isOpen
             title="Complete"
-            onRequestClose={onDoneClick}
             {...modalProps}
           >
             <div
@@ -308,9 +306,8 @@ function TxBroadcastingModal({
           shouldCloseOnOverlayClick={false}
           drawer={screenClass === MOBILE_SCREEN_CLASS}
           error
-          isOpen={isOpen}
+          isOpen
           title="Something wrong"
-          onRequestClose={onDoneClick}
           {...modalProps}
         >
           <div
