@@ -479,11 +479,14 @@ function SwapPage() {
                                   width: 20px;
                                   height: 20px;
                                   position: relative;
-                                  background-image: url(${asset1?.iconSrc}),
-                                    url(${iconDefaultAsset});
+                                  background-image: url(${asset1?.iconSrc ||
+                                  iconDefaultAsset});
                                   background-position: 50% 50%, 50% 50%;
-                                  background-size: auto 15px, contain;
+                                  background-size: auto 20px, contain;
                                   background-repeat: no-repeat, no-repeat;
+                                  background-color: ${theme.colors.white};
+                                  background-color: ${theme.colors.white};
+                                  border-radius: 50%;
                                 `}
                               />
                             )}
@@ -492,6 +495,7 @@ function SwapPage() {
                               weight="bold"
                               color={theme.colors.primary}
                               style={{
+                                paddingTop: "1px",
                                 paddingLeft: asset1 ? "0px" : "5px",
                                 lineHeight: 1,
                               }}
@@ -692,11 +696,13 @@ function SwapPage() {
                                   width: 20px;
                                   height: 20px;
                                   position: relative;
-                                  background-image: url(${asset2?.iconSrc}),
-                                    url(${iconDefaultAsset});
+                                  background-image: url(${asset2?.iconSrc ||
+                                  iconDefaultAsset});
                                   background-position: 50% 50%, 50% 50%;
-                                  background-size: auto 15px, contain;
+                                  background-size: auto 20px, contain;
                                   background-repeat: no-repeat, no-repeat;
+                                  background-color: ${theme.colors.white};
+                                  border-radius: 50%;
                                 `}
                               />
                             )}
@@ -705,6 +711,7 @@ function SwapPage() {
                               weight="bold"
                               color={theme.colors.primary}
                               style={{
+                                paddingTop: "1px",
                                 paddingLeft: asset2 ? "0px" : "5px",
                                 lineHeight: 1,
                               }}
