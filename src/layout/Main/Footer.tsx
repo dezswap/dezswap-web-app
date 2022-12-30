@@ -62,14 +62,15 @@ const SocialMediaLinks = styled.div`
 `;
 
 const socialMediaLinks = [
-  {
-    name: "Medium",
-    url: "https://medium.com/@dezswap",
-    icons: {
-      default: iconMedium,
-      hover: iconMediumHover,
-    },
-  },
+  // TODO: enable medium link
+  // {
+  //   name: "Medium",
+  //   url: "https://medium.com/@dezswap",
+  //   icons: {
+  //     default: iconMedium,
+  //     hover: iconMediumHover,
+  //   },
+  // },
   {
     name: "Twitter",
     url: "https://twitter.com/dezswap_io",
