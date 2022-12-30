@@ -159,7 +159,7 @@ function SettingsForm() {
       <Row justify="between" align="center" gutterWidth={0} wrap="nowrap">
         <Col xs="content">
           <Row justify="start" align="center" gutterWidth={2}>
-            <Label>Auto Router</Label>
+            <Label color="disabled">Auto Router</Label>
             <Tooltip
               arrow
               content="If there is no direct pair between two assets, Dezswap helps finding the best path from the all possible multihop swaps."
@@ -169,7 +169,11 @@ function SettingsForm() {
           </Row>
         </Col>
         <Col xs="content">
-          <ToggleButton />
+          <Tooltip arrow content="Coming soon" placement="right">
+            <div>
+              <ToggleButton disabled />
+            </div>
+          </Tooltip>
         </Col>
       </Row>
     </Wrapper>

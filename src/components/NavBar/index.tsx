@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { NavLink, NavLinkProps } from "react-router-dom";
 
 interface NavBarProps {
-  items: (NavLinkProps & { key?: React.Key })[];
+  items: (NavLinkProps & { key?: React.Key; disabled?: boolean })[];
   flex?: boolean;
 }
 
@@ -34,17 +34,23 @@ const NavItem = styled(NavLink, {
       flex: 1;
     `}
 
-  &.active {
+  &.active:not(.disabled) {
     opacity: 1;
+  }
+
+  &.disabled {
+    cursor: default;
   }
 `;
 
 function NavBar({ items, flex = true }: NavBarProps) {
   return (
     <Wrapper>
-      {items.map(({ key, ...navLink }) => (
+      {items.map(({ key, disabled, to, ...navLink }) => (
         <NavItem
-          key={key ?? `${navLink.to.toString()}`}
+          className={`${navLink.className ?? ""} ${disabled ? "disabled" : ""}`}
+          key={key ?? `${to.toString()}`}
+          to={disabled ? "#" : to}
           {...navLink}
           flex={flex}
         />

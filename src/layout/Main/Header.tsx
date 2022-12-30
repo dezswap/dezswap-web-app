@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import styled from "@emotion/styled";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
@@ -41,6 +41,7 @@ import Modal from "components/Modal";
 import Copy from "components/Copy";
 import Banner from "components/Banner";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import Tooltip from "components/Tooltip";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -152,6 +153,7 @@ const navLinks = [
   {
     path: "/",
     label: "Overview",
+    disabled: true,
   },
   {
     path: "/trade",
@@ -160,6 +162,7 @@ const navLinks = [
   {
     path: "/pool",
     label: "Pool",
+    disabled: true,
   },
 ];
 
@@ -242,6 +245,7 @@ function Header() {
   const theme = useTheme();
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
+  const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -259,7 +263,7 @@ function Header() {
 
   return (
     <>
-      {connectedWallet?.network.name !== "mainnet" && (
+      {isTestnet && (
         <Banner
           css={css`
             padding: 0;
@@ -282,10 +286,7 @@ function Header() {
           </span>
         </Banner>
       )}
-      <Wrapper
-        ref={wrapperRef}
-        isTestnet={connectedWallet?.network.name !== "mainnet"}
-      >
+      <Wrapper ref={wrapperRef} isTestnet={isTestnet}>
         <div>
           <Container>
             <Row justify="between" align="center" gutterWidth={10}>
@@ -301,7 +302,14 @@ function Header() {
                     items={navLinks.map((item) => ({
                       key: item.path,
                       to: item.path,
-                      children: (
+                      disabled: item.disabled,
+                      children: item.disabled ? (
+                        <Tooltip arrow content="Coming soon">
+                          <Typography size={18} weight={900} color="primary">
+                            {item.label}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
                         </Typography>
@@ -313,7 +321,8 @@ function Header() {
               )}
               <Col xs="content">
                 <Row justify="end" align="center" gutterWidth={10}>
-                  <Col width="auto">
+                  {/* TODO: implement */}
+                  {/* <Col width="auto">
                     <IconButton
                       title="Notification"
                       size={45}
@@ -322,7 +331,7 @@ function Header() {
                         hover: iconNotificationHover,
                       }}
                     />
-                  </Col>
+                  </Col> */}
                   <Col width="auto">
                     {connectedWallet ? (
                       <WalletInfo

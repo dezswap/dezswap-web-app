@@ -24,6 +24,9 @@ const Wrapper = styled.label`
   &:has(input:checked) {
     border-color: ${({ theme }) => theme.colors.primary};
   }
+  &:has(input:disabled) {
+    cursor: default;
+  }
 `;
 
 const Handle = styled.div`

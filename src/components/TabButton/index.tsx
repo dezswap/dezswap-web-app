@@ -3,8 +3,9 @@ import Typography from "components/Typography";
 import { useId } from "react";
 
 interface TabButtonItem {
-  label?: string;
+  label?: React.ReactNode;
   value: string;
+  disabled?: boolean;
   key?: React.Key;
 }
 
@@ -75,6 +76,13 @@ const TabItem = styled.div`
       color: ${({ theme }) => theme.colors.white};
     }
   }
+
+  & > input:disabled + label {
+    cursor: default;
+    & > * {
+      color: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `;
 function TabButton({
   selectedIndex,
@@ -98,6 +106,7 @@ function TabButton({
               id={`${id}-${index}`}
               name={id}
               value={item.value}
+              disabled={item.disabled}
               checked={isControlled ? isSelected : undefined}
               defaultChecked={!isControlled ? isSelected : undefined}
               onChange={() => {
