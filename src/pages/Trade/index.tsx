@@ -11,6 +11,7 @@ import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -43,20 +44,33 @@ function TradePage() {
                 `}
               >
                 <Col style={{ paddingRight: 0 }}>
-                  <IconButton
-                    size={38}
-                    icons={{ default: iconOverview, hover: iconOverviewHover }}
-                  />
+                  <Tooltip arrow content="Coming soon">
+                    <IconButton
+                      size={38}
+                      icons={{
+                        default: iconOverview,
+                        // hover: iconOverviewHover,
+                      }}
+                    />
+                  </Tooltip>
                 </Col>
                 <Col width={194}>
-                  <TabButton
-                    selectedIndex={0}
-                    defaultSelectedIndex={0}
-                    items={[
-                      { label: "Swap", value: "trade/swap" },
-                      { label: "Limit", value: "trade/limit" },
-                    ]}
-                  />
+                  <Tooltip arrow content="Coming soon">
+                    <div>
+                      <TabButton
+                        selectedIndex={0}
+                        defaultSelectedIndex={0}
+                        items={[
+                          { label: "Swap", value: "trade/swap" },
+                          {
+                            label: "Limit",
+                            value: "trade/limit",
+                            disabled: true,
+                          },
+                        ]}
+                      />
+                    </div>
+                  </Tooltip>
                 </Col>
                 <Col style={{ paddingLeft: 0, textAlign: "right" }}>
                   <IconButton

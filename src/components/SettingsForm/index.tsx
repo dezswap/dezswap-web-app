@@ -169,7 +169,11 @@ function SettingsForm() {
           </Row>
         </Col>
         <Col xs="content">
-          <ToggleButton />
+          <Tooltip arrow content="Coming soon">
+            <div>
+              <ToggleButton disabled />
+            </div>
+          </Tooltip>
         </Col>
       </Row>
     </Wrapper>

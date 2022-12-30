@@ -41,6 +41,7 @@ import Modal from "components/Modal";
 import Copy from "components/Copy";
 import Banner from "components/Banner";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import Tooltip from "components/Tooltip";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -152,6 +153,7 @@ const navLinks = [
   {
     path: "/",
     label: "Overview",
+    disabled: true,
   },
   {
     path: "/trade",
@@ -160,6 +162,7 @@ const navLinks = [
   {
     path: "/pool",
     label: "Pool",
+    disabled: true,
   },
 ];
 
@@ -299,7 +302,14 @@ function Header() {
                     items={navLinks.map((item) => ({
                       key: item.path,
                       to: item.path,
-                      children: (
+                      disabled: item.disabled,
+                      children: item.disabled ? (
+                        <Tooltip arrow content="Coming soon">
+                          <Typography size={18} weight={900} color="primary">
+                            {item.label}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
                         </Typography>
@@ -311,7 +321,8 @@ function Header() {
               )}
               <Col xs="content">
                 <Row justify="end" align="center" gutterWidth={10}>
-                  <Col width="auto">
+                  {/* TODO: implement */}
+                  {/* <Col width="auto">
                     <IconButton
                       title="Notification"
                       size={45}
@@ -320,7 +331,7 @@ function Header() {
                         hover: iconNotificationHover,
                       }}
                     />
-                  </Col>
+                  </Col> */}
                   <Col width="auto">
                     {connectedWallet ? (
                       <WalletInfo

@@ -5,6 +5,7 @@ import { useId } from "react";
 interface TabButtonItem {
   label?: string;
   value: string;
+  disabled?: boolean;
   key?: React.Key;
 }
 
@@ -75,6 +76,10 @@ const TabItem = styled.div`
       color: ${({ theme }) => theme.colors.white};
     }
   }
+
+  & > input:disabled + label {
+    cursor: default;
+  }
 `;
 function TabButton({
   selectedIndex,
@@ -98,6 +103,7 @@ function TabButton({
               id={`${id}-${index}`}
               name={id}
               value={item.value}
+              disabled={item.disabled}
               checked={isControlled ? isSelected : undefined}
               defaultChecked={!isControlled ? isSelected : undefined}
               onChange={() => {

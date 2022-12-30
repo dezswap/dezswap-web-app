@@ -67,6 +67,7 @@ const navLinks = [
     path: "/",
     icon: iconOverview,
     label: "Overview",
+    disabled: true,
   },
   {
     path: "/trade",
@@ -77,6 +78,7 @@ const navLinks = [
     path: "/pool",
     icon: iconPool,
     label: "Pool",
+    disabled: true,
   },
 ];
 
@@ -84,6 +86,7 @@ const navBar = (
   <NavBar
     items={navLinks.map((navLink) => ({
       to: navLink.path,
+      disabled: navLink.disabled,
       children: (
         <div>
           <IconButton icons={{ default: navLink.icon }} size={24} />
