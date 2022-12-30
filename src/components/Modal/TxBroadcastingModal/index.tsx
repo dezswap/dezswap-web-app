@@ -74,6 +74,8 @@ function TxBroadcastingModal({
     <>
       {!txHash && !txError && (
         <Modal
+          shouldCloseOnEsc={false}
+          shouldCloseOnOverlayClick={false}
           drawer={screenClass === MOBILE_SCREEN_CLASS}
           isOpen={isOpen}
           title="Check your wallet"
@@ -122,6 +124,8 @@ function TxBroadcastingModal({
       )}
       {!txInfo && txHash && (
         <Modal
+          shouldCloseOnEsc={false}
+          shouldCloseOnOverlayClick={false}
           drawer={screenClass === MOBILE_SCREEN_CLASS}
           isOpen={isOpen}
           title="Broadcasting transaction"
@@ -213,6 +217,8 @@ function TxBroadcastingModal({
         txHash &&
         !txInfo?.code && ( // txInfo.code must be 0 when success
           <Modal
+            shouldCloseOnEsc={false}
+            shouldCloseOnOverlayClick={false}
             drawer={screenClass === MOBILE_SCREEN_CLASS}
             isOpen={isOpen}
             title="Complete"
@@ -298,6 +304,8 @@ function TxBroadcastingModal({
         )}
       {(txError || txInfo?.code) && (
         <Modal
+          shouldCloseOnEsc={false}
+          shouldCloseOnOverlayClick={false}
           drawer={screenClass === MOBILE_SCREEN_CLASS}
           error
           isOpen={isOpen}
