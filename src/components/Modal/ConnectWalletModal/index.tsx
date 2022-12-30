@@ -88,7 +88,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
           padding-top: 20px;
         `}
       >
-        {/* TODO: write description */}
+        By connecting a wallet, you understand and agree to Dezswap’s
+        Disclaimer. Wallets are provided by third parties. By connecting your
+        wallet is considered that you agree to their terms and conditions.
+        Always trade at your own risk.
       </Typography>
       <Row
         justify="between"

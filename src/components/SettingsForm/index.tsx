@@ -57,7 +57,7 @@ function SettingsForm() {
             <Label>Slippage Tolerance</Label>
             <Tooltip
               arrow
-              content="When you select asset pair and input how much you want to swap, Dezswap simulates the result and shows the expected amount. But the number can vary by the timing between you simulated and the unexpected swap transaction executed. If you set the number of it, your swap transaction raises failure if the actual result is different from the simulated result. The number is your allowance of the difference(may be loss)."
+              content="By slippage tolerance setting, it prevents the ratio of the spread to the amount expected to receive from becoming larger than the set value. High slippage tolerance helps transaction success, but you may get an unexpected price. "
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
@@ -128,7 +128,7 @@ function SettingsForm() {
             <Label>Transaction Deadline</Label>
             <Tooltip
               arrow
-              content="If the chain network is too busy to process, your transaction would not be executed and could be remain on the memory queue. But if it remains long time, the swap rate could be different and it could cause your loss. If you set this parameter, your swap transaction will only be valid within the given time range and will raise an error when your transaction is executed after the given lifetime."
+              content="Transaction will not be executed if it takes longer than the time."
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>
@@ -162,7 +162,7 @@ function SettingsForm() {
             <Label color="disabled">Auto Router</Label>
             <Tooltip
               arrow
-              content="If there is no direct pair between two assets, Dezswap helps finding the best path from the all possible multihop swaps."
+              content="Optimize the best route for the optimal price."
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>

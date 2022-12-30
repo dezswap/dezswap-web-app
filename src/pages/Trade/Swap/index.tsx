@@ -863,7 +863,7 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Expected quantity to be received based on the current price, maximum spread and trading fee"
+                    content="The result value you may get at the current condition."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -919,7 +919,7 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Fee paid due to the difference between market price and estimated price"
+                    content="The impact on the market price of this pool you may encounter by executing your transaction."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -966,7 +966,7 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Fee paid to execute this transaction"
+                    content="The fee paid for executing the transaction."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1018,7 +1018,7 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Optimized route for your optimal gain"
+                    content="Provide a route for the optimal price."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1052,7 +1052,7 @@ function SwapPage() {
           <Tooltip
             arrow
             placement="top"
-            content="Fee paid due to the difference between market price and estimated price"
+            content="The impact on the market price of this pool you may encounter by executing your transaction."
           >
             <div>
               <Message variant={spread.message}>
