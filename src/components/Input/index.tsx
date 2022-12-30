@@ -112,6 +112,10 @@ const Wrapper = styled.div<WrapperProps>`
         return css`
           border-color: ${theme.colors.disabled};
           background-color: ${theme.colors.text.background};
+          &:has(input:focus),
+          &:active {
+            border-color: ${theme.colors.primary};
+          }
         `;
     }
   }}

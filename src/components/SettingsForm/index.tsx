@@ -94,11 +94,7 @@ function SettingsForm() {
             padding: 0;
           `}
           borderStyle="solid"
-          variant={
-            slippageTolerance.selectedPreset === "custom"
-              ? "primary"
-              : "default"
-          }
+          variant="default"
           defaultValue={slippageTolerance.customValue}
           onFocus={() => slippageTolerance.setSelectedPreset("custom")}
           onChange={(e) => {
