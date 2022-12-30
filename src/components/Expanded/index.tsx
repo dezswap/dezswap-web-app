@@ -79,7 +79,6 @@ const Content = styled.div`
     padding-bottom 1s cubic-bezier(0, 1, 0, 1);
   .expanded &,
   .cm & {
-    padding-top: 5px;
     padding-bottom: 12px;
     max-height: 600px;
     .${MOBILE_SCREEN_CLASS} & {

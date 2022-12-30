@@ -130,7 +130,7 @@ const AssetIcon = styled.div<{ src?: string }>`
   padding: 0px 6px;
 
   ${({ src = iconToken }) => css`
-    background-image: url(${src}), url(${iconToken});
+    background-image: url(${src || iconToken});
   `};
   background-size: 32px 32px, 32px 32px;
   background-position: 50% 50%, 50% 50%;
