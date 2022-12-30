@@ -51,6 +51,7 @@ import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
+import Decimal from "decimal.js";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -180,9 +181,9 @@ function SwapPage() {
     const percentage = simulationResult
       ? Number(
           cutDecimal(
-            Numeric.parse(simulationResult.spreadAmount || 0)
-              .mul(100)
-              .div(Numeric.parse(simulationResult.estimatedAmount || 1)),
+            new Decimal(simulationResult.spreadAmount || 0)
+              .div(new Decimal(simulationResult.estimatedAmount || 1))
+              .mul(100),
             DISPLAY_DECIMAL,
           ),
         )
