@@ -61,7 +61,8 @@ const Icon = styled.div<{ src?: string }>`
 
 const getIconSrc = (variant: MessageProps["variant"]) => {
   switch (variant) {
-    case "error" || "warning":
+    case "error":
+    case "warning":
       return iconCaution;
     default:
       return undefined;
