@@ -217,6 +217,14 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   .includes(deferredSearchKeyword.toLowerCase()),
               ) < 0
             }
+            onClick={() => {
+              if (handleSelect) {
+                handleSelect(address);
+              }
+              if (goBackOnSelect && onGoBack) {
+                onGoBack();
+              }
+            }}
           >
             <div>
               <IconButton
@@ -240,14 +248,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               }}
               justify="start"
               wrap="nowrap"
-              onClick={() => {
-                if (handleSelect) {
-                  handleSelect(address);
-                }
-                if (goBackOnSelect && onGoBack) {
-                  onGoBack();
-                }
-              }}
             >
               <Col
                 xs="content"
