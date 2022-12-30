@@ -113,7 +113,8 @@ const Wrapper = styled.div<WrapperProps>`
           border-color: ${theme.colors.disabled};
           background-color: ${theme.colors.text.background};
           &:has(input:focus),
-          &:active {
+          &:active,
+          &:has(input.active) {
             border-color: ${theme.colors.primary};
           }
         `;
