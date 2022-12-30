@@ -85,22 +85,22 @@ export const useAPI = () => {
     async (contractAddress: string, offerAsset: string, amount: Amount) => {
       const res = await lcd.wasm.contractQuery<Simulation>(
         contractAddress,
-        generateSimulationMsg(offerAsset, amount),
+        generateSimulationMsg(network.name, offerAsset, amount),
       );
       return res;
     },
-    [lcd],
+    [lcd, network.name],
   );
 
   const reverseSimulate = useCallback(
     async (contractAddress: string, askAsset: string, amount: Amount) => {
       const res = await lcd.wasm.contractQuery<ReverseSimulation>(
         contractAddress,
-        generateReverseSimulationMsg(askAsset, amount),
+        generateReverseSimulationMsg(network.name, askAsset, amount),
       );
       return res;
     },
-    [lcd],
+    [lcd, network.name],
   );
 
   const getNativeTokenBalance = useCallback(
