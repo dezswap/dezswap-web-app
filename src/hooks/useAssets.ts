@@ -122,7 +122,10 @@ const useAssets = () => {
     [assetStore, network, addFetchQueue],
   );
 
-  return useMemo(() => ({ getAsset }), [getAsset]);
+  return useMemo(
+    () => ({ getAsset, verifiedAssets: verifiedAssets?.[network.name] }),
+    [getAsset, network.name, verifiedAssets],
+  );
 };
 
 export default useAssets;

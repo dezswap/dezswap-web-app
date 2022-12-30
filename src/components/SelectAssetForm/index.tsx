@@ -3,10 +3,17 @@ import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import Typography from "components/Typography";
-import { amountToValue, cutDecimal, ellipsisCenter, formatNumber } from "utils";
+import {
+  amountToValue,
+  cutDecimal,
+  ellipsisCenter,
+  formatNumber,
+  isNativeTokenAddress,
+} from "utils";
 import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
+import iconVerified from "assets/icons/icon-verified.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
 import Hr from "components/Hr";
@@ -18,6 +25,8 @@ import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import useBookmark from "hooks/useBookmark";
 import Panel from "components/Panel";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import Tooltip from "components/Tooltip";
+import { useNetwork } from "hooks/useNetwork";
 
 type Asset = Partial<OrgAsset & { disabled?: boolean }>;
 export type LPAsset = {
@@ -155,9 +164,10 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset } = useAssets();
+  const { getAsset, verifiedAssets } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { bookmarks, toggleBookmark } = useBookmark();
+  const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
 
   const assetList = useMemo(() => {
@@ -192,6 +202,9 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     )?.map(({ address, isLP }) => {
       if (!isLP) {
         const asset = getAsset(address);
+        const isVerified =
+          !!verifiedAssets?.[address] ||
+          isNativeTokenAddress(network.name, address);
         return (
           <AssetItem
             key={address}
@@ -242,7 +255,28 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   vertical-align: middle;
                 `}
               >
-                <AssetIcon src={asset?.iconSrc} />
+                <AssetIcon src={asset?.iconSrc}>
+                  {isVerified && (
+                    <Tooltip
+                      arrow
+                      content={`${asset?.symbol} is verified token`}
+                    >
+                      <div
+                        css={css`
+                          position: absolute;
+                          bottom: -3px;
+                          right: -3px;
+                          width: 18px;
+                          height: 18px;
+                          background-image: url(${iconVerified});
+                          background-size: contain;
+                          background-repeat: no-repeat;
+                          background-position: 50% 50%;
+                        `}
+                      />
+                    </Tooltip>
+                  )}
+                </AssetIcon>
               </Col>
               <Col xs={8}>
                 <Typography
@@ -427,6 +461,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     tabIdx,
     theme,
     toggleBookmark,
+    network,
+    verifiedAssets,
   ]);
   return (
     <Wrapper>
