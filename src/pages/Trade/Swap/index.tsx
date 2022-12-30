@@ -182,7 +182,13 @@ function SwapPage() {
       ? Number(
           cutDecimal(
             new Decimal(simulationResult.spreadAmount || 0)
-              .div(new Decimal(simulationResult.estimatedAmount || 1))
+              .div(
+                new Decimal(
+                  isReversed
+                    ? valueToAmount(asset2Value, asset2?.decimals) || 1
+                    : simulationResult.estimatedAmount || 1,
+                ),
+              )
               .mul(100),
             DISPLAY_DECIMAL,
           ),
