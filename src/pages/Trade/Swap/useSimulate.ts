@@ -7,6 +7,7 @@ import {
 } from "utils/dezswap";
 import { useLCDClient } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
+import { useNetwork } from "hooks/useNetwork";
 
 const useSimulate = ({
   fromAddress,
@@ -26,6 +27,7 @@ const useSimulate = ({
   >();
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
+  const network = useNetwork();
 
   const deferredAmount = useDeferredValue(amount);
 
@@ -52,7 +54,7 @@ const useSimulate = ({
         if (!isReversed) {
           const res = await lcd.wasm.contractQuery<Simulation>(
             pair.contract_addr,
-            generateSimulationMsg(fromAddress, deferredAmount),
+            generateSimulationMsg(network.name, fromAddress, deferredAmount),
           );
           if (res && !isAborted) {
             setResult(res);
@@ -62,7 +64,11 @@ const useSimulate = ({
         if (isReversed) {
           const res = await lcd.wasm.contractQuery<ReverseSimulation>(
             pair.contract_addr,
-            generateReverseSimulationMsg(toAddress, deferredAmount),
+            generateReverseSimulationMsg(
+              network.name,
+              toAddress,
+              deferredAmount,
+            ),
           );
           if (res && !isAborted) {
             setResult(res);
@@ -85,7 +91,15 @@ const useSimulate = ({
     return () => {
       isAborted = true;
     };
-  }, [deferredAmount, findPair, fromAddress, isReversed, lcd, toAddress]);
+  }, [
+    deferredAmount,
+    findPair,
+    fromAddress,
+    isReversed,
+    lcd,
+    toAddress,
+    network.name,
+  ]);
 
   return useMemo(
     () => ({
