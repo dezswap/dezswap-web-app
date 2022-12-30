@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import styled from "@emotion/styled";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
@@ -242,6 +242,7 @@ function Header() {
   const theme = useTheme();
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
+  const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -259,7 +260,7 @@ function Header() {
 
   return (
     <>
-      {connectedWallet?.network.name !== "mainnet" && (
+      {isTestnet && (
         <Banner
           css={css`
             padding: 0;
@@ -282,10 +283,7 @@ function Header() {
           </span>
         </Banner>
       )}
-      <Wrapper
-        ref={wrapperRef}
-        isTestnet={connectedWallet?.network.name !== "mainnet"}
-      >
+      <Wrapper ref={wrapperRef} isTestnet={isTestnet}>
         <div>
           <Container>
             <Row justify="between" align="center" gutterWidth={10}>

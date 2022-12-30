@@ -13,7 +13,7 @@ import iconTrade from "assets/icons/icon-trade.svg";
 import iconPool from "assets/icons/icon-pool.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import { useNetwork } from "hooks/useNetwork";
 import Footer from "./Footer";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
@@ -98,11 +98,11 @@ const navBar = (
 
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
-  const connectedWallet = useConnectedWallet();
+  const network = useNetwork();
   return (
     <>
       <Header />
-      <Wrapper hasBanner={connectedWallet?.network.name !== "mainnet"}>
+      <Wrapper hasBanner={network.name !== "mainnet"}>
         {children}
         <FooterWrapper>
           <Footer />
