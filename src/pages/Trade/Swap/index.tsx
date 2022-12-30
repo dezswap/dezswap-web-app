@@ -28,11 +28,11 @@ import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useHashModal from "hooks/useHashModal";
 import { css, useTheme } from "@emotion/react";
-import { useNavigate } from "react-router-dom";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
+import iconInfoWhite from "assets/icons/icon-info-white.svg";
 import { NumberInput } from "components/Input";
 import Button from "components/Button";
 import Copy from "components/Copy";
@@ -1049,41 +1049,49 @@ function SwapPage() {
           </div>
         )}
         {spread.message && (
-          // TODO: add tooltip
-          // <Tooltip arrow placement="top" content="">
-          <div>
-            <Message variant={spread.message}>
-              <Row
-                justify="between"
-                nogutter
-                css={css`
-                  width: 100%;
-                `}
-              >
-                <Col
+          <Tooltip
+            arrow
+            placement="top"
+            content="Fee paid due to the difference between market price and estimated price"
+          >
+            <div>
+              <Message variant={spread.message}>
+                <Row
+                  justify="between"
+                  nogutter
                   css={css`
-                    text-align: left;
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
+                    width: 100%;
                   `}
                 >
-                  Price impact warning
-                </Col>
-                <Col
-                  css={css`
-                    text-align: right;
-                    display: flex;
-                    justify-content: flex-end;
-                    align-items: center;
-                  `}
-                >
-                  {formatNumber(spread.rate)}%
-                </Col>
-              </Row>
-            </Message>
-          </div>
-          // </Tooltip>
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Price impact warning
+                  </Col>
+                  <Col
+                    css={css`
+                      text-align: right;
+                      display: flex;
+                      justify-content: flex-end;
+                      align-items: center;
+                    `}
+                  >
+                    {formatNumber(spread.rate)}%
+                    <IconButton
+                      className="cm-hidden"
+                      size={22}
+                      icons={{ default: iconInfoWhite }}
+                    />
+                  </Col>
+                </Row>
+              </Message>
+            </div>
+          </Tooltip>
         )}
         {connectedWallet ? (
           <Button
