@@ -33,9 +33,8 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           }
         `}
       >
-        {/* TODO: change document */}
         <Typography color={theme.colors.primary} size={16} weight="normal">
-          Dezswap is a decentralized exchange on Terra blockchain. Trading and
+          Dezswap is a decentralized exchange on XPLA chain. Trading and
           providing liquidity on Dezswap is at your own risk, without warranties
           of any kind. Please read the&nbsp;
           <a
