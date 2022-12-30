@@ -5,8 +5,8 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Panel from "components/Panel";
 import IconButton from "components/IconButton";
-import iconOverview from "assets/icons/icon-overview-38px.svg";
-import iconOverviewHover from "assets/icons/icon-overview-38px-hover.svg";
+import iconOverview from "assets/icons/icon-overview-disabled.svg";
+import iconOverviewHover from "assets/icons/icon-overview-disabled-hover.svg";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
@@ -49,28 +49,28 @@ function TradePage() {
                       size={38}
                       icons={{
                         default: iconOverview,
-                        // hover: iconOverviewHover,
+                        hover: iconOverviewHover,
                       }}
                     />
                   </Tooltip>
                 </Col>
                 <Col width={194}>
-                  <Tooltip arrow content="Coming soon">
-                    <div>
-                      <TabButton
-                        selectedIndex={0}
-                        defaultSelectedIndex={0}
-                        items={[
-                          { label: "Swap", value: "trade/swap" },
-                          {
-                            label: "Limit",
-                            value: "trade/limit",
-                            disabled: true,
-                          },
-                        ]}
-                      />
-                    </div>
-                  </Tooltip>
+                  <TabButton
+                    selectedIndex={0}
+                    defaultSelectedIndex={0}
+                    items={[
+                      { label: "Swap", value: "trade/swap" },
+                      {
+                        label: (
+                          <Tooltip arrow content="Coming soon">
+                            <span>Limit</span>
+                          </Tooltip>
+                        ),
+                        value: "trade/limit",
+                        disabled: true,
+                      },
+                    ]}
+                  />
                 </Col>
                 <Col style={{ paddingLeft: 0, textAlign: "right" }}>
                   <IconButton

@@ -3,7 +3,7 @@ import Typography from "components/Typography";
 import { useId } from "react";
 
 interface TabButtonItem {
-  label?: string;
+  label?: React.ReactNode;
   value: string;
   disabled?: boolean;
   key?: React.Key;
@@ -79,6 +79,9 @@ const TabItem = styled.div`
 
   & > input:disabled + label {
     cursor: default;
+    & > * {
+      color: ${({ theme }) => theme.colors.disabled};
+    }
   }
 `;
 function TabButton({
