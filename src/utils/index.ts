@@ -58,7 +58,7 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
   try {
     const s = value.toString();
     if (s.length <= decimals) {
-      return Dec.withPrec(value, decimals).toString();
+      return Dec.withPrec(value, decimals).toFixed(decimals).toString();
     }
     return `${s.substring(0, s.length - decimals)}.${s.substring(
       s.length - decimals,
