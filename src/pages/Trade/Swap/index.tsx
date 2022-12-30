@@ -1044,44 +1044,41 @@ function SwapPage() {
           </div>
         )}
         {spread.message && (
-          <Tooltip
-            arrow
-            placement="top"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra eleifend convallis."
-          >
-            <div>
-              <Message variant={spread.message}>
-                <Row
-                  justify="between"
-                  nogutter
+          // TODO: add tooltip
+          // <Tooltip arrow placement="top" content="">
+          <div>
+            <Message variant={spread.message}>
+              <Row
+                justify="between"
+                nogutter
+                css={css`
+                  width: 100%;
+                `}
+              >
+                <Col
                   css={css`
-                    width: 100%;
+                    text-align: left;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
                   `}
                 >
-                  <Col
-                    css={css`
-                      text-align: left;
-                      display: flex;
-                      justify-content: flex-start;
-                      align-items: center;
-                    `}
-                  >
-                    Price impact Warning
-                  </Col>
-                  <Col
-                    css={css`
-                      text-align: right;
-                      display: flex;
-                      justify-content: flex-end;
-                      align-items: center;
-                    `}
-                  >
-                    {formatNumber(spread.rate)}%
-                  </Col>
-                </Row>
-              </Message>
-            </div>
-          </Tooltip>
+                  Price impact warning
+                </Col>
+                <Col
+                  css={css`
+                    text-align: right;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                  `}
+                >
+                  {formatNumber(spread.rate)}%
+                </Col>
+              </Row>
+            </Message>
+          </div>
+          // </Tooltip>
         )}
         {connectedWallet ? (
           <Button

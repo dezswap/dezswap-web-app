@@ -33,21 +33,25 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           }
         `}
       >
+        {/* TODO: change document */}
         <Typography color={theme.colors.primary} size={16} weight="normal">
-          By participating in the staking of LP Token (“Staking Program”), each
-          participating individual and organization (“Participant“) accepts and
-          agrees that, to the extent permitted by law, C2X disclaims all
-          liability, damages, cost, loss or expense (including, without
-          limitation, legal fees, costs and expenses) to it in respect of its
-          involvement in the Staking Program. If participants do not accept any
-          of the following factors, they should not be taking part in the
-          Staking Program * You are required to set the lock-up period when
-          staking LP tokens, and it cannot be withdrawn or changed until the
-          lock-up period ends. ** The minimum lock-up period is 4 weeks. You may
-          also lock your tokens for up to 52 weeks. *** You will be
-          automatically admitted to the staking program if you stake your LP
-          Tokens during the staking program period. **** Transaction fees of
-          $LUNA or $UST will occur during the staking process.
+          Dezswap is a decentralized exchange on Terra blockchain. Trading and
+          providing liquidity on Dezswap is at your own risk, without warranties
+          of any kind. Please read the&nbsp;
+          <a
+            href="https://docs.dezswap.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontWeight: 700 }}
+          >
+            document
+          </a>
+          &nbsp;carefully and understand how Dezswap works before using it.
+          <br />
+          <br />I acknowledge and agree that I am responsible for various losses
+          of assets by making transactions on Dezswap, including swap, liquidity
+          provision/withdrawal, etc. The entities involved in this site are not
+          liable for any damages resulting from my use of Dezswap.
         </Typography>
       </Box>
       <div
@@ -60,8 +64,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           onClick={(e) => setAgreed(!!(e?.target as HTMLInputElement)?.checked)}
         >
           <Typography color={theme.colors.primary} size={16} weight="normal">
-            By participating in the staking of LP Token (“Staking Program”),
-            each participating individual
+            I understand the risks and would like to proceed
           </Typography>
         </Checkbox>
       </div>
