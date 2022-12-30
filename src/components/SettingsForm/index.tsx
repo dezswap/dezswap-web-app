@@ -1,7 +1,7 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import IconButton from "components/IconButton";
-import { NumberInput } from "components/Input";
+import Input, { NumberInput } from "components/Input";
 import RadioButton from "components/RadioButton";
 import Tooltip from "components/Tooltip";
 import Typography from "components/Typography";
@@ -83,26 +83,50 @@ function SettingsForm() {
             value={preset}
             name="preset"
             checked={slippageTolerance.selectedPreset === preset}
-            onChange={() => slippageTolerance.setSelectedPreset(preset)}
+            onChange={() => {
+              slippageTolerance.setSelectedPreset(preset);
+              slippageTolerance.setCustomValue(null);
+            }}
           >
             {preset}%
           </RadioButton>
         ))}
         <NumberInput
+          className={
+            slippageTolerance.selectedPreset === "custom" &&
+            slippageTolerance.customValue
+              ? "active"
+              : ""
+          }
           css={css`
             flex: 1;
             padding: 0;
           `}
           borderStyle="solid"
-          variant={
+          variant="default"
+          value={
             slippageTolerance.selectedPreset === "custom"
-              ? "primary"
-              : "default"
+              ? slippageTolerance.customValue ?? ""
+              : ""
           }
-          defaultValue={slippageTolerance.customValue}
           onFocus={() => slippageTolerance.setSelectedPreset("custom")}
           onChange={(e) => {
-            slippageTolerance.setCustomValue(Number(e.target.value));
+            slippageTolerance.setCustomValue(
+              !e.target.value ||
+                Number.isNaN(e.target.value) ||
+                Number.isNaN(Number(e.target.value))
+                ? null
+                : Number(e.target.value),
+            );
+          }}
+          onBlur={() => {
+            if (
+              slippageTolerance.customValue === null ||
+              slippageTolerance.customValue === undefined
+            ) {
+              slippageTolerance.setSelectedPreset("0.5");
+              slippageTolerance.setCustomValue(null);
+            }
           }}
           suffix={
             <Typography color={theme.colors.text.secondary} weight="bold">
@@ -110,7 +134,11 @@ function SettingsForm() {
             </Typography>
           }
           align="right"
-          placeholder="0.5"
+          placeholder={
+            slippageTolerance.selectedPreset !== "custom"
+              ? slippageTolerance.selectedPreset
+              : ""
+          }
           height={40}
         />
       </RadioGroup>
@@ -135,7 +163,8 @@ function SettingsForm() {
           </Row>
         </Col>
         <Col xs={4} sm={6}>
-          <NumberInput
+          <Input
+            className={txDeadlineMinutes.value ? "active" : ""}
             borderStyle="solid"
             placeholder="20"
             suffix={
@@ -145,13 +174,16 @@ function SettingsForm() {
             }
             align="right"
             height={40}
-            value={txDeadlineMinutes.value}
+            value={txDeadlineMinutes.value || ""}
             onChange={(e) => {
-              txDeadlineMinutes.setValue(Number(e.target.value));
+              txDeadlineMinutes.setValue(
+                !e.target.value ||
+                  Number.isNaN(e.target.value) ||
+                  Number.isNaN(Number(e.target.value))
+                  ? null
+                  : Number(e.target.value),
+              );
             }}
-            step={1}
-            min={0}
-            max={99}
             maxLength={2}
           />
         </Col>
