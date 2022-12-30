@@ -18,6 +18,8 @@ const Wrapper = styled.button`
   background: none;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
 
   & > textarea:first-of-type {
     width: 0;
