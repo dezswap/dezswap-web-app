@@ -82,13 +82,30 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   transition: all 0.125s cubic-bezier(0, 1, 0, 1);
   max-height: 1280px;
 
+  & .asset-address {
+    display: none;
+  }
+
   &:hover {
     background-color: ${({ theme }) => theme.colors.text.background};
+    & .asset-name {
+      display: none;
+    }
+    & .asset-address {
+      display: unset;
+    }
   }
+
   ${({ selected, theme }) =>
     selected &&
     css`
       background-color: ${theme.colors.text.background};
+      & .asset-name {
+        display: none;
+      }
+      & .asset-address {
+        display: unset;
+      }
     `}
   ${({ invisible }) =>
     invisible &&
@@ -241,7 +258,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   {asset?.symbol}
                 </Typography>
                 <Typography
-                  size={12}
+                  size={13}
                   weight="normal"
                   color={theme.colors.text.primary}
                   css={css`
@@ -251,7 +268,10 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                     opacity: 0.5;
                   `}
                 >
-                  {asset?.name}
+                  <span className="asset-name">{asset?.name}</span>
+                  <span className="asset-address">
+                    {ellipsisCenter(address, 6)}
+                  </span>
                 </Typography>
               </Col>
             </Row>
