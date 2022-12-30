@@ -408,7 +408,7 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px;
+                                  padding: 7px;
                                   font-weight: bold;
                                   text-align: center;
                                 `}
@@ -420,6 +420,9 @@ function Header() {
                                   css={css`
                                     display: flex;
                                     justify-content: space-between;
+                                    & > div {
+                                      line-height: 1;
+                                    }
                                   `}
                                 >
                                   <Col>
@@ -428,7 +431,12 @@ function Header() {
                                       10,
                                     )}
                                   </Col>
-                                  <Col width="auto">
+                                  <Col
+                                    width="auto"
+                                    css={css`
+                                      font-size: 0;
+                                    `}
+                                  >
                                     <Copy
                                       value={connectedWallet?.walletAddress}
                                     />
