@@ -15,6 +15,7 @@ import {
   cutDecimal,
   filterNumberFormat,
   formatNumber,
+  isNativeTokenAddress,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -52,6 +53,7 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
+import useUnverifiedAssetModal from "hooks/modals/useUnverifiedAssetModal";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -130,13 +132,14 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, verifiedAssets } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
   const { requestPost } = useRequestPost();
+  const unverifiedAssetModal = useUnverifiedAssetModal();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
 
@@ -433,6 +436,21 @@ function SwapPage() {
               form.setValue(oppositeTarget, "");
             }
             form.setValue(target, address);
+
+            if (
+              verifiedAssets &&
+              !verifiedAssets[address] &&
+              !isNativeTokenAddress(
+                connectedWallet?.network.name || "",
+                address,
+              )
+            ) {
+              setTimeout(() => {
+                unverifiedAssetModal.showModal(address, () => {
+                  form.setValue(target, "");
+                });
+              }, MODAL_CLOSE_TIMEOUT_MS); // wait for modal to close
+            }
           }}
           onGoBack={() => {
             selectAsset1Modal.close();
