@@ -141,9 +141,9 @@ const AssetIcon = styled.div<{ src?: string }>`
   ${({ src = iconToken }) => css`
     background-image: url(${src || iconToken});
   `};
-  background-size: 32px 32px, 32px 32px;
-  background-position: 50% 50%, 50% 50%;
-  background-repeat: no-repeat, no-repeat;
+  background-size: 32px 32px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
 `;
 
 const tabs = [
