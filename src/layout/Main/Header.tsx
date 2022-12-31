@@ -42,6 +42,7 @@ import Copy from "components/Copy";
 import Banner from "components/Banner";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
+import { Link } from "react-router-dom";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -291,7 +292,9 @@ function Header() {
           <Container>
             <Row justify="between" align="center" gutterWidth={10}>
               <Col xs="content">
-                <Logo />
+                <Link to="/">
+                  <Logo />
+                </Link>
               </Col>
               {[
                 SMALL_BROWSER_SCREEN_CLASS,
