@@ -46,26 +46,26 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           subject matter of the terms.
           <br />
           <br />
-          &nbsp;You agree not to engage in, or attempt to engage in, any of the
+          You agree not to engage in, or attempt to engage in, any of the
           following categories of prohibited activity including any unlawful
           conduct in relation to your access and use of the Interface:
           cyberattack, market manipulation(e.g. the manipulative tactics
           commonly known as “rug pulls”), sale of Stolen Property.
           <br />
           <br />
-          &nbsp;You understand and acknowledge that we do not broker trading
-          orders on your behalf nor do we collect or earn fees from your trades
-          on the Interface. We also do not facilitate the execution or
-          settlement of your trades, which occur entirely on the XPLA Chain. As
-          a result, we do not (and cannot) guarantee market best pricing or best
-          execution through the Interface or when using our Auto Routing
-          feature, which routes trades across liquidity pools on the Protocol
-          only. Any references in the Interface to “best price” do not
-          constitute a representation or warranty about pricing available
-          through the Interface, on the Protocol, or elsewhere.
+          You understand and acknowledge that we do not broker trading orders on
+          your behalf nor do we collect or earn fees from your trades on the
+          Interface. We also do not facilitate the execution or settlement of
+          your trades, which occur entirely on the XPLA Chain. As a result, we
+          do not (and cannot) guarantee market best pricing or best execution
+          through the Interface or when using our Auto Routing feature, which
+          routes trades across liquidity pools on the Protocol only. Any
+          references in the Interface to “best price” do not constitute a
+          representation or warranty about pricing available through the
+          Interface, on the Protocol, or elsewhere.
           <br />
           <br />
-          &nbsp;You agree and understand that:
+          You agree and understand that:
           <br />
           a. all trades you submit through the Interface are considered
           unsolicited, which means that they are solely initiated by you
@@ -95,31 +95,31 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           financial circumstances, and risk tolerance.
           <br />
           <br />
-          &nbsp;The Interface is a purely non-custodial application, meaning we
-          do not ever have custody, possession, or control of your digital
-          assets at any time. It further means you are solely responsible for
-          the custody of the cryptographic private keys to the digital asset
-          wallets you hold and you should never share your wallet credentials or
-          seed phrase with anyone. We accept no responsibility for, or liability
-          to you, in connection with your use of a wallet and make no
-          representations or warranties regarding how the Interface will operate
-          with any specific wallet. Likewise, you are solely responsible for any
-          associated wallet and we are not liable for any acts or omissions by
-          you in connection with or as a result of your wallet being
-          compromised. This Agreement is not intended to, and does not, create
-          or impose any fiduciary duties on us. To the fullest extent permitted
-          by law, you acknowledge and agree that we owe no fiduciary duties or
-          liabilities to you or any other party, and that to the extent any such
-          duties or liabilities may exist at law or in equity, those duties and
-          liabilities are hereby irrevocably disclaimed, waived, and eliminated.
-          You further agree that the only duties and obligations that we owe you
-          are those set out expressly in this Agreement.
+          The Interface is a purely non-custodial application, meaning we do not
+          ever have custody, possession, or control of your digital assets at
+          any time. It further means you are solely responsible for the custody
+          of the cryptographic private keys to the digital asset wallets you
+          hold and you should never share your wallet credentials or seed phrase
+          with anyone. We accept no responsibility for, or liability to you, in
+          connection with your use of a wallet and make no representations or
+          warranties regarding how the Interface will operate with any specific
+          wallet. Likewise, you are solely responsible for any associated wallet
+          and we are not liable for any acts or omissions by you in connection
+          with or as a result of your wallet being compromised. This Agreement
+          is not intended to, and does not, create or impose any fiduciary
+          duties on us. To the fullest extent permitted by law, you acknowledge
+          and agree that we owe no fiduciary duties or liabilities to you or any
+          other party, and that to the extent any such duties or liabilities may
+          exist at law or in equity, those duties and liabilities are hereby
+          irrevocably disclaimed, waived, and eliminated. You further agree that
+          the only duties and obligations that we owe you are those set out
+          expressly in this Agreement.
           <br />
           <br />
-          &nbsp;The Interface may not be available or appropriate for use in
-          your jurisdiction. By accessing or using the Interface, you agree that
-          you are solely and entirely responsible for compliance with all laws
-          and regulations that may apply to you. Specifically, your use of the
+          The Interface may not be available or appropriate for use in your
+          jurisdiction. By accessing or using the Interface, you agree that you
+          are solely and entirely responsible for compliance with all laws and
+          regulations that may apply to you. Specifically, your use of the
           Interface or the Protocol may result in various tax consequences, such
           as income or capital gains tax, value-added tax, goods and services
           tax, or sales tax in certain jurisdictions. It is your responsibility
@@ -128,7 +128,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           appropriate tax authority.
           <br />
           <br />
-          &nbsp;By accessing and using the Interface, you represent that you are
+          By accessing and using the Interface, you represent that you are
           financially and technically sophisticated enough to understand the
           inherent risks associated with using cryptographic and
           blockchain-based systems, and that you have a working knowledge of the
@@ -164,7 +164,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           Interface to interact with the Protocol.
           <br />
           <br />
-          &nbsp;The Interface may contain references or links to third-party
+          The Interface may contain references or links to third-party
           resources, including (but not limited to) information, materials,
           products, or services, that we do not own or control. In addition,
           third parties may offer promotions related to your access and use of
@@ -177,25 +177,25 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           any such resources or participation in any such promotions.
           <br />
           <br />
-          &nbsp;You expressly agree that you assume all risks in connection with
-          your access and use of the Interface. You further expressly waive and
+          You expressly agree that you assume all risks in connection with your
+          access and use of the Interface. You further expressly waive and
           release us from any and all liability, claims, causes of action, or
           damages arising from or in any way relating to your use of the
           Interface.
           <br />
           <br />
-          &nbsp;You agree to hold harmless, release, defend, and indemnify us
-          and our officers, directors, employees, contractors, agents,
-          affiliates, and subsidiaries from and against all claims, damages,
-          obligations, losses, liabilities, costs, and expenses arising from:
-          (a) your access and use of the Interface; (b) your violation of any
-          term or condition of this Agreement, the right of any third party, or
-          any other applicable law, rule, or regulation; and (c) any other
-          party&apos;s access and use of the Interface with your assistance or
-          using any device or account that you own or control.
+          You agree to hold harmless, release, defend, and indemnify us and our
+          officers, directors, employees, contractors, agents, affiliates, and
+          subsidiaries from and against all claims, damages, obligations,
+          losses, liabilities, costs, and expenses arising from: (a) your access
+          and use of the Interface; (b) your violation of any term or condition
+          of this Agreement, the right of any third party, or any other
+          applicable law, rule, or regulation; and (c) any other party&apos;s
+          access and use of the Interface with your assistance or using any
+          device or account that you own or control.
           <br />
           <br />
-          &nbsp;The Interface is provided on an &quot;AS IS&quot; and &quot;AS
+          The Interface is provided on an &quot;AS IS&quot; and &quot;AS
           AVAILABLE&quot; basis. TO THE FULLEST EXTENT PERMITTED BY LAW, WE
           DISCLAIM ANY REPRESENTATIONS AND WARRANTIES OF ANY KIND, WHETHER
           EXPRESS, IMPLIED, OR STATUTORY, INCLUDING (BUT NOT LIMITED TO) THE
@@ -212,35 +212,35 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           third parties concerning the Interface.
           <br />
           <br />
-          &nbsp;UNDER NO CIRCUMSTANCES SHALL WE OR ANY OF OUR OFFICERS,
-          DIRECTORS, EMPLOYEES, CONTRACTORS, AGENTS, AFFILIATES, OR SUBSIDIARIES
-          BE LIABLE TO YOU FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL,
-          CONSEQUENTIAL, OR EXEMPLARY DAMAGES, INCLUDING (BUT NOT LIMITED TO)
-          DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE
-          PROPERTY, ARISING OUT OF OR RELATING TO ANY ACCESS OR USE OF THE
-          INTERFACE, NOR WILL WE BE RESPONSIBLE FOR ANY DAMAGE, LOSS, OR INJURY
-          RESULTING FROM HACKING, TAMPERING, OR OTHER UNAUTHORIZED ACCESS OR USE
-          OF THE INTERFACE OR THE INFORMATION CONTAINED WITHIN IT. WE ASSUME NO
-          LIABILITY OR RESPONSIBILITY FOR ANY: (A) ERRORS, MISTAKES, OR
-          INACCURACIES OF CONTENT; (B) PERSONAL INJURY OR PROPERTY DAMAGE, OF
-          ANY NATURE WHATSOEVER, RESULTING FROM ANY ACCESS OR USE OF THE
-          INTERFACE; (C) UNAUTHORIZED ACCESS OR USE OF ANY SECURE SERVER OR
-          DATABASE IN OUR CONTROL, OR THE USE OF ANY INFORMATION OR DATA STORED
-          THEREIN; (D) INTERRUPTION OR CESSATION OF FUNCTION RELATED TO THE
-          INTERFACE; (E) BUGS, VIRUSES, TROJAN HORSES, OR THE LIKE THAT MAY BE
-          TRANSMITTED TO OR THROUGH THE INTERFACE; (F) ERRORS OR OMISSIONS IN,
-          OR LOSS OR DAMAGE INCURRED AS A RESULT OF THE USE OF, ANY CONTENT MADE
-          AVAILABLE THROUGH THE INTERFACE; AND (G) THE DEFAMATORY, OFFENSIVE, OR
-          ILLEGAL CONDUCT OF ANY THIRD PARTY.
+          UNDER NO CIRCUMSTANCES SHALL WE OR ANY OF OUR OFFICERS, DIRECTORS,
+          EMPLOYEES, CONTRACTORS, AGENTS, AFFILIATES, OR SUBSIDIARIES BE LIABLE
+          TO YOU FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
+          OR EXEMPLARY DAMAGES, INCLUDING (BUT NOT LIMITED TO) DAMAGES FOR LOSS
+          OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE PROPERTY, ARISING
+          OUT OF OR RELATING TO ANY ACCESS OR USE OF THE INTERFACE, NOR WILL WE
+          BE RESPONSIBLE FOR ANY DAMAGE, LOSS, OR INJURY RESULTING FROM HACKING,
+          TAMPERING, OR OTHER UNAUTHORIZED ACCESS OR USE OF THE INTERFACE OR THE
+          INFORMATION CONTAINED WITHIN IT. WE ASSUME NO LIABILITY OR
+          RESPONSIBILITY FOR ANY: (A) ERRORS, MISTAKES, OR INACCURACIES OF
+          CONTENT; (B) PERSONAL INJURY OR PROPERTY DAMAGE, OF ANY NATURE
+          WHATSOEVER, RESULTING FROM ANY ACCESS OR USE OF THE INTERFACE; (C)
+          UNAUTHORIZED ACCESS OR USE OF ANY SECURE SERVER OR DATABASE IN OUR
+          CONTROL, OR THE USE OF ANY INFORMATION OR DATA STORED THEREIN; (D)
+          INTERRUPTION OR CESSATION OF FUNCTION RELATED TO THE INTERFACE; (E)
+          BUGS, VIRUSES, TROJAN HORSES, OR THE LIKE THAT MAY BE TRANSMITTED TO
+          OR THROUGH THE INTERFACE; (F) ERRORS OR OMISSIONS IN, OR LOSS OR
+          DAMAGE INCURRED AS A RESULT OF THE USE OF, ANY CONTENT MADE AVAILABLE
+          THROUGH THE INTERFACE; AND (G) THE DEFAMATORY, OFFENSIVE, OR ILLEGAL
+          CONDUCT OF ANY THIRD PARTY.
           <br />
           <br />
-          &nbsp;Blockchain transactions require the payment of transaction fees
-          to the XPLA Chain. You will be responsible for paying the Gas Fees for
-          any transaction.
+          Blockchain transactions require the payment of transaction fees to the
+          XPLA Chain. You will be responsible for paying the Gas Fees for any
+          transaction.
           <br />
           <br />
-          &nbsp;This app uses Google Analytics API and the app logs anonymized
-          usage statistics in order to improve over time.
+          This app uses Google Analytics API and the app logs anonymized usage
+          statistics in order to improve over time.
           <br />
           <br />
           <a
