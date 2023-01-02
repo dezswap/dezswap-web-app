@@ -14,14 +14,14 @@ const Hr = styled.div<HrProps>`
   width: 100%;
   height: 0;
   position: relative;
-  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.primary};
 
   ${({ color = colors.primary, theme }) => css`
     border-color: ${theme.colors[color as Color] ?? color};
   `}
 
-  ${({ size = 2 }) => css`
-    border-width: ${typeof size === "number" ? size / 2 : 1}px;
+  ${({ size = 1 }) => css`
+    border-bottom-width: ${typeof size === "number" ? `${size}px` : size};
   `}
 `;
 
