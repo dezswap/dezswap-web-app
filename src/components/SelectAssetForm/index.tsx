@@ -226,18 +226,19 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               }
             }}
           >
-            <div>
-              <IconButton
-                size={32}
-                style={{ alignItems: "center" }}
-                icons={{
-                  default: bookmarks?.includes(address)
-                    ? iconBookmarkSelected
-                    : iconBookmark,
-                }}
-                onClick={() => toggleBookmark(address)}
-              />
-            </div>
+            <IconButton
+              size={32}
+              style={{ alignItems: "center" }}
+              icons={{
+                default: bookmarks?.includes(address)
+                  ? iconBookmarkSelected
+                  : iconBookmark,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark(address);
+              }}
+            />
             <Row
               gutterWidth={6}
               style={{
