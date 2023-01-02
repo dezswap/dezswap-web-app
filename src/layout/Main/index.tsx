@@ -14,6 +14,7 @@ import iconPool from "assets/icons/icon-pool.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useNetwork } from "hooks/useNetwork";
+import Tooltip from "components/Tooltip";
 import Footer from "./Footer";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
@@ -84,18 +85,27 @@ const navLinks = [
 
 const navBar = (
   <NavBar
-    items={navLinks.map((navLink) => ({
-      to: navLink.path,
-      disabled: navLink.disabled,
-      children: (
+    items={navLinks.map((navLink) => {
+      const children = (
         <div>
           <IconButton icons={{ default: navLink.icon }} size={24} />
           <Typography size={12} weight={900} color="primary">
             {navLink.label}
           </Typography>
         </div>
-      ),
-    }))}
+      );
+      return {
+        to: navLink.path,
+        disabled: navLink.disabled,
+        children: navLink.disabled ? (
+          <Tooltip arrow content="Coming soon">
+            {children}
+          </Tooltip>
+        ) : (
+          children
+        ),
+      };
+    })}
   />
 );
 
