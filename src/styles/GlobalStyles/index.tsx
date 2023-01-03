@@ -163,10 +163,10 @@ function GlobalStyles() {
             }
             &[data-placement^="top"] > .tippy-arrow:after {
               border-top-color: ${theme.colors.primary};
-              border-width: 7px 7px 0;
-              top: 17px;
-              left: 1px;
-              transform: scaleX(1.5) translateY(1px);
+              border-width: 6px 6px 0;
+              top: 18px;
+              left: 2.5px;
+              transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="top"] > .tippy-svg-arrow > svg {
               top: 16px;
@@ -180,10 +180,10 @@ function GlobalStyles() {
             }
             &[data-placement^="bottom"] > .tippy-arrow:after {
               border-bottom-color: ${theme.colors.primary};
-              border-width: 0 7px 7px;
-              bottom: 17px;
-              left: 1px;
-              transform: scale(1.5) translateY(-1px);
+              border-width: 0 6px 6px;
+              bottom: 19px;
+              left: 2.5px;
+              transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="bottom"] > .tippy-svg-arrow > svg {
               bottom: 16px;
