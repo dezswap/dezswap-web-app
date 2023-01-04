@@ -120,6 +120,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
                       background-repeat: no-repeat;
                       background-image: url(${item.iconSrc});
                       text-align: right;
+                      &:hover {
+                        opacity: 0.7;
+                      }
                     `}
                   >
                     <div
