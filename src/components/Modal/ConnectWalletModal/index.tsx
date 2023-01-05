@@ -93,23 +93,15 @@ function ConnectWalletModal(props: ReactModal.Props) {
         wallet is considered that you agree to their terms and conditions.
         Always trade at your own risk.
       </Typography>
-      <Row
-        justify="between"
-        gutterWidth={1}
-        style={{
-          flexWrap: "wrap",
-          height: "100%",
-          paddingBottom: "20px",
-          paddingLeft: screenClass === MOBILE_SCREEN_CLASS ? "16px" : "0px",
-          paddingRight: screenClass === MOBILE_SCREEN_CLASS ? "16px" : "0px",
-        }}
-      >
+      <Row gutterWidth={0}>
         {buttons.map((item) => (
           <Col
-            width="auto"
+            xs={6}
+            sm={4}
             key={item.label}
             style={{
               paddingTop: screenClass === MOBILE_SCREEN_CLASS ? "30px" : "20px",
+              textAlign: "center",
             }}
           >
             <WalletButton
@@ -128,6 +120,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
                       background-repeat: no-repeat;
                       background-image: url(${item.iconSrc});
                       text-align: right;
+                      &:hover {
+                        opacity: 0.7;
+                      }
                     `}
                   >
                     <div
@@ -146,7 +141,11 @@ function ConnectWalletModal(props: ReactModal.Props) {
                   </div>
                 </Col>
                 <Col style={{ height: "20px" }}>
-                  <Typography color={theme.colors.primary} weight={900}>
+                  <Typography
+                    color={theme.colors.primary}
+                    weight={900}
+                    style={{ whiteSpace: "nowrap" }}
+                  >
                     {item.label}
                   </Typography>
                 </Col>
