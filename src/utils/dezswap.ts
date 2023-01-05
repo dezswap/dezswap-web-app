@@ -26,12 +26,12 @@ const assetMsg = (
 export const generateSimulationMsg = (
   networkName: NetworkName,
   offerAsset: string,
-  amount: Numeric.Input,
+  amount: string,
 ) => ({
   simulation: {
     offer_asset: assetMsg(networkName, {
       address: offerAsset,
-      amount: `${Numeric.parse(amount).toString()}`,
+      amount,
     }),
   },
 });
@@ -39,12 +39,12 @@ export const generateSimulationMsg = (
 export const generateReverseSimulationMsg = (
   networkName: NetworkName,
   askAsset: string,
-  amount: Numeric.Input,
+  amount: string,
 ) => ({
   reverse_simulation: {
     ask_asset: assetMsg(networkName, {
       address: askAsset,
-      amount: `${Numeric.parse(amount).toString()}`,
+      amount,
     }),
   },
 });
@@ -148,7 +148,7 @@ export const generateSwapMsg = (
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,
-  amount: Numeric.Input,
+  amount: string,
   beliefPrice: Numeric.Input,
   maxSpread = "0.1",
   txDeadlineSeconds = 1200,
@@ -162,7 +162,7 @@ export const generateSwapMsg = (
         swap: {
           offer_asset: assetMsg(networkName, {
             address: fromAssetAddress,
-            amount: amount.toString(),
+            amount,
           }),
           max_spread: `${maxSpreadFixed}`,
           belief_price: `${beliefPrice}`,
@@ -193,7 +193,7 @@ export const generateSwapMsg = (
     {
       send: {
         msg: sendMsg,
-        amount: amount.toString(),
+        amount,
         contract: contractAddress,
       },
     },
