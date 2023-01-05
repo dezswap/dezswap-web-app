@@ -6,6 +6,9 @@ import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { Col, Row } from "react-grid-system";
 import { amountToValue, formatDecimals, formatNumber } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
+import Typography from "components/Typography";
+import Button from "components/Button";
+import { Link } from "react-router-dom";
 import Expand from "./Expand";
 import { PoolWithPair } from ".";
 
@@ -100,6 +103,20 @@ const AssetIcon = styled.div<{ src?: string }>`
 
 const PoolItem = styled(Box)``;
 
+const Label = styled(Typography)`
+  margin-bottom: 15px;
+`;
+
+const LinkButton = styled(Button.withComponent(Link))`
+  text-decoration: none;
+`;
+
+Label.defaultProps = {
+  size: 14,
+  weight: 900,
+  color: "primary",
+};
+
 function PoolList({ pools }: PoolListProps) {
   const { getAsset } = useAssets();
   return (
@@ -151,16 +168,72 @@ function PoolList({ pools }: PoolListProps) {
             }
             extra={[<div>1</div>, <div>2</div>]}
           >
-            <div
-              key={pool.pair.contract_addr}
-              css={css`
-                width: 120px;
-                position: relative;
-                display: inline-block;
-              `}
-            >
-              <SimplePieChart data={[50, 50]} />
-            </div>
+            <Row justify="between" align="start" gutterWidth={0}>
+              <Col width={360}>
+                <Label
+                  css={css`
+                    margin-bottom: 10px;
+                  `}
+                >
+                  Liquidity Ratio
+                </Label>
+                <Row justify="between" align="center" gutterWidth={10}>
+                  <Col width={80}>
+                    <div
+                      key={pool.pair.contract_addr}
+                      css={css`
+                        width: 60px;
+                        position: relative;
+                        display: inline-block;
+                      `}
+                    >
+                      <SimplePieChart data={[50, 50]} />
+                    </div>
+                  </Col>
+                  <Col>
+                    <Typography>
+                      0000 {asset1?.symbol} {formatNumber(50)}%
+                    </Typography>
+                    <Typography>
+                      0000 {asset2?.symbol} {formatNumber(50)}%
+                    </Typography>
+                  </Col>
+                </Row>
+              </Col>
+              <Col width={210}>
+                <Label>Your Liquidity</Label>
+              </Col>
+              <Col width={210}>
+                <Label>Asset Pooled</Label>
+              </Col>
+              <Col width={80}>
+                <Label>Your Share</Label>
+              </Col>
+              <Col
+                width={150}
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <LinkButton
+                  to={`/pool/add-liquidity/${pool.pair.contract_addr}`}
+                  variant="primary"
+                  block
+                  css={css`
+                    margin-bottom: 10px;
+                  `}
+                >
+                  Add liquidity
+                </LinkButton>
+                <LinkButton
+                  to={`/pool/withdraw/${pool.pair.contract_addr}`}
+                  variant="secondary"
+                  block
+                >
+                  Remove liquidity
+                </LinkButton>
+              </Col>
+            </Row>
           </Expand>
         );
       })}
