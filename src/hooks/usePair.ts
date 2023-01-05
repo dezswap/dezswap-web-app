@@ -127,6 +127,15 @@ const usePairs = () => {
     }
   }, [availableAssetAddresses, setAssets]);
 
+  const getPair = useCallback(
+    (contractAddress: string) => {
+      return pairs[network.name]?.data?.find(
+        (pair) => pair.contract_addr === contractAddress,
+      );
+    },
+    [network.name, pairs],
+  );
+
   const findPair = useCallback(
     (addresses: [string, string]) => {
       return pairs[network.name]?.data?.find(
@@ -152,6 +161,7 @@ const usePairs = () => {
       pairs: pairs[network.name as NetworkName]?.data,
       getPairedAddresses,
       availableAssetAddresses,
+      getPair,
       findPair,
       findPairByLpAddress,
     }),
@@ -160,6 +170,7 @@ const usePairs = () => {
       getPairedAddresses,
       network.name,
       pairs,
+      getPair,
       findPair,
       findPairByLpAddress,
     ],
