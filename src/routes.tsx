@@ -27,8 +27,8 @@ const routes: RouteObject[] = [
     path: "pool",
     element: <PoolPage />,
     children: [
-      { path: "add-liquidity", element: <ProvidePage /> },
-      { path: "withdraw", element: <WithdrawPage /> },
+      { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
+      { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
       { path: "*", element: <Navigate replace to="add-liquidity" /> },
     ],
   },
