@@ -82,7 +82,7 @@ export const useAPI = () => {
   );
 
   const simulate = useCallback(
-    async (contractAddress: string, offerAsset: string, amount: Amount) => {
+    async (contractAddress: string, offerAsset: string, amount: string) => {
       const res = await lcd.wasm.contractQuery<Simulation>(
         contractAddress,
         generateSimulationMsg(network.name, offerAsset, amount),
@@ -93,7 +93,7 @@ export const useAPI = () => {
   );
 
   const reverseSimulate = useCallback(
-    async (contractAddress: string, askAsset: string, amount: Amount) => {
+    async (contractAddress: string, askAsset: string, amount: string) => {
       const res = await lcd.wasm.contractQuery<ReverseSimulation>(
         contractAddress,
         generateReverseSimulationMsg(network.name, askAsset, amount),

@@ -1,13 +1,10 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
 import { ReverseSimulation, Simulation } from "types/pair";
-import {
-  generateReverseSimulationMsg,
-  generateSimulationMsg,
-} from "utils/dezswap";
 import { useLCDClient } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
 import { useNetwork } from "hooks/useNetwork";
+import { useAPI } from "hooks/useAPI";
 
 const useSimulate = ({
   fromAddress,
@@ -28,6 +25,7 @@ const useSimulate = ({
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
   const network = useNetwork();
+  const api = useAPI();
 
   const deferredAmount = useDeferredValue(amount);
 
@@ -52,9 +50,10 @@ const useSimulate = ({
           return;
         }
         if (!isReversed) {
-          const res = await lcd.wasm.contractQuery<Simulation>(
+          const res = await api.simulate(
             pair.contract_addr,
-            generateSimulationMsg(network.name, fromAddress, deferredAmount),
+            fromAddress,
+            deferredAmount.toString(),
           );
           if (res && !isAborted) {
             setResult(res);
@@ -62,13 +61,10 @@ const useSimulate = ({
         }
 
         if (isReversed) {
-          const res = await lcd.wasm.contractQuery<ReverseSimulation>(
+          const res = await api.reverseSimulate(
             pair.contract_addr,
-            generateReverseSimulationMsg(
-              network.name,
-              toAddress,
-              deferredAmount,
-            ),
+            toAddress,
+            deferredAmount.toString(),
           );
           if (res && !isAborted) {
             setResult(res);
