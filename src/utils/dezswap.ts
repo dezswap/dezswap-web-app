@@ -2,6 +2,7 @@ import { Coin, Coins, MsgExecuteContract, Numeric } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
 import { isNativeTokenAddress } from "utils";
 import { NetworkName } from "types/common";
+import { contractAddresses } from "constants/dezswap";
 
 export type Amount = string | number;
 
@@ -47,6 +48,26 @@ export const generateReverseSimulationMsg = (
     }),
   },
 });
+
+export const generateCreatePoolMsg = (
+  networkName: NetworkName,
+  senderAddress: string,
+  assets: string[],
+) =>
+  new MsgExecuteContract(
+    senderAddress,
+    contractAddresses[networkName]?.factory || "",
+    {
+      create_pair: {
+        asset_infos: assets.map((a) =>
+          isNativeTokenAddress(networkName, a)
+            ? { native_token: { denom: a } }
+            : { token: { contract_addr: a } },
+        ),
+      },
+    },
+    [],
+  );
 
 export const generateAddLiquidityMsg = (
   networkName: NetworkName,
