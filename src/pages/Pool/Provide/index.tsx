@@ -9,6 +9,7 @@ import { css } from "@emotion/react";
 import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import Button from "components/Button";
 import InputGroup from "./InputGroup";
 
 enum FormKey {
@@ -41,6 +42,7 @@ function ProvidePage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       /* TODO: implement */
+      event.preventDefault();
     },
     [],
   );
@@ -106,34 +108,43 @@ function ProvidePage() {
           }}
           style={{ marginBottom: 10 }}
         />
-        <Expand
-          label="Summary"
-          preview={
-            <div>
-              Preview
-              <br />
-              Preview
-              <br />
-              Preview
-              <br />
-              Preview
-              <br />
-            </div>
-          }
+        <div
+          css={css`
+            margin-bottom: 20px;
+          `}
         >
-          Children
-          <br />
-          Children
-          <br />
-          Children
-          <br />
-          Children
-          <br />
-          Children
-          <br />
-          Children
-          <br />
-        </Expand>
+          <Expand
+            label="Summary"
+            preview={
+              <div>
+                Preview
+                <br />
+                Preview
+                <br />
+                Preview
+                <br />
+                Preview
+                <br />
+              </div>
+            }
+          >
+            Children
+            <br />
+            Children
+            <br />
+            Children
+            <br />
+            Children
+            <br />
+            Children
+            <br />
+            Children
+            <br />
+          </Expand>
+        </div>
+        <Button type="submit" size="large" variant="primary" block>
+          Add liquidity
+        </Button>
       </form>
     </Modal>
   );

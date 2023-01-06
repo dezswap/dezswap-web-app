@@ -54,7 +54,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
                   {asset?.symbol}
                 </AssetButton>
               </Col>
-              <Col xs="content">
+              <Col xs="content" className="cm-hidden">
                 <Copy size={38} value={asset?.address} />
               </Col>
             </Row>
