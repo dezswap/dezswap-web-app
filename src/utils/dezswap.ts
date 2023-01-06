@@ -17,6 +17,9 @@ export const queryMessages = {
       pairs: options,
     };
   },
+  getPool() {
+    return { pool: {} };
+  },
 };
 
 const assetMsg = (
