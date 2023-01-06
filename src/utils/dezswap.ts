@@ -6,11 +6,17 @@ import { contractAddresses } from "constants/dezswap";
 
 export type Amount = string | number;
 
-export const generatePairsMsg = (options: {
-  limit?: number;
-  start_after?: [Asset | NativeAsset, Asset | NativeAsset];
-}) => {
-  return { pairs: options };
+export const queryMessages = {
+  getPairs(
+    options: {
+      limit?: number;
+      start_after?: [Asset | NativeAsset, Asset | NativeAsset];
+    } = {},
+  ) {
+    return {
+      pairs: options,
+    };
+  },
 };
 
 const assetMsg = (
