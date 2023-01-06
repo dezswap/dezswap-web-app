@@ -180,7 +180,7 @@ function PoolPage() {
 
           <Pagination
             current={currentPage}
-            total={Math.floor(pools.length - 1 / 8) + 1}
+            total={Math.floor((pools.length - 1) / 8) + 1}
             onChange={(value) => {
               setCurrentPage(value);
             }}
