@@ -5,7 +5,7 @@ import {
   Amount,
   generateReverseSimulationMsg,
   generateSimulationMsg,
-  generatePairsMsg,
+  queryMessages,
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
@@ -38,14 +38,14 @@ export const useAPI = () => {
   );
 
   const getPairs = useCallback(
-    (options: Parameters<typeof generatePairsMsg>[0]) => {
+    (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
       const contractAddress = contractAddresses[network.name]?.factory;
       if (!contractAddress) {
         return undefined;
       }
       const res = lcd.wasm.contractQuery<Pairs>(
         contractAddress,
-        generatePairsMsg(options),
+        queryMessages.getPairs(options),
       );
 
       return res;
