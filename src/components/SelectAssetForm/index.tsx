@@ -1,4 +1,4 @@
-import { Col, Hidden, Row } from "react-grid-system";
+import { Col, Row } from "react-grid-system";
 import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import React, { useDeferredValue, useMemo, useState } from "react";
@@ -19,7 +19,6 @@ import Input from "components/Input";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
 import useAssets from "hooks/useAssets";
-import usePairs from "hooks/usePair";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import useBookmark from "hooks/useBookmark";
@@ -42,7 +41,7 @@ interface SelectAssetFormProps {
   goBackOnSelect?: boolean;
   onSelect?(address: string): void;
 
-  addressList?: { address: string; isLP?: boolean }[];
+  addressList?: string[];
 }
 
 const Wrapper = styled.div`
@@ -165,7 +164,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
   const { getAsset, verifiedAssets } = useAssets();
-  const { findPairByLpAddress } = usePairs();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -197,235 +195,130 @@ function SelectAssetForm(props: SelectAssetFormProps) {
 
     const items = (
       isBookmark
-        ? bookmarks?.map((b) => ({ address: b, isLP: false }))
+        ? addressList?.filter((address) => bookmarks?.includes(address))
         : addressList
-    )?.map(({ address, isLP }) => {
-      if (!isLP) {
-        const asset = getAsset(address);
-        const isVerified =
-          !!verifiedAssets?.[address] ||
-          isNativeTokenAddress(network.name, address);
-        return (
-          <AssetItem
-            key={address}
-            selected={selectedAssetAddress === address}
-            invisible={
-              !!deferredSearchKeyword &&
-              [asset?.name, asset?.address, asset?.symbol].findIndex((item) =>
-                item
-                  ?.toLowerCase()
-                  .includes(deferredSearchKeyword.toLowerCase()),
-              ) < 0
-            }
-            onClick={() => {
-              if (handleSelect) {
-                handleSelect(address);
-              }
-              if (goBackOnSelect && onGoBack) {
-                onGoBack();
-              }
-            }}
-          >
-            <IconButton
-              size={32}
-              style={{ alignItems: "center" }}
-              icons={{
-                default: bookmarks?.includes(address)
-                  ? iconBookmarkSelected
-                  : iconBookmark,
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleBookmark(address);
-              }}
-            />
-            <Row
-              gutterWidth={6}
-              style={{
-                display: "flex",
-                flex: 6,
-                flexShrink: 0,
-                alignItems: "center",
-              }}
-              justify="start"
-              wrap="nowrap"
-            >
-              <Col
-                xs="content"
-                css={css`
-                  vertical-align: middle;
-                `}
-              >
-                <AssetIcon src={asset?.iconSrc}>
-                  {isVerified && (
-                    <Tooltip
-                      arrow
-                      content={`${asset?.symbol} is verified token`}
-                    >
-                      <div
-                        css={css`
-                          position: absolute;
-                          bottom: -3px;
-                          right: -3px;
-                          width: 18px;
-                          height: 18px;
-                          background-image: url(${iconVerified});
-                          background-size: contain;
-                          background-repeat: no-repeat;
-                          background-position: 50% 50%;
-                        `}
-                      />
-                    </Tooltip>
-                  )}
-                </AssetIcon>
-              </Col>
-              <Col xs={8}>
-                <Typography
-                  size={16}
-                  weight="bold"
-                  color={theme.colors.text.primary}
-                  css={css`
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                  `}
-                >
-                  {asset?.symbol}
-                </Typography>
-                <Typography
-                  size={13}
-                  weight="normal"
-                  color={theme.colors.text.primary}
-                  css={css`
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    opacity: 0.5;
-                  `}
-                >
-                  <span className="asset-name">{asset?.name}</span>
-                  <span className="asset-address">
-                    {ellipsisCenter(address, 6)}
-                  </span>
-                </Typography>
-              </Col>
-            </Row>
-            <Typography
-              size={16}
-              css={css`
-                overflow: hidden;
-                white-space: nowrap;
-                text-align: right;
-                margin-left: auto;
-                flex: 4;
-              `}
-            >
-              {formatNumber(
-                cutDecimal(
-                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                  3,
-                ),
-              )}
-            </Typography>
-          </AssetItem>
-        );
-      }
-
-      const pair = findPairByLpAddress(address);
-      const assets = pair?.asset_addresses.map((item) => getAsset(item)) || [];
-
+    )?.map((address) => {
+      const asset = getAsset(address);
+      const isVerified =
+        !!verifiedAssets?.[address] ||
+        isNativeTokenAddress(network.name, address);
       return (
         <AssetItem
           key={address}
           selected={selectedAssetAddress === address}
           invisible={
             !!deferredSearchKeyword &&
-            (!address
-              .toLowerCase()
-              .includes(deferredSearchKeyword.toLowerCase()) ||
-              assets.findIndex(
-                (asset) =>
-                  asset?.address
-                    ?.toLowerCase()
-                    .includes(deferredSearchKeyword.toLowerCase()) ||
-                  asset?.symbol
-                    ?.toLowerCase()
-                    .includes(deferredSearchKeyword.toLowerCase()) ||
-                  asset?.name
-                    ?.toLowerCase()
-                    .includes(deferredSearchKeyword.toLowerCase()),
-              ) < 0)
+            [asset?.name, asset?.address, asset?.symbol].findIndex((item) =>
+              item?.toLowerCase().includes(deferredSearchKeyword.toLowerCase()),
+            ) < 0
           }
+          onClick={() => {
+            if (handleSelect) {
+              handleSelect(address);
+            }
+            if (goBackOnSelect && onGoBack) {
+              onGoBack();
+            }
+          }}
         >
-          <div
-            css={css`
-              flex: 1;
-            `}
+          <IconButton
+            size={32}
+            style={{ alignItems: "center" }}
+            icons={{
+              default: bookmarks?.includes(address)
+                ? iconBookmarkSelected
+                : iconBookmark,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBookmark(address);
+            }}
+          />
+          <Row
+            gutterWidth={6}
+            style={{
+              display: "flex",
+              flex: 6,
+              flexShrink: 0,
+              alignItems: "center",
+            }}
+            justify="start"
+            wrap="nowrap"
           >
-            <Row
-              gutterWidth={3}
-              justify="between"
-              align="start"
+            <Col
+              xs="content"
               css={css`
-                & > div:last-child {
-                  display: none;
-                }
+                vertical-align: middle;
               `}
             >
-              {assets.map((asset) => (
-                <React.Fragment key={asset?.address}>
-                  <Col xs="content">
-                    <AssetIcon
-                      src={asset?.iconSrc}
+              <AssetIcon src={asset?.iconSrc}>
+                {isVerified && (
+                  <Tooltip arrow content={`${asset?.symbol} is verified token`}>
+                    <div
                       css={css`
-                        width: 20px;
-                        height: 20px;
+                        position: absolute;
+                        bottom: -3px;
+                        right: -3px;
+                        width: 18px;
+                        height: 18px;
+                        background-image: url(${iconVerified});
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: 50% 50%;
                       `}
                     />
-                  </Col>
-                  <Col
-                    css={css`
-                      flex: 1;
-                    `}
-                  >
-                    <Typography
-                      size={16}
-                      weight={700}
-                      color="white"
-                      css={{ marginBottom: 3 }}
-                    >
-                      {asset?.name}
-                    </Typography>
-                  </Col>
-                  <Col xs={12} sm="content">
-                    <Hidden xs>
-                      <Typography
-                        size={16}
-                        weight={700}
-                        color="white"
-                        css={{ marginBottom: 3 }}
-                      >
-                        &nbsp;-&nbsp;
-                      </Typography>
-                    </Hidden>
-                  </Col>
-                </React.Fragment>
-              ))}
-            </Row>
-            <Row>
-              <Col>
-                <Typography
-                  size={14}
-                  weight={500}
-                  color="white"
-                  as="span"
-                  css={{ wordBreak: "break-all" }}
-                >
-                  {ellipsisCenter(address, 10)}
-                </Typography>
-              </Col>
-            </Row>
-          </div>
+                  </Tooltip>
+                )}
+              </AssetIcon>
+            </Col>
+            <Col xs={8}>
+              <Typography
+                size={16}
+                weight="bold"
+                color={theme.colors.text.primary}
+                css={css`
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                `}
+              >
+                {asset?.symbol}
+              </Typography>
+              <Typography
+                size={13}
+                weight="normal"
+                color={theme.colors.text.primary}
+                css={css`
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  opacity: 0.5;
+                `}
+              >
+                <span className="asset-name">{asset?.name}</span>
+                <span className="asset-address">
+                  {ellipsisCenter(address, 6)}
+                </span>
+              </Typography>
+            </Col>
+          </Row>
+          <Typography
+            size={16}
+            css={css`
+              overflow: hidden;
+              white-space: nowrap;
+              text-align: right;
+              margin-left: auto;
+              flex: 4;
+            `}
+          >
+            {formatNumber(
+              cutDecimal(
+                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                3,
+              ),
+            )}
+          </Typography>
         </AssetItem>
       );
     });
@@ -452,7 +345,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   }, [
     bookmarks,
     deferredSearchKeyword,
-    findPairByLpAddress,
     getAsset,
     goBackOnSelect,
     handleSelect,

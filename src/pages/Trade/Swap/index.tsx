@@ -410,10 +410,7 @@ function SwapPage() {
       >
         <SelectAssetForm
           goBackOnSelect
-          addressList={availableAssetAddresses.addresses?.map((address) => ({
-            address,
-            isLP: false,
-          }))}
+          addressList={availableAssetAddresses.addresses}
           hasBackButton
           selectedAssetAddress={
             selectAsset1Modal.isOpen
