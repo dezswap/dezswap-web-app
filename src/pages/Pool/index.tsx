@@ -20,6 +20,7 @@ import PoolButton from "./PoolButton";
 import PoolList from "./PoolList";
 
 const timeBaseOptions = ["24h", "7d", "1m"];
+const LIMIT = 8;
 
 const HeaderSection = styled.div`
   width: 100%;
@@ -133,7 +134,7 @@ function PoolPage() {
             <Col xs={12} sm={6}>
               <div
                 css={css`
-                  max-width: 274px;
+                  max-width: 408px;
                   .${MOBILE_SCREEN_CLASS} & {
                     max-width: unset;
                   }
@@ -141,11 +142,13 @@ function PoolPage() {
               >
                 <TabButton
                   size="large"
-                  items={["Liquidity pools", "My pools"].map((item) => ({
-                    value: item,
-                    label: item,
-                    key: item,
-                  }))}
+                  items={["Liquidity pools", "My pools", "Bookmarks"].map(
+                    (item) => ({
+                      value: item,
+                      label: item,
+                      key: item,
+                    }),
+                  )}
                   defaultSelectedIndex={0}
                 />
               </div>
@@ -175,12 +178,17 @@ function PoolPage() {
               margin-bottom: 25px;
             `}
           >
-            <PoolList pools={pools} />
+            <PoolList
+              pools={pools.slice(
+                (currentPage - 1) * LIMIT,
+                currentPage * LIMIT,
+              )}
+            />
           </div>
 
           <Pagination
             current={currentPage}
-            total={Math.floor((pools.length - 1) / 8) + 1}
+            total={Math.floor((pools.length - 1) / LIMIT) + 1}
             onChange={(value) => {
               setCurrentPage(value);
             }}

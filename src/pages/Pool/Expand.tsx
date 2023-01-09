@@ -23,14 +23,17 @@ const Header = styled.div`
 `;
 
 const Extra = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
   padding: 20px;
+  &,
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 `;
 
 const Content = styled.div`
@@ -45,19 +48,28 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
       <Header>
         {header}
         <Extra>
-          {extra}
           <div
-            css={css`
-              width: 18px;
-              height: 18px;
-              background-image: url(${iconExpand});
-              background-size: contain;
-              background-repeat: no-repeat;
-              background-position: 50% 50%;
-              transform: rotate(${isOpen ? 180 : 0}deg);
-              margin-left: 2px;
-            `}
-          />
+            aria-hidden
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            {extra}
+          </div>
+          <div>
+            <div
+              css={css`
+                width: 18px;
+                height: 18px;
+                background-image: url(${iconExpand});
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+                transform: rotate(${isOpen ? 180 : 0}deg);
+                margin-left: 2px;
+              `}
+            />
+          </div>
         </Extra>
       </Header>
       {isOpen && (
