@@ -26,7 +26,7 @@ const useSimulate = (
     setIsFailed(false);
     const fetchProvideInfos = async () => {
       try {
-        if (pool) {
+        if (assetAddress && assetAmount && pool) {
           const poolAssets = pool.assets.map((asset) => ({
             address:
               "token" in asset.info
@@ -52,7 +52,7 @@ const useSimulate = (
                 .ceil();
 
               setResult({
-                estimatedAmount: estimated.toString(),
+                estimatedAmount: estimated.toPrecision(64).split(".")[0],
                 poolAssets,
                 percentageOfShare: share
                   .mul(100)

@@ -6,9 +6,11 @@ import { useMemo } from "react";
 const useConfirmationModal = ({
   node,
   onConfirm,
+  isModalParent,
 }: {
   node?: Node;
   onConfirm?(): void;
+  isModalParent: boolean;
 }) => {
   const modal = useModal();
 
@@ -19,6 +21,7 @@ const useConfirmationModal = ({
         onRequestClose={() => modal.close()}
         node={node}
         onConfirm={onConfirm}
+        isModalParent={isModalParent}
       />
     ),
     [modal, node, onConfirm],
