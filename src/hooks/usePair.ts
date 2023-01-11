@@ -138,6 +138,9 @@ const usePairs = () => {
 
   const findPair = useCallback(
     (addresses: [string, string]) => {
+      if (addresses[0] === addresses[1]) {
+        return undefined;
+      }
       return pairs[network.name]?.data?.find(
         (pair) =>
           pair.asset_addresses.includes(addresses[0]) &&
