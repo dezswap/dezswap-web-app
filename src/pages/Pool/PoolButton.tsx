@@ -16,7 +16,14 @@ function PoolButton(props: PoolButtonProps) {
         }
       `}
     >
-      <Button size="xLarge" block {...props} />
+      <Button
+        size="xLarge"
+        block
+        css={css`
+          /* justify-content: space-between; */
+        `}
+        {...props}
+      />
     </Panel>
   );
 }

@@ -23,7 +23,7 @@ import Box from "components/Box";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
 import Expand from "./Expand";
-import { PoolWithPair } from ".";
+import { PoolExtended } from ".";
 
 const SimplePieChart = styled.div<{ data: number[] }>`
   width: 100%;
@@ -104,7 +104,13 @@ const IconButtonAnchor = styled(IconButton.withComponent("a"))`
   cursor: pointer;
 `;
 
-function PoolItem({ pool }: { pool: PoolWithPair }) {
+interface PoolItemProps {
+  pool: PoolExtended;
+  bookmarked?: boolean;
+  onBookmarkClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
   const { getAsset } = useAssets();
   const network = useNetwork();
   const lpBalance = useBalance(pool.pair.liquidity_token);
@@ -157,7 +163,13 @@ function PoolItem({ pool }: { pool: PoolWithPair }) {
         </TableRow>
       }
       extra={[
-        <IconButton size={32} icons={{ default: iconBookmark }} />,
+        <IconButton
+          size={32}
+          icons={{
+            default: bookmarked ? iconBookmarkSelected : iconBookmark,
+          }}
+          onClick={onBookmarkClick}
+        />,
         <IconButtonAnchor
           href={getWalletLink(pool.pair.contract_addr, network.name)}
           target="_blank"
@@ -224,6 +236,7 @@ function PoolItem({ pool }: { pool: PoolWithPair }) {
             {formatNumber(
               formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 3),
             )}
+            &nbsp;LP
           </Typography>
         </Col>
         <Col width={210}>

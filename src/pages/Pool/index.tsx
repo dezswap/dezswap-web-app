@@ -1,62 +1,116 @@
 import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
-import { Col, Container, Row } from "react-grid-system";
+import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet } from "react-router-dom";
 
-import iconPlus from "assets/icons/icon-plus.svg";
 import { css } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import { useEffect, useState } from "react";
-import styled from "@emotion/styled";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePair";
 import { useAPI } from "hooks/useAPI";
 import { Pool } from "types/pair";
 import { PairExtended } from "types/common";
-import Select from "./Select";
-import PoolButton from "./PoolButton";
+import usePairBookmark from "hooks/usePairBookmark";
+import { Numeric } from "@xpla/xpla.js";
+import IconButton from "components/IconButton";
+import iconReload from "assets/icons/icon-reload.svg";
+import iconReloadHover from "assets/icons/icon-reload-hover.svg";
 import PoolList from "./PoolList";
+import Select from "./Select";
+import PoolForm from "./PoolForm";
 
 const timeBaseOptions = ["24h", "7d", "1m"];
+const tabs = [
+  { value: "lp", label: "Liquidity pool" },
+  { value: "my-pool", label: "My pool" },
+  { value: "bookmark", label: "Bookmark" },
+];
+const mobileTabs = [
+  { value: "lp", label: "LP" },
+  { value: "my-pool", label: "My LP" },
+  { value: "bookmark", label: "Bookmark" },
+];
 const LIMIT = 8;
 
-const HeaderSection = styled.div`
-  width: 100%;
-  height: auto;
-  position: relative;
-  display: flex;
-  column-gap: 58px;
-
-  & > div {
-    flex: 1;
-  }
-`;
-
-export type PoolWithPair = Pool & { pair: PairExtended };
+export interface PoolExtended extends Pool {
+  pair: PairExtended;
+  hasBalance: boolean;
+}
 
 function PoolPage() {
+  const screenClass = useScreenClass();
   const [selectedTimeBase, setSelectedTimeBase] = useState(timeBaseOptions[0]);
   const [currentPage, setCurrentPage] = useState(1);
-  const { pairs } = usePairs();
-  const { getPool } = useAPI();
-  const [pools, setPools] = useState<PoolWithPair[]>([]);
+  const { pairs, findPair } = usePairs();
+  const api = useAPI();
+  const { bookmarks } = usePairBookmark();
+  const [pools, setPools] = useState<PoolExtended[]>([]);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+
+  const [addresses, setAddresses] =
+    useState<[string | undefined, string | undefined]>();
+  const [selectedPair, setSelectedPair] = useState<PairExtended>();
+
+  const poolList = useMemo(() => {
+    return pools.filter((item) => {
+      if (selectedPair) {
+        return item.pair.contract_addr === selectedPair.contract_addr;
+      }
+      if (selectedTabIndex === 0) {
+        return true;
+      }
+      if (selectedTabIndex === 1) {
+        return item.hasBalance;
+      }
+      if (selectedTabIndex === 2) {
+        return !!bookmarks?.includes(item.pair.contract_addr);
+      }
+      return false;
+    });
+  }, [bookmarks, pools, selectedTabIndex, selectedPair]);
+
+  const handleReloadClick = useCallback(() => {
+    setAddresses(undefined);
+  }, []);
+
+  useEffect(() => {
+    const [address1, address2] = addresses || [];
+    if (address1 && address2) {
+      setSelectedPair(() => findPair([address1, address2]));
+    }
+  }, [addresses, findPair]);
+
+  useEffect(() => {
+    if (selectedPair) {
+      setSelectedTabIndex(0);
+    }
+  }, [selectedPair]);
+
   useEffect(() => {
     let isAborted = false;
     const fetchPools = async () => {
       if (pairs) {
         const res = await Promise.all(
-          pairs.map(async (pair) => {
+          pairs.map(async (item) => {
             if (isAborted) {
               return undefined;
             }
-            const pool = await getPool(pair.contract_addr);
-            return { ...pool, pair };
+            const pool = await api.getPool(item.contract_addr);
+            let hasBalance = false;
+            try {
+              const balance = await api.getTokenBalance(item.liquidity_token);
+              hasBalance = Numeric.parse(balance || 0).gt(0);
+            } catch (error) {
+              console.log(error);
+            }
+            return { ...pool, pair: item, hasBalance };
           }),
         );
         if (!isAborted) {
-          setPools(res.filter((pool) => pool) as PoolWithPair[]);
+          setPools(res.filter((pool) => pool) as PoolExtended[]);
         }
       }
     };
@@ -64,63 +118,51 @@ function PoolPage() {
     return () => {
       isAborted = true;
     };
-  }, [getPool, pairs]);
+  }, [api, pairs]);
 
   useEffect(() => {
-    console.log("pools");
-    console.log(pools);
-  }, [pools]);
+    setCurrentPage(1);
+  }, [selectedTabIndex]);
+
   return (
     <>
       <Container>
-        <Typography
-          size={32}
-          color="primary"
-          weight={900}
-          css={css`
-            margin-bottom: 19px;
-          `}
-        >
-          Pool
-        </Typography>
+        <Row justify="between" align="center" gutterWidth={0}>
+          <Col xs="content">
+            <Typography
+              size={32}
+              color="primary"
+              weight={900}
+              css={css`
+                margin-bottom: 19px;
+              `}
+            >
+              Pool
+            </Typography>
+          </Col>
+          <Col xs="content">
+            <IconButton
+              size={38}
+              icons={{ default: iconReload, hover: iconReloadHover }}
+              onClick={handleReloadClick}
+            />
+          </Col>
+        </Row>
         <Hr
           css={css`
             margin-bottom: 20px;
           `}
         />
-        <HeaderSection
+        <div
           css={css`
             margin-bottom: 20px;
           `}
         >
-          <div>
-            <Row
-              justify="between"
-              align="center"
-              gutterWidth={44}
-              css={css`
-                background-image: url(${iconPlus});
-                background-repeat: no-repeat;
-                background-position: 50% 50%;
-                background-size: 24px 24px;
-              `}
-            >
-              <Col xs={12} sm={6}>
-                <PoolButton variant="default">&nbsp;</PoolButton>
-              </Col>
-              <Col xs={12} sm={6}>
-                <PoolButton variant="default">&nbsp;</PoolButton>
-              </Col>
-            </Row>
-          </div>
-          <div
-            css={css`
-              max-width: 300px;
-            `}
-          >
-            <PoolButton variant="gradient">Create a new pool</PoolButton>
-          </div>
-        </HeaderSection>
+          <PoolForm
+            addresses={addresses}
+            onChange={(value) => setAddresses(value)}
+          />
+        </div>
 
         <Panel shadow>
           <Row
@@ -138,18 +180,17 @@ function PoolPage() {
                   .${MOBILE_SCREEN_CLASS} & {
                     max-width: unset;
                   }
+                  ${selectedPair &&
+                  css`
+                    pointer-events: none;
+                  `}
                 `}
               >
                 <TabButton
                   size="large"
-                  items={["Liquidity pools", "My pools", "Bookmarks"].map(
-                    (item) => ({
-                      value: item,
-                      label: item,
-                      key: item,
-                    }),
-                  )}
-                  defaultSelectedIndex={0}
+                  items={screenClass === "xs" ? mobileTabs : tabs}
+                  selectedIndex={selectedTabIndex}
+                  onChange={(index) => setSelectedTabIndex(index)}
                 />
               </div>
             </Col>
@@ -179,20 +220,27 @@ function PoolPage() {
             `}
           >
             <PoolList
-              pools={pools.slice(
+              pools={poolList.slice(
                 (currentPage - 1) * LIMIT,
                 currentPage * LIMIT,
               )}
+              emptyMessage={
+                [undefined, "No pool found.", "No bookmark found."][
+                  selectedTabIndex
+                ]
+              }
             />
           </div>
 
-          <Pagination
-            current={currentPage}
-            total={Math.floor((pools.length - 1) / LIMIT) + 1}
-            onChange={(value) => {
-              setCurrentPage(value);
-            }}
-          />
+          {!!poolList.length && (
+            <Pagination
+              current={currentPage}
+              total={Math.floor((poolList.length - 1) / LIMIT) + 1}
+              onChange={(value) => {
+                setCurrentPage(value);
+              }}
+            />
+          )}
         </Panel>
       </Container>
       <Outlet />

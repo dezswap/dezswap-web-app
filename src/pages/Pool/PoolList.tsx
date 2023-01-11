@@ -1,12 +1,16 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Box from "components/Box";
+import Typography from "components/Typography";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
-import { useNetwork } from "hooks/useNetwork";
-import { PoolWithPair } from ".";
+import usePairBookmark from "hooks/usePairBookmark";
+import { PoolExtended } from ".";
 import PoolItem from "./PoolItem";
 
 interface PoolListProps {
-  pools: PoolWithPair[];
+  pools: PoolExtended[];
+  emptyMessage?: string;
 }
 
 const Wrapper = styled.div`
@@ -44,7 +48,11 @@ const TableHeader = styled(Box)`
   }
 `;
 
-function PoolList({ pools }: PoolListProps) {
+function PoolList({
+  pools,
+  emptyMessage = "The pool doesn’t exist. Create a new pool.",
+}: PoolListProps) {
+  const { bookmarks, toggleBookmark } = usePairBookmark();
   return (
     <Wrapper>
       <TableHeader>
@@ -54,9 +62,35 @@ function PoolList({ pools }: PoolListProps) {
         <div>Fees(24H)</div>
         <div>APR</div>
       </TableHeader>
-
+      {!pools.length && (
+        <div
+          css={css`
+            padding: 120px 0;
+            .${MOBILE_SCREEN_CLASS} & {
+              padding: 48px 0;
+            }
+          `}
+        >
+          <Typography
+            css={css`
+              text-align: center;
+              opacity: 0.3;
+            `}
+            size={20}
+            weight={900}
+          >
+            {emptyMessage}
+          </Typography>
+        </div>
+      )}
       {pools.map((pool) => {
-        return <PoolItem pool={pool} />;
+        return (
+          <PoolItem
+            pool={pool}
+            bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
+            onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
+          />
+        );
       })}
     </Wrapper>
   );
