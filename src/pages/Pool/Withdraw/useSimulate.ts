@@ -2,12 +2,9 @@ import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 import usePool from "hooks/usePool";
 import { useNetwork } from "hooks/useNetwork";
-import useAssets from "hooks/useAssets";
 
 export interface WithdrawSimulationResult {
-  estimatedAmount1: string;
-  estimatedAmount2: string;
-  poolAssets: { address: string; amount: string }[];
+  estimatedAmount: { address: string; amount: string }[];
   percentageOfShare: string;
 }
 
@@ -18,7 +15,6 @@ const useSimulate = (
 ) => {
   const { name: networkName } = useNetwork();
   const pool = usePool(pairAddress);
-  const { getAsset } = useAssets();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [result, setResult] = useState<WithdrawSimulationResult>();
@@ -51,17 +47,15 @@ const useSimulate = (
           ) {
             const amountInNumeric = Numeric.parse(amount);
             setResult({
-              estimatedAmount1: amountInNumeric
-                .mul(poolAssets[0].amount)
-                .div(pool.total_share)
-                .floor()
-                .toString(),
-              estimatedAmount2: amountInNumeric
-                .mul(poolAssets[1].amount)
-                .div(pool.total_share)
-                .floor()
-                .toString(),
-              poolAssets,
+              estimatedAmount: poolAssets.map((p) => ({
+                ...p,
+                amount: amountInNumeric
+                  .mul(p.amount)
+                  .div(pool.total_share)
+                  .floor()
+                  .toPrecision(64)
+                  .split(".")[0],
+              })),
               percentageOfShare: amountInNumeric.mul(100).toString(),
             });
             return;
@@ -83,7 +77,7 @@ const useSimulate = (
     return () => {
       isAborted = true;
     };
-  }, [pairAddress, liquidityTokenAddress, amount, getAsset, networkName, pool]);
+  }, [pairAddress, liquidityTokenAddress, amount, networkName, pool]);
 
   return useMemo(
     () => ({ ...result, isLoading, isFailed }),
