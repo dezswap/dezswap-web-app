@@ -139,6 +139,18 @@ function Modal({
     };
   }, [resizeTrigger]);
 
+  useEffect(() => {
+    const removeClassName = () => {
+      if (!document.querySelector(".ReactModal__Content")) {
+        document.body.classList.remove("ReactModal__Body--open");
+      }
+    };
+    return () => {
+      removeClassName();
+      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 100);
+    };
+  }, [isOpen]);
+
   return (
     <ReactModal
       isOpen={resizeTrigger ? false : isOpen}
