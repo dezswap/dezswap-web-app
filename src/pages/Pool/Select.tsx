@@ -24,7 +24,21 @@ interface SelectProps extends WrapperProps {
   // TODO: disabled;
 }
 
-const Wrapper = styled.button<WrapperProps & { isOpen?: boolean }>`
+const Wrapper = styled.div<WrapperProps>`
+  ${({ block }) =>
+    block
+      ? css`
+          display: block;
+          width: 100%;
+        `
+      : css`
+          display: inline-block;
+          width: auto;
+        `}
+  position: relative;
+`;
+
+const Button = styled.button<WrapperProps & { isOpen?: boolean }>`
   ${({ block }) =>
     block
       ? css`
@@ -75,6 +89,10 @@ const Wrapper = styled.button<WrapperProps & { isOpen?: boolean }>`
   }
 `;
 
+Button.defaultProps = {
+  type: "button",
+};
+
 const OptionList = styled.div<{ isOpen?: boolean }>`
   position: absolute;
   top: 100%;
@@ -121,6 +139,10 @@ const OptionItem = styled.button`
   }
 `;
 
+OptionItem.defaultProps = {
+  type: "button",
+};
+
 function Select({
   value,
   options,
@@ -131,20 +153,22 @@ function Select({
   const modal = useModal();
 
   return (
-    <Wrapper
-      {...wrapperProps}
-      isOpen={modal.isOpen}
-      onClick={(event) => {
-        event.stopPropagation();
-        if (options?.length) {
-          modal.toggle();
-        }
-        if (wrapperProps.onClick) {
-          wrapperProps.onClick(event);
-        }
-      }}
-    >
-      <span>{selectedOption?.label ?? selectedOption?.value ?? value}</span>
+    <Wrapper>
+      <Button
+        {...wrapperProps}
+        isOpen={modal.isOpen}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (options?.length) {
+            modal.toggle();
+          }
+          if (wrapperProps.onClick) {
+            wrapperProps.onClick(event);
+          }
+        }}
+      >
+        <span>{selectedOption?.label ?? selectedOption?.value ?? value}</span>
+      </Button>
       {options?.length && (
         <OptionList isOpen={modal.isOpen}>
           {options?.map((option) => {
