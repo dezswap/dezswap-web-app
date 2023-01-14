@@ -28,6 +28,7 @@ const Wrapper = styled.div<{ size?: TabButtonSize }>`
   justify-content: space-between;
   align-items: center;
 
+  background-color: ${({ theme }) => theme.colors.text.background};
   border: 3px solid ${({ theme }) => theme.colors.primary};
   border-radius: 30px;
   font-size: 0;

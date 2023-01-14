@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import { useState } from "react";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   header?: React.ReactNode;
@@ -16,10 +17,20 @@ const Wrapper = styled(Box)`
   &:hover {
     background-color: ${({ theme }) => theme.colors.selected};
   }
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    padding-top: 2px;
+    padding-bottom: 30px;
+  }
 `;
 
 const Header = styled.div`
   position: relative;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    position: unset;
+  }
 `;
 
 const Extra = styled.div`
@@ -33,6 +44,19 @@ const Extra = styled.div`
     display: flex;
     align-items: center;
     gap: 10px;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    top: unset;
+    bottom: 0;
+    right: 50%;
+    transform: translateX(50%) translateX(-4px);
+    padding: 16px;
   }
 `;
 

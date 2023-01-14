@@ -2,9 +2,10 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Box from "components/Box";
 import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 
 import usePairBookmark from "hooks/usePairBookmark";
+import { useScreenClass } from "react-grid-system";
 import { PoolExtended } from ".";
 import PoolItem from "./PoolItem";
 
@@ -52,21 +53,28 @@ function PoolList({
   pools,
   emptyMessage = "The pool doesn’t exist. Create a new pool.",
 }: PoolListProps) {
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const { bookmarks, toggleBookmark } = usePairBookmark();
   return (
     <Wrapper>
-      <TableHeader>
-        <div>Pool</div>
-        <div>Total Liquidity</div>
-        <div>Volume(24H)</div>
-        <div>Fees(24H)</div>
-        <div>APR</div>
-      </TableHeader>
+      {!isSmallScreen && (
+        <TableHeader>
+          <div>Pool</div>
+          <div>Total Liquidity</div>
+          <div>Volume(24H)</div>
+          <div>Fees(24H)</div>
+          <div>APR</div>
+        </TableHeader>
+      )}
       {!pools.length && (
         <div
           css={css`
             padding: 120px 0;
-            .${MOBILE_SCREEN_CLASS} & {
+            .${MOBILE_SCREEN_CLASS} &,
+            .${TABLET_SCREEN_CLASS} & {
               padding: 48px 0;
             }
           `}
@@ -86,6 +94,7 @@ function PoolList({
       {pools.map((pool) => {
         return (
           <PoolItem
+            key={pool?.pair?.contract_addr}
             pool={pool}
             bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
             onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}

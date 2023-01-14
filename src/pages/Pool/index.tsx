@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 import { css } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePair";
 import { useAPI } from "hooks/useAPI";
@@ -127,16 +127,22 @@ function PoolPage() {
   return (
     <>
       <Container>
-        <Row justify="between" align="center" gutterWidth={0}>
+        <Row
+          justify="between"
+          align="center"
+          gutterWidth={0}
+          css={css`
+            padding-top: 20px;
+            margin-bottom: 19px;
+
+            .${MOBILE_SCREEN_CLASS} & {
+              padding-top: 10px;
+              margin-bottom: 20px;
+            }
+          `}
+        >
           <Col xs="content">
-            <Typography
-              size={32}
-              color="primary"
-              weight={900}
-              css={css`
-                margin-bottom: 19px;
-              `}
-            >
+            <Typography size={32} color="primary" weight={900}>
               Pool
             </Typography>
           </Col>
@@ -177,7 +183,8 @@ function PoolPage() {
               <div
                 css={css`
                   max-width: 408px;
-                  .${MOBILE_SCREEN_CLASS} & {
+                  .${MOBILE_SCREEN_CLASS} &,
+                  .${TABLET_SCREEN_CLASS} & {
                     max-width: unset;
                   }
                   ${selectedPair &&

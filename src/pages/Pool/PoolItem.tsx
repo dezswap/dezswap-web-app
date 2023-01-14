@@ -7,7 +7,7 @@ import useAssets from "hooks/useAssets";
 import { useBalance } from "hooks/useBalance";
 import { useNetwork } from "hooks/useNetwork";
 import { useMemo } from "react";
-import { Row, Col } from "react-grid-system";
+import { Row, Col, useScreenClass } from "react-grid-system";
 import {
   formatNumber,
   formatDecimals,
@@ -22,6 +22,7 @@ import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "./Expand";
 import { PoolExtended } from ".";
 
@@ -64,6 +65,24 @@ const TableRow = styled(Box)`
     &:first-of-type {
       width: 244px;
     }
+
+    & > div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+
+    & > div {
+      width: 100%;
+      &:first-of-type {
+        width: 100%;
+      }
+    }
   }
 `;
 
@@ -88,10 +107,18 @@ const AssetIcon = styled.div<{ src?: string }>`
 
 const Label = styled(Typography)`
   margin-bottom: 15px;
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    margin-bottom: 6px;
+  }
 `;
 
-const LinkButton = styled(Button.withComponent(Link))`
+const LinkButton = styled(Button.withComponent(Link), {
+  shouldForwardProp: (prop) => prop !== "block",
+})`
   text-decoration: none;
+  white-space: nowrap;
+  text-align: center;
 `;
 
 Label.defaultProps = {
@@ -102,6 +129,7 @@ Label.defaultProps = {
 
 const IconButtonAnchor = styled(IconButton.withComponent("a"))`
   cursor: pointer;
+  display: inline-block;
 `;
 
 interface PoolItemProps {
@@ -111,6 +139,10 @@ interface PoolItemProps {
 }
 
 function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const { getAsset } = useAssets();
   const network = useNetwork();
   const lpBalance = useBalance(pool.pair.liquidity_token);
@@ -128,13 +160,44 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
     );
   }, [lpBalance, pool]);
 
+  const extra = useMemo(
+    () => [
+      <IconButton
+        key="bookmark"
+        size={32}
+        icons={{
+          default: bookmarked ? iconBookmarkSelected : iconBookmark,
+        }}
+        onClick={onBookmarkClick}
+      />,
+      <IconButtonAnchor
+        key="link"
+        href={getWalletLink(pool.pair.contract_addr, network.name)}
+        target="_blank"
+        rel="noreferrer noopener"
+        size={19}
+        icons={{ default: iconLink }}
+        css={css`
+          margin-bottom: -2px;
+        `}
+      />,
+    ],
+    [bookmarked, network, onBookmarkClick, pool],
+  );
+
   return (
     <Expand
       header={
         <TableRow>
           <div>
-            <Row justify="start" align="center" gutterWidth={6}>
-              <Col width="auto">
+            {isSmallScreen && <Label>Pool</Label>}
+            <Row justify="start" align="center" gutterWidth={6} wrap="nowrap">
+              <Col
+                width="auto"
+                css={css`
+                  white-space: nowrap;
+                `}
+              >
                 <AssetIcon src={asset1?.iconSrc} />
                 <AssetIcon
                   src={asset2?.iconSrc}
@@ -143,46 +206,87 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   `}
                 />
               </Col>
-              <Col>
+              <Col
+                width="auto"
+                css={css`
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                `}
+              >
                 {asset1?.symbol}-{asset2?.symbol}
               </Col>
+              {isSmallScreen && (
+                <Col width="auto" style={{ marginLeft: "auto" }}>
+                  <Row
+                    justify="end"
+                    align="center"
+                    gutterWidth={4}
+                    aria-hidden
+                    onClick={(event) => {
+                      event.preventDefault();
+                    }}
+                    wrap="nowrap"
+                  >
+                    {extra.map((item) => (
+                      <Col key={item.key}>{item}</Col>
+                    ))}
+                  </Row>
+                </Col>
+              )}
             </Row>
           </div>
           <div>
-            {formatNumber(
-              formatDecimals(
-                amountToValue(pool.total_share, LP_DECIMALS) || "",
-                2,
-              ),
-            )}
-            &nbsp;LP
+            {isSmallScreen && <Label>Total liquidity</Label>}
+            <div>
+              {formatNumber(
+                formatDecimals(
+                  amountToValue(pool.total_share, LP_DECIMALS) || "",
+                  2,
+                ),
+              )}
+              &nbsp;LP
+            </div>
           </div>
-          <div>-</div>
-          <div>-</div>
-          <div>-</div>
+          <div>
+            {isSmallScreen && <Label>Volume(24h)</Label>}
+            <div>-</div>
+          </div>
+          <div>
+            {isSmallScreen && <Label>Fees(24h)</Label>}
+            <div>-</div>
+          </div>
+          <div>
+            {isSmallScreen && <Label>APR</Label>}
+            <div>-</div>
+          </div>
         </TableRow>
       }
-      extra={[
-        <IconButton
-          size={32}
-          icons={{
-            default: bookmarked ? iconBookmarkSelected : iconBookmark,
-          }}
-          onClick={onBookmarkClick}
-        />,
-        <IconButtonAnchor
-          href={getWalletLink(pool.pair.contract_addr, network.name)}
-          target="_blank"
-          rel="noreferrer noopener"
-          size={19}
-          icons={{ default: iconLink }}
-          css={css`
-            margin-bottom: -3px;
-          `}
-        />,
-      ]}
+      extra={!isSmallScreen ? extra : undefined}
     >
-      <Row justify="between" align="start" gutterWidth={0}>
+      <Row
+        justify="between"
+        align="start"
+        gutterWidth={0}
+        direction={isSmallScreen ? "column" : "row"}
+        wrap="nowrap"
+        css={css`
+          .${MOBILE_SCREEN_CLASS} &,
+          .${TABLET_SCREEN_CLASS} & {
+            & > div {
+              margin-bottom: 16px;
+
+              &:first-of-type {
+                margin-bottom: 20px;
+              }
+              &:last-of-type {
+                margin-top: 4px;
+                margin-bottom: 0;
+              }
+            }
+          }
+        `}
+      >
         <Col width={360}>
           <Label
             css={css`
@@ -191,8 +295,8 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           >
             Total Liquidity Ratio
           </Label>
-          <Row justify="between" align="center" gutterWidth={10}>
-            <Col width={80}>
+          <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
+            <Col width="auto">
               <div
                 key={pool.pair.contract_addr}
                 css={css`
@@ -204,7 +308,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 <SimplePieChart data={[50, 50]} />
               </div>
             </Col>
-            <Col>
+            <Col width="auto" style={{ flex: 1 }}>
               <Typography color="secondary" size={16} weight={900}>
                 {formatNumber(
                   formatDecimals(
@@ -280,7 +384,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           </Typography>
         </Col>
         <Col
-          width={150}
+          width={isSmallScreen ? "100%" : 150}
           aria-hidden
           onClick={(event) => {
             event.stopPropagation();

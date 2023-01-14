@@ -6,7 +6,7 @@ import { useTheme, css } from "@emotion/react";
 import Modal from "components/Modal";
 import SelectAssetForm from "components/SelectAssetForm";
 import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePair";
@@ -26,6 +26,12 @@ const Wrapper = styled.div`
 
   & > div {
     flex: 1;
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+    row-gap: 20px;
   }
 `;
 
@@ -77,6 +83,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
             background-repeat: no-repeat;
             background-position: 50% 50%;
             background-size: 24px 24px;
+            row-gap: 45px;
           `}
         >
           {[
@@ -92,6 +99,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                   align="center"
                   justify="start"
                   gutterWidth={0}
+                  wrap="nowrap"
                 >
                   <Col width="auto">
                     <Typography
@@ -100,6 +108,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                       weight={700}
                       css={css`
                         padding-left: 12px;
+                        .${MOBILE_SCREEN_CLASS} &,
+                        .${TABLET_SCREEN_CLASS} & {
+                          padding-left: 3px;
+                        }
                       `}
                     >
                       {asset ? (
@@ -109,6 +121,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                             justify-content: flex-start;
                             align-items: center;
                             gap: 4px;
+
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                           `}
                         >
                           <div
@@ -171,6 +187,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
       <div
         css={css`
           max-width: 300px;
+          .${MOBILE_SCREEN_CLASS} &,
+          .${TABLET_SCREEN_CLASS} & {
+            max-width: unset;
+          }
         `}
       >
         {!selectedAddress1 || !selectedAddress2 ? (
