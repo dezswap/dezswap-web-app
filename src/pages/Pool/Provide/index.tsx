@@ -76,6 +76,7 @@ function ProvidePage() {
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
+  const [display, setDisplay] = useState(true);
   const network = useNetwork();
   const pair = useMemo(
     () => (pairAddress ? getPair(pairAddress) : undefined),
@@ -234,7 +235,7 @@ function ProvidePage() {
     navigate("/pool", { replace: true });
   }, [navigate]);
 
-  const { requestPost } = useRequestPost(handleModalClose, true);
+  const { requestPost } = useRequestPost(handleModalClose, setDisplay, true);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -322,7 +323,7 @@ function ProvidePage() {
 
   return (
     <Modal
-      isOpen
+      isOpen={display}
       title="Add liquidity"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}

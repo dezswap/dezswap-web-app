@@ -61,7 +61,6 @@ function ConfirmationModal({
       }
       title="Confirmation"
       drawer={screenClass === MOBILE_SCREEN_CLASS}
-      overlay={screenClass === MOBILE_SCREEN_CLASS}
       hasGoBackButton={screenClass !== MOBILE_SCREEN_CLASS}
       hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
       onGoBack={modalProps.onRequestClose}

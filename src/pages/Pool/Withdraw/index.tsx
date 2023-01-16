@@ -1,4 +1,4 @@
-import { FormEventHandler, useCallback, useMemo } from "react";
+import { FormEventHandler, useCallback, useMemo, useState } from "react";
 import Typography from "components/Typography";
 import {
   BROWSER_DISPLAY_NUMBER_CNT,
@@ -67,6 +67,7 @@ function WithdrawPage() {
   const network = useNetwork();
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const { getPair } = usePairs();
+  const [display, setDisplay] = useState(true);
   const pair = useMemo(
     () => (pairAddress ? getPair(pairAddress) : undefined),
     [getPair, pairAddress],
@@ -142,7 +143,7 @@ function WithdrawPage() {
     navigate("/pool", { replace: true });
   }, [navigate]);
 
-  const { requestPost } = useRequestPost(handleModalClose, true);
+  const { requestPost } = useRequestPost(handleModalClose, setDisplay, true);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -183,7 +184,7 @@ function WithdrawPage() {
 
   return (
     <Modal
-      isOpen
+      isOpen={display}
       title="Remove liquidity"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
