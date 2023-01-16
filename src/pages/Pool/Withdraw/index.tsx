@@ -2,12 +2,14 @@ import { FormEventHandler, useCallback, useMemo, useState } from "react";
 import Typography from "components/Typography";
 import {
   BROWSER_DISPLAY_NUMBER_CNT,
+  DISPLAY_DECIMAL,
   MOBILE_DISPLAY_NUMBER_CNT,
   MOBILE_SCREEN_CLASS,
 } from "constants/layout";
 import InputGroup from "pages/Pool/Withdraw/InputGroup";
 import {
   amountToValue,
+  cutDecimal,
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
@@ -39,7 +41,7 @@ import { useFee } from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS } from "constants/network";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
@@ -100,9 +102,29 @@ function WithdrawPage() {
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
 
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+
+  const { requestPost } = useRequestPost(handleModalClose, setDisplay, true);
+
+  const balance = useBalance(pair?.liquidity_token || "");
+
+  const isLpPayable = useMemo(
+    () =>
+      lpValue &&
+      Numeric.parse(
+        valueToAmount(lpValue, LP_DECIMALS) || "0",
+      ).lessThanOrEqualTo(balance || "0"),
+    [lpValue, balance],
+  );
+
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
-      !simulationResult?.isLoading && connectedWallet
+      !simulationResult?.isLoading &&
+      !simulationResult?.isFailed &&
+      connectedWallet &&
+      isLpPayable
         ? {
             msgs: [
               generateWithdrawLiquidityMsg(
@@ -141,12 +163,6 @@ function WithdrawPage() {
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
 
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, setDisplay, true);
-
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -159,17 +175,6 @@ function WithdrawPage() {
       }
     },
     [createTxOptions, fee, requestPost],
-  );
-
-  const balance = useBalance(pair?.liquidity_token || "");
-
-  const isLpPayable = useMemo(
-    () =>
-      lpValue &&
-      Numeric.parse(
-        valueToAmount(lpValue, LP_DECIMALS) || "0",
-      ).lessThanOrEqualTo(balance || "0"),
-    [lpValue, balance],
   );
 
   const buttonMsg = useMemo(() => {
@@ -508,8 +513,16 @@ function WithdrawPage() {
                     `}
                   >
                     {fee
-                      ? fee.amount?.get(XPLA_ADDRESS)?.amount.toString()
+                      ? formatNumber(
+                          cutDecimal(
+                            amountToValue(
+                              fee.amount?.get(XPLA_ADDRESS)?.amount.toString(),
+                            ) || 0,
+                            DISPLAY_DECIMAL,
+                          ),
+                        )
                       : "-"}
+                    &nbsp;{XPLA_SYMBOL}
                   </Col>
                 </Row>
               </Detail>

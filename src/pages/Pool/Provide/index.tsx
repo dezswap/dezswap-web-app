@@ -221,7 +221,7 @@ function ProvidePage() {
     }
 
     if (formData.asset2Value && !formData.asset1Value) {
-      return `Enter ${asset2?.symbol} amount`;
+      return `Enter ${asset1?.symbol} amount`;
     }
 
     return "Enter an amount";
@@ -510,7 +510,20 @@ function ProvidePage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(formData.asset1Value) || "-"}
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(
+                          pool?.assets?.find((a) =>
+                            "token" in a.info
+                              ? a.info.token.contract_addr
+                              : a.info.native_token.denom === asset1?.address,
+                          )?.amount,
+                          asset1?.decimals,
+                        ) || "0",
+                        DISPLAY_DECIMAL,
+                      ),
+                    ) || "-"}
+                    &nbsp;{asset1?.symbol}
                   </Col>
                 </Row>
                 <Row
@@ -548,7 +561,20 @@ function ProvidePage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(formData.asset2Value) || "-"}
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(
+                          pool?.assets?.find((a) =>
+                            "token" in a.info
+                              ? a.info.token.contract_addr
+                              : a.info.native_token.denom === asset2?.address,
+                          )?.amount,
+                          asset2?.decimals,
+                        ) || "0",
+                        DISPLAY_DECIMAL,
+                      ),
+                    ) || "-"}
+                    &nbsp;{asset2?.symbol}
                   </Col>
                 </Row>
                 <Row justify="between" style={{ alignItems: "flex-start" }}>
@@ -628,8 +654,11 @@ function ProvidePage() {
                   >
                     {feeAmount
                       ? `${formatNumber(
-                          amountToValue(feeAmount) || 0,
-                        )}${XPLA_SYMBOL}`
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
                       : ""}
                   </Col>
                 </Row>
