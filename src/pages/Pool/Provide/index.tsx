@@ -44,6 +44,7 @@ import useRequestPost from "hooks/useRequestPost";
 import { useNetwork } from "hooks/useNetwork";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
+import usePool from "hooks/usePool";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -90,12 +91,33 @@ function ProvidePage() {
   });
   const formData = form.watch();
   const { register, formState } = form;
+
+  const pool = usePool(pairAddress);
+  const isPoolEmpty = useMemo(
+    () => Numeric.parse(pool?.total_share || "0").isZero(),
+    [pool],
+  );
+
   const simulationResult = useSimulate(
-    pairAddress || "",
-    isReversed ? asset2?.address || "" : asset1?.address || "",
-    isReversed
-      ? valueToAmount(formData.asset2Value, asset2?.decimals) || ""
-      : valueToAmount(formData.asset1Value, asset1?.decimals) || "",
+    isPoolEmpty
+      ? {
+          pairAddress: pairAddress || "",
+          asset1Address: asset1?.address || "",
+          asset1Amount:
+            valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+          asset2Address: asset2?.address || "",
+          asset2Amount:
+            valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
+        }
+      : {
+          pairAddress: pairAddress || "",
+          asset1Address: isReversed
+            ? asset2?.address || ""
+            : asset1?.address || "",
+          asset1Amount: isReversed
+            ? valueToAmount(formData.asset2Value, asset2?.decimals) || "0"
+            : valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+        },
   );
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
@@ -231,7 +253,7 @@ function ProvidePage() {
     if (
       connectedWallet &&
       balanceApplied &&
-      !isReversed &&
+      (!isReversed || isPoolEmpty) &&
       asset1?.address === XPLA_ADDRESS &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
@@ -254,7 +276,7 @@ function ProvidePage() {
     if (
       connectedWallet &&
       balanceApplied &&
-      isReversed &&
+      (isReversed || isPoolEmpty) &&
       asset2?.address === XPLA_ADDRESS &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
@@ -274,7 +296,7 @@ function ProvidePage() {
   }, [asset2BalanceMinusFee, formData.asset2Value, form]);
 
   useEffect(() => {
-    if (simulationResult && !simulationResult.isLoading) {
+    if (simulationResult && !simulationResult.isLoading && !isPoolEmpty) {
       form.setValue(
         isReversed ? FormKey.asset1Value : FormKey.asset2Value,
         amountToValue(
@@ -284,7 +306,7 @@ function ProvidePage() {
         { shouldValidate: true },
       );
     }
-  }, [simulationResult]);
+  }, [simulationResult, isPoolEmpty]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -385,7 +407,7 @@ function ProvidePage() {
         />
         <div
           css={css`
-            margin-bottom: 20px;
+            margin-bottom: ${isPoolEmpty ? "10px" : "20px"};
           `}
         >
           <Expand
