@@ -1,13 +1,15 @@
-import { FormEventHandler, useCallback, useMemo } from "react";
+import { FormEventHandler, useCallback, useMemo, useState } from "react";
 import Typography from "components/Typography";
 import {
   BROWSER_DISPLAY_NUMBER_CNT,
+  DISPLAY_DECIMAL,
   MOBILE_DISPLAY_NUMBER_CNT,
   MOBILE_SCREEN_CLASS,
 } from "constants/layout";
 import InputGroup from "pages/Pool/Withdraw/InputGroup";
 import {
   amountToValue,
+  cutDecimal,
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
@@ -39,11 +41,12 @@ import { useFee } from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS } from "constants/network";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
 import { useBalance } from "hooks/useBalance";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 
 const Detail = styled.div`
   font-size: 14px;
@@ -60,6 +63,7 @@ enum FormKey {
 
 function WithdrawPage() {
   const connectedWallet = useConnectedWallet();
+  const connectWalletModal = useConnectWalletModal();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -97,9 +101,29 @@ function WithdrawPage() {
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
 
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+
+  const { requestPost } = useRequestPost(handleModalClose, true);
+
+  const balance = useBalance(pair?.liquidity_token || "");
+
+  const isLpPayable = useMemo(
+    () =>
+      lpValue &&
+      Numeric.parse(
+        valueToAmount(lpValue, LP_DECIMALS) || "0",
+      ).lessThanOrEqualTo(balance || "0"),
+    [lpValue, balance],
+  );
+
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
-      !simulationResult?.isLoading && connectedWallet
+      !simulationResult?.isLoading &&
+      !simulationResult?.isFailed &&
+      connectedWallet &&
+      isLpPayable
         ? {
             msgs: [
               generateWithdrawLiquidityMsg(
@@ -138,12 +162,6 @@ function WithdrawPage() {
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
 
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
-
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -156,17 +174,6 @@ function WithdrawPage() {
       }
     },
     [createTxOptions, fee, requestPost],
-  );
-
-  const balance = useBalance(pair?.liquidity_token || "");
-
-  const isLpPayable = useMemo(
-    () =>
-      lpValue &&
-      Numeric.parse(
-        valueToAmount(lpValue, LP_DECIMALS) || "0",
-      ).lessThanOrEqualTo(balance || "0"),
-    [lpValue, balance],
   );
 
   const buttonMsg = useMemo(() => {
@@ -183,6 +190,7 @@ function WithdrawPage() {
 
   return (
     <Modal
+      id="withdraw-modal"
       isOpen
       title="Remove liquidity"
       hasCloseButton
@@ -505,8 +513,16 @@ function WithdrawPage() {
                     `}
                   >
                     {fee
-                      ? fee.amount?.get(XPLA_ADDRESS)?.amount.toString()
+                      ? formatNumber(
+                          cutDecimal(
+                            amountToValue(
+                              fee.amount?.get(XPLA_ADDRESS)?.amount.toString(),
+                            ) || 0,
+                            DISPLAY_DECIMAL,
+                          ),
+                        )
                       : "-"}
+                    &nbsp;{XPLA_SYMBOL}
                   </Col>
                 </Row>
               </Detail>
@@ -650,25 +666,39 @@ function WithdrawPage() {
             </Detail>
           </Expand>
         </div>
-        <Button
-          type="submit"
-          size="large"
-          variant="primary"
-          block
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isValidating ||
-            simulationResult.isLoading ||
-            isFeeLoading ||
-            isFeeFailed ||
-            !isLpPayable
-          }
-          css={css`
-            margin-bottom: 10px;
-          `}
-        >
-          {buttonMsg}
-        </Button>
+        {connectedWallet ? (
+          <Button
+            type="submit"
+            size="large"
+            variant="primary"
+            block
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              simulationResult.isLoading ||
+              isFeeLoading ||
+              isFeeFailed ||
+              !isLpPayable
+            }
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            {buttonMsg}
+          </Button>
+        ) : (
+          <Button
+            size="large"
+            variant="primary"
+            block
+            css={css`
+              margin-bottom: 10px;
+            `}
+            onClick={() => connectWalletModal.open()}
+          >
+            Connect wallet
+          </Button>
+        )}
         <Button
           type="button"
           size="large"

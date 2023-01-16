@@ -46,6 +46,7 @@ function ConfirmationModal({
   return (
     <Modal
       {...modalProps}
+      id="confirm-modal"
       parentSelector={
         screenClass !== MOBILE_SCREEN_CLASS && !isModalParent
           ? () => {

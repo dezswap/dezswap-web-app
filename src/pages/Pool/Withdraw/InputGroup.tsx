@@ -14,7 +14,6 @@ import { LP_DECIMALS } from "constants/dezswap";
 import { useBalance } from "hooks/useBalance";
 import { DISPLAY_DECIMAL } from "constants/layout";
 import { Asset } from "types/common";
-import IconButton from "components/IconButton";
 
 interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
   lpToken?: string;
@@ -44,21 +43,19 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
               <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>
                 <AssetButton block={screenClass === "xs"}>
-                  <IconButton
-                    size={24}
-                    icons={{
-                      default: assets?.[0]?.iconSrc || iconDefaultToken,
-                    }}
+                  <img
+                    src={assets?.[0]?.iconSrc || iconDefaultToken}
+                    width={24}
+                    alt={assets?.[0]?.symbol}
                     css={css`
                       margin-right: 4px;
                     `}
                   />
                   {assets?.[0]?.symbol}&nbsp;-&nbsp;
-                  <IconButton
-                    size={24}
-                    icons={{
-                      default: assets?.[1]?.iconSrc || iconDefaultToken,
-                    }}
+                  <img
+                    src={assets?.[1]?.iconSrc || iconDefaultToken}
+                    width={24}
+                    alt={assets?.[1]?.symbol}
                     css={css`
                       margin-right: 4px;
                     `}

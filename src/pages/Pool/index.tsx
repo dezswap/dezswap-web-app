@@ -4,7 +4,7 @@ import Typography from "components/Typography";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet } from "react-router-dom";
 
-import { css } from "@emotion/react";
+import { css, Global } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
@@ -128,6 +128,17 @@ function PoolPage() {
 
   return (
     <>
+      <Global
+        styles={css`
+          body:has(#confirm-modal) {
+            & #provide-modal,
+            & #withdraw-modal {
+              opacity: 0;
+              pointer-events: none;
+            }
+          }
+        `}
+      />
       <Container>
         <Row
           justify="between"

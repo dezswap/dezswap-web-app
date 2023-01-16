@@ -46,6 +46,7 @@ import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
 import usePool from "hooks/usePool";
 import Message from "components/Message";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -68,6 +69,7 @@ const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
+  const connectWalletModal = useConnectWalletModal();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const navigate = useNavigate();
@@ -218,7 +220,7 @@ function ProvidePage() {
     }
 
     if (formData.asset2Value && !formData.asset1Value) {
-      return `Enter ${asset2?.symbol} amount`;
+      return `Enter ${asset1?.symbol} amount`;
     }
 
     return "Enter an amount";
@@ -322,6 +324,7 @@ function ProvidePage() {
 
   return (
     <Modal
+      id="provide-modal"
       isOpen
       title="Add liquidity"
       hasCloseButton
@@ -507,7 +510,20 @@ function ProvidePage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(formData.asset1Value) || "-"}
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(
+                          pool?.assets?.find((a) =>
+                            "token" in a.info
+                              ? a.info.token.contract_addr
+                              : a.info.native_token.denom === asset1?.address,
+                          )?.amount,
+                          asset1?.decimals,
+                        ) || "0",
+                        DISPLAY_DECIMAL,
+                      ),
+                    ) || "-"}
+                    &nbsp;{asset1?.symbol}
                   </Col>
                 </Row>
                 <Row
@@ -545,7 +561,20 @@ function ProvidePage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(formData.asset2Value) || "-"}
+                    {formatNumber(
+                      cutDecimal(
+                        amountToValue(
+                          pool?.assets?.find((a) =>
+                            "token" in a.info
+                              ? a.info.token.contract_addr
+                              : a.info.native_token.denom === asset2?.address,
+                          )?.amount,
+                          asset2?.decimals,
+                        ) || "0",
+                        DISPLAY_DECIMAL,
+                      ),
+                    ) || "-"}
+                    &nbsp;{asset2?.symbol}
                   </Col>
                 </Row>
                 <Row justify="between" style={{ alignItems: "flex-start" }}>
@@ -625,8 +654,11 @@ function ProvidePage() {
                   >
                     {feeAmount
                       ? `${formatNumber(
-                          amountToValue(feeAmount) || 0,
-                        )}${XPLA_SYMBOL}`
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
                       : ""}
                   </Col>
                 </Row>
@@ -747,24 +779,38 @@ function ProvidePage() {
             </Message>
           </div>
         )}
-        <Button
-          type="submit"
-          size="large"
-          variant="primary"
-          block
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isValidating ||
-            simulationResult.isLoading ||
-            isFeeLoading ||
-            isFeeFailed
-          }
-          css={css`
-            margin-bottom: 10px;
-          `}
-        >
-          {buttonMsg}
-        </Button>
+        {connectedWallet ? (
+          <Button
+            type="submit"
+            size="large"
+            variant="primary"
+            block
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              simulationResult.isLoading ||
+              isFeeLoading ||
+              isFeeFailed
+            }
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            {buttonMsg}
+          </Button>
+        ) : (
+          <Button
+            size="large"
+            variant="primary"
+            block
+            css={css`
+              margin-bottom: 10px;
+            `}
+            onClick={() => connectWalletModal.open()}
+          >
+            Connect wallet
+          </Button>
+        )}
         <Button
           type="button"
           size="large"
