@@ -12,7 +12,7 @@ import {
   formatNumber,
   formatDecimals,
   amountToValue,
-  getWalletLink,
+  getAddressLink,
 } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -172,7 +172,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       />,
       <IconButtonAnchor
         key="link"
-        href={getWalletLink(pool.pair.contract_addr, network.name)}
+        href={getAddressLink(pool.pair.contract_addr, network.name)}
         target="_blank"
         rel="noreferrer noopener"
         size={19}

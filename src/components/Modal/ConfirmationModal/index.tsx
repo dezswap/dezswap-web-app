@@ -19,11 +19,13 @@ const Content = styled.div`
 interface ConfirmationModalProps extends Omit<ReactModal.Props, "children"> {
   node?: Node;
   onConfirm?(): void;
+  isModalParent: boolean;
 }
 
 function ConfirmationModal({
   node,
   onConfirm,
+  isModalParent,
   ...modalProps
 }: ConfirmationModalProps) {
   const divRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,7 @@ function ConfirmationModal({
     <Modal
       {...modalProps}
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS
+        screenClass !== MOBILE_SCREEN_CLASS && !isModalParent
           ? () => {
               return (
                 document.querySelector("#main") ||

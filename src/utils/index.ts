@@ -102,7 +102,7 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
 export const getBlockLink = (height?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/block/${height}`;
 
-export const getWalletLink = (address?: string, network?: string) =>
+export const getAddressLink = (address?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/address/${address}`;
 
 export const getTransactionLink = (txHash?: string, network?: string) =>
