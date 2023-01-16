@@ -5,11 +5,7 @@ import { TxError } from "types/common";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 
-const useRequestPost = (
-  onDoneTx?: () => void,
-  setDisplayParent?: React.Dispatch<React.SetStateAction<boolean>>,
-  isModalParent = false,
-) => {
+const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
   const [txOptions, setTxOptions] = useState<CreateTxOptions>();
 
@@ -44,11 +40,6 @@ const useRequestPost = (
   const confirmationModal = useConfirmationModal({
     node,
     onConfirm: handleConfirm,
-    onClose: () => {
-      if (setDisplayParent) {
-        setDisplayParent(true);
-      }
-    },
     isModalParent,
   });
 
@@ -81,9 +72,6 @@ const useRequestPost = (
         setNode(newNode);
       });
       confirmationModal.open();
-      if (setDisplayParent) {
-        setDisplayParent(false);
-      }
     },
     [confirmationModal],
   );
