@@ -53,6 +53,7 @@ import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
 import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
+import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
 
 const Wrapper = styled.form`
@@ -161,6 +162,10 @@ function SwapPage() {
 
   const { asset1Address, asset2Address, asset1Value, asset2Value } =
     form.watch();
+
+  const firstProvideModal = useFirstProvideModal({
+    addresses: [asset1Address, asset2Address],
+  });
 
   const asset1 = useMemo(
     () => getAsset(asset1Address),
@@ -436,11 +441,13 @@ function SwapPage() {
             const oppositeTarget = selectAsset1Modal.isOpen
               ? FormKey.asset2Address
               : FormKey.asset1Address;
-            if (
-              formData[oppositeTarget] === address ||
+            if (formData[oppositeTarget] === address) {
+              form.setValue(oppositeTarget, "");
+            } else if (
+              formData[oppositeTarget] &&
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
-              form.setValue(oppositeTarget, "");
+              firstProvideModal.open();
             }
             form.setValue(target, address);
             selectAsset1Modal.close();
