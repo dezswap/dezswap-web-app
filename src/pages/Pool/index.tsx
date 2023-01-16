@@ -80,6 +80,8 @@ function PoolPage() {
     const [address1, address2] = addresses || [];
     if (address1 && address2) {
       setSelectedPair(() => findPair([address1, address2]));
+    } else {
+      setSelectedPair(undefined);
     }
   }, [addresses, findPair]);
 
