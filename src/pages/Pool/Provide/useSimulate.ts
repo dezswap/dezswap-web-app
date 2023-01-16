@@ -1,4 +1,3 @@
-import useAssets from "hooks/useAssets";
 import { useEffect, useMemo, useState } from "react";
 import usePool from "hooks/usePool";
 import { Numeric } from "@xpla/xpla.js";
@@ -24,7 +23,6 @@ const useSimulate = ({
   asset2Amount?: string;
 }) => {
   const pool = usePool(pairAddress);
-  const { getAsset } = useAssets();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [result, setResult] = useState<ProvideSimulationResult>();
@@ -108,7 +106,7 @@ const useSimulate = ({
     return () => {
       clearTimeout(timerId);
     };
-  }, [getAsset, asset1Address, asset1Amount, asset2Address, asset2Amount]);
+  }, [asset1Address, asset1Amount, asset2Address, asset2Amount]);
 
   return useMemo(
     () => ({ ...result, isLoading, isFailed }),
