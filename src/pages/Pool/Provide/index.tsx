@@ -45,6 +45,7 @@ import { useNetwork } from "hooks/useNetwork";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
 import usePool from "hooks/usePool";
+import Message from "components/Message";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -211,13 +212,13 @@ function ProvidePage() {
       }
 
       if (formData.asset1Value && !formData.asset2Value) {
-        return `Insufficient ${asset2?.symbol} in the pool`;
+        return `Enter ${asset2?.symbol} amount`;
       }
       return "Add liquidity";
     }
 
     if (formData.asset2Value && !formData.asset1Value) {
-      return `Insufficient ${asset2?.symbol} in the pool`;
+      return `Enter ${asset2?.symbol} amount`;
     }
 
     return "Enter an amount";
@@ -718,6 +719,34 @@ function ProvidePage() {
             </Detail>
           </Expand>
         </div>
+        {isPoolEmpty && (
+          <div
+            css={css`
+              margin-bottom: 20px;
+            `}
+          >
+            <Message variant="guide">
+              <Row
+                justify="between"
+                nogutter
+                css={css`
+                  width: 100%;
+                `}
+              >
+                <Col
+                  css={css`
+                    text-align: left;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
+                >
+                  Empty pool - Please add liquidity to both tokens
+                </Col>
+              </Row>
+            </Message>
+          </div>
+        )}
         <Button
           type="submit"
           size="large"
