@@ -44,6 +44,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
 import { useBalance } from "hooks/useBalance";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 
 const Detail = styled.div`
   font-size: 14px;
@@ -60,6 +61,7 @@ enum FormKey {
 
 function WithdrawPage() {
   const connectedWallet = useConnectedWallet();
+  const connectWalletModal = useConnectWalletModal();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -651,25 +653,39 @@ function WithdrawPage() {
             </Detail>
           </Expand>
         </div>
-        <Button
-          type="submit"
-          size="large"
-          variant="primary"
-          block
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isValidating ||
-            simulationResult.isLoading ||
-            isFeeLoading ||
-            isFeeFailed ||
-            !isLpPayable
-          }
-          css={css`
-            margin-bottom: 10px;
-          `}
-        >
-          {buttonMsg}
-        </Button>
+        {connectedWallet ? (
+          <Button
+            type="submit"
+            size="large"
+            variant="primary"
+            block
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              simulationResult.isLoading ||
+              isFeeLoading ||
+              isFeeFailed ||
+              !isLpPayable
+            }
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            {buttonMsg}
+          </Button>
+        ) : (
+          <Button
+            size="large"
+            variant="primary"
+            block
+            css={css`
+              margin-bottom: 10px;
+            `}
+            onClick={() => connectWalletModal.open()}
+          >
+            Connect wallet
+          </Button>
+        )}
         <Button
           type="button"
           size="large"

@@ -46,6 +46,7 @@ import iconQuestion from "assets/icons/icon-question.svg";
 import Tooltip from "components/Tooltip";
 import usePool from "hooks/usePool";
 import Message from "components/Message";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -68,6 +69,7 @@ const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
+  const connectWalletModal = useConnectWalletModal();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const navigate = useNavigate();
@@ -748,24 +750,38 @@ function ProvidePage() {
             </Message>
           </div>
         )}
-        <Button
-          type="submit"
-          size="large"
-          variant="primary"
-          block
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isValidating ||
-            simulationResult.isLoading ||
-            isFeeLoading ||
-            isFeeFailed
-          }
-          css={css`
-            margin-bottom: 10px;
-          `}
-        >
-          {buttonMsg}
-        </Button>
+        {connectedWallet ? (
+          <Button
+            type="submit"
+            size="large"
+            variant="primary"
+            block
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              simulationResult.isLoading ||
+              isFeeLoading ||
+              isFeeFailed
+            }
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            {buttonMsg}
+          </Button>
+        ) : (
+          <Button
+            size="large"
+            variant="primary"
+            block
+            css={css`
+              margin-bottom: 10px;
+            `}
+            onClick={() => connectWalletModal.open()}
+          >
+            Connect wallet
+          </Button>
+        )}
         <Button
           type="button"
           size="large"
