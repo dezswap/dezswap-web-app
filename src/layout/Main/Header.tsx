@@ -163,7 +163,6 @@ const navLinks = [
   {
     path: "/pool",
     label: "Pool",
-    disabled: true,
   },
 ];
 
