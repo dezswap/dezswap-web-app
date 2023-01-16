@@ -1090,7 +1090,7 @@ function SwapPage() {
                   `}
                 >
                   Empty pool - {asset1?.symbol}-{asset2?.symbol} is an empty
-                  &nbsp;pool,try another one
+                  pool, try another one
                 </Col>
               </Row>
             </Message>
