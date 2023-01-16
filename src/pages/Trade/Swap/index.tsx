@@ -321,7 +321,7 @@ function SwapPage() {
           ),
         )
       ) {
-        return `Insufficient ${asset1?.name} balance`;
+        return `Insufficient ${asset1?.symbol} balance`;
       }
 
       if (asset1Value && !asset2Value) {
@@ -838,14 +838,9 @@ function SwapPage() {
               label={
                 <Typography size={14} weight="bold">
                   {asset1 && `1 ${asset1.symbol} = `}
-                  {asset1Value && simulationResult?.estimatedAmount
+                  {asset1Value && asset2Value
                     ? cutDecimal(
-                        Numeric.parse(
-                          amountToValue(
-                            simulationResult.estimatedAmount,
-                            asset2?.decimals,
-                          ) || "0",
-                        ).div(asset1Value),
+                        Numeric.parse(asset2Value || 0).div(asset1Value || 1),
                         DISPLAY_DECIMAL,
                       )
                     : "-"}
@@ -1134,7 +1129,7 @@ function SwapPage() {
             `}
             onClick={() => connectWalletModal.open()}
           >
-            Connect Wallet
+            Connect wallet
           </Button>
         )}
       </Wrapper>

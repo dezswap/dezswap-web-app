@@ -7,9 +7,11 @@ import { TxError } from "types/common";
 const useTxBroadcastingModal = ({
   txHash,
   txError,
+  onDoneClick,
 }: {
   txHash?: string;
   txError?: TxError;
+  onDoneClick?: () => void;
 }) => {
   const modal = useModal();
   const element = useMemo(
@@ -18,7 +20,13 @@ const useTxBroadcastingModal = ({
         txHash={txHash}
         txError={txError}
         isOpen={modal.isOpen}
-        onDoneClick={() => window.location.reload()}
+        onDoneClick={() => {
+          if (onDoneClick) {
+            onDoneClick();
+          } else {
+            window.location.reload();
+          }
+        }}
         onRetryClick={modal.close}
       />
     ),

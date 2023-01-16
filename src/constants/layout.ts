@@ -24,3 +24,8 @@ export const gridConfiguration: Configuration = {
 };
 
 export const MODAL_CLOSE_TIMEOUT_MS = 125;
+
+export const DISPLAY_DECIMAL = 3;
+
+export const MOBILE_DISPLAY_NUMBER_CNT = 20;
+export const BROWSER_DISPLAY_NUMBER_CNT = 31;

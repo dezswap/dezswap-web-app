@@ -79,7 +79,6 @@ const navLinks = [
     path: "/pool",
     icon: iconPool,
     label: "Pool",
-    disabled: true,
   },
 ];
 

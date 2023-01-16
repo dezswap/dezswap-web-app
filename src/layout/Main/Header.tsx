@@ -24,7 +24,7 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
-  getWalletLink,
+  getAddressLink,
 } from "utils";
 import { useBalance } from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -163,7 +163,6 @@ const navLinks = [
   {
     path: "/pool",
     label: "Pool",
-    disabled: true,
   },
 ];
 
@@ -402,7 +401,7 @@ function Header() {
                                 </Col>
                                 <Col width="auto">
                                   <a
-                                    href={getWalletLink(
+                                    href={getAddressLink(
                                       connectedWallet.walletAddress,
                                       network.name,
                                     )}
@@ -531,7 +530,7 @@ function Header() {
                         variant="primary"
                         onClick={() => connectWalletModal.open()}
                       >
-                        Connect Wallet
+                        Connect wallet
                       </Button>
                     )}
                   </Col>

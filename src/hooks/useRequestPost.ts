@@ -5,7 +5,7 @@ import { TxError } from "types/common";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 
-const useRequestPost = () => {
+const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
   const [txOptions, setTxOptions] = useState<CreateTxOptions>();
 
@@ -14,6 +14,7 @@ const useRequestPost = () => {
   const txBroadcastModal = useTxBroadcastingModal({
     txHash: txResult?.result.txhash,
     txError,
+    onDoneClick: onDoneTx,
   });
 
   const [fee, setFee] = useState<Fee>();
@@ -39,6 +40,7 @@ const useRequestPost = () => {
   const confirmationModal = useConfirmationModal({
     node,
     onConfirm: handleConfirm,
+    isModalParent,
   });
 
   const [, startTransition] = useTransition();

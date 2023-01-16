@@ -146,7 +146,6 @@ function Modal({
       }
     };
     return () => {
-      removeClassName();
       setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 100);
     };
   }, [isOpen]);

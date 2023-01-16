@@ -6,11 +6,20 @@ import { contractAddresses } from "constants/dezswap";
 
 export type Amount = string | number;
 
-export const generatePairsMsg = (options: {
-  limit?: number;
-  start_after?: [Asset | NativeAsset, Asset | NativeAsset];
-}) => {
-  return { pairs: options };
+export const queryMessages = {
+  getPairs(
+    options: {
+      limit?: number;
+      start_after?: [Asset | NativeAsset, Asset | NativeAsset];
+    } = {},
+  ) {
+    return {
+      pairs: options,
+    };
+  },
+  getPool() {
+    return { pool: {} };
+  },
 };
 
 const assetMsg = (
@@ -118,7 +127,7 @@ export const generateWithdrawLiquidityMsg = (
   contractAddress: string,
   lpTokenAddress: string,
   amount: string,
-  assets: { address: string; amount: string }[],
+  // assets: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
 ) =>
   new MsgExecuteContract(
@@ -129,7 +138,7 @@ export const generateWithdrawLiquidityMsg = (
         msg: window.btoa(
           JSON.stringify({
             withdraw_liquidity: {
-              min_assets: assets.map((a) => assetMsg(networkName, a)),
+              // min_assets: assets.map((a) => assetMsg(networkName, a)),
               deadline: Number(
                 Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
               ),

@@ -41,17 +41,15 @@ const Content = styled.div<StyledPanelProps>`
   height: auto;
   position: relative;
   background-color: ${({ theme }) => theme.colors.white};
-  padding: 25px;
-  .${MOBILE_SCREEN_CLASS} & {
-    padding: 16px;
-  }
-
   border-radius: 12px;
 
   ${({ noPadding }) =>
-    noPadding &&
+    !noPadding &&
     css`
-      padding: 0;
+      padding: 25px;
+      .${MOBILE_SCREEN_CLASS} & {
+        padding: 16px;
+      }
     `}
 
   ${({ border, theme }) =>
