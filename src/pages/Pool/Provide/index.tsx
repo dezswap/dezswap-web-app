@@ -95,8 +95,10 @@ function ProvidePage() {
 
   const pool = usePool(pairAddress);
   const isPoolEmpty = useMemo(
-    () => Numeric.parse(pool?.total_share || "0").isZero(),
-    [pool],
+    () =>
+      pool?.total_share !== undefined &&
+      Numeric.parse(pool.total_share).isZero(),
+    [pool?.total_share],
   );
 
   const simulationResult = useSimulate(
