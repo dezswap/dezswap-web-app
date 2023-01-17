@@ -265,11 +265,10 @@ function WithdrawPage() {
                       background-color: ${theme.colors.white};
                     `}
                   >
-                    <IconButton
-                      size={24}
-                      icons={{
-                        default: asset1?.iconSrc || iconDefaultToken,
-                      }}
+                    <img
+                      src={asset1?.iconSrc || iconDefaultToken}
+                      width={24}
+                      alt={asset1?.symbol}
                       css={css`
                         margin-right: 4px;
                       `}
@@ -344,11 +343,10 @@ function WithdrawPage() {
                       background-color: ${theme.colors.white};
                     `}
                   >
-                    <IconButton
-                      size={24}
-                      icons={{
-                        default: asset2?.iconSrc || iconDefaultToken,
-                      }}
+                    <img
+                      src={asset2?.iconSrc || iconDefaultToken}
+                      width={24}
+                      alt={asset2?.symbol}
                       css={css`
                         margin-right: 4px;
                       `}
