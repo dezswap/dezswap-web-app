@@ -200,7 +200,7 @@ function WithdrawPage() {
       <form onSubmit={handleSubmit}>
         <InputGroup
           {...register(FormKey.lpValue, {
-            setValueAs: (value) => filterNumberFormat(value, asset1?.decimals),
+            setValueAs: (value) => filterNumberFormat(value, LP_DECIMALS),
             required: true,
           })}
           lpToken={pair?.liquidity_token}
