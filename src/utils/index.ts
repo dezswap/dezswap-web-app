@@ -1,4 +1,4 @@
-import { Dec, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import { nativeTokens } from "constants/network";
 import { Decimal } from "decimal.js";
 
@@ -56,14 +56,9 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    const s = new Dec(value).toInt().toString();
-    if (s.length <= decimals) {
-      return Dec.withPrec(value, decimals).toFixed(decimals).toString();
-    }
-    return `${s.substring(0, s.length - decimals)}.${s.substring(
-      s.length - decimals,
-      s.length,
-    )}`;
+    return Numeric.parse(value || 0)
+      .mul(10 ** -decimals)
+      .toFixed(decimals, Decimal.ROUND_FLOOR);
   } catch (error) {
     return undefined;
   }
