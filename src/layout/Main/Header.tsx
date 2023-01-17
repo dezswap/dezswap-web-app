@@ -60,52 +60,44 @@ const Wrapper = styled.header<WrapperProps>`
   position: sticky;
   left: 0;
   z-index: 5000;
-  backdrop-filter: blur(4px);
-
-  ${({ isTestnet = false }) =>
-    isTestnet
-      ? css`
-          top: ${`-${
-            DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT - BANNER_HEIGHT
-          }px`};
-          .${MOBILE_SCREEN_CLASS} & {
-            top: ${`${BANNER_HEIGHT}px`};
-          }
-        `
-      : css`
-          top: ${`-${DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT}px`};
-          .${MOBILE_SCREEN_CLASS} & {
-            top: 0;
-          }
-        `}
 
   .${MOBILE_SCREEN_CLASS} & {
     height: ${`${MOBILE_HEADER_HEIGHT}px`};
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: ${({ theme }) => theme.colors.background};
-    opacity: 0.8;
-    pointer-events: none;
-  }
+  ${({ isTestnet = false }) =>
+    isTestnet
+      ? css`
+          top: ${`${BANNER_HEIGHT}px`};
+        `
+      : css`
+          top: 0;
+        `}
 
   & > div {
     position: absolute;
     left: 0;
-    bottom: 0;
+    top: 0;
     width: 100%;
     padding-top: 16px;
     padding-bottom: 24px;
+    backdrop-filter: blur(4px);
 
     .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: ${({ theme }) => theme.colors.background};
+      opacity: 0.8;
+      pointer-events: none;
     }
   }
   &.scrolled > div {
@@ -251,10 +243,7 @@ function Header() {
     const handleScroll = () => {
       const { current } = wrapperRef;
       if (!current) return;
-      current.classList.toggle(
-        "scrolled",
-        window.scrollY > DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT,
-      );
+      current.classList.toggle("scrolled", window.scrollY > 0);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
