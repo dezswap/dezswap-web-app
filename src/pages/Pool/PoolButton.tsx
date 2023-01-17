@@ -11,14 +11,17 @@ function PoolButton(props: PoolButtonProps) {
       shadow
       noPadding
       border={false}
-      css={css`
-        &:hover {
-          box-shadow: 6px 6px 0px #000000;
-          .${MOBILE_SCREEN_CLASS} & {
-            box-shadow: 3px 3px 0px #000000;
+      css={
+        !props.disabled &&
+        css`
+          &:hover {
+            box-shadow: 6px 6px 0px #000000;
+            .${MOBILE_SCREEN_CLASS} & {
+              box-shadow: 3px 3px 0px #000000;
+            }
           }
-        }
-      `}
+        `
+      }
     >
       <Button size="xLarge" block {...props} />
     </Panel>

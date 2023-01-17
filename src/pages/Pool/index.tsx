@@ -215,14 +215,22 @@ function PoolPage() {
               </div>
             </Col>
             <Col xs={12} sm="content">
-              <Row align="center" justify="center" gutterWidth={8}>
+              <Row
+                align="center"
+                justify="center"
+                gutterWidth={8}
+                css={css`
+                  pointer-events: none;
+                `}
+              >
                 <Col xs="content">
-                  <Typography color="primary" size={14} weight={900}>
+                  <Typography color="disabled" size={14} weight={900}>
                     Time base
                   </Typography>
                 </Col>
                 <Col xs="content">
                   <Select
+                    disabled
                     options={timeBaseOptions.map((value) => ({
                       value,
                       label: value.toUpperCase(),

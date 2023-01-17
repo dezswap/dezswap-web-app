@@ -6,6 +6,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 
 import usePairBookmark from "hooks/usePairBookmark";
 import { useScreenClass } from "react-grid-system";
+import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
 import { PoolExtended } from ".";
 import PoolItem from "./PoolItem";
 
@@ -43,6 +44,9 @@ const TableHeader = styled(Box)`
     color: ${({ theme }) => theme.colors.primary};
     font-size: 14px;
     font-weight: 900;
+    & > img {
+      vertical-align: middle;
+    }
     &:first-of-type {
       width: 244px;
     }
@@ -63,10 +67,22 @@ function PoolList({
       {!isSmallScreen && (
         <TableHeader>
           <div>Pool</div>
-          <div>Total Liquidity</div>
-          <div>Volume(24H)</div>
-          <div>Fees(24H)</div>
-          <div>APR</div>
+          <div>
+            Total Liquidity
+            <img src={iconSortDisabled} width={22} alt="sort" />
+          </div>
+          <div>
+            Volume(24H)
+            <img src={iconSortDisabled} width={22} alt="sort" />
+          </div>
+          <div>
+            Fees(24H)
+            <img src={iconSortDisabled} width={22} alt="sort" />
+          </div>
+          <div>
+            APR
+            <img src={iconSortDisabled} width={22} alt="sort" />
+          </div>
         </TableHeader>
       )}
       {!pools.length && (
