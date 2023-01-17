@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import iconCopy from "assets/icons/icon-copy.svg";
 import iconCopyHover from "assets/icons/icon-copy-hover.svg";
+import iconCopyDisabled from "assets/icons/icon-copy-disabled.svg";
 import { useCallback, useRef } from "react";
 import Tooltip from "components/Tooltip";
 import { css } from "@emotion/react";
@@ -8,6 +9,7 @@ import { css } from "@emotion/react";
 type CopyProps = React.PropsWithChildren<{
   value?: string;
   size?: React.CSSProperties["width"];
+  disabled?: boolean;
 }>;
 
 const Wrapper = styled.button`
@@ -53,9 +55,14 @@ const CopyIcon = styled.div<Pick<CopyProps, "size">>`
   &:hover {
     background-image: url(${iconCopyHover});
   }
+
+  button:disabled & {
+    background-image: url(${iconCopyDisabled});
+    cursor: default;
+  }
 `;
 
-function Copy({ value, size, children }: CopyProps) {
+function Copy({ value, size, children, disabled }: CopyProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (event) => {
@@ -77,7 +84,7 @@ function Copy({ value, size, children }: CopyProps) {
   );
 
   return (
-    <Wrapper onClick={handleClick} type="button">
+    <Wrapper onClick={handleClick} disabled={disabled || !value} type="button">
       <textarea ref={inputRef} value={value} readOnly />
       {children || (
         <Tooltip
@@ -89,6 +96,7 @@ function Copy({ value, size, children }: CopyProps) {
               instance.hide();
             }, 1000);
           }}
+          disabled={disabled || !value}
         >
           <CopyIcon size={size} />
         </Tooltip>
