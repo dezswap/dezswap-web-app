@@ -56,17 +56,19 @@ function PoolPage() {
 
   const poolList = useMemo(() => {
     return pools.filter((item) => {
-      if (selectedPair) {
-        return item.pair.contract_addr === selectedPair.contract_addr;
-      }
-      if (selectedTabIndex === 0) {
-        return true;
-      }
-      if (selectedTabIndex === 1) {
-        return item.hasBalance;
-      }
-      if (selectedTabIndex === 2) {
-        return !!bookmarks?.includes(item.pair.contract_addr);
+      const isSelectedPair =
+        !selectedPair || item.pair.contract_addr === selectedPair.contract_addr;
+      switch (selectedTabIndex) {
+        case 0:
+          return isSelectedPair;
+        case 1:
+          return isSelectedPair && item.hasBalance;
+        case 2:
+          return (
+            isSelectedPair && !!bookmarks?.includes(item.pair.contract_addr)
+          );
+        default:
+        // do nothing
       }
       return false;
     });
@@ -84,12 +86,6 @@ function PoolPage() {
       setSelectedPair(undefined);
     }
   }, [addresses, findPair]);
-
-  useEffect(() => {
-    if (selectedPair) {
-      setSelectedTabIndex(0);
-    }
-  }, [selectedPair]);
 
   useEffect(() => {
     let isAborted = false;
@@ -200,10 +196,6 @@ function PoolPage() {
                   .${TABLET_SCREEN_CLASS} & {
                     max-width: unset;
                   }
-                  ${selectedPair &&
-                  css`
-                    pointer-events: none;
-                  `}
                 `}
               >
                 <TabButton
@@ -245,9 +237,11 @@ function PoolPage() {
                 currentPage * LIMIT,
               )}
               emptyMessage={
-                [undefined, "No pool found.", "No bookmark found."][
-                  selectedTabIndex
-                ]
+                [
+                  undefined,
+                  selectedPair ? "No my pool found." : "No pool found.",
+                  "No bookmark found.",
+                ][selectedTabIndex]
               }
             />
           </div>
