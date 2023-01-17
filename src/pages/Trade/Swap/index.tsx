@@ -40,6 +40,7 @@ import IconButton from "components/IconButton";
 import Message from "components/Message";
 import Select from "components/Select";
 import iconQuestion from "assets/icons/icon-question.svg";
+import iconShift from "assets/icons/icon-shift.svg";
 import Expand from "components/Expanded";
 import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
@@ -53,6 +54,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
 import { NetworkName } from "types/common";
+import usePool from "hooks/usePool";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -225,6 +227,14 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
+  const pool = usePool(selectedPair?.contract_addr);
+  const isPoolEmpty = useMemo(
+    () =>
+      pool?.total_share !== undefined &&
+      Numeric.parse(pool.total_share).isZero(),
+    [pool?.total_share],
+  );
+
   const beliefPrice = useMemo(() => {
     if (isReversed) {
       if (asset2Value && simulationResult.estimatedAmount) {
@@ -260,6 +270,7 @@ function SwapPage() {
       !selectedPair ||
       !asset1?.address ||
       !asset1Value ||
+      isPoolEmpty ||
       Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
@@ -290,6 +301,7 @@ function SwapPage() {
     slippageTolerance,
     beliefPrice,
     txDeadlineMinutes,
+    isPoolEmpty,
   ]);
 
   const {
@@ -313,6 +325,10 @@ function SwapPage() {
       return "Select tokens";
     }
 
+    if (isPoolEmpty) {
+      return "Swap";
+    }
+
     if (asset1Value) {
       if (
         Numeric.parse(asset1Value).gt(
@@ -323,15 +339,7 @@ function SwapPage() {
       ) {
         return `Insufficient ${asset1?.symbol} balance`;
       }
-
-      if (asset1Value && !asset2Value) {
-        return `Insufficient ${asset2?.symbol} in the pool`;
-      }
       return "Swap";
-    }
-
-    if (asset2Value && !asset1Value) {
-      return `Insufficient ${asset2?.symbol} in the pool`;
     }
 
     return "Enter an amount";
@@ -836,7 +844,14 @@ function SwapPage() {
           <div style={{ marginBottom: "10px" }}>
             <Expand
               label={
-                <Typography size={14} weight="bold">
+                <Typography
+                  size={14}
+                  weight="bold"
+                  css={css`
+                    display: flex;
+                    align-items: center;
+                  `}
+                >
                   {asset1 && `1 ${asset1.symbol} = `}
                   {asset1Value && asset2Value
                     ? cutDecimal(
@@ -844,7 +859,8 @@ function SwapPage() {
                         DISPLAY_DECIMAL,
                       )
                     : "-"}
-                  {asset2?.symbol}
+                  &nbsp;{asset2?.symbol}
+                  <img src={iconShift} width={24} alt="shift" />
                 </Typography>
               }
               isExpanded={false}
@@ -1055,6 +1071,31 @@ function SwapPage() {
             </Expand>
           </div>
         )}
+        {isPoolEmpty && (
+          <div>
+            <Message variant="guide">
+              <Row
+                justify="between"
+                nogutter
+                css={css`
+                  width: 100%;
+                `}
+              >
+                <Col
+                  css={css`
+                    text-align: left;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
+                >
+                  Empty pool - {asset1?.symbol}-{asset2?.symbol} is an empty
+                  pool, try another one
+                </Col>
+              </Row>
+            </Message>
+          </div>
+        )}
         {spread.message && (
           <Tooltip
             arrow
@@ -1111,7 +1152,8 @@ function SwapPage() {
               form.formState.isValidating ||
               simulationResult.isLoading ||
               isFeeLoading ||
-              isFeeFailed
+              isFeeFailed ||
+              isPoolEmpty
             }
             css={css`
               margin-top: 20px;
