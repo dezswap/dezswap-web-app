@@ -53,7 +53,7 @@ const Detail = styled.div`
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
-  line-height: normal;
+  line-height: 22px;
   letter-spacing: normal;
 `;
 
@@ -632,7 +632,7 @@ function WithdrawPage() {
                       justifyContent: "center",
                     }}
                   >
-                    <IconButton size={12.2} icons={{ default: iconLink }} />
+                    <IconButton size={18} icons={{ default: iconLink }} />
                   </a>
                 </Col>
               </Row>
@@ -659,7 +659,7 @@ function WithdrawPage() {
                       justifyContent: "center",
                     }}
                   >
-                    <IconButton size={12.2} icons={{ default: iconLink }} />
+                    <IconButton size={18} icons={{ default: iconLink }} />
                   </a>
                 </Col>
               </Row>
