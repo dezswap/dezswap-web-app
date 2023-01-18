@@ -10,6 +10,6 @@ export const isPairsLoadingAtom = atom(false);
 
 export const bookmarksAtom = atomWithStorage<{
   [K in NetworkName]?: string[];
-}>("bookmarks", { mainnet: [], testnet: [] });
+}>("pair-bookmarks", { mainnet: [], testnet: [] });
 
 export default pairsAtom;

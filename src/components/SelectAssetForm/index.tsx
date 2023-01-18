@@ -171,7 +171,11 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const assetList = useMemo(() => {
     const isBookmark = tabs[tabIdx].value === "bookmark";
 
-    if (isBookmark && (bookmarks === undefined || bookmarks?.length < 1)) {
+    const filteredList = isBookmark
+      ? addressList?.filter((address) => bookmarks?.includes(address))
+      : addressList;
+
+    if (isBookmark && !filteredList?.length) {
       return (
         <div
           css={css`
@@ -193,11 +197,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       );
     }
 
-    const items = (
-      isBookmark
-        ? addressList?.filter((address) => bookmarks?.includes(address))
-        : addressList
-    )?.map((address) => {
+    const items = filteredList?.map((address) => {
       const asset = getAsset(address);
       const isVerified =
         !!verifiedAssets?.[address] ||
