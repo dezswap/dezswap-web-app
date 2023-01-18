@@ -2,7 +2,7 @@ import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import { css, Global } from "@emotion/react";
 import Pagination from "components/Pagination";
@@ -41,6 +41,7 @@ export interface PoolExtended extends Pool {
 }
 
 function PoolPage() {
+  const location = useLocation();
   const screenClass = useScreenClass();
   const [selectedTimeBase, setSelectedTimeBase] = useState(timeBaseOptions[0]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,7 +121,7 @@ function PoolPage() {
     return () => {
       isAborted = true;
     };
-  }, [api, pairs]);
+  }, [api, pairs, location]);
 
   useEffect(() => {
     setCurrentPage(1);
