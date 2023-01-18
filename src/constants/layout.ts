@@ -21,6 +21,7 @@ export const gridConfiguration: Configuration = {
   breakpoints: [600, 1024, 1440],
   containerWidths: [940, 1180, 1300],
   maxScreenClass: LARGE_BROWSER_SCREEN_CLASS,
+  gutterWidth: 32,
 };
 
 export const MODAL_CLOSE_TIMEOUT_MS = 125;
