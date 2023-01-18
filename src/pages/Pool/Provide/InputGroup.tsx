@@ -24,7 +24,7 @@ const AssetButton = styled(Button)<{ iconSrc?: string }>`
   pointer-events: none;
   border-radius: 30px;
   height: 38px;
-  padding: 0 9px;
+  padding: 7px 12px;
   justify-content: flex-start;
   &::before {
     content: "";
