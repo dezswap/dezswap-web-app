@@ -71,14 +71,14 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
 
   let t = 0;
   let v = 0;
-  const filtered = value.replaceAll(/[0.]/g, "").length
+  const filtered = value.replaceAll(/[0\\.]/g, "").length
     ? value
-        .replace(/[^0-9.]/g, "")
-        .replace(/[0]+[.]/g, (match: string) => {
+        .replace(/[^0-9\\.]/g, "")
+        .replace(/^[0]+[\\.]/g, (match: string) => {
           v += 1;
           return v === 1 ? "0." : match;
         })
-        .replace(/[.]/g, (match: string) => {
+        .replace(/[\\.]/g, (match: string) => {
           t += 1;
           return t === 2 ? "" : match;
         })
