@@ -6,7 +6,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import useAssets from "hooks/useAssets";
 import { useBalance } from "hooks/useBalance";
 import { useNetwork } from "hooks/useNetwork";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import {
   formatNumber,
@@ -23,6 +23,7 @@ import Box from "components/Box";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import Tooltip from "components/Tooltip";
 import Expand from "./Expand";
 import { PoolExtended } from ".";
 
@@ -186,6 +187,19 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
     [bookmarked, network, onBookmarkClick, pool],
   );
 
+  const [overflowActive, setOverflowActive] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+  const poolWidth = isSmallScreen ? 128 : 173;
+
+  useEffect(() => {
+    if (
+      textRef.current?.scrollWidth &&
+      textRef.current?.scrollWidth > poolWidth
+    ) {
+      setOverflowActive(true);
+    }
+  }, [textRef.current?.innerText]);
+
   return (
     <Expand
       header={
@@ -214,15 +228,27 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   `}
                 />
               </Col>
-              <Col
-                width="auto"
-                css={css`
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                `}
-              >
-                {asset1?.symbol}-{asset2?.symbol}
+              <Col width={`${poolWidth}px`}>
+                <div
+                  style={{
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                  }}
+                  ref={textRef}
+                >
+                  {overflowActive ? (
+                    <Tooltip
+                      arrow
+                      content={`${asset1?.symbol}-${asset2?.symbol}`}
+                    >
+                      <span>
+                        {asset1?.symbol}-{asset2?.symbol}
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    `${asset1?.symbol}-${asset2?.symbol}`
+                  )}
+                </div>
               </Col>
               {isSmallScreen && (
                 <Col width="auto" style={{ marginLeft: "auto" }}>
@@ -278,7 +304,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         gutterWidth={isSmallScreen ? 0 : 20}
         direction={isSmallScreen ? "column" : "row"}
         wrap="nowrap"
-        style={{ width: "100%" }}
+        style={{ width: isSmallScreen ? "100%" : "none" }}
         css={css`
           .${MOBILE_SCREEN_CLASS} &,
           .${TABLET_SCREEN_CLASS} & {
