@@ -6,6 +6,7 @@ import { useTheme, css } from "@emotion/react";
 import Modal from "components/Modal";
 import SelectAssetForm from "components/SelectAssetForm";
 import Typography from "components/Typography";
+import Tooltip from "components/Tooltip";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
@@ -211,7 +212,13 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
           </Link>
         ) : undefined}
         {selectedAddress1 && selectedAddress2 && !pair ? (
-          <PoolButton variant="gradient">Create a new pool</PoolButton>
+          <Tooltip content="Coming soon" placement="top" arrow>
+            <div>
+              <PoolButton variant="primary" disabled>
+                Create a new pool
+              </PoolButton>
+            </div>
+          </Tooltip>
         ) : undefined}
       </div>
 

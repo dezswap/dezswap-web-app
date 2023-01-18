@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { useModal } from "hooks/useModal";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
+import iconDropdownDisabled from "assets/icons/icon-dropdown-arrow-disabled.svg";
 import { css } from "@emotion/react";
 
 type SelectValue = string | number;
@@ -13,6 +14,7 @@ interface SelectOption {
 
 interface WrapperProps {
   block?: boolean;
+  disabled?: boolean;
 }
 
 interface SelectProps extends WrapperProps {
@@ -21,7 +23,6 @@ interface SelectProps extends WrapperProps {
   onClick?(event: React.MouseEvent<HTMLButtonElement>): void;
   onChange?(value: SelectValue, option: SelectOption): void;
   // TODO: placement;
-  // TODO: disabled;
 }
 
 const Wrapper = styled.div<WrapperProps>`
@@ -87,6 +88,20 @@ const Button = styled.button<WrapperProps & { isOpen?: boolean }>`
         `translateY(-50%) rotateX(${isOpen ? 180 : 0}deg)`};
     }
   }
+
+  &:disabled {
+    color: ${({ theme }) => theme.colors.disabled};
+    & > span {
+      border-color: ${({ theme }) => theme.colors.disabled};
+      cursor: default;
+      &::after {
+        width: 12px;
+        height: 12px;
+        right: 10px;
+        background-image: url(${iconDropdownDisabled});
+      }
+    }
+  }
 `;
 
 Button.defaultProps = {
@@ -146,6 +161,7 @@ OptionItem.defaultProps = {
 function Select({
   value,
   options,
+  onClick: handleClick,
   onChange: handleChange,
   ...wrapperProps
 }: SelectProps) {
@@ -153,7 +169,7 @@ function Select({
   const modal = useModal();
 
   return (
-    <Wrapper>
+    <Wrapper {...wrapperProps}>
       <Button
         {...wrapperProps}
         isOpen={modal.isOpen}
@@ -162,8 +178,8 @@ function Select({
           if (options?.length) {
             modal.toggle();
           }
-          if (wrapperProps.onClick) {
-            wrapperProps.onClick(event);
+          if (handleClick) {
+            handleClick(event);
           }
         }}
       >
