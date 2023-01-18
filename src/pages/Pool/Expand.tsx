@@ -4,7 +4,12 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import { useState } from "react";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import {
+  LARGE_BROWSER_SCREEN_CLASS,
+  MOBILE_SCREEN_CLASS,
+  SMALL_BROWSER_SCREEN_CLASS,
+  TABLET_SCREEN_CLASS,
+} from "constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   header?: React.ReactNode;
@@ -14,9 +19,6 @@ type ExpandProps = React.PropsWithChildren<{
 
 const Wrapper = styled(Box)`
   padding: 0;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.selected};
-  }
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     padding-top: 2px;
@@ -24,12 +26,22 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const Header = styled.div`
+const Header = styled(Box)`
   position: relative;
 
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     position: unset;
+  }
+  padding: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  .${SMALL_BROWSER_SCREEN_CLASS} &,
+  .${LARGE_BROWSER_SCREEN_CLASS} & {
+    &:hover {
+      background-color: ${({ theme }) => theme.colors.selected};
+    }
   }
 `;
 
@@ -68,8 +80,8 @@ const Content = styled.div`
 function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <Wrapper onClick={() => setIsOpen((current) => !current)}>
-      <Header>
+    <Wrapper>
+      <Header onClick={() => setIsOpen((current) => !current)} role="button">
         {header}
         <Extra>
           <div
