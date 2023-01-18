@@ -25,7 +25,7 @@ const TableHeader = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: nowrap;
   padding: 14px 20px;
   margin-bottom: 10px;

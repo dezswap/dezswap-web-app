@@ -71,6 +71,7 @@ const Extra = styled.div`
 `;
 
 const Content = styled.div`
+  display: flex;
   padding: 20px;
   padding-top: 0;
 `;
@@ -117,14 +118,29 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
         </Extra>
       </Header>
       {isOpen && (
-        <Content>
+        <>
           <Hr
             css={css`
-              margin-bottom: 20px;
+              width: auto;
+              margin: 20px;
+              margin-top: 0px;
             `}
           />
-          {children}
-        </Content>
+          <Content
+            css={css`
+              overflow-x: scroll;
+              &::-webkit-scrollbar-track {
+                margin: 5px;
+              }
+              .${MOBILE_SCREEN_CLASS} &,
+              .${TABLET_SCREEN_CLASS} & {
+                overflow-x: unset;
+              }
+            `}
+          >
+            {children}
+          </Content>
+        </>
       )}
     </Wrapper>
   );

@@ -53,9 +53,9 @@ const TableRow = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: nowrap;
-  padding: 14px 20px;
+  padding: 20px;
   background: none;
   & > div {
     width: 190px;
@@ -106,6 +106,7 @@ const AssetIcon = styled.div<{ src?: string }>`
 `;
 
 const Label = styled(Typography)`
+  white-space: nowrap;
   margin-bottom: 15px;
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
@@ -191,11 +192,18 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         <TableRow>
           <div>
             {isSmallScreen && <Label>Pool</Label>}
-            <Row justify="start" align="center" gutterWidth={6} wrap="nowrap">
+            <Row
+              justify="start"
+              align="center"
+              gutterWidth={6}
+              wrap="nowrap"
+              style={{ height: "32px" }}
+            >
               <Col
                 width="auto"
                 css={css`
                   white-space: nowrap;
+                  display: flex;
                 `}
               >
                 <AssetIcon src={asset1?.iconSrc} />
@@ -267,9 +275,10 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       <Row
         justify="between"
         align="start"
-        gutterWidth={0}
+        gutterWidth={isSmallScreen ? 0 : 20}
         direction={isSmallScreen ? "column" : "row"}
         wrap="nowrap"
+        style={{ width: "100%" }}
         css={css`
           .${MOBILE_SCREEN_CLASS} &,
           .${TABLET_SCREEN_CLASS} & {
@@ -287,7 +296,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           }
         `}
       >
-        <Col width={360}>
+        <Col width={isSmallScreen ? "100%" : 360}>
           <Label
             css={css`
               margin-bottom: 10px;
@@ -309,7 +318,14 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
               </div>
             </Col>
             <Col width="auto" style={{ flex: 1 }}>
-              <Typography color="secondary" size={16} weight={900}>
+              <Typography
+                color="secondary"
+                size={16}
+                weight={900}
+                css={css`
+                  white-space: nowrap;
+                `}
+              >
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[0].amount, asset1?.decimals) ||
@@ -320,7 +336,14 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 &nbsp;
                 {asset1?.symbol} (50%)
               </Typography>
-              <Typography color="#00b1ff" size={16} weight={900}>
+              <Typography
+                color="#00b1ff"
+                size={16}
+                weight={900}
+                css={css`
+                  white-space: nowrap;
+                `}
+              >
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[1].amount, asset2?.decimals) ||
@@ -334,7 +357,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             </Col>
           </Row>
         </Col>
-        <Col width={210}>
+        <Col width={isSmallScreen ? "100%" : "content"}>
           <Label>Your Liquidity</Label>
           <Typography color="primary" size={16} weight={500}>
             {formatNumber(
@@ -343,9 +366,16 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             &nbsp;LP
           </Typography>
         </Col>
-        <Col width={210}>
+        <Col width="content">
           <Label>Asset Pooled</Label>
-          <Typography color="primary" size={16} weight={500}>
+          <Typography
+            color="primary"
+            size={16}
+            weight={500}
+            css={css`
+              white-space: nowrap;
+            `}
+          >
             {formatNumber(
               formatDecimals(
                 amountToValue(
@@ -377,7 +407,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             {asset2?.symbol}
           </Typography>
         </Col>
-        <Col width={80}>
+        <Col width={isSmallScreen ? "100%" : "300px"}>
           <Label>Your Share</Label>
           <Typography color="primary" size={16} weight={500}>
             {formatDecimals(userShare * 100, 2)}%
