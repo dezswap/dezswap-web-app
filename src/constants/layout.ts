@@ -20,6 +20,7 @@ export const gridConfiguration: Configuration = {
   // Disabled: xl, xxl, xxxl
   breakpoints: [600, 1024, 1440],
   containerWidths: [940, 1180, 1300],
+  defaultScreenClass: LARGE_BROWSER_SCREEN_CLASS,
   maxScreenClass: LARGE_BROWSER_SCREEN_CLASS,
 };
 
