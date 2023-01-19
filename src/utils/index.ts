@@ -71,6 +71,8 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
 
   let t = 0;
   let v = 0;
+  // remove redundant zeros
+  // replace non-digit characters and preceding multiple zeros
   const filtered = value.replaceAll(/[0\\.]/g, "").length
     ? value
         .replace(/[^0-9\\.]/g, "")
@@ -84,6 +86,7 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
         })
     : "0";
 
+  // decimal count check
   return filtered.includes(".") &&
     (filtered.split(".").pop()?.length || 0) > decimals
     ? filtered.slice(0, filtered.indexOf(".")) +

@@ -32,7 +32,6 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
-import iconInfoWhite from "assets/icons/icon-info-white.svg";
 import { NumberInput } from "components/Input";
 import Button from "components/Button";
 import Copy from "components/Copy";
@@ -344,6 +343,8 @@ function SwapPage() {
 
     return "Enter an amount";
   }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+
+  const [shiftAssets, setShiftAssets] = useState(false);
 
   useEffect(() => {
     if (
@@ -852,15 +853,36 @@ function SwapPage() {
                     align-items: center;
                   `}
                 >
-                  {asset1 && `1 ${asset1.symbol} = `}
-                  {asset1Value && asset2Value
-                    ? cutDecimal(
-                        Numeric.parse(asset2Value || 0).div(asset1Value || 1),
-                        DISPLAY_DECIMAL,
-                      )
-                    : "-"}
-                  &nbsp;{asset2?.symbol}
-                  <img src={iconShift} width={24} alt="shift" />
+                  {shiftAssets
+                    ? `1 ${asset2.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset1Value || 0).div(
+                                asset2Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset1?.symbol}`
+                    : `1 ${asset1.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset2Value || 0).div(
+                                asset1Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset2?.symbol}`}
+                  <IconButton
+                    icons={{ default: iconShift }}
+                    size={24}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShiftAssets((current) => !current);
+                    }}
+                  />
                 </Typography>
               }
               isExpanded={false}
@@ -1130,11 +1152,6 @@ function SwapPage() {
                     `}
                   >
                     {formatNumber(spread.rate)}%
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconInfoWhite }}
-                    />
                   </Col>
                 </Row>
               </Message>
