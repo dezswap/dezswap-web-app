@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-const Label = styled.button`
+const Label = styled.div`
   width: 100%;
   height: 48px;
   position: relative;
@@ -63,10 +63,6 @@ const Label = styled.button`
   }
 `;
 
-Label.defaultProps = {
-  type: "button",
-};
-
 const Content = styled.div`
   width: 100%;
   height: auto;
@@ -108,7 +104,6 @@ function Expand({
   preview,
   children,
   isExpanded: isExpandedFromProps,
-  onLabelClick: handleLabelClick,
 }: ExpandProps) {
   const [isExpanded, setIsExpanded] = useState(isExpandedFromProps || false);
   useEffect(() => {
@@ -116,15 +111,7 @@ function Expand({
   }, [isExpandedFromProps]);
   return (
     <Wrapper className={isExpanded ? "expanded" : ""}>
-      <Label
-        onClick={(event) => {
-          if (handleLabelClick) {
-            handleLabelClick(event);
-          } else {
-            setIsExpanded((current) => !current);
-          }
-        }}
-      >
+      <Label onClick={() => setIsExpanded((current) => !current)}>
         {label}
       </Label>
       {preview && <PreviewContent>{preview}</PreviewContent>}

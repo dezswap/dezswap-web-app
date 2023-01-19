@@ -345,6 +345,8 @@ function SwapPage() {
     return "Enter an amount";
   }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
 
+  const [shiftAssets, setShiftAssets] = useState(false);
+
   useEffect(() => {
     if (
       connectedWallet &&
@@ -852,15 +854,36 @@ function SwapPage() {
                     align-items: center;
                   `}
                 >
-                  {asset1 && `1 ${asset1.symbol} = `}
-                  {asset1Value && asset2Value
-                    ? cutDecimal(
-                        Numeric.parse(asset2Value || 0).div(asset1Value || 1),
-                        DISPLAY_DECIMAL,
-                      )
-                    : "-"}
-                  &nbsp;{asset2?.symbol}
-                  <img src={iconShift} width={24} alt="shift" />
+                  {shiftAssets
+                    ? `1 ${asset2.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset1Value || 0).div(
+                                asset2Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset1?.symbol}`
+                    : `1 ${asset1.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset2Value || 0).div(
+                                asset1Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset2?.symbol}`}
+                  <IconButton
+                    icons={{ default: iconShift }}
+                    size={24}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShiftAssets((current) => !current);
+                    }}
+                  />
                 </Typography>
               }
               isExpanded={false}
