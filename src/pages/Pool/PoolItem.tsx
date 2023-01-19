@@ -188,17 +188,24 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
   );
 
   const [overflowActive, setOverflowActive] = useState(false);
-  const textRef = useRef<HTMLDivElement>(null);
-  const poolWidth = isSmallScreen ? 128 : 173;
+  const textRef = useRef<Col & HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      textRef.current?.scrollWidth &&
-      textRef.current?.scrollWidth > poolWidth
-    ) {
-      setOverflowActive(true);
-    }
-  }, [textRef.current?.innerText]);
+    const handleResize = () => {
+      setOverflowActive(
+        !!(
+          textRef.current?.scrollWidth &&
+          textRef.current?.scrollWidth > textRef.current.offsetWidth
+        ),
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <Expand
@@ -217,7 +224,6 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 width="auto"
                 css={css`
                   white-space: nowrap;
-                  display: flex;
                 `}
               >
                 <AssetIcon src={asset1?.iconSrc} />
@@ -228,28 +234,23 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   `}
                 />
               </Col>
-              <Col width={`${poolWidth}px`}>
-                <div
-                  style={{
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                  }}
+              <Tooltip
+                arrow
+                content={`${asset1?.symbol}-${asset2?.symbol}`}
+                disabled={!overflowActive}
+              >
+                <Col
                   ref={textRef}
+                  width="auto"
+                  css={css`
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  `}
                 >
-                  {overflowActive ? (
-                    <Tooltip
-                      arrow
-                      content={`${asset1?.symbol}-${asset2?.symbol}`}
-                    >
-                      <span>
-                        {asset1?.symbol}-{asset2?.symbol}
-                      </span>
-                    </Tooltip>
-                  ) : (
-                    `${asset1?.symbol}-${asset2?.symbol}`
-                  )}
-                </div>
-              </Col>
+                  {asset1?.symbol}-{asset2?.symbol}
+                </Col>
+              </Tooltip>
               {isSmallScreen && (
                 <Col width="auto" style={{ marginLeft: "auto" }}>
                   <Row
