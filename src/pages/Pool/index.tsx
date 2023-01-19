@@ -201,7 +201,13 @@ function PoolPage() {
               >
                 <TabButton
                   size="large"
-                  items={screenClass === "xs" ? mobileTabs : tabs}
+                  items={
+                    [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+                      screenClass,
+                    )
+                      ? mobileTabs
+                      : tabs
+                  }
                   selectedIndex={selectedTabIndex}
                   onChange={(index) => setSelectedTabIndex(index)}
                 />
