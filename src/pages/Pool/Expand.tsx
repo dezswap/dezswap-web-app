@@ -34,8 +34,6 @@ const Header = styled(Box)`
     position: unset;
   }
   padding: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 
   .${SMALL_BROWSER_SCREEN_CLASS} &,
   .${LARGE_BROWSER_SCREEN_CLASS} & {
@@ -81,7 +79,17 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
     <Wrapper>
-      <Header onClick={() => setIsOpen((current) => !current)} role="button">
+      <Header
+        onClick={() => setIsOpen((current) => !current)}
+        role="button"
+        css={
+          isOpen &&
+          css`
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          `
+        }
+      >
         {header}
         <Extra>
           <div
