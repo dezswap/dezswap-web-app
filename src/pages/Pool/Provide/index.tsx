@@ -450,7 +450,7 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content="The expected amount of LP you may get at the transaction."
                     >
                       <IconButton
                         className="cm-hidden"
@@ -494,7 +494,7 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content={`Total liquidity of ${asset1?.symbol} before adding.`}
                     >
                       <IconButton
                         className="cm-hidden"
@@ -545,7 +545,7 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content={`Total liquidity of ${asset2?.symbol} before adding.`}
                     >
                       <IconButton
                         className="cm-hidden"
@@ -593,7 +593,7 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content="Share of the total liquidity."
                     >
                       <IconButton
                         className="cm-hidden"
@@ -635,7 +635,7 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content="The fee paid for executing the transaction."
                     >
                       <IconButton
                         className="cm-hidden"

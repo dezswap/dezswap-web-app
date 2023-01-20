@@ -429,7 +429,7 @@ function WithdrawPage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content="The result value you may get at the current condition."
                     >
                       <IconButton
                         className="cm-hidden"
@@ -493,7 +493,7 @@ function WithdrawPage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      content="The fee paid for executing the transaction."
                     >
                       <IconButton
                         className="cm-hidden"
@@ -548,7 +548,7 @@ function WithdrawPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    content="The provided assets will be distributed from the LP."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -586,7 +586,7 @@ function WithdrawPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    content="Share of the total liquidity."
                   >
                     <IconButton
                       className="cm-hidden"
@@ -604,9 +604,11 @@ function WithdrawPage() {
                     align-items: center;
                   `}
                 >
-                  {cutDecimal(
-                    formatNumber(simulationResult.percentageOfShare || "0"),
-                    DISPLAY_DECIMAL,
+                  {formatNumber(
+                    cutDecimal(
+                      simulationResult.percentageOfShare || "0",
+                      DISPLAY_DECIMAL,
+                    ),
                   )}
                   %
                 </Col>
