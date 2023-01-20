@@ -223,6 +223,8 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
       </div>
 
       <Modal
+        title="Select a token"
+        hasCloseButton
         isOpen={selectAsset1Modal.isOpen || selectAsset2Modal.isOpen}
         drawer={screenClass === MOBILE_SCREEN_CLASS}
         onRequestClose={() => closeSelectAssetModals()}
@@ -237,9 +239,6 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         <SelectAssetForm
           // TODO: addressList should be changed for pool creation
           addressList={availableAssetAddresses.addresses}
-          hasBackButton
-          goBackOnSelect
-          onGoBack={() => closeSelectAssetModals()}
           onSelect={(address) => {
             if (handleChange) {
               const newAddresses = [...(addresses || [])];
@@ -255,6 +254,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
               }
 
               handleChange([newAddresses[0], newAddresses[1]]);
+              closeSelectAssetModals();
             }
           }}
         />
