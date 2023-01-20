@@ -604,9 +604,11 @@ function WithdrawPage() {
                     align-items: center;
                   `}
                 >
-                  {cutDecimal(
-                    formatNumber(simulationResult.percentageOfShare || "0"),
-                    DISPLAY_DECIMAL,
+                  {formatNumber(
+                    cutDecimal(
+                      simulationResult.percentageOfShare || "0",
+                      DISPLAY_DECIMAL,
+                    ),
                   )}
                   %
                 </Col>
