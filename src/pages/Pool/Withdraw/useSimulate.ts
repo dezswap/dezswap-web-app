@@ -1,4 +1,4 @@
-import { Numeric } from "@xpla/xpla.js";
+import { Dec, Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 import usePool from "hooks/usePool";
 import { useNetwork } from "hooks/useNetwork";
@@ -56,7 +56,10 @@ const useSimulate = (
                   .toPrecision(64)
                   .split(".")[0],
               })),
-              percentageOfShare: amountInNumeric.mul(100).toString(),
+              percentageOfShare: Dec.withPrec(amount, 0)
+                .div(pool.total_share)
+                .mul(100)
+                .toString(),
             });
             return;
           }

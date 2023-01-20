@@ -604,7 +604,11 @@ function WithdrawPage() {
                     align-items: center;
                   `}
                 >
-                  {formatNumber(simulationResult.percentageOfShare || "0")}%
+                  {cutDecimal(
+                    formatNumber(simulationResult.percentageOfShare || "0"),
+                    DISPLAY_DECIMAL,
+                  )}
+                  %
                 </Col>
               </Row>
               <Row justify="between" style={{ alignItems: "flex-start" }}>
