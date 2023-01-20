@@ -15,14 +15,20 @@ export const TABLET_SCREEN_CLASS: ScreenClass = "sm";
 export const SMALL_BROWSER_SCREEN_CLASS: ScreenClass = "md";
 export const LARGE_BROWSER_SCREEN_CLASS: ScreenClass = "lg";
 
+export const DEFAULT_GUTTER_WIDTH = 32;
+
 export const gridConfiguration: Configuration = {
   // Available: (xs), sm, md, lg
   // Disabled: xl, xxl, xxxl
   breakpoints: [600, 1024, 1440],
-  containerWidths: [940, 1180, 1300],
+  containerWidths: [
+    940 + DEFAULT_GUTTER_WIDTH,
+    1180 + DEFAULT_GUTTER_WIDTH,
+    1300 + DEFAULT_GUTTER_WIDTH,
+  ],
   defaultScreenClass: LARGE_BROWSER_SCREEN_CLASS,
   maxScreenClass: LARGE_BROWSER_SCREEN_CLASS,
-  gutterWidth: 32,
+  gutterWidth: DEFAULT_GUTTER_WIDTH,
 };
 
 export const MODAL_CLOSE_TIMEOUT_MS = 125;
