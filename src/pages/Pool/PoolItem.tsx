@@ -41,7 +41,7 @@ const SimplePieChart = styled.div<{ data: number[] }>`
     left: 0;
     top: 0;
     background-image: ${({ data, theme }) => {
-      const pieColors = [theme.colors.secondary, "#00b1ff"];
+      const pieColors = [theme.colors.secondary, theme.colors.selected];
       return `conic-gradient(${data
         .map((d, i) => `${pieColors[i]} ${d}%`)
         .join(", ")})`;
@@ -71,6 +71,13 @@ const TableRow = styled(Box)`
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      .${MOBILE_SCREEN_CLASS} &,
+      .${TABLET_SCREEN_CLASS} & {
+        overflow: unset;
+        white-space: normal;
+        text-overflow: unset;
+        word-break: break-all;
+      }
     }
   }
 
@@ -300,15 +307,17 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       extra={!isSmallScreen ? extra : undefined}
     >
       <Row
-        justify="between"
+        justify="start"
         align="start"
-        gutterWidth={isSmallScreen ? 0 : 20}
-        direction={isSmallScreen ? "column" : "row"}
-        wrap="nowrap"
-        style={{ width: isSmallScreen ? "100%" : "none" }}
+        gutterWidth={0}
+        wrap={!isSmallScreen ? "nowrap" : "wrap"}
+        style={{ columnGap: 30 }}
         css={css`
+          min-width: 100%;
           .${MOBILE_SCREEN_CLASS} &,
           .${TABLET_SCREEN_CLASS} & {
+            width: 100%;
+            min-width: unset;
             & > div {
               margin-bottom: 16px;
 
@@ -323,7 +332,13 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           }
         `}
       >
-        <Col width={isSmallScreen ? "100%" : 360}>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            /* min-width: 280px; */
+          `}
+        >
           <Label
             css={css`
               margin-bottom: 10px;
@@ -332,27 +347,8 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             Total Liquidity Ratio
           </Label>
           <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
-            <Col width="auto">
-              <div
-                key={pool.pair.contract_addr}
-                css={css`
-                  width: 60px;
-                  position: relative;
-                  display: inline-block;
-                `}
-              >
-                <SimplePieChart data={[50, 50]} />
-              </div>
-            </Col>
             <Col width="auto" style={{ flex: 1 }}>
-              <Typography
-                color="secondary"
-                size={16}
-                weight={900}
-                css={css`
-                  white-space: nowrap;
-                `}
-              >
+              <Typography color="primary" size={16} weight={500}>
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[0].amount, asset1?.decimals) ||
@@ -361,16 +357,9 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset1?.symbol} (50%)
+                {asset1?.symbol} - 50%
               </Typography>
-              <Typography
-                color="#00b1ff"
-                size={16}
-                weight={900}
-                css={css`
-                  white-space: nowrap;
-                `}
-              >
+              <Typography color="primary" size={16} weight={500}>
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[1].amount, asset2?.decimals) ||
@@ -379,12 +368,18 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset2?.symbol} (50%)
+                {asset2?.symbol} - 50%
               </Typography>
             </Col>
           </Row>
         </Col>
-        <Col width={isSmallScreen ? "100%" : "content"}>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            /* min-width: 220px; */
+          `}
+        >
           <Label>Your Liquidity</Label>
           <Typography color="primary" size={16} weight={500}>
             {formatNumber(
@@ -393,7 +388,13 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             &nbsp;LP
           </Typography>
         </Col>
-        <Col width="content">
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            /* min-width: 264px; */
+          `}
+        >
           <Label>Asset Pooled</Label>
           <Typography
             color="primary"
@@ -434,18 +435,39 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             {asset2?.symbol}
           </Typography>
         </Col>
-        <Col width={isSmallScreen ? "100%" : "300px"}>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            /* min-width: 164px; */
+          `}
+        >
           <Label>Your Share</Label>
-          <Typography color="primary" size={16} weight={500}>
-            {formatDecimals(userShare * 100, 2)}%
-          </Typography>
+          <Row justify="start" align="center" gutterWidth={15}>
+            <Col xs="content">
+              <div
+                css={css`
+                  width: 59px;
+                `}
+              >
+                <SimplePieChart data={[userShare * 100, 0]} />
+              </div>
+            </Col>
+            <Col>
+              <Typography color="secondary" size={16} weight={900}>
+                {formatDecimals(userShare * 100, 2)}%
+              </Typography>
+            </Col>
+          </Row>
         </Col>
         <Col
-          width={isSmallScreen ? "100%" : 150}
+          xs={12}
+          md="content"
           aria-hidden
           onClick={(event) => {
             event.stopPropagation();
           }}
+          style={{ marginLeft: "auto" }}
         >
           <LinkButton
             to={`/pool/add-liquidity/${pool.pair.contract_addr}`}

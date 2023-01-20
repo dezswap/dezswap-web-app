@@ -128,7 +128,7 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
           />
           <Content
             css={css`
-              overflow-x: scroll;
+              overflow-x: auto;
               &::-webkit-scrollbar-track {
                 margin: 5px;
               }
