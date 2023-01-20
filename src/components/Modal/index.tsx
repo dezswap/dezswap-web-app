@@ -9,7 +9,7 @@ import ReactModal from "react-modal";
 import iconClose from "assets/icons/icon-close-28px.svg";
 import iconBack from "assets/icons/icon-back.svg";
 import { useEffect, useMemo, useState } from "react";
-import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
 ReactModal.setAppElement("#root");
 
@@ -50,6 +50,11 @@ const ModalHeader = styled.div`
   position: sticky;
   left: 0;
   top: 0;
+  padding: 0px 25px;
+  .${MOBILE_SCREEN_CLASS} & {
+    padding: 0px 16px;
+    padding-bottom: 20px;
+  }
   padding-bottom: 20px;
   z-index: 100;
   &:empty {
@@ -62,7 +67,6 @@ const ModalHeader = styled.div`
     position: absolute;
     left: 0;
     bottom: 0;
-    background-color: ${({ theme }) => theme.colors.white};
     z-index: -1;
   }
 `;
@@ -188,6 +192,7 @@ function Modal({
         `}
       >
         <Panel
+          noPadding
           shadow
           wrapperStyle={
             drawer
@@ -203,11 +208,12 @@ function Modal({
               ? {
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
+                  paddingTop: "16px",
                 }
-              : {}),
+              : {
+                  paddingTop: "25px",
+                }),
             borderColor: error ? theme.colors.danger : theme.colors.primary,
-            maxHeight: "80vh",
-            overflowY: "auto",
             ...(noPadding && { padding: 0 }),
             ...style?.panel,
           }}
@@ -232,7 +238,10 @@ function Modal({
                 css={css`
                   position: absolute;
                   top: 0;
-                  left: 0;
+                  left: 25px;
+                  .${MOBILE_SCREEN_CLASS} & {
+                    left: 16px;
+                  }
                 `}
                 onClick={onGoBack}
               />
@@ -243,14 +252,34 @@ function Modal({
                 size={28}
                 css={css`
                   position: absolute;
-                  top: 0;
-                  right: 0;
+                  top: 0px;
+                  right: 25px;
+                  .${MOBILE_SCREEN_CLASS} & {
+                    right: 16px;
+                  }
                 `}
                 onClick={modalProps.onRequestClose}
               />
             )}
           </ModalHeader>
-          {children}
+          <div
+            css={
+              !noPadding &&
+              css`
+                max-height: 70vh;
+                overflow-y: auto;
+                padding: 0px 25px 25px;
+                .${MOBILE_SCREEN_CLASS} & {
+                  padding: 0px 16px 16px;
+                }
+                &::-webkit-scrollbar-track {
+                  margin-bottom: 10px;
+                }
+              `
+            }
+          >
+            {children}
+          </div>
         </Panel>
       </Container>
     </ReactModal>
