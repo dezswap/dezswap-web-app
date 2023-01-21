@@ -85,38 +85,53 @@ function PoolList({
           </div>
         </TableHeader>
       )}
-      {!pools.length && (
-        <div
-          css={css`
-            padding: 120px 0;
-            .${MOBILE_SCREEN_CLASS} &,
-            .${TABLET_SCREEN_CLASS} & {
-              padding: 48px 0;
-            }
-          `}
-        >
-          <Typography
+      <div
+        css={css`
+          width: 100%;
+          height: auto;
+          position: relative;
+          min-height: 157px;
+
+          .${MOBILE_SCREEN_CLASS} &,
+          .${TABLET_SCREEN_CLASS} & {
+            min-height: 78px;
+          }
+        `}
+      >
+        {!pools.length && (
+          <div
             css={css`
-              text-align: center;
-              opacity: 0.3;
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 100%;
+              height: auto;
             `}
-            size={20}
-            weight={900}
           >
-            {emptyMessage}
-          </Typography>
-        </div>
-      )}
-      {pools.map((pool) => {
-        return (
-          <PoolItem
-            key={pool?.pair?.contract_addr}
-            pool={pool}
-            bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
-            onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
-          />
-        );
-      })}
+            <Typography
+              css={css`
+                text-align: center;
+                opacity: 0.3;
+              `}
+              size={20}
+              weight={900}
+            >
+              {emptyMessage}
+            </Typography>
+          </div>
+        )}
+        {pools.map((pool) => {
+          return (
+            <PoolItem
+              key={pool?.pair?.contract_addr}
+              pool={pool}
+              bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
+              onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
+            />
+          );
+        })}
+      </div>
     </Wrapper>
   );
 }
