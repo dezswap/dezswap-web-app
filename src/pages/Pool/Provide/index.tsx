@@ -23,7 +23,7 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
-  getAddressLink,
+  getTokenLink,
   valueToAmount,
 } from "utils";
 import styled from "@emotion/styled";
@@ -684,7 +684,7 @@ function ProvidePage() {
                 >
                   {ellipsisCenter(pair?.liquidity_token)}&nbsp;
                   <a
-                    href={getAddressLink(pair?.liquidity_token, network.name)}
+                    href={getTokenLink(pair?.liquidity_token, network.name)}
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{
@@ -711,7 +711,7 @@ function ProvidePage() {
                 >
                   {ellipsisCenter(asset1?.address)}&nbsp;
                   <a
-                    href={getAddressLink(asset1?.address, network.name)}
+                    href={getTokenLink(asset1?.address, network.name)}
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{
@@ -738,7 +738,7 @@ function ProvidePage() {
                 >
                   {ellipsisCenter(asset2?.address)}&nbsp;
                   <a
-                    href={getAddressLink(asset2?.address, network.name)}
+                    href={getTokenLink(asset2?.address, network.name)}
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{

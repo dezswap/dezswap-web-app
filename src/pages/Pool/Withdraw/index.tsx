@@ -13,7 +13,7 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
-  getAddressLink,
+  getTokenLink,
   valueToAmount,
 } from "utils";
 import iconWithdraw from "assets/icons/icon-withdraw.svg";
@@ -628,7 +628,7 @@ function WithdrawPage() {
                 >
                   {ellipsisCenter(asset1?.address)}&nbsp;
                   <a
-                    href={getAddressLink(asset1?.address, network.name)}
+                    href={getTokenLink(asset1?.address, network.name)}
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{
@@ -655,7 +655,7 @@ function WithdrawPage() {
                 >
                   {ellipsisCenter(asset2?.address)}&nbsp;
                   <a
-                    href={getAddressLink(asset2?.address, network.name)}
+                    href={getTokenLink(asset2?.address, network.name)}
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{
