@@ -52,7 +52,13 @@ const CopyIcon = styled.div<Pick<CopyProps, "size">>`
   background-size: contain;
   background-repeat: no-repeat;
 
-  &:hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-image: url(${iconCopyHover});
+    }
+  }
+
+  &:active {
     background-image: url(${iconCopyHover});
   }
 
