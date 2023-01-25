@@ -56,7 +56,7 @@ function GlobalStyles() {
           }
           .ReactModal__Overlay {
             opacity: 0;
-            transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-in-out;
+            transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-out;
             z-index: 6000;
             backdrop-filter: blur(4px);
             position: fixed;
@@ -75,7 +75,7 @@ function GlobalStyles() {
 
             & .ReactModal__Content {
               transform: translateY(0px) scale(1);
-              transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-in-out;
+              transition: transform ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} ease-out;
               display: flex;
               align-items: center;
               justify-content: center;

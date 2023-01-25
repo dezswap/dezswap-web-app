@@ -25,7 +25,7 @@ export const gridConfiguration: Configuration = {
   gutterWidth: 32,
 };
 
-export const MODAL_CLOSE_TIMEOUT_MS = 125;
+export const MODAL_CLOSE_TIMEOUT_MS = 300;
 
 export const DISPLAY_DECIMAL = 3;
 
