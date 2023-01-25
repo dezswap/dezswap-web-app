@@ -19,26 +19,16 @@ const Wrapper = styled.div`
   width: 100%;
   height: auto;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  /* overflow-x: auto;
-  & > div {
-    width: auto;
-    min-width: 100%;
-  } */
 `;
 
 const TableHeader = styled(Box)`
-  /* width: auto;
-  min-width: 100%; */
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
   padding: 14px 20px;
+  margin-bottom: 10px;
   & > div {
     width: 190px;
     color: ${({ theme }) => theme.colors.primary};
@@ -50,6 +40,21 @@ const TableHeader = styled(Box)`
     &:first-of-type {
       width: 244px;
     }
+  }
+`;
+
+const List = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+  min-height: 157px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    min-height: 78px;
   }
 `;
 
@@ -85,38 +90,42 @@ function PoolList({
           </div>
         </TableHeader>
       )}
-      {!pools.length && (
-        <div
-          css={css`
-            padding: 120px 0;
-            .${MOBILE_SCREEN_CLASS} &,
-            .${TABLET_SCREEN_CLASS} & {
-              padding: 48px 0;
-            }
-          `}
-        >
-          <Typography
+      <List>
+        {!pools.length && (
+          <div
             css={css`
-              text-align: center;
-              opacity: 0.3;
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 100%;
+              height: auto;
+              padding-top: 25px;
             `}
-            size={20}
-            weight={900}
           >
-            {emptyMessage}
-          </Typography>
-        </div>
-      )}
-      {pools.map((pool) => {
-        return (
-          <PoolItem
-            key={pool?.pair?.contract_addr}
-            pool={pool}
-            bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
-            onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
-          />
-        );
-      })}
+            <Typography
+              css={css`
+                text-align: center;
+                opacity: 0.3;
+              `}
+              size={20}
+              weight={900}
+            >
+              {emptyMessage}
+            </Typography>
+          </div>
+        )}
+        {pools.map((pool) => {
+          return (
+            <PoolItem
+              key={pool?.pair?.contract_addr}
+              pool={pool}
+              bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
+              onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
+            />
+          );
+        })}
+      </List>
     </Wrapper>
   );
 }
