@@ -450,7 +450,13 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="The expected amount of LP you may get at the transaction."
+                      content={
+                        <>
+                          The expected amount of LP
+                          <br />
+                          you may get at the transaction.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
@@ -494,7 +500,13 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content={`Total liquidity of ${asset1?.symbol} before adding.`}
+                      content={
+                        <>
+                          Total liquidity of {asset1?.symbol}
+                          <br />
+                          before adding.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
@@ -545,7 +557,13 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content={`Total liquidity of ${asset2?.symbol} before adding.`}
+                      content={
+                        <>
+                          Total liquidity of {asset2?.symbol}
+                          <br />
+                          before adding.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
@@ -635,7 +653,13 @@ function ProvidePage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="The fee paid for executing the transaction."
+                      content={
+                        <>
+                          The fee paid for executing
+                          <br />
+                          the transaction.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
