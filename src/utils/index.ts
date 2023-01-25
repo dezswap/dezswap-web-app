@@ -1,5 +1,5 @@
 import { Numeric } from "@xpla/xpla.js";
-import { nativeTokens } from "constants/network";
+import { nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
@@ -105,3 +105,9 @@ export const getAddressLink = (address?: string, network?: string) =>
 
 export const getTransactionLink = (txHash?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/tx/${txHash}`;
+
+export const getTokenLink = (address?: string, network?: string) => {
+  return `https://explorer.xpla.io/${network}/token/${
+    address === XPLA_ADDRESS ? "xpla" : address
+  }`;
+};
