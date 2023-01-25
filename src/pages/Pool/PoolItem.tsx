@@ -114,6 +114,7 @@ const AssetIcon = styled.div<{ src?: string }>`
 `;
 
 const Label = styled(Typography)`
+  line-height: 1;
   white-space: nowrap;
   margin-bottom: 15px;
   .${MOBILE_SCREEN_CLASS} &,
@@ -339,16 +340,17 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             /* min-width: 280px; */
           `}
         >
-          <Label
-            css={css`
-              margin-bottom: 10px;
-            `}
-          >
-            Total Liquidity Ratio
-          </Label>
+          <Label>Total Liquidity Ratio</Label>
           <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
             <Col width="auto" style={{ flex: 1 }}>
-              <Typography color="primary" size={16} weight={500}>
+              <Typography
+                color="primary"
+                size={16}
+                weight={500}
+                css={css`
+                  margin-bottom: 4px;
+                `}
+              >
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[0].amount, asset1?.decimals) ||
@@ -402,6 +404,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             weight={500}
             css={css`
               white-space: nowrap;
+              margin-bottom: 4px;
             `}
           >
             {formatNumber(
@@ -418,7 +421,15 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             )}
             &nbsp;
             {asset1?.symbol}
-            <br />
+          </Typography>
+          <Typography
+            color="primary"
+            size={16}
+            weight={500}
+            css={css`
+              white-space: nowrap;
+            `}
+          >
             {formatNumber(
               formatDecimals(
                 amountToValue(
@@ -442,7 +453,13 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             /* min-width: 164px; */
           `}
         >
-          <Label>Your Share</Label>
+          <Label
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            Your Share
+          </Label>
           <Row justify="start" align="center" gutterWidth={15}>
             <Col xs="content">
               <div
