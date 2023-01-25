@@ -194,7 +194,13 @@ function SettingsForm() {
             <Label color="disabled">Auto Router</Label>
             <Tooltip
               arrow
-              content="Optimize the best route for the optimal price."
+              content={
+                <>
+                  Optimize the best route
+                  <br />
+                  for the optimal price.
+                </>
+              }
             >
               <IconButton size={22} icons={{ default: iconQuestion }} />
             </Tooltip>

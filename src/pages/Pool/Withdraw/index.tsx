@@ -429,7 +429,13 @@ function WithdrawPage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="The result value you may get at the current condition."
+                      content={
+                        <>
+                          The result value you may get
+                          <br />
+                          at the current condition.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
@@ -493,7 +499,13 @@ function WithdrawPage() {
                       placement={
                         screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                       }
-                      content="The fee paid for executing the transaction."
+                      content={
+                        <>
+                          The fee paid for executing
+                          <br />
+                          the transaction.
+                        </>
+                      }
                     >
                       <IconButton
                         className="cm-hidden"
@@ -548,7 +560,13 @@ function WithdrawPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="The provided assets will be distributed from the LP."
+                    content={
+                      <>
+                        The provided assets will
+                        <br />
+                        be distributed from the LP.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"

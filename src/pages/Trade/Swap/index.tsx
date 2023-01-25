@@ -908,7 +908,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="The result value you may get at the current condition."
+                    content={
+                      <>
+                        The result value you may get
+                        <br />
+                        at the current condition.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1011,7 +1017,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="The fee paid for executing the transaction."
+                    content={
+                      <>
+                        The fee paid for executing
+                        <br />
+                        the transaction.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1063,7 +1075,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Provide a route for the optimal price."
+                    content={
+                      <>
+                        Provide a route for
+                        <br />
+                        the optimal price.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
