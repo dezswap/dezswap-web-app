@@ -19,26 +19,16 @@ const Wrapper = styled.div`
   width: 100%;
   height: auto;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  /* overflow-x: auto;
-  & > div {
-    width: auto;
-    min-width: 100%;
-  } */
 `;
 
 const TableHeader = styled(Box)`
-  /* width: auto;
-  min-width: 100%; */
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
   padding: 14px 20px;
+  margin-bottom: 10px;
   & > div {
     width: 190px;
     color: ${({ theme }) => theme.colors.primary};
@@ -50,6 +40,21 @@ const TableHeader = styled(Box)`
     &:first-of-type {
       width: 244px;
     }
+  }
+`;
+
+const List = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+  min-height: 157px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    min-height: 78px;
   }
 `;
 
@@ -85,19 +90,7 @@ function PoolList({
           </div>
         </TableHeader>
       )}
-      <div
-        css={css`
-          width: 100%;
-          height: auto;
-          position: relative;
-          min-height: 157px;
-
-          .${MOBILE_SCREEN_CLASS} &,
-          .${TABLET_SCREEN_CLASS} & {
-            min-height: 78px;
-          }
-        `}
-      >
+      <List>
         {!pools.length && (
           <div
             css={css`
@@ -132,7 +125,7 @@ function PoolList({
             />
           );
         })}
-      </div>
+      </List>
     </Wrapper>
   );
 }
