@@ -265,7 +265,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                     gutterWidth={4}
                     aria-hidden
                     onClick={(event) => {
-                      event.preventDefault();
+                      event.stopPropagation();
                     }}
                     wrap="nowrap"
                   >
