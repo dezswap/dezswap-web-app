@@ -34,31 +34,26 @@ export type LPAsset = {
   disabled?: boolean;
 };
 interface SelectAssetFormProps {
-  title?: React.ReactNode;
   selectedAssetAddress?: string;
-  hasBackButton?: boolean;
-  onGoBack?(): void;
-  goBackOnSelect?: boolean;
   onSelect?(address: string): void;
-
   addressList?: string[];
 }
 
 const Wrapper = styled.div`
   width: 100%;
-  height: calc(min(60vh, 690px) - 6px);
+  height: calc(min(60vh, 690px) - 78px);
   position: relative;
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
-  min-height: 512px;
+  min-height: 422px;
 
   .${MOBILE_SCREEN_CLASS} & {
     min-height: unset;
     max-height: unset;
-    height: 80vh;
+    height: calc(80vh - 70px);
   }
 `;
 
@@ -66,6 +61,10 @@ const AssetList = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 0;
+
+  &::-webkit-scrollbar-track {
+    margin-bottom: 10px;
+  }
 `;
 
 const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
@@ -151,15 +150,7 @@ const tabs = [
 ];
 
 function SelectAssetForm(props: SelectAssetFormProps) {
-  const {
-    title = "Select a token",
-    onSelect: handleSelect,
-    selectedAssetAddress,
-    hasBackButton,
-    onGoBack,
-    goBackOnSelect,
-    addressList,
-  } = props;
+  const { onSelect: handleSelect, selectedAssetAddress, addressList } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
@@ -215,9 +206,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           onClick={() => {
             if (handleSelect) {
               handleSelect(address);
-            }
-            if (goBackOnSelect && onGoBack) {
-              onGoBack();
             }
           }}
         >
@@ -346,9 +334,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     bookmarks,
     deferredSearchKeyword,
     getAsset,
-    goBackOnSelect,
     handleSelect,
-    onGoBack,
     addressList,
     selectedAssetAddress,
     tabIdx,
@@ -359,8 +345,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   ]);
   return (
     <Wrapper>
-      <Panel border={false} style={{ paddingBottom: 0 }}>
-        <Typography
+      <Panel border={false} style={{ paddingTop: 0, paddingBottom: 0 }}>
+        {/* <Typography
           size={20}
           color={theme.colors.primary}
           weight={900}
@@ -383,7 +369,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
             />
           )}
           {title}
-        </Typography>
+        </Typography> */}
         <Input
           size="large"
           variant="primary"

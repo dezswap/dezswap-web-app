@@ -105,12 +105,16 @@ function SelectAssetDrawer({
       isOpen={isOpen}
       noPadding
       onGoBack={onGoBack}
+      onRequestClose={onGoBack}
       style={{
         panel: {
           maxHeight: "unset",
           overflowY: "visible",
         },
       }}
+      title="Select a token"
+      hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
+      hasGoBackButton={screenClass !== MOBILE_SCREEN_CLASS}
       closeTimeoutMS={
         screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
       }
@@ -418,9 +422,7 @@ function SwapPage() {
         }}
       >
         <SelectAssetForm
-          goBackOnSelect
           addressList={availableAssetAddresses.addresses}
-          hasBackButton
           selectedAssetAddress={
             selectAsset1Modal.isOpen
               ? asset1?.address || ""
@@ -440,8 +442,6 @@ function SwapPage() {
               form.setValue(oppositeTarget, "");
             }
             form.setValue(target, address);
-          }}
-          onGoBack={() => {
             selectAsset1Modal.close();
             selectAsset2Modal.close();
           }}
