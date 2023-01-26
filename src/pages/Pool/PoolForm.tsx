@@ -148,7 +148,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                       )}
                     </Typography>
                   </Col>
-                  <Col width="auto" style={{ marginLeft: "auto" }}>
+                  <Col
+                    width="auto"
+                    style={{ marginLeft: "auto", overflow: "hidden" }}
+                  >
                     <Typography
                       size={14}
                       weight={700}
