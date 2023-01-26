@@ -221,17 +221,13 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         <TableRow>
           <div>
             {isSmallScreen && <Label>Pool</Label>}
-            <Row
-              justify="start"
-              align="center"
-              gutterWidth={6}
-              wrap="nowrap"
-              style={{ height: "32px" }}
-            >
+            <Row justify="start" align="center" gutterWidth={6} wrap="nowrap">
               <Col
                 width="auto"
                 css={css`
                   white-space: nowrap;
+                  line-height: 1;
+                  font-size: 0;
                 `}
               >
                 <AssetIcon src={asset1?.iconSrc} />
