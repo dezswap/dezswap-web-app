@@ -102,7 +102,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                   gutterWidth={0}
                   wrap="nowrap"
                 >
-                  <Col width="auto">
+                  <Col width="auto" style={{ paddingRight: 10 }}>
                     <Typography
                       color="primary"
                       size={16}
@@ -150,8 +150,19 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                       )}
                     </Typography>
                   </Col>
-                  <Col width="auto" style={{ marginLeft: "auto" }}>
-                    <Typography size={14} weight={700}>
+                  <Col
+                    width="auto"
+                    style={{ marginLeft: "auto", overflow: "hidden" }}
+                  >
+                    <Typography
+                      size={14}
+                      weight={700}
+                      css={css`
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 160px;
+                      `}
+                    >
                       Balance:&nbsp;
                       <span
                         css={css`
