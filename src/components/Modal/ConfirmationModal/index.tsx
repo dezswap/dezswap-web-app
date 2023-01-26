@@ -7,12 +7,15 @@ import { useEffect, useRef } from "react";
 import { useScreenClass } from "react-grid-system";
 
 const Content = styled.div`
-  pointer-events: none;
   & button[type="submit"] {
     display: none;
   }
   & .cm-hidden {
     display: none;
+  }
+  & button,
+  & input {
+    pointer-events: none;
   }
 `;
 
