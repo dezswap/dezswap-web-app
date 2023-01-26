@@ -17,6 +17,7 @@ import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
+  TABLET_SCREEN_CLASS,
 } from "constants/layout";
 import { useModal } from "hooks/useModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
@@ -408,9 +409,13 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 7px;
+                                  padding: 12px 18px;
                                   font-weight: bold;
                                   text-align: center;
+                                  .${MOBILE_SCREEN_CLASS} &,
+                                  .${TABLET_SCREEN_CLASS} & {
+                                    text-align: start;
+                                  }
                                 `}
                               >
                                 <Row
