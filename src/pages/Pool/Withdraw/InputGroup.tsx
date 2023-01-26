@@ -28,8 +28,10 @@ const AssetButton = styled(Button)`
   pointer-events: none;
   border-radius: 30px;
   height: 38px;
-  padding: 7px 12px;
+  padding: 4px 9px;
   justify-content: flex-start;
+  font-size: 16px;
+  font-weight: 700;
 `;
 const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
   ({ lpToken, assets, onBalanceClick, style, ...inputProps }, ref) => {
