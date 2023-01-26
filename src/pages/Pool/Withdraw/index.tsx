@@ -263,6 +263,8 @@ function WithdrawPage() {
                       padding: 0 9px;
                       justify-content: flex-start;
                       background-color: ${theme.colors.white};
+                      font-size: 16px;
+                      font-weight: 700;
                     `}
                   >
                     <img
@@ -343,6 +345,8 @@ function WithdrawPage() {
                       padding: 0 9px;
                       justify-content: flex-start;
                       background-color: ${theme.colors.white};
+                      font-size: 16px;
+                      font-weight: 700;
                     `}
                   >
                     <img
