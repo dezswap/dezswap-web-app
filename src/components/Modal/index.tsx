@@ -44,28 +44,29 @@ const defaultOverlayStyle: React.CSSProperties = {
   height: "100%",
 };
 
-const ModalHeader = styled.div`
+const ModalHeader = styled(Panel)`
   width: 100%;
   height: auto;
   position: sticky;
   left: 0;
   top: 0;
-  padding-bottom: 20px;
+  padding-bottom: 0 !important;
+  margin-bottom: 20px;
+
   z-index: 100;
-  &:empty {
-    padding-bottom: 0;
+  &:has(div:empty) {
+    padding: 0;
   }
-  &::before {
-    content: "";
+  & > div {
     width: 100%;
-    height: 200%;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    background-color: ${({ theme }) => theme.colors.white};
-    z-index: -1;
+    height: auto;
+    position: relative;
   }
 `;
+
+ModalHeader.defaultProps = {
+  border: false,
+};
 
 function Modal({
   isOpen,
@@ -139,6 +140,17 @@ function Modal({
     };
   }, [resizeTrigger]);
 
+  useEffect(() => {
+    const removeClassName = () => {
+      if (!document.querySelector(".ReactModal__Content")) {
+        document.body.classList.remove("ReactModal__Body--open");
+      }
+    };
+    return () => {
+      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 100);
+    };
+  }, [isOpen]);
+
   return (
     <ReactModal
       isOpen={resizeTrigger ? false : isOpen}
@@ -178,6 +190,7 @@ function Modal({
       >
         <Panel
           shadow
+          noPadding
           wrapperStyle={
             drawer
               ? {
@@ -197,49 +210,69 @@ function Modal({
             borderColor: error ? theme.colors.danger : theme.colors.primary,
             maxHeight: "80vh",
             overflowY: "auto",
-            ...(noPadding && { padding: 0 }),
+            display: "flex",
+            flexDirection: "column",
             ...style?.panel,
           }}
         >
           <ModalHeader>
-            {typeof title === "string" ? (
-              <Typography
-                size={20}
-                weight={900}
-                color={error ? "danger" : "primary"}
-                css={{ textAlign: "center" }}
-              >
-                {title}
-              </Typography>
-            ) : (
-              title
-            )}
-            {hasGoBackButton && (
-              <IconButton
-                icons={{ default: iconBack }}
-                size={28}
-                css={css`
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                `}
-                onClick={onGoBack}
-              />
-            )}
-            {hasCloseButton && (
-              <IconButton
-                icons={{ default: iconClose }}
-                size={28}
-                css={css`
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                `}
-                onClick={modalProps.onRequestClose}
-              />
-            )}
+            <div>
+              {typeof title === "string" ? (
+                <Typography
+                  size={20}
+                  weight={900}
+                  color={error ? "danger" : "primary"}
+                  css={{ textAlign: "center" }}
+                >
+                  {title}
+                </Typography>
+              ) : (
+                title
+              )}
+              {hasGoBackButton && (
+                <IconButton
+                  icons={{ default: iconBack }}
+                  size={28}
+                  css={css`
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                  `}
+                  onClick={onGoBack}
+                />
+              )}
+              {hasCloseButton && (
+                <IconButton
+                  icons={{ default: iconClose }}
+                  size={28}
+                  css={css`
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                  `}
+                  onClick={modalProps.onRequestClose}
+                />
+              )}
+            </div>
           </ModalHeader>
-          {children}
+          <Panel
+            border={false}
+            wrapperCss={css`
+              &::-webkit-scrollbar-track {
+                margin-bottom: 10px;
+              }
+            `}
+            noPadding={noPadding}
+            style={{
+              paddingTop: 0,
+            }}
+            wrapperStyle={{
+              flex: 1,
+              overflowY: "auto",
+            }}
+          >
+            {children}
+          </Panel>
         </Panel>
       </Container>
     </ReactModal>

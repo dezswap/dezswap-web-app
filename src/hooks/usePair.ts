@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAPI } from "hooks/useAPI";
 import { NetworkName } from "types/common";
 import { useAtom, useSetAtom } from "jotai";
-import { generatePairsMsg } from "utils/dezswap";
+import { queryMessages } from "utils/dezswap";
 import pairsAtom, { isPairsLoadingAtom } from "stores/pairs";
 import assetsAtom from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
@@ -18,7 +18,7 @@ const usePairs = () => {
   const api = useAPI();
 
   const fetchPairs = useCallback(
-    async (options: Parameters<typeof generatePairsMsg>[0]) => {
+    async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
       try {
         if (!network.name || !window.navigator.onLine) {
           return;
@@ -127,8 +127,20 @@ const usePairs = () => {
     }
   }, [availableAssetAddresses, setAssets]);
 
+  const getPair = useCallback(
+    (contractAddress: string) => {
+      return pairs[network.name]?.data?.find(
+        (pair) => pair.contract_addr === contractAddress,
+      );
+    },
+    [network.name, pairs],
+  );
+
   const findPair = useCallback(
     (addresses: [string, string]) => {
+      if (addresses[0] === addresses[1]) {
+        return undefined;
+      }
       return pairs[network.name]?.data?.find(
         (pair) =>
           pair.asset_addresses.includes(addresses[0]) &&
@@ -152,6 +164,7 @@ const usePairs = () => {
       pairs: pairs[network.name as NetworkName]?.data,
       getPairedAddresses,
       availableAssetAddresses,
+      getPair,
       findPair,
       findPairByLpAddress,
     }),
@@ -160,6 +173,7 @@ const usePairs = () => {
       getPairedAddresses,
       network.name,
       pairs,
+      getPair,
       findPair,
       findPairByLpAddress,
     ],

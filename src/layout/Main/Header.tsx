@@ -13,9 +13,11 @@ import IconButton from "components/IconButton";
 import NavBar from "components/NavBar";
 import Typography from "components/Typography";
 import {
+  DISPLAY_DECIMAL,
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
+  TABLET_SCREEN_CLASS,
 } from "constants/layout";
 import { useModal } from "hooks/useModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
@@ -24,7 +26,7 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
-  getWalletLink,
+  getAddressLink,
 } from "utils";
 import { useBalance } from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -48,7 +50,6 @@ export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
 export const MOBILE_HEADER_HEIGHT = 65;
 export const BANNER_HEIGHT = 31;
-export const DISPLAY_DECIMAL = 2;
 
 interface WrapperProps {
   isTestnet?: boolean;
@@ -60,52 +61,44 @@ const Wrapper = styled.header<WrapperProps>`
   position: sticky;
   left: 0;
   z-index: 5000;
-  backdrop-filter: blur(4px);
-
-  ${({ isTestnet = false }) =>
-    isTestnet
-      ? css`
-          top: ${`-${
-            DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT - BANNER_HEIGHT
-          }px`};
-          .${MOBILE_SCREEN_CLASS} & {
-            top: ${`${BANNER_HEIGHT}px`};
-          }
-        `
-      : css`
-          top: ${`-${DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT}px`};
-          .${MOBILE_SCREEN_CLASS} & {
-            top: 0;
-          }
-        `}
 
   .${MOBILE_SCREEN_CLASS} & {
     height: ${`${MOBILE_HEADER_HEIGHT}px`};
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: ${({ theme }) => theme.colors.background};
-    opacity: 0.8;
-    pointer-events: none;
-  }
+  ${({ isTestnet = false }) =>
+    isTestnet
+      ? css`
+          top: ${`${BANNER_HEIGHT}px`};
+        `
+      : css`
+          top: 0;
+        `}
 
   & > div {
     position: absolute;
     left: 0;
-    bottom: 0;
+    top: 0;
     width: 100%;
     padding-top: 16px;
     padding-bottom: 24px;
+    backdrop-filter: blur(4px);
 
     .${MOBILE_SCREEN_CLASS} & {
       padding-top: 10px;
       padding-bottom: 10px;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: ${({ theme }) => theme.colors.background};
+      opacity: 0.8;
+      pointer-events: none;
     }
   }
   &.scrolled > div {
@@ -163,7 +156,6 @@ const navLinks = [
   {
     path: "/pool",
     label: "Pool",
-    disabled: true,
   },
 ];
 
@@ -252,10 +244,7 @@ function Header() {
     const handleScroll = () => {
       const { current } = wrapperRef;
       if (!current) return;
-      current.classList.toggle(
-        "scrolled",
-        window.scrollY > DEFAULT_HEADER_HEIGHT - SCROLLED_HEADER_HEIGHT,
-      );
+      current.classList.toggle("scrolled", window.scrollY > 0);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -352,7 +341,7 @@ function Header() {
                                     amountToValue(balance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
-                                )}${XPLA_SYMBOL}`}
+                                )} ${XPLA_SYMBOL}`}
                             <img src={iconDropdown} width={22} alt="dropdown" />
                           </Button>
                         }
@@ -402,7 +391,7 @@ function Header() {
                                 </Col>
                                 <Col width="auto">
                                   <a
-                                    href={getWalletLink(
+                                    href={getAddressLink(
                                       connectedWallet.walletAddress,
                                       network.name,
                                     )}
@@ -420,9 +409,13 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 7px;
+                                  padding: 12px 18px;
                                   font-weight: bold;
                                   text-align: center;
+                                  .${MOBILE_SCREEN_CLASS} &,
+                                  .${TABLET_SCREEN_CLASS} & {
+                                    text-align: start;
+                                  }
                                 `}
                               >
                                 <Row
@@ -531,7 +524,7 @@ function Header() {
                         variant="primary"
                         onClick={() => connectWalletModal.open()}
                       >
-                        Connect Wallet
+                        Connect wallet
                       </Button>
                     )}
                   </Col>

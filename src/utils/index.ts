@@ -1,5 +1,5 @@
-import { Dec, Numeric } from "@xpla/xpla.js";
-import { nativeTokens } from "constants/network";
+import { Numeric } from "@xpla/xpla.js";
+import { nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
@@ -56,14 +56,9 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    const s = value.toString();
-    if (s.length <= decimals) {
-      return Dec.withPrec(value, decimals).toFixed(decimals).toString();
-    }
-    return `${s.substring(0, s.length - decimals)}.${s.substring(
-      s.length - decimals,
-      s.length,
-    )}`;
+    return Numeric.parse(value || 0)
+      .mul(10 ** -decimals)
+      .toFixed(decimals, Decimal.ROUND_FLOOR);
   } catch (error) {
     return undefined;
   }
@@ -76,19 +71,22 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
 
   let t = 0;
   let v = 0;
-  const filtered = value.replaceAll(/[0.]/g, "").length
+  // remove redundant zeros
+  // replace non-digit characters and preceding multiple zeros
+  const filtered = value.replaceAll(/[0\\.]/g, "").length
     ? value
-        .replace(/[^0-9.]/g, "")
-        .replace(/[0]+[.]/g, (match: string) => {
+        .replace(/[^0-9\\.]/g, "")
+        .replace(/^[0]+[\\.]/g, (match: string) => {
           v += 1;
           return v === 1 ? "0." : match;
         })
-        .replace(/[.]/g, (match: string) => {
+        .replace(/[\\.]/g, (match: string) => {
           t += 1;
           return t === 2 ? "" : match;
         })
     : "0";
 
+  // decimal count check
   return filtered.includes(".") &&
     (filtered.split(".").pop()?.length || 0) > decimals
     ? filtered.slice(0, filtered.indexOf(".")) +
@@ -102,8 +100,14 @@ export const filterNumberFormat = (value: string, decimals = 18) => {
 export const getBlockLink = (height?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/block/${height}`;
 
-export const getWalletLink = (address?: string, network?: string) =>
+export const getAddressLink = (address?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/address/${address}`;
 
 export const getTransactionLink = (txHash?: string, network?: string) =>
   `https://explorer.xpla.io/${network}/tx/${txHash}`;
+
+export const getTokenLink = (address?: string, network?: string) => {
+  return `https://explorer.xpla.io/${network}/token/${
+    address === XPLA_ADDRESS ? "xpla" : address
+  }`;
+};

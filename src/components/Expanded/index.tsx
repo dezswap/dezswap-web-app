@@ -5,6 +5,7 @@ import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   label?: React.ReactNode;
+  preview?: React.ReactNode;
   isExpanded?: boolean;
   onLabelClick?: React.MouseEventHandler<HTMLButtonElement>;
 }>;
@@ -17,7 +18,7 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-const Label = styled.button`
+const Label = styled.div`
   width: 100%;
   height: 48px;
   position: relative;
@@ -62,10 +63,6 @@ const Label = styled.button`
   }
 `;
 
-Label.defaultProps = {
-  type: "button",
-};
-
 const Content = styled.div`
   width: 100%;
   height: auto;
@@ -74,25 +71,39 @@ const Content = styled.div`
   max-height: 0px;
   overflow: hidden;
   padding: 0px 16px;
-  transition: max-height 0.25s cubic-bezier(0, 1, 0, 1),
-    padding-top 1s cubic-bezier(0, 1, 0, 1),
-    padding-bottom 1s cubic-bezier(0, 1, 0, 1);
+  transition: max-height 0.25s cubic-bezier(0, 1, 0, 1);
   .expanded &,
   .cm & {
     padding-bottom: 12px;
     max-height: 600px;
     .${MOBILE_SCREEN_CLASS} & {
-      padding: 12px 16px;
+      padding-bottom: 16px;
       max-height: 300px;
+    }
+  }
+`;
+
+const PreviewContent = styled(Content)`
+  max-height: unset !important;
+  transition: unset;
+  padding-bottom: 12px;
+  .${MOBILE_SCREEN_CLASS} & {
+    padding-bottom: 16px;
+  }
+  .expanded &,
+  .cm & {
+    padding-bottom: 0;
+    .${MOBILE_SCREEN_CLASS} & {
+      padding-bottom: 0;
     }
   }
 `;
 
 function Expand({
   label,
+  preview,
   children,
   isExpanded: isExpandedFromProps,
-  onLabelClick: handleLabelClick,
 }: ExpandProps) {
   const [isExpanded, setIsExpanded] = useState(isExpandedFromProps || false);
   useEffect(() => {
@@ -100,17 +111,10 @@ function Expand({
   }, [isExpandedFromProps]);
   return (
     <Wrapper className={isExpanded ? "expanded" : ""}>
-      <Label
-        onClick={(event) => {
-          if (handleLabelClick) {
-            handleLabelClick(event);
-          } else {
-            setIsExpanded((current) => !current);
-          }
-        }}
-      >
+      <Label onClick={() => setIsExpanded((current) => !current)}>
         {label}
       </Label>
+      {preview && <PreviewContent>{preview}</PreviewContent>}
       <Content>{children}</Content>
     </Wrapper>
   );

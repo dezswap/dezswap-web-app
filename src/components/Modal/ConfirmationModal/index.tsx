@@ -7,23 +7,28 @@ import { useEffect, useRef } from "react";
 import { useScreenClass } from "react-grid-system";
 
 const Content = styled.div`
-  pointer-events: none;
   & button[type="submit"] {
     display: none;
   }
   & .cm-hidden {
     display: none;
   }
+  & button,
+  & input {
+    pointer-events: none;
+  }
 `;
 
 interface ConfirmationModalProps extends Omit<ReactModal.Props, "children"> {
   node?: Node;
   onConfirm?(): void;
+  isModalParent: boolean;
 }
 
 function ConfirmationModal({
   node,
   onConfirm,
+  isModalParent,
   ...modalProps
 }: ConfirmationModalProps) {
   const divRef = useRef<HTMLDivElement>(null);
@@ -44,8 +49,9 @@ function ConfirmationModal({
   return (
     <Modal
       {...modalProps}
+      id="confirm-modal"
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS
+        screenClass !== MOBILE_SCREEN_CLASS && !isModalParent
           ? () => {
               return (
                 document.querySelector("#main") ||

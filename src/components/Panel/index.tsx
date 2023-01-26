@@ -13,6 +13,7 @@ type PanelProps = PropsWithChildren<
   StyledPanelProps &
     React.HTMLAttributes<HTMLDivElement> & {
       wrapperStyle?: React.CSSProperties;
+      wrapperCss?: ReturnType<typeof css>;
     }
 >;
 
@@ -23,6 +24,16 @@ const Wrapper = styled.div<StyledPanelProps>`
   width: 100%;
   height: auto;
   position: relative;
+
+  ${({ border }) =>
+    border &&
+    css`
+      &::-webkit-scrollbar-track {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    `}
+
   ${({ shadow }) =>
     shadow &&
     css`
@@ -41,17 +52,15 @@ const Content = styled.div<StyledPanelProps>`
   height: auto;
   position: relative;
   background-color: ${({ theme }) => theme.colors.white};
-  padding: 25px;
-  .${MOBILE_SCREEN_CLASS} & {
-    padding: 16px;
-  }
-
   border-radius: 12px;
 
   ${({ noPadding }) =>
-    noPadding &&
+    !noPadding &&
     css`
-      padding: 0;
+      padding: 25px;
+      .${MOBILE_SCREEN_CLASS} & {
+        padding: 16px;
+      }
     `}
 
   ${({ border, theme }) =>
@@ -77,12 +86,13 @@ function Panel({
   children,
   style,
   wrapperStyle,
+  wrapperCss,
   shadow,
   border = true,
   ...divProps
 }: PanelProps) {
   return (
-    <Wrapper shadow={shadow} style={wrapperStyle}>
+    <Wrapper shadow={shadow} style={wrapperStyle} css={wrapperCss}>
       <Content {...divProps} shadow={shadow} border={border} style={style}>
         {children}
       </Content>

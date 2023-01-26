@@ -25,7 +25,6 @@ const IconButton = styled.button<IconButtonProps>`
   background-repeat: no-repeat;
   background-position: 50% 50%;
 
-  &:hover,
   &:active {
     background-image: none;
   }
@@ -45,8 +44,13 @@ const IconButton = styled.button<IconButtonProps>`
     opacity: 0;
   }
 
-  &:hover::before {
-    opacity: 1;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-image: none;
+    }
+    &:hover::before {
+      opacity: 1;
+    }
   }
   &:active::before {
     opacity: 0;

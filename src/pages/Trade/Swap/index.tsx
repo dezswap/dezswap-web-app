@@ -32,7 +32,6 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import iconSwap from "assets/icons/icon-from-to.svg";
 import iconSwapHover from "assets/icons/icon-from-to-hover.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
-import iconInfoWhite from "assets/icons/icon-info-white.svg";
 import { NumberInput } from "components/Input";
 import Button from "components/Button";
 import Copy from "components/Copy";
@@ -40,6 +39,7 @@ import IconButton from "components/IconButton";
 import Message from "components/Message";
 import Select from "components/Select";
 import iconQuestion from "assets/icons/icon-question.svg";
+import iconShift from "assets/icons/icon-shift.svg";
 import Expand from "components/Expanded";
 import styled from "@emotion/styled";
 import SelectAssetForm from "components/SelectAssetForm";
@@ -52,6 +52,8 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
+import { NetworkName } from "types/common";
+import usePool from "hooks/usePool";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -103,12 +105,16 @@ function SelectAssetDrawer({
       isOpen={isOpen}
       noPadding
       onGoBack={onGoBack}
+      onRequestClose={onGoBack}
       style={{
         panel: {
           maxHeight: "unset",
           overflowY: "visible",
         },
       }}
+      title="Select a token"
+      hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
+      hasGoBackButton={screenClass !== MOBILE_SCREEN_CLASS}
       closeTimeoutMS={
         screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
       }
@@ -224,6 +230,14 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
+  const pool = usePool(selectedPair?.contract_addr);
+  const isPoolEmpty = useMemo(
+    () =>
+      pool?.total_share !== undefined &&
+      Numeric.parse(pool.total_share).isZero(),
+    [pool?.total_share],
+  );
+
   const beliefPrice = useMemo(() => {
     if (isReversed) {
       if (asset2Value && simulationResult.estimatedAmount) {
@@ -259,6 +273,7 @@ function SwapPage() {
       !selectedPair ||
       !asset1?.address ||
       !asset1Value ||
+      isPoolEmpty ||
       Numeric.parse(asset1Value).isNaN()
     ) {
       return undefined;
@@ -266,7 +281,7 @@ function SwapPage() {
     return {
       msgs: [
         generateSwapMsg(
-          connectedWallet?.network.name,
+          connectedWallet?.network.name as NetworkName,
           connectedWallet.walletAddress,
           selectedPair.contract_addr,
           asset1.address,
@@ -289,6 +304,7 @@ function SwapPage() {
     slippageTolerance,
     beliefPrice,
     txDeadlineMinutes,
+    isPoolEmpty,
   ]);
 
   const {
@@ -312,6 +328,10 @@ function SwapPage() {
       return "Select tokens";
     }
 
+    if (isPoolEmpty) {
+      return "Swap";
+    }
+
     if (asset1Value) {
       if (
         Numeric.parse(asset1Value).gt(
@@ -320,21 +340,15 @@ function SwapPage() {
           ),
         )
       ) {
-        return `Insufficient ${asset1?.name} balance`;
-      }
-
-      if (asset1Value && !asset2Value) {
-        return `Insufficient ${asset2?.symbol} in the pool`;
+        return `Insufficient ${asset1?.symbol} balance`;
       }
       return "Swap";
     }
 
-    if (asset2Value && !asset1Value) {
-      return `Insufficient ${asset2?.symbol} in the pool`;
-    }
-
     return "Enter an amount";
   }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+
+  const [shiftAssets, setShiftAssets] = useState(false);
 
   useEffect(() => {
     if (
@@ -408,12 +422,7 @@ function SwapPage() {
         }}
       >
         <SelectAssetForm
-          goBackOnSelect
-          addressList={availableAssetAddresses.addresses?.map((address) => ({
-            address,
-            isLP: false,
-          }))}
-          hasBackButton
+          addressList={availableAssetAddresses.addresses}
           selectedAssetAddress={
             selectAsset1Modal.isOpen
               ? asset1?.address || ""
@@ -433,8 +442,6 @@ function SwapPage() {
               form.setValue(oppositeTarget, "");
             }
             form.setValue(target, address);
-          }}
-          onGoBack={() => {
             selectAsset1Modal.close();
             selectAsset2Modal.close();
           }}
@@ -838,20 +845,44 @@ function SwapPage() {
           <div style={{ marginBottom: "10px" }}>
             <Expand
               label={
-                <Typography size={14} weight="bold">
-                  {asset1 && `1 ${asset1.symbol} = `}
-                  {asset1Value && simulationResult?.estimatedAmount
-                    ? cutDecimal(
-                        Numeric.parse(
-                          amountToValue(
-                            simulationResult.estimatedAmount,
-                            asset2?.decimals,
-                          ) || "0",
-                        ).div(asset1Value),
-                        DISPLAY_DECIMAL,
-                      )
-                    : "-"}
-                  {asset2?.symbol}
+                <Typography
+                  size={14}
+                  weight="bold"
+                  css={css`
+                    display: flex;
+                    align-items: center;
+                  `}
+                >
+                  {shiftAssets
+                    ? `1 ${asset2.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset1Value || 0).div(
+                                asset2Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset1?.symbol}`
+                    : `1 ${asset1.symbol} = ${
+                        asset1Value && asset2Value
+                          ? cutDecimal(
+                              Numeric.parse(asset2Value || 0).div(
+                                asset1Value || 1,
+                              ),
+                              DISPLAY_DECIMAL,
+                            )
+                          : "-"
+                      } ${asset2?.symbol}`}
+                  <IconButton
+                    icons={{ default: iconShift }}
+                    size={24}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShiftAssets((current) => !current);
+                    }}
+                  />
                 </Typography>
               }
               isExpanded={false}
@@ -877,7 +908,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="The result value you may get at the current condition."
+                    content={
+                      <>
+                        The result value you may get
+                        <br />
+                        at the current condition.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
@@ -980,7 +1017,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="The fee paid for executing the transaction."
+                    content={
+                      <>
+                        The fee paid for executing
+                        <br />
+                        the transaction.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1032,7 +1075,13 @@ function SwapPage() {
                     placement={
                       screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
                     }
-                    content="Provide a route for the optimal price."
+                    content={
+                      <>
+                        Provide a route for
+                        <br />
+                        the optimal price.
+                      </>
+                    }
                   >
                     <IconButton
                       className="cm-hidden"
@@ -1062,6 +1111,31 @@ function SwapPage() {
             </Expand>
           </div>
         )}
+        {isPoolEmpty && (
+          <div>
+            <Message variant="guide">
+              <Row
+                justify="between"
+                nogutter
+                css={css`
+                  width: 100%;
+                `}
+              >
+                <Col
+                  css={css`
+                    text-align: left;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                  `}
+                >
+                  Empty pool - {asset1?.symbol}-{asset2?.symbol} is an empty
+                  pool, try another one
+                </Col>
+              </Row>
+            </Message>
+          </div>
+        )}
         {spread.message && (
           <Tooltip
             arrow
@@ -1078,6 +1152,7 @@ function SwapPage() {
                   `}
                 >
                   <Col
+                    xs={8}
                     css={css`
                       text-align: left;
                       display: flex;
@@ -1088,6 +1163,7 @@ function SwapPage() {
                     Price impact warning
                   </Col>
                   <Col
+                    xs={4}
                     css={css`
                       text-align: right;
                       display: flex;
@@ -1096,11 +1172,6 @@ function SwapPage() {
                     `}
                   >
                     {formatNumber(spread.rate)}%
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconInfoWhite }}
-                    />
                   </Col>
                 </Row>
               </Message>
@@ -1118,7 +1189,8 @@ function SwapPage() {
               form.formState.isValidating ||
               simulationResult.isLoading ||
               isFeeLoading ||
-              isFeeFailed
+              isFeeFailed ||
+              isPoolEmpty
             }
             css={css`
               margin-top: 20px;
@@ -1136,7 +1208,7 @@ function SwapPage() {
             `}
             onClick={() => connectWalletModal.open()}
           >
-            Connect Wallet
+            Connect wallet
           </Button>
         )}
       </Wrapper>
