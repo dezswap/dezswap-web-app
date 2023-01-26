@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
@@ -7,7 +7,6 @@ import Copy from "components/Copy";
 import { NumberInput } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import theme from "styles/theme";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -35,6 +34,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
   ({ lpToken, assets, onBalanceClick, style, ...inputProps }, ref) => {
     const screenClass = useScreenClass();
     const balance = useBalance(lpToken || "");
+    const theme = useTheme();
 
     return (
       <Box style={style}>
@@ -49,6 +49,8 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
                     alt={assets?.[0]?.symbol}
                     css={css`
                       margin-right: 4px;
+                      background-color: ${theme.colors.white};
+                      border-radius: 50%;
                     `}
                   />
                   {assets?.[0]?.symbol}&nbsp;-&nbsp;
@@ -58,6 +60,8 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
                     alt={assets?.[1]?.symbol}
                     css={css`
                       margin-right: 4px;
+                      background-color: ${theme.colors.white};
+                      border-radius: 50%;
                     `}
                   />
                   {assets?.[1]?.symbol}

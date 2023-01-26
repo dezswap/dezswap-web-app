@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
@@ -7,7 +7,6 @@ import Copy from "components/Copy";
 import { NumberInput } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import theme from "styles/theme";
 import { Asset } from "types/common";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
@@ -30,6 +29,8 @@ const AssetButton = styled(Button)<{ iconSrc?: string }>`
     content: "";
     width: 24px;
     height: 24px;
+    background-color: ${({ theme }) => theme.colors.white};
+    border-radius: 50%;
     background-image: ${({ iconSrc }) => `url(${iconSrc || iconDefaultToken})`};
     background-size: cover;
     background-position: 50% 50%;
@@ -40,6 +41,7 @@ const AssetButton = styled(Button)<{ iconSrc?: string }>`
 const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
   ({ asset, onBalanceClick, style, ...inputProps }, ref) => {
     const screenClass = useScreenClass();
+    const theme = useTheme();
 
     return (
       <Box style={style}>

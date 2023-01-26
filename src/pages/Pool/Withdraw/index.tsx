@@ -271,6 +271,8 @@ function WithdrawPage() {
                       alt={asset1?.symbol}
                       css={css`
                         margin-right: 4px;
+                        background-color: ${theme.colors.white};
+                        border-radius: 50%;
                       `}
                     />
                     {asset1?.symbol}
@@ -349,6 +351,8 @@ function WithdrawPage() {
                       alt={asset2?.symbol}
                       css={css`
                         margin-right: 4px;
+                        background-color: ${theme.colors.white};
+                        border-radius: 50%;
                       `}
                     />
                     {asset2?.symbol}
