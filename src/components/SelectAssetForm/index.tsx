@@ -48,7 +48,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   text-align: center;
   border-radius: 12px;
-  min-height: 512px;
+  min-height: 422px;
 
   .${MOBILE_SCREEN_CLASS} & {
     min-height: unset;
