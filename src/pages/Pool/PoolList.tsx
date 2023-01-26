@@ -19,13 +19,25 @@ const Wrapper = styled.div`
   width: 100%;
   height: auto;
   position: relative;
+  overflow-x: auto;
+
+  & > div {
+    width: 100%;
+    min-width: 1111px;
+    position: relative;
+    height: auto;
+
+    .${MOBILE_SCREEN_CLASS} &,
+    .${TABLET_SCREEN_CLASS} & {
+      min-width: unset;
+    }
+  }
 `;
 
 const TableHeader = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   flex-wrap: nowrap;
   padding: 14px 20px;
   margin-bottom: 10px;
@@ -100,7 +112,6 @@ function PoolList({
               transform: translateY(-50%);
               width: 100%;
               height: auto;
-              padding-top: 25px;
             `}
           >
             <Typography

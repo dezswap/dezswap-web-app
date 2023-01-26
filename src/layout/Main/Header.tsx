@@ -13,6 +13,7 @@ import IconButton from "components/IconButton";
 import NavBar from "components/NavBar";
 import Typography from "components/Typography";
 import {
+  DISPLAY_DECIMAL,
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
@@ -48,7 +49,6 @@ export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
 export const MOBILE_HEADER_HEIGHT = 65;
 export const BANNER_HEIGHT = 31;
-export const DISPLAY_DECIMAL = 2;
 
 interface WrapperProps {
   isTestnet?: boolean;
@@ -340,7 +340,7 @@ function Header() {
                                     amountToValue(balance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
-                                )}${XPLA_SYMBOL}`}
+                                )} ${XPLA_SYMBOL}`}
                             <img src={iconDropdown} width={22} alt="dropdown" />
                           </Button>
                         }

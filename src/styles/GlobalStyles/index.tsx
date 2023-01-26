@@ -37,6 +37,7 @@ function GlobalStyles() {
             scrollbar-color: ${theme.colors.secondary} transparent;
             &::-webkit-scrollbar {
               width: 8px;
+              height: 8px;
             }
             &::-webkit-scrollbar-thumb {
               background-color: ${theme.colors.secondary};

@@ -6,7 +6,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import useAssets from "hooks/useAssets";
 import { useBalance } from "hooks/useBalance";
 import { useNetwork } from "hooks/useNetwork";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import {
   formatNumber,
@@ -23,6 +23,7 @@ import Box from "components/Box";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import Tooltip from "components/Tooltip";
 import Expand from "./Expand";
 import { PoolExtended } from ".";
 
@@ -40,7 +41,7 @@ const SimplePieChart = styled.div<{ data: number[] }>`
     left: 0;
     top: 0;
     background-image: ${({ data, theme }) => {
-      const pieColors = [theme.colors.secondary, "#00b1ff"];
+      const pieColors = [theme.colors.secondary, theme.colors.selected];
       return `conic-gradient(${data
         .map((d, i) => `${pieColors[i]} ${d}%`)
         .join(", ")})`;
@@ -53,9 +54,8 @@ const TableRow = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   flex-wrap: nowrap;
-  padding: 14px 20px;
+  padding: 20px;
   background: none;
   & > div {
     width: 190px;
@@ -70,12 +70,20 @@ const TableRow = styled(Box)`
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      .${MOBILE_SCREEN_CLASS} &,
+      .${TABLET_SCREEN_CLASS} & {
+        overflow: unset;
+        white-space: normal;
+        text-overflow: unset;
+        word-break: break-all;
+      }
     }
   }
 
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     flex-direction: column;
+    gap: 20px;
 
     & > div {
       width: 100%;
@@ -108,6 +116,8 @@ const AssetIcon = styled.div<{ src?: string }>`
 `;
 
 const Label = styled(Typography)`
+  line-height: 1;
+  white-space: nowrap;
   margin-bottom: 15px;
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
@@ -187,6 +197,26 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
     [bookmarked, network, onBookmarkClick, pool],
   );
 
+  const [overflowActive, setOverflowActive] = useState(false);
+  const textRef = useRef<Col & HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setOverflowActive(
+        !!(
+          textRef.current?.scrollWidth &&
+          textRef.current?.scrollWidth > textRef.current.offsetWidth
+        ),
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <Expand
       header={
@@ -198,6 +228,8 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 width="auto"
                 css={css`
                   white-space: nowrap;
+                  line-height: 1;
+                  font-size: 0;
                 `}
               >
                 <AssetIcon src={asset1?.iconSrc} />
@@ -208,16 +240,23 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   `}
                 />
               </Col>
-              <Col
-                width="auto"
-                css={css`
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                `}
+              <Tooltip
+                arrow
+                content={`${asset1?.symbol}-${asset2?.symbol}`}
+                disabled={!overflowActive}
               >
-                {asset1?.symbol}-{asset2?.symbol}
-              </Col>
+                <Col
+                  ref={textRef}
+                  width="auto"
+                  css={css`
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  `}
+                >
+                  {asset1?.symbol}-{asset2?.symbol}
+                </Col>
+              </Tooltip>
               {isSmallScreen && (
                 <Col width="auto" style={{ marginLeft: "auto" }}>
                   <Row
@@ -267,14 +306,17 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       extra={!isSmallScreen ? extra : undefined}
     >
       <Row
-        justify="between"
+        justify="start"
         align="start"
         gutterWidth={0}
-        direction={isSmallScreen ? "column" : "row"}
-        wrap="nowrap"
+        wrap={!isSmallScreen ? "nowrap" : "wrap"}
+        style={{ columnGap: 20 }}
         css={css`
+          min-width: 100%;
           .${MOBILE_SCREEN_CLASS} &,
           .${TABLET_SCREEN_CLASS} & {
+            width: 100%;
+            min-width: unset;
             & > div {
               margin-bottom: 16px;
 
@@ -289,29 +331,24 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           }
         `}
       >
-        <Col width={360}>
-          <Label
-            css={css`
-              margin-bottom: 10px;
-            `}
-          >
-            Total Liquidity Ratio
-          </Label>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            min-width: 260px;
+          `}
+        >
+          <Label>Total Liquidity Ratio</Label>
           <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
-            <Col width="auto">
-              <div
-                key={pool.pair.contract_addr}
+            <Col width="auto" style={{ flex: 1 }}>
+              <Typography
+                color="primary"
+                size={16}
+                weight={500}
                 css={css`
-                  width: 60px;
-                  position: relative;
-                  display: inline-block;
+                  margin-bottom: 4px;
                 `}
               >
-                <SimplePieChart data={[50, 50]} />
-              </div>
-            </Col>
-            <Col width="auto" style={{ flex: 1 }}>
-              <Typography color="secondary" size={16} weight={900}>
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[0].amount, asset1?.decimals) ||
@@ -320,9 +357,9 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset1?.symbol} (50%)
+                {asset1?.symbol} - 50%
               </Typography>
-              <Typography color="#00b1ff" size={16} weight={900}>
+              <Typography color="primary" size={16} weight={500}>
                 {formatNumber(
                   formatDecimals(
                     amountToValue(pool.assets[1].amount, asset2?.decimals) ||
@@ -331,12 +368,18 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset2?.symbol} (50%)
+                {asset2?.symbol} - 50%
               </Typography>
             </Col>
           </Row>
         </Col>
-        <Col width={210}>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            min-width: 200px;
+          `}
+        >
           <Label>Your Liquidity</Label>
           <Typography color="primary" size={16} weight={500}>
             {formatNumber(
@@ -345,9 +388,23 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             &nbsp;LP
           </Typography>
         </Col>
-        <Col width={210}>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            min-width: 200px;
+          `}
+        >
           <Label>Asset Pooled</Label>
-          <Typography color="primary" size={16} weight={500}>
+          <Typography
+            color="primary"
+            size={16}
+            weight={500}
+            css={css`
+              white-space: nowrap;
+              margin-bottom: 4px;
+            `}
+          >
             {formatNumber(
               formatDecimals(
                 amountToValue(
@@ -362,7 +419,15 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             )}
             &nbsp;
             {asset1?.symbol}
-            <br />
+          </Typography>
+          <Typography
+            color="primary"
+            size={16}
+            weight={500}
+            css={css`
+              white-space: nowrap;
+            `}
+          >
             {formatNumber(
               formatDecimals(
                 amountToValue(
@@ -379,18 +444,45 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             {asset2?.symbol}
           </Typography>
         </Col>
-        <Col width={80}>
-          <Label>Your Share</Label>
-          <Typography color="primary" size={16} weight={500}>
-            {formatDecimals(userShare * 100, 2)}%
-          </Typography>
+        <Col
+          xs={12}
+          md="content"
+          css={css`
+            min-width: 132px;
+          `}
+        >
+          <Label
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
+            Your Share
+          </Label>
+          <Row justify="start" align="center" gutterWidth={15}>
+            <Col xs="content">
+              <div
+                css={css`
+                  width: 59px;
+                `}
+              >
+                <SimplePieChart data={[userShare * 100, 0]} />
+              </div>
+            </Col>
+            <Col>
+              <Typography color="secondary" size={16} weight={900}>
+                {formatDecimals(userShare * 100, 2)}%
+              </Typography>
+            </Col>
+          </Row>
         </Col>
         <Col
-          width={isSmallScreen ? "100%" : 150}
+          xs={12}
+          md="content"
           aria-hidden
           onClick={(event) => {
             event.stopPropagation();
           }}
+          style={{ marginLeft: "auto" }}
         >
           <LinkButton
             to={`/pool/add-liquidity/${pool.pair.contract_addr}`}

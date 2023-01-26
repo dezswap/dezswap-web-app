@@ -33,7 +33,7 @@ function Pagination({ total = 1, current = 1, onChange }: PaginationProps) {
         onClick={() => onChange && onChange(current - 1)}
       />
       <Typography color="primary" size={16} weight={500}>
-        {current} - {total}
+        {current}/{total}
       </Typography>
       <IconButton
         icons={{
