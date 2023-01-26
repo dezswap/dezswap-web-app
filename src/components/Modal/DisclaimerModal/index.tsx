@@ -340,9 +340,9 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           accept that the cost and speed of transacting with cryptographic and
           blockchain-based systems such as XPLA Chain are variable and may
           increase dramatically at any time. You further acknowledge and accept
-          the risk of trading with additional parameters' settings (slippage
-          tolerance, auto-router, and transaction deadline), which can expose
-          you to potentially significant price slippage and higher costs.
+          the risk of trading with additional parameters&apos; settings
+          (slippage tolerance, auto-router, and transaction deadline), which can
+          expose you to potentially significant price slippage and higher costs.
           <br /> If you act as a liquidity provider to the Protocol through the
           Interface, you understand that your digital assets may lose some or
           all of their value while they are supplied to the Protocol through the
