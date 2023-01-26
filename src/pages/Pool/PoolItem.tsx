@@ -83,6 +83,7 @@ const TableRow = styled(Box)`
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     flex-direction: column;
+    gap: 20px;
 
     & > div {
       width: 100%;
