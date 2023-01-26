@@ -312,7 +312,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         align="start"
         gutterWidth={0}
         wrap={!isSmallScreen ? "nowrap" : "wrap"}
-        style={{ columnGap: 30 }}
+        style={{ columnGap: 20 }}
         css={css`
           min-width: 100%;
           .${MOBILE_SCREEN_CLASS} &,
@@ -337,7 +337,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           xs={12}
           md="content"
           css={css`
-            /* min-width: 280px; */
+            min-width: 260px;
           `}
         >
           <Label>Total Liquidity Ratio</Label>
@@ -379,7 +379,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           xs={12}
           md="content"
           css={css`
-            /* min-width: 220px; */
+            min-width: 200px;
           `}
         >
           <Label>Your Liquidity</Label>
@@ -394,7 +394,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           xs={12}
           md="content"
           css={css`
-            /* min-width: 264px; */
+            min-width: 260px;
           `}
         >
           <Label>Asset Pooled</Label>
@@ -450,7 +450,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           xs={12}
           md="content"
           css={css`
-            /* min-width: 164px; */
+            min-width: 132px;
           `}
         >
           <Label
