@@ -133,6 +133,8 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                               width: 24px;
                               height: 24px;
                               position: relative;
+                              background-color: ${theme.colors.white};
+                              border-radius: 50%;
                               background-image: ${`url(${
                                 asset.iconSrc || iconDefaultAsset
                               })`};

@@ -98,6 +98,8 @@ const AssetIcon = styled.div<{ src?: string }>`
     position: absolute;
     left: 0;
     top: 0;
+    background-color: ${({ theme }) => theme.colors.white};
+    border-radius: 50%;
     background-image: ${({ src }) => `url(${src || iconDefaultToken})`};
     background-size: contain;
     background-repeat: no-repeat;

@@ -136,6 +136,9 @@ const AssetIcon = styled.div<{ src?: string }>`
   display: inline-block;
   padding: 0px 6px;
 
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 50%;
+
   ${({ src = iconToken }) => css`
     background-image: url(${src || iconToken});
   `};
