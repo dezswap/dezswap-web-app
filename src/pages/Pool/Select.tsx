@@ -69,7 +69,6 @@ const Button = styled.button<WrapperProps & { isOpen?: boolean }>`
     position: relative;
     cursor: pointer;
     overflow: hidden;
-    text-overflow: ellipsis;
 
     &::after {
       content: "";
