@@ -185,7 +185,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
             weight={900}
             color={theme.colors.text.placeholder}
           >
-            No bookmarked tokens
+            No bookmark found
           </Typography>
         </div>
       );
@@ -317,19 +317,23 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     return deferredSearchKeyword &&
       (items === undefined ||
         items?.filter((i) => !i.props.invisible)?.length < 1) ? (
-      <Typography
-        size={22}
-        weight={900}
-        color={theme.colors.text.placeholder}
+      <div
         css={css`
-          padding: 123px 0px;
-          .${MOBILE_SCREEN_CLASS} {
-            padding: 157px 0px;
-          }
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         `}
       >
-        No result found
-      </Typography>
+        <Typography
+          size={22}
+          weight={900}
+          color={theme.colors.text.placeholder}
+        >
+          No result found
+        </Typography>
+      </div>
     ) : (
       items
     );
