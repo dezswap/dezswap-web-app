@@ -112,7 +112,6 @@ function PoolList({
               transform: translateY(-50%);
               width: 100%;
               height: auto;
-              padding-top: 25px;
             `}
           >
             <Typography
