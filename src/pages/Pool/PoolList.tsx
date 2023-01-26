@@ -23,7 +23,7 @@ const Wrapper = styled.div`
 
   & > div {
     width: 100%;
-    min-width: 1122px;
+    min-width: 1111px;
     position: relative;
     height: auto;
 
@@ -38,7 +38,6 @@ const TableHeader = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
   flex-wrap: nowrap;
   padding: 14px 20px;
   margin-bottom: 10px;

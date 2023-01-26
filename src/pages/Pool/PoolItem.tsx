@@ -54,7 +54,6 @@ const TableRow = styled(Box)`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
   flex-wrap: nowrap;
   padding: 20px;
   background: none;
@@ -390,7 +389,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           xs={12}
           md="content"
           css={css`
-            min-width: 260px;
+            min-width: 200px;
           `}
         >
           <Label>Asset Pooled</Label>
