@@ -41,7 +41,7 @@ interface SelectAssetFormProps {
 
 const Wrapper = styled.div`
   width: 100%;
-  height: calc(min(60vh, 690px) - 6px);
+  height: calc(min(60vh, 690px) - 78px);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@ const Wrapper = styled.div`
   .${MOBILE_SCREEN_CLASS} & {
     min-height: unset;
     max-height: unset;
-    height: 80vh;
+    height: calc(80vh - 70px);
   }
 `;
 
