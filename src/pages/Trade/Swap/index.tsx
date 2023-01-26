@@ -1152,6 +1152,7 @@ function SwapPage() {
                   `}
                 >
                   <Col
+                    xs={8}
                     css={css`
                       text-align: left;
                       display: flex;
@@ -1162,6 +1163,7 @@ function SwapPage() {
                     Price impact warning
                   </Col>
                   <Col
+                    xs={4}
                     css={css`
                       text-align: right;
                       display: flex;
