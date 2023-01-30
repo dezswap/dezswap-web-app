@@ -410,8 +410,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 amountToValue(
                   Numeric.parse(pool.assets[0].amount)
                     .times(userShare)
-                    .toString()
-                    .split(".")[0],
+                    .toFixed(0),
                   asset1?.decimals,
                 ) || "0",
                 3,
@@ -433,8 +432,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 amountToValue(
                   Numeric.parse(pool.assets[1].amount)
                     .times(userShare)
-                    .toString()
-                    .split(".")[0],
+                    .toFixed(0),
                   asset2?.decimals,
                 ) || "0",
                 3,
