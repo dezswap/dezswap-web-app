@@ -71,8 +71,10 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  column-gap: 6px;
 
   width: 100%;
+  max-width: 100%;
   height: auto;
   position: relative;
   padding: 16px 27px;
@@ -132,6 +134,8 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
 const AssetIcon = styled.div<{ src?: string }>`
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   position: relative;
   display: inline-block;
   padding: 0px 6px;
@@ -225,49 +229,55 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               toggleBookmark(address);
             }}
           />
-          <Row
-            gutterWidth={6}
-            style={{
-              display: "flex",
-              flex: 6,
-              flexShrink: 0,
-              alignItems: "center",
-            }}
-            justify="start"
-            wrap="nowrap"
-          >
-            <Col
-              xs="content"
-              css={css`
+
+          <AssetIcon src={asset?.iconSrc}>
+            {isVerified && (
+              <Tooltip arrow content={`${asset?.symbol} is verified token`}>
+                <div
+                  css={css`
+                    position: absolute;
+                    bottom: -3px;
+                    right: -3px;
+                    width: 18px;
+                    height: 18px;
+                    background-image: url(${iconVerified});
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: 50% 50%;
+                  `}
+                />
+              </Tooltip>
+            )}
+          </AssetIcon>
+          <div
+            css={css`
+              min-width: 0;
+              display: block;
+              flex: 1;
+              flex-shrink: 0;
+              flex-basis: 0;
+              position: relative;
+              & > div {
+                display: inline-block;
                 vertical-align: middle;
+              }
+            `}
+          >
+            <div
+              css={css`
+                width: 40%;
+                max-width: 40%;
+                font-size: 0;
+                line-height: 1;
+                padding-right: 10px;
               `}
             >
-              <AssetIcon src={asset?.iconSrc}>
-                {isVerified && (
-                  <Tooltip arrow content={`${asset?.symbol} is verified token`}>
-                    <div
-                      css={css`
-                        position: absolute;
-                        bottom: -3px;
-                        right: -3px;
-                        width: 18px;
-                        height: 18px;
-                        background-image: url(${iconVerified});
-                        background-size: contain;
-                        background-repeat: no-repeat;
-                        background-position: 50% 50%;
-                      `}
-                    />
-                  </Tooltip>
-                )}
-              </AssetIcon>
-            </Col>
-            <Col xs={8}>
               <Typography
                 size={16}
                 weight="bold"
                 color={theme.colors.text.primary}
                 css={css`
+                  display: block;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -280,6 +290,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 weight="normal"
                 color={theme.colors.text.primary}
                 css={css`
+                  display: block;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -291,25 +302,27 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   {ellipsisCenter(address, 6)}
                 </span>
               </Typography>
-            </Col>
-          </Row>
-          <Typography
-            size={16}
-            css={css`
-              overflow: hidden;
-              white-space: nowrap;
-              text-align: right;
-              margin-left: auto;
-              flex: 4;
-            `}
-          >
-            {formatNumber(
-              cutDecimal(
-                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                3,
-              ),
-            )}
-          </Typography>
+            </div>
+            <Typography
+              size={16}
+              css={css`
+                width: 60%;
+                max-width: 60%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                text-align: right;
+                padding-left: 10px;
+              `}
+            >
+              {formatNumber(
+                cutDecimal(
+                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                  3,
+                ),
+              )}
+            </Typography>
+          </div>
         </AssetItem>
       );
     });
