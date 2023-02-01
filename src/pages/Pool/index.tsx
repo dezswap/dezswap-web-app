@@ -227,8 +227,9 @@ function PoolPage() {
                     Time base
                   </Typography>
                 </Col>
-                <Col xs="content">
+                <Col width={80}>
                   <Select
+                    block
                     disabled
                     options={timeBaseOptions.map((value) => ({
                       value,
