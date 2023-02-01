@@ -409,11 +409,12 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px 18px;
+                                  padding: 7px;
                                   font-weight: bold;
                                   text-align: center;
                                   .${MOBILE_SCREEN_CLASS} &,
                                   .${TABLET_SCREEN_CLASS} & {
+                                    padding: 12px 18px;
                                     text-align: start;
                                   }
                                 `}
