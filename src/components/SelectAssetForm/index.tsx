@@ -265,8 +265,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           >
             <div
               css={css`
-                width: 40%;
-                max-width: 40%;
+                width: 50%;
+                max-width: 50%;
                 font-size: 0;
                 line-height: 1;
                 padding-right: 10px;
@@ -306,8 +306,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
             <Typography
               size={16}
               css={css`
-                width: 60%;
-                max-width: 60%;
+                width: 50%;
+                max-width: 50%;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
