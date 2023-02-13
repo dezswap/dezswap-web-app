@@ -23,7 +23,6 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import Button from "components/Button";
 import Modal from "components/Modal";
-import styled from "@emotion/styled";
 import { useNavigate, useParams } from "react-router-dom";
 import useSimulate from "pages/Pool/Withdraw/useSimulate";
 import usePairs from "hooks/usePair";
@@ -43,19 +42,9 @@ import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
-import iconQuestion from "assets/icons/icon-question.svg";
-import Tooltip from "components/Tooltip";
 import { useBalance } from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-
-const Detail = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 22px;
-  letter-spacing: normal;
-`;
+import InfoTable from "components/InfoTable";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -415,285 +404,147 @@ function WithdrawPage() {
           <Expand
             label={
               <Typography weight="bold">
-                {`${asset1?.symbol} - ${asset2?.symbol}`}
+                {`${asset1?.symbol || ""} - ${asset2?.symbol || ""}`}
               </Typography>
             }
             preview={
-              <Detail>
-                <Row
-                  justify="between"
-                  style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-                >
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Expected amount
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          The result value you may get
-                          <br />
-                          at the current condition.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {formatNumber(
+              <InfoTable
+                items={[
+                  {
+                    key: "expectedAmount",
+                    label: "Expected amount",
+                    tooltip: (
+                      <>
+                        The result value you may get
+                        <br />
+                        at the current condition.
+                      </>
+                    ),
+                    value: `${formatNumber(
                       amountToValue(
                         simulationResult?.estimatedAmount?.find(
                           (a) => a.address === asset1?.address,
                         )?.amount,
                         asset1?.decimals,
                       ) || "",
-                    )}
-                    &nbsp;
-                    {asset1?.symbol}
-                  </Col>
-                </Row>
-                <Row justify="between" style={{ alignItems: "flex-start" }}>
-                  <Col width="content" />
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {formatNumber(
-                      amountToValue(
-                        simulationResult?.estimatedAmount?.find(
-                          (a) => a.address === asset2?.address,
-                        )?.amount,
-                        asset1?.decimals,
-                      ) || "",
-                    )}
-                    &nbsp;{asset2?.symbol}
-                  </Col>
-                </Row>
-                <Row justify="between" style={{ alignItems: "flex-start" }}>
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Fee
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          The fee paid for executing
-                          <br />
-                          the transaction.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {fee
-                      ? formatNumber(
-                          cutDecimal(
-                            amountToValue(
-                              fee.amount?.get(XPLA_ADDRESS)?.amount.toString(),
-                            ) || 0,
-                            DISPLAY_DECIMAL,
-                          ),
-                        )
-                      : "-"}
-                    &nbsp;{XPLA_SYMBOL}
-                  </Col>
-                </Row>
-              </Detail>
+                    )} ${asset1?.symbol || ""}
+                      ${formatNumber(
+                        amountToValue(
+                          simulationResult?.estimatedAmount?.find(
+                            (a) => a.address === asset2?.address,
+                          )?.amount,
+                          asset1?.decimals,
+                        ) || "",
+                      )} ${asset2?.symbol || ""}`,
+                  },
+                  {
+                    key: "fee",
+                    label: "Fee",
+                    tooltip: (
+                      <>
+                        The fee paid for executing
+                        <br />
+                        the transaction.
+                      </>
+                    ),
+                    value: `${
+                      fee
+                        ? formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                fee.amount
+                                  ?.get(XPLA_ADDRESS)
+                                  ?.amount.toString(),
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )
+                        : "-"
+                    } ${XPLA_SYMBOL}`,
+                  },
+                ]}
+              />
             }
           >
-            <Detail>
-              <Row
-                justify="between"
-                style={{
-                  paddingTop: "3px",
-                  paddingBottom: "3px",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Col
-                  width="content"
-                  css={css`
-                    display: flex;
-                    align-items: center;
-                  `}
-                >
-                  LP
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content={
-                      <>
-                        The provided assets will
-                        <br />
-                        be distributed from the LP.
-                      </>
-                    }
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {formatNumber(lpValue)}
-                </Col>
-              </Row>
-              <Row
-                justify="between"
-                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-              >
-                <Col
-                  width="content"
-                  css={css`
-                    display: flex;
-                    align-items: center;
-                  `}
-                >
-                  Your share
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content="Share of the total liquidity."
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {formatNumber(
+            <InfoTable
+              items={[
+                {
+                  key: "lp",
+                  label: "LP",
+                  tooltip: (
+                    <>
+                      The provided assets will
+                      <br />
+                      be distributed from the LP.
+                    </>
+                  ),
+                  value: formatNumber(lpValue),
+                },
+                {
+                  key: "yourShare",
+                  label: "Your share",
+                  tooltip: "Share of the total liquidity.",
+                  value: `${formatNumber(
                     cutDecimal(
                       simulationResult.percentageOfShare || "0",
                       DISPLAY_DECIMAL,
                     ),
-                  )}
-                  %
-                </Col>
-              </Row>
-              <Row justify="between" style={{ alignItems: "flex-start" }}>
-                <Col width="content" style={{ paddingBottom: "3px" }}>
-                  {asset1 && `${asset1?.symbol} `}Address
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {ellipsisCenter(asset1?.address)}&nbsp;
-                  <a
-                    href={getTokenLink(asset1?.address, network.name)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton size={18} icons={{ default: iconLink }} />
-                  </a>
-                </Col>
-              </Row>
-              <Row justify="between" style={{ alignItems: "flex-start" }}>
-                <Col width="content">
-                  {asset2 && `${asset2?.symbol} `}Address
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {ellipsisCenter(asset2?.address)}&nbsp;
-                  <a
-                    href={getTokenLink(asset2?.address, network.name)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton size={18} icons={{ default: iconLink }} />
-                  </a>
-                </Col>
-              </Row>
-            </Detail>
+                  )}%`,
+                },
+                {
+                  key: "asset1Address",
+                  label: `${asset1?.symbol} Address`,
+                  value: (
+                    <>
+                      {ellipsisCenter(asset1?.address)}&nbsp;
+                      <a
+                        href={getTokenLink(asset1?.address, network.name)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
+                    </>
+                  ),
+                },
+                {
+                  key: "asset2Address",
+                  label: `${asset2?.symbol} Address`,
+                  value: (
+                    <>
+                      {ellipsisCenter(asset2?.address)}&nbsp;
+                      <a
+                        href={getTokenLink(asset2?.address, network.name)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
+                    </>
+                  ),
+                },
+              ]}
+            />
           </Expand>
         </div>
         {connectedWallet ? (
