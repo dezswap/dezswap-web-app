@@ -45,6 +45,9 @@ import { LP_DECIMALS } from "constants/dezswap";
 import { useBalance } from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
+import iconSetting from "assets/icons/icon-setting.svg";
+import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import useSettingsModal from "hooks/modals/useSettingsModal";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -53,6 +56,9 @@ enum FormKey {
 function WithdrawPage() {
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
+  const settingsModal = useSettingsModal({
+    items: ["slippageTolerance", "txDeadline"],
+  });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -180,11 +186,19 @@ function WithdrawPage() {
   return (
     <Modal
       id="withdraw-modal"
+      className="modal-parent"
       isOpen
       title="Remove liquidity"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       onRequestClose={() => handleModalClose()}
+      headerExtra={
+        <IconButton
+          size={38}
+          icons={{ default: iconSetting, hover: iconSettingHover }}
+          onClick={() => settingsModal.open()}
+        />
+      }
     >
       <form onSubmit={handleSubmit}>
         <InputGroup

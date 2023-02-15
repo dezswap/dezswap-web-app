@@ -10,7 +10,7 @@ import iconOverviewHover from "assets/icons/icon-overview-disabled-hover.svg";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.div`
@@ -23,11 +23,6 @@ const Wrapper = styled.div`
   .${MOBILE_SCREEN_CLASS} & {
     padding-top: 26px;
   }
-
-  & #main:has(.inner-modal) > div:first-of-type {
-    opacity: 0;
-    transition: opacity ${`${MODAL_CLOSE_TIMEOUT_MS}ms`} step-end;
-  }
 `;
 
 function TradePage() {
@@ -36,7 +31,7 @@ function TradePage() {
     <Wrapper>
       <Container>
         <Row justify="center" gutterWidth={0}>
-          <Col width={512} xs={12} id="main">
+          <Col width={512} xs={12} className="modal-parent">
             <Panel shadow border>
               <Row
                 css={css`
