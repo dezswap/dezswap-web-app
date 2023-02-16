@@ -48,11 +48,11 @@ const Item = styled.div`
 `;
 
 const Label = styled.div`
-  flex: 4;
+  flex: 5;
 `;
 
 const Value = styled.div`
-  flex: 6;
+  flex: 5;
   text-align: right;
 `;
 
