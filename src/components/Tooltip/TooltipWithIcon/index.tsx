@@ -39,7 +39,7 @@ function TooltipWithIcon({
     <>
       {children && <>{children}&nbsp;</>}
       <Tooltip {...tippyProps}>
-        <Icon size={size} />
+        <Icon size={size} className="cm-hidden" />
       </Tooltip>
     </>
   );
