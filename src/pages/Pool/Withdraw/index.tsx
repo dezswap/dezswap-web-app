@@ -1,4 +1,10 @@
-import { FormEventHandler, useCallback, useMemo, useState } from "react";
+import {
+  FormEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Typography from "components/Typography";
 import {
   BROWSER_DISPLAY_NUMBER_CNT,
@@ -48,6 +54,7 @@ import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
+import useSlippageTolerance from "hooks/useSlippageTolerance";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -59,6 +66,7 @@ function WithdrawPage() {
   const settingsModal = useSettingsModal({
     items: ["slippageTolerance", "txDeadline"],
   });
+  const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -71,16 +79,20 @@ function WithdrawPage() {
     [getPair, pairAddress],
   );
   const { getAsset } = useAssets();
-  const [asset1, asset2] = pair
-    ? pair.asset_addresses
-        .map((address) => getAsset(address))
-        .map((a) => ({
-          address: a?.address,
-          symbol: a?.symbol,
-          decimals: a?.decimals,
-          iconSrc: a?.iconSrc,
-        }))
-    : [undefined, undefined];
+  const [asset1, asset2] = useMemo(
+    () =>
+      pair
+        ? pair.asset_addresses
+            .map((address) => getAsset(address))
+            .map((a) => ({
+              address: a?.address,
+              symbol: a?.symbol,
+              decimals: a?.decimals,
+              iconSrc: a?.iconSrc,
+            }))
+        : [undefined, undefined],
+    [getAsset, pair],
+  );
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -127,22 +139,20 @@ function WithdrawPage() {
                 pairAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
-                // [
-                //   {
-                //     address: asset1?.address || "",
-                //     amount:
-                //       simulationResult?.estimatedAmount?.find(
-                //         (a) => a.address === asset1?.address,
-                //       )?.amount || "0",
-                //   },
-                //   {
-                //     address: asset2?.address || "",
-                //     amount:
-                //       simulationResult?.estimatedAmount?.find(
-                //         (a) => a.address === asset2?.address,
-                //       )?.amount || "0",
-                //   },
-                // ],
+                [asset1?.address, asset2?.address].map((address) => ({
+                  address: address || "",
+                  amount: Numeric.parse(
+                    simulationResult?.estimatedAmount?.find(
+                      (a) => a.address === address,
+                    )?.amount || "0",
+                  )
+                    .mul(
+                      Numeric.parse(
+                        (1 - (slippageTolerance ?? 0.5) / 100).toString(),
+                      ),
+                    )
+                    .toFixed(0),
+                })),
                 txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
               ),
             ],
