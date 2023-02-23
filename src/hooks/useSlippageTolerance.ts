@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import {
   selectedSlippagePresetAtom,
   customSlippageToleranceAtom,
+  DEFAULT_SLIPPAGE_TOLERANCE,
 } from "stores/settings";
 
 const useSlippageTolerance = () => {
@@ -13,7 +14,7 @@ const useSlippageTolerance = () => {
 
   const value = useMemo(() => {
     if (selectedPreset === "custom") {
-      return customValue;
+      return customValue ?? Number(DEFAULT_SLIPPAGE_TOLERANCE);
     }
     return Number(selectedPreset);
   }, [customValue, selectedPreset]);
