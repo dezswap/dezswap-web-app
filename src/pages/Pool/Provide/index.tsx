@@ -45,6 +45,9 @@ import usePool from "hooks/usePool";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
+import iconSetting from "assets/icons/icon-setting.svg";
+import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import useSettingsModal from "hooks/modals/useSettingsModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -59,6 +62,9 @@ const BROWSER_DISPLAY_NUMBER_CNT = 31;
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
+  const settingsModal = useSettingsModal({
+    items: ["txDeadline"],
+  });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const navigate = useNavigate();
@@ -316,11 +322,19 @@ function ProvidePage() {
   return (
     <Modal
       id="provide-modal"
+      className="modal-parent"
       isOpen
       title="Add liquidity"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       onRequestClose={() => handleModalClose()}
+      headerExtra={
+        <IconButton
+          size={38}
+          icons={{ default: iconSetting, hover: iconSettingHover }}
+          onClick={() => settingsModal.open()}
+        />
+      }
     >
       <form onSubmit={handleSubmit}>
         <InputGroup

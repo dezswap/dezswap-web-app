@@ -30,6 +30,7 @@ function GlobalStyles() {
           *::before {
             box-sizing: border-box;
             font-family: "Nunito", sans-serif;
+            outline: none;
           }
 
           * {
@@ -52,7 +53,9 @@ function GlobalStyles() {
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)) {
+          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)),
+          .ReactModal__Body--open:has(.ReactModal__Overlay
+              .ReactModal__Overlay.inner-modal) {
             overflow: hidden;
           }
           .ReactModal__Overlay {
@@ -120,6 +123,11 @@ function GlobalStyles() {
                 transform: translateY(100%) scale(1);
               }
             }
+          }
+
+          & .modal-parent:has(.inner-modal) > div:first-of-type {
+            opacity: 0;
+            transition: opacity 10ms step-end;
           }
         `}
       />

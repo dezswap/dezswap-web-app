@@ -51,10 +51,12 @@ function ConfirmationModal({
       {...modalProps}
       id="confirm-modal"
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS && !isModalParent
+        screenClass !== MOBILE_SCREEN_CLASS &&
+        !isModalParent &&
+        document.querySelector(".modal-parent")
           ? () => {
               return (
-                document.querySelector("#main") ||
+                document.querySelector(".modal-parent") ||
                 (document.querySelector("#root") as HTMLElement)
               );
             }

@@ -119,9 +119,10 @@ function SelectAssetDrawer({
         screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
       }
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS
+        screenClass !== MOBILE_SCREEN_CLASS &&
+        document.querySelector(".modal-parent")
           ? () =>
-              document.querySelector("#main") ||
+              document.querySelector(".modal-parent") ||
               (document.querySelector("#root") as HTMLElement)
           : undefined
       }
