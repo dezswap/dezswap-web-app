@@ -147,9 +147,7 @@ function WithdrawPage() {
                     )?.amount || "0",
                   )
                     .mul(
-                      Numeric.parse(
-                        (1 - (slippageTolerance ?? 0.5) / 100).toString(),
-                      ),
+                      Numeric.parse((1 - slippageTolerance / 100).toString()),
                     )
                     .toFixed(0),
                 })),
