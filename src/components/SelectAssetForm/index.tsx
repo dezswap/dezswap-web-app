@@ -58,16 +58,12 @@ const Wrapper = styled.div`
 `;
 
 const AssetList = styled.div`
-  display: flex;
   flex: 1;
   overflow-y: auto;
   padding: 0;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
 
-  & .simplebar-scrollbar.simplebar-visible::before {
-    bottom: 10px;
-  }
   &::-webkit-scrollbar-track {
     margin-bottom: 10px;
   }
@@ -440,9 +436,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </Row>
         <Hr />
       </Panel>
-      <AssetList data-simplebar data-simplebar-auto-hide="false">
-        {assetList}
-      </AssetList>
+      <AssetList>{assetList}</AssetList>
     </Wrapper>
   );
 }
