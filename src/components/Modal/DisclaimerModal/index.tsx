@@ -96,15 +96,16 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           Chain, that allows users to trade certain compatible digital assets
           (“the Dezswap protocol” or the “Protocol”). The Interface is one, but
           not the exclusive, means of accessing the Protocol.
-          <br /> To access the Interface, you must use non-custodial wallet
-          software, which allows you to interact with the XPLA Chain. Your
-          relationship with that non-custodial wallet provider is governed by
-          the applicable terms of service of that third party, not this
-          Agreement. Wallets are not operated by, maintained by, or affiliated
-          with us, and we do not have custody or control over the contents of
-          your wallet and have no ability to retrieve or transfer its contents.
-          By connecting your wallet to our Interface, you agree to be bound by
-          this Agreement and all of the terms incorporated herein by reference.
+          <br />
+          To access the Interface, you must use non-custodial wallet software,
+          which allows you to interact with the XPLA Chain. Your relationship
+          with that non-custodial wallet provider is governed by the applicable
+          terms of service of that third party, not this Agreement. Wallets are
+          not operated by, maintained by, or affiliated with us, and we do not
+          have custody or control over the contents of your wallet and have no
+          ability to retrieve or transfer its contents. By connecting your
+          wallet to our Interface, you agree to be bound by this Agreement and
+          all of the terms incorporated herein by reference.
           <br />
           <br />
         </Content>
@@ -114,12 +115,12 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           from time to time. If we make any material modifications, we will
           notify you by updating the date at the top of the Agreement and by
           maintaining a current version of the Agreement at
-          https://docs.dezswap.io/docs/terms-of-service. All modifications will
-          be effective when they are posted, and your continued accessing or use
-          of the Interface will serve as confirmation of your acceptance of
-          those modifications. If you do not agree with any modifications to
-          this Agreement, you must immediately stop accessing and using the
-          Interface.
+          https://docs.dezswap.io/docs/introduction/terms-of-service. All
+          modifications will be effective when they are posted, and your
+          continued accessing or use of the Interface will serve as confirmation
+          of your acceptance of those modifications. If you do not agree with
+          any modifications to this Agreement, you must immediately stop
+          accessing and using the Interface.
           <br />
           <br />
         </Content>
@@ -129,20 +130,47 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
         <Content>
           The Interface provides a web or mobile-based means of accessing the
           Protocol.
-          <br /> The Interface is distinct from the Protocol and is one, but not
-          the exclusive, means of accessing the Protocol. The Protocol itself
+          <br />
+          The Interface is distinct from the Protocol and is one, but not the
+          exclusive, means of accessing the Protocol. The Protocol itself
           comprises open-source or source-available self-executing smart
-          contracts that are deployed on the XPLA Chain. We do not control or
-          operate the Protocol on the XPLA Chain. By using the Interface, you
-          understand that you are not buying or selling digital assets from us
-          and that we do not operate any liquidity pools on the Protocol or
-          control trade execution on the Protocol. When traders pay fees for
-          trades, those fees accrue to liquidity providers for the Protocol. As
-          a general matter, we are not a liquidity provider into Protocol
-          liquidity pools and liquidity providers are independent third parties.
-          The Protocol was deployed on the XPLA Chain. Please note that digital
-          assets that have been “bridged” or “wrapped” to operate on other
-          blockchain networks are distinct from the original XPLA mainnet asset.
+          contracts that are deployed on the XPLA Chain. We do not operate the
+          Protocol on the XPLA Chain. By using the Interface, you understand
+          that you are not buying or selling digital assets from us and that we
+          do not operate any liquidity pools on the Protocol or control trade
+          execution on the Protocol. When traders pay fees for trades, those
+          fees accrue to liquidity providers for the Protocol. As a general
+          matter, we are not a liquidity provider into Protocol liquidity pools
+          and liquidity providers are independent third parties. The Protocol
+          was deployed on the XPLA Chain. Please note that digital assets that
+          have been “bridged” or “wrapped” to operate on other blockchain
+          networks are distinct from the original XPLA mainnet asset.
+          <br />
+          <br />
+        </Content>
+        <BoldContent>Eligibility</BoldContent>
+        <Content>
+          To access or use the Interface, you must be able to form a legally
+          binding contract with us. Accordingly, you represent that you are at
+          least the age of majority in your jurisdiction and have the full
+          right, power, and authority to enter into and comply with the terms
+          and conditions of this Agreement on behalf of yourself and any company
+          or legal entity for which you may access or use the Interface.
+          <br />
+          You further represent that you are not (a) the subject of economic or
+          trade sanctions administered or enforced by any governmental authority
+          or otherwise designated on any list of prohibited or restricted
+          parties including but not limited to the lists maintained by the
+          relevant authorities of the Republic of Korea, the United States, the
+          United Kingdom, or the European Union; or (b) a citizen, resident, or
+          organized in a jurisdiction or territory that is the subject of
+          comprehensive country-wide, territory-wide, or regional economic
+          sanctions by the Republic of Korea, the United States, the United
+          Kingdom, the European Union or other relevant jurisdictions. Finally,
+          you represent that your access and use of the Interface will fully
+          comply with all applicable laws and regulations and that you will not
+          access or use the Interface to conduct, promote, or otherwise
+          facilitate any illegal activity.
           <br />
           <br />
         </Content>
@@ -162,13 +190,13 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
         <Content>
           We reserve the following rights, which do not constitute obligations
           of ours:
-          <br /> (a) with or without notice to you, to modify, substitute,
-          eliminate or add to the Interface; (b) to review, modify, filter,
-          disable, delete and remove any and all content and information from
-          the Interface; and (c) to cooperate with any law enforcement, court or
-          government investigation or order or third party requesting or
-          directing that we disclose information or content or information that
-          you provide.
+          <br />
+          (a) with or without notice to you, to modify, substitute, eliminate or
+          add to the Interface; (b) to review, modify, filter, disable, delete
+          and remove any and all content and information from the Interface; and
+          (c) to cooperate with any law enforcement, court or government
+          investigation or order or third party requesting or directing that we
+          disclose information or content or information that you provide.
           <br />
           <br />
         </Content>
@@ -178,59 +206,73 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           following categories of prohibited activity in relation to your access
           and use of the Interface:
         </Content>
-
         <Content>
-          This app uses Google Analytics API and the app logs anonymized usage
-          statistics in order to improve over time.
-          <br />
           <br />
           Intellectual Property Infringement. Activity that infringes on or
           violates any copyright, trademark, service mark, patent, right of
           publicity, right of privacy, or other proprietary or intellectual
           property rights under the law.
-          <br /> Cyberattack. Activity that seeks to interfere with or
-          compromise the integrity, security, or proper functioning of any
-          computer, server, network, personal device, or other information
-          technology system, including (but not limited to) the deployment of
-          viruses and denial of service attacks.
-          <br /> Fraud and Misrepresentation. Activity that seeks to defraud us
-          or any other person or entity, including (but not limited to)
-          providing any false, inaccurate, or misleading information in order to
-          unlawfully obtain the property of another.
-          <br /> Market Manipulation. Activity that violates any applicable law,
-          rule, or regulation concerning the integrity of trading markets,
-          including (but not limited to) the manipulative tactics commonly known
-          as “rug pulls”, pumping and dumping, and wash trading.
           <br />
+          Cyberattack. Activity that seeks to interfere with or compromise the
+          integrity, security, or proper functioning of any computer, server,
+          network, personal device, or other information technology system,
+          including (but not limited to) the deployment of viruses and denial of
+          service attacks.
+          <br />
+          Fraud and Misrepresentation. Activity that seeks to defraud us or any
+          other person or entity, including (but not limited to) providing any
+          false, inaccurate, or misleading information in order to unlawfully
+          obtain the property of another.
+          <br />
+          Market Manipulation. Activity that violates any applicable law, rule,
+          or regulation concerning the integrity of trading markets, including
+          (but not limited to) the manipulative tactics commonly known as “rug
+          pulls”, pumping and dumping, and wash trading.
+          <br />
+          Securities and Derivatives Violations. Activity that violates any
+          applicable law, rule, or regulation concerning the trading of
+          securities or derivatives, including (but not limited to) the
+          unregistered offering of securities and the offering of leveraged and
+          margined commodity products to retail customers in the relevant
+          jurisdiction.
           <br />
           Sale of Stolen Property. Buying, selling, or transferring of stolen
           items, fraudulently obtained items, items taken without authorization,
           and/or any other illegally obtained items.
-          <br /> Data Mining or Scraping. Activity that involves data mining,
-          robots, scraping, or similar data gathering or extraction methods of
-          content or information from the Interface.
-          <br /> Objectionable Content. Activity that involves soliciting
-          information from anyone under the age of 18 or that is otherwise
-          harmful, threatening, abusive, harassing, tortious, excessively
-          violent, defamatory, vulgar, obscene, pornographic, libelous, invasive
-          of another’s privacy, hateful, discriminatory, or otherwise
+          <br />
+          Data Mining or Scraping. Activity that involves data mining, robots,
+          scraping, or similar data gathering or extraction methods of content
+          or information from the Interface.
+          <br />
+          Objectionable Content. Activity that involves soliciting information
+          from anyone under the age of 18 or that is otherwise harmful,
+          threatening, abusive, harassing, tortious, excessively violent,
+          defamatory, vulgar, obscene, pornographic, libelous, invasive of
+          another’s privacy, hateful, discriminatory, or otherwise
           objectionable.
+          <br />
+          Any Other Unlawful Conduct. Activity that violates any applicable law,
+          rule, or regulation of a relevant jurisdiction.
           <br />
           <br />
         </Content>
-        <BoldContent>Not Registered with Any Other Agency</BoldContent>
+        <BoldContent>
+          Not Registered with the SEC or Any Other Agency
+        </BoldContent>
         <Content>
-          You understand and acknowledge that we do not broker trading orders on
+          We are not registered as a securities exchange with a regulatory
+          authority in pertinent jurisdictions or in any other capacity. You
+          understand and acknowledge that we do not broker trading orders on
           your behalf nor do we collect or earn fees from your trades on the
           Interface. We also do not facilitate the execution or settlement of
-          your trades, which occur entirely on the public distributed on public
-          distributed blockchain, which is the XPLA Chain. As a result, we do
-          not (and cannot) guarantee market best pricing or best execution
-          through the Interface or when using our Auto Routing feature, which
-          routes trades across liquidity pools on the Protocol only. Any
-          references in the Interface to “best price” do not constitute a
-          representation or warranty about pricing available through the
-          Interface, on the Protocol, or elsewhere.
+          your trades, which occur entirely on the public distributed
+          blockchain, which is the XPLA Chain. As a result, we do not (and
+          cannot) guarantee market best pricing or best execution through the
+          Interface or when using our Auto Routing feature, which routes trades
+          across liquidity pools on the Protocol only. Any references in the
+          Interface to “best price” do not constitute a representation or
+          warranty about pricing available through the Interface, on the
+          Protocol, or elsewhere.
           <br />
           <br />
         </Content>
@@ -287,11 +329,12 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           wallet. Likewise, you are solely responsible for any associated wallet
           and we are not liable for any acts or omissions by you in connection
           with or as a result of your wallet being compromised.
-          <br /> This Agreement is not intended to, and does not, create or
-          impose any fiduciary duties on us. To the fullest extent permitted by
-          law, you acknowledge and agree that we owe no fiduciary duties or
-          liabilities to you or any other party, and that to the extent any such
-          duties or liabilities may exist at law or in equity, those duties and
+          <br />
+          This Agreement is not intended to, and does not, create or impose any
+          fiduciary duties on us. To the fullest extent permitted by law, you
+          acknowledge and agree that we owe no fiduciary duties or liabilities
+          to you or any other party, and that to the extent any such duties or
+          liabilities may exist at law or in equity, those duties and
           liabilities are hereby irrevocably disclaimed, waived, and eliminated.
           You further agree that the only duties and obligations that we owe you
           are those set out expressly in this Agreement.
@@ -304,12 +347,14 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           jurisdiction. By accessing or using the Interface, you agree that you
           are solely and entirely responsible for compliance with all laws and
           regulations that may apply to you.
-          <br /> Specifically, your use of the Interface or the Protocol may
-          result in various tax consequences, such as income or capital gains
-          tax, value-added tax, goods and services tax, or sales tax in certain
+          <br />
+          Specifically, your use of the Interface or the Protocol may result in
+          various tax consequences, such as income or capital gains tax,
+          value-added tax, goods and services tax, or sales tax in certain
           jurisdictions.
-          <br /> It is your responsibility to determine whether taxes apply to
-          any transactions you initiate or receive and, if so, to report and/or
+          <br />
+          It is your responsibility to determine whether taxes apply to any
+          transactions you initiate or receive and, if so, to report and/or
           remit the correct tax to the appropriate tax authority.
           <br />
           <br />
@@ -324,34 +369,38 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           and intricacies of digital assets such as XPLA, so-called stablecoins,
           and other digital tokens such as those following the Cosmwasm Token
           Spec (CW-20).
-          <br /> In particular, you understand that the markets for these
-          digital assets are nascent and highly volatile due to risk factors
-          including (but not limited to) adoption, speculation, technology,
-          security, and regulation. You understand that anyone can create a
-          token, including fake versions of existing tokens and tokens that
-          falsely claim to represent projects, and acknowledge and accept the
-          risk that you may mistakenly trade those or other tokens. So-called
-          stablecoins may not be as stable as they purport to be, may not be
-          fully or adequately collateralized, and may be subject to panics and
-          runs.
-          <br /> Further, you understand that smart contract transactions
-          automatically execute and settle, and that blockchain-based
-          transactions are irreversible when confirmed. You acknowledge and
-          accept that the cost and speed of transacting with cryptographic and
-          blockchain-based systems such as XPLA Chain are variable and may
-          increase dramatically at any time. You further acknowledge and accept
-          the risk of trading with additional parameters&apos; settings
-          (slippage tolerance, auto-router, and transaction deadline), which can
-          expose you to potentially significant price slippage and higher costs.
-          <br /> If you act as a liquidity provider to the Protocol through the
+          <br />
+          In particular, you understand that the markets for these digital
+          assets are nascent and highly volatile due to risk factors including
+          (but not limited to) adoption, speculation, technology, security, and
+          regulation. You understand that anyone can create a token, including
+          fake versions of existing tokens and tokens that falsely claim to
+          represent projects, and acknowledge and accept the risk that you may
+          mistakenly trade those or other tokens. So-called stablecoins may not
+          be as stable as they purport to be, may not be fully or adequately
+          collateralized, and may be subject to panics and runs.
+          <br />
+          Further, you understand that smart contract transactions automatically
+          execute and settle, and that blockchain-based transactions are
+          irreversible when confirmed. You acknowledge and accept that the cost
+          and speed of transacting with cryptographic and blockchain-based
+          systems such as XPLA Chain are variable and may increase dramatically
+          at any time. You further acknowledge and accept the risk of trading
+          with additional parameters&apos; settings (slippage tolerance,
+          auto-router, and transaction deadline), which can expose you to
+          potentially significant price slippage and higher costs.
+          <br />
+          If you act as a liquidity provider to the Protocol through the
           Interface, you understand that your digital assets may lose some or
           all of their value while they are supplied to the Protocol through the
           Interface due to the fluctuation of prices of tokens in a trading pair
           or liquidity pool.
-          <br /> Finally, you understand that we do not make any representation
-          or warranty about the safety or soundness of any cross-chain bridge.
-          <br /> In summary, you acknowledge that we are not responsible for any
-          of these variables or risks, do not own or control the Protocol, and
+          <br />
+          Finally, you understand that we do not make any representation or
+          warranty about the safety or soundness of any cross-chain bridge.
+          <br />
+          In summary, you acknowledge that we are not responsible for any of
+          these variables or risks, do not own or control the Protocol, and
           cannot be held liable for any resulting losses that you experience
           while accessing or using the Interface. Accordingly, you understand
           and agree to assume full responsibility for all of the risks of
@@ -381,7 +430,13 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           access and use of the Interface. You further expressly waive and
           release us from any and all liability, claims, causes of action, or
           damages arising from or in any way relating to your use of the
-          Interface.
+          Interface. If you are a California resident, you waive the benefits
+          and protections of California Civil Code § 1542, which provides:
+          &quot;[a] general release does not extend to claims that the creditor
+          or releasing party does not know or suspect to exist in his or her
+          favor at the time of executing the release and that, if known by him
+          or her, would have materially affected his or her settlement with the
+          debtor or released party.&quot;
           <br />
           <br />
         </Content>
@@ -418,16 +473,18 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           or statement that we make should be treated as creating any warranty
           concerning the Interface. We do not endorse, guarantee, or assume
           responsibility for any advertisements, offers, or statements made by
-          third parties concerning the Interface. Similarly, the Protocol is
-          provided &quot;AS IS&quot;, at your own risk, and without warranties
-          of any kind. No developer or entity involved in creating the Protocol
-          will be liable for any claims or damages whatsoever associated with
-          your use, inability to use, or your interaction with other users of,
-          the Protocol, including any direct, indirect, incidental, special,
-          exemplary, punitive or consequential damages, or loss of profits,
-          cryptocurrencies, tokens, or anything else of value. We do not
-          endorse, guarantee, or assume responsibility for any advertisements,
-          offers, or statements made by third parties concerning the Interface.
+          third parties concerning the Interface.
+          <br />
+          Similarly, the Protocol is provided &quot;AS IS&quot;, at your own
+          risk, and without warranties of any kind. No developer or entity
+          involved in creating the Protocol will be liable for any claims or
+          damages whatsoever associated with your use, inability to use, or your
+          interaction with other users of, the Protocol, including any direct,
+          indirect, incidental, special, exemplary, punitive or consequential
+          damages, or loss of profits, cryptocurrencies, tokens, or anything
+          else of value. We do not endorse, guarantee, or assume responsibility
+          for any advertisements, offers, or statements made by third parties
+          concerning the Interface.
           <br />
           <br />
         </Content>
@@ -467,6 +524,21 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           the potential dispute according to the process set forth below.
           <br />
           <br />
+          Any claim or controversy arising out of or relating to the Interface,
+          this Agreement, or any other acts or omissions for which you may
+          contend that we are liable, including (but not limited to) any claim
+          or controversy as to arbitrability (&quot;Dispute&quot;), shall be
+          finally and exclusively settled by arbitration in accordance with the
+          International Arbitration Rules of the Korean Commercial Arbitration
+          Board(KCAB Rules). The number of arbitrators shall be three. The seat,
+          or legal place, of arbitral proceedings shall be Seoul/Republic of
+          Korea. The language to be used in the arbitral proceedings shall be
+          English. Unless we agree otherwise, the arbitrator may not consolidate
+          your claims with those of any other party. Any judgment on the award
+          rendered by the arbitrator may be entered in any court of competent
+          jurisdiction.
+          <br />
+          <br />
         </Content>
         <BoldContent>Class Action and Jury Trial Waiver</BoldContent>
         <Content>
@@ -476,6 +548,24 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           representative proceeding. This provision applies to class
           arbitration. You and we both agree to waive the right to demand a
           trial by jury.
+          <br />
+          <br />
+        </Content>
+        <BoldContent>Governing Law</BoldContent>
+        <Content>
+          You agree that the laws of the Republic of Korea, without regard to
+          principles of conflict of laws, govern this Agreement and any Dispute
+          between you and us. You further agree that the Interface shall be
+          deemed to be based solely in the Republic of Korea, and that although
+          the Interface may be available in other jurisdictions, its
+          availability does not give rise to general or specific personal
+          jurisdiction in any forum outside the Republic of Korea. Any
+          arbitration conducted pursuant to this Agreement shall be governed by
+          the Arbitration Act of the Republic of Korea. You agree that the
+          courts of the Republic of Korea are the proper forum for any appeals
+          of an arbitration award or for court proceedings in the event that
+          this Agreement&apos;s binding arbitration clause is found to be
+          unenforceable.
           <br />
           <br />
         </Content>
