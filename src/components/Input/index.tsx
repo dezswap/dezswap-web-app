@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { formatDecimals } from "utils";
+import { formatDecimals, formatNumber } from "utils";
 
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";
@@ -180,7 +180,7 @@ interface NumberInput extends InputProps {
 }
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
-  ({ decimals = 18, ...InputProps }, ref) => {
+  ({ decimals = 18, ...inputProps }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
     useEffect(() => {
@@ -217,6 +217,43 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
       };
     }, [decimals]);
 
-    return <Input ref={inputRef} {...InputProps} />;
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        if (inputRef.current && inputRef.current !== document.activeElement) {
+          inputRef.current.value = formatNumber(
+            inputRef.current.value.replace(/,/g, ""),
+          );
+        }
+      }, 100);
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, []);
+
+    return (
+      <Input
+        ref={inputRef}
+        {...inputProps}
+        onFocus={(event) => {
+          if (inputRef.current) {
+            inputRef.current.value = inputRef.current.value.replace(/,/g, "");
+            inputRef.current.type = "number";
+          }
+          if (inputProps.onFocus && event) {
+            inputProps.onFocus(event);
+          }
+        }}
+        onBlur={(event) => {
+          const value = inputRef?.current?.value;
+          if (inputProps.onBlur) {
+            inputProps.onBlur(event);
+          }
+          if (inputRef.current && event) {
+            inputRef.current.type = "text";
+            inputRef.current.value = formatNumber(value);
+          }
+        }}
+      />
+    );
   },
 );

@@ -10,12 +10,19 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
     : t;
 };
 
-export const formatNumber = (value: number | string) =>
-  !value
-    ? "0"
-    : Intl.NumberFormat("en-US", { maximumFractionDigits: 20 }).format(
-        Number(value),
-      );
+// Intl doesn't cover all floating point numbers
+export const formatNumber = (value?: Decimal.Value) => {
+  if (!value && value !== 0) {
+    return "";
+  }
+  if (Number.isNaN(Number(value)) || new Decimal(value).isNaN()) {
+    throw new Error("Invalid number");
+  }
+  const [number, decimal] = `${value}`.split(".");
+  return `${number.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${
+    decimal ? `.${decimal}` : ""
+  }`;
+};
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
