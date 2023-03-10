@@ -48,14 +48,25 @@ function GlobalStyles() {
               background-color: transparent;
             }
           }
+
+          /* Hide arrows from input number */
+          input::-webkit-outer-spin-button,
+          input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          input[type="number"] {
+            -moz-appearance: textfield;
+          }
         `}
       />
       {/* React Modal */}
       <Global
         styles={css`
           .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)),
-          .ReactModal__Body--open:has(.ReactModal__Overlay
-              .ReactModal__Overlay.inner-modal) {
+          .ReactModal__Body--open:has(
+              .ReactModal__Overlay .ReactModal__Overlay.inner-modal
+            ) {
             overflow: hidden;
           }
           .ReactModal__Overlay {
