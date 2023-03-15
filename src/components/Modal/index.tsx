@@ -11,6 +11,8 @@ import iconBack from "assets/icons/icon-back.svg";
 import { useEffect, useMemo, useState } from "react";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
+import SimpleBar from "simplebar/dist";
+
 ReactModal.setAppElement("#root");
 
 interface ModalProps extends Omit<ReactModal.Props, "style"> {
@@ -149,7 +151,31 @@ function Modal({
       }
     };
     return () => {
-      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 100);
+      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 10);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleModalPop = () => {
+      const simpleBar = SimpleBar.instances.get(document.body);
+      if (simpleBar?.onWindowResize) {
+        simpleBar.onWindowResize();
+        setTimeout(() => {
+          simpleBar.onWindowResize();
+        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+      }
+
+      if (simpleBar?.recalculate) {
+        simpleBar.recalculate();
+        setTimeout(() => {
+          simpleBar.recalculate();
+        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+      }
+    };
+
+    handleModalPop();
+    return () => {
+      handleModalPop();
     };
   }, [isOpen]);
 

@@ -61,6 +61,8 @@ const AssetList = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 
   &::-webkit-scrollbar-track {
     margin-bottom: 10px;
