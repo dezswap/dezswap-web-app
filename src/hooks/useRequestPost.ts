@@ -1,4 +1,9 @@
-import { TxResult, useConnectedWallet } from "@xpla/wallet-provider";
+import {
+  ConnectType,
+  CreateTxFailed,
+  TxResult,
+  useConnectedWallet,
+} from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
@@ -29,6 +34,13 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         setTxResult(result);
       } catch (error) {
         console.log(error);
+        if (
+          error instanceof CreateTxFailed &&
+          connectedWallet?.connectType === ConnectType.WALLETCONNECT
+        ) {
+          error.message =
+            "Transaction creation failed, please check the details in your wallet and try again";
+        }
         if (error instanceof Error) {
           setTxError(error);
         }
