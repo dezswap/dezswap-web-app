@@ -17,3 +17,4 @@ export const contractAddresses: {
 };
 
 export const LP_DECIMALS = 6;
+export const LOCKED_LP_SUPPLY = 1_000;

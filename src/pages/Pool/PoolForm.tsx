@@ -225,13 +225,14 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
           </Link>
         ) : undefined}
         {selectedAddress1 && selectedAddress2 && !pair ? (
-          <Tooltip content="Coming soon" placement="top" arrow>
-            <div>
-              <PoolButton variant="primary" disabled>
-                Create a new pool
-              </PoolButton>
-            </div>
-          </Tooltip>
+          <Link
+            to={`/pool/create/${addresses?.join("/")}`}
+            css={css`
+              text-decoration: none;
+            `}
+          >
+            <PoolButton variant="gradient">Create a new pool</PoolButton>
+          </Link>
         ) : undefined}
       </div>
 
