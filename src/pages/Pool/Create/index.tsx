@@ -16,7 +16,6 @@ import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
-import useSimulate from "pages/Pool/Provide/useSimulate";
 import {
   amountToValue,
   cutDecimal,
@@ -33,7 +32,7 @@ import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateAddLiquidityMsg } from "utils/dezswap";
+import { generateCreatePoolMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
@@ -42,7 +41,6 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
 import { useNetwork } from "hooks/useNetwork";
-import usePool from "hooks/usePool";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
@@ -70,14 +68,12 @@ function CreatePage() {
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
   });
-  const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { asset1Address, asset2Address } = useParams<{
     asset1Address: string;
     asset2Address: string;
   }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { pairs } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
@@ -106,11 +102,64 @@ function CreatePage() {
 
   const { requestPost } = useRequestPost(handleModalClose, true);
 
+  const createTxOptions = useMemo<CreateTxOptions | undefined>(
+    () =>
+      connectedWallet &&
+      asset1?.address &&
+      formData.asset1Value &&
+      asset2?.address &&
+      formData.asset2Value &&
+      !Numeric.parse(formData.asset1Value).isNaN() &&
+      !Numeric.parse(formData.asset2Value).isNaN()
+        ? {
+            msgs: generateCreatePoolMsg(
+              connectedWallet?.network.name as NetworkName,
+              connectedWallet.walletAddress,
+              [
+                {
+                  address: asset1?.address || "",
+                  amount:
+                    valueToAmount(formData.asset1Value, asset1?.decimals) ||
+                    "0",
+                },
+                {
+                  address: asset2?.address || "",
+                  amount:
+                    valueToAmount(formData.asset2Value, asset2?.decimals) ||
+                    "0",
+                },
+              ],
+            ),
+          }
+        : undefined,
+    [
+      connectedWallet,
+      asset1,
+      isReversed,
+      asset2,
+      formData.asset1Value,
+      formData.asset2Value,
+    ],
+  );
+
+  const {
+    fee,
+    isLoading: isFeeLoading,
+    isFailed: isFeeFailed,
+  } = useFee(createTxOptions);
+
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
+      if (event.target && createTxOptions && fee) {
+        requestPost({
+          txOptions: createTxOptions,
+          fee,
+          formElement: event.target as HTMLFormElement,
+        });
+      }
     },
-    [],
+    [createTxOptions, fee, requestPost],
   );
 
   const ratio = useMemo(() => {
@@ -408,7 +457,11 @@ function CreatePage() {
             variant="primary"
             block
             disabled={
-              !form.formState.isValid || form.formState.isValidating || !isValid
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              !isValid ||
+              isFeeLoading ||
+              isFeeFailed
             }
             css={css`
               margin-bottom: 10px;
