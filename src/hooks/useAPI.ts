@@ -2,23 +2,25 @@ import { useCallback, useMemo } from "react";
 import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
 import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
 import {
-  Amount,
   generateReverseSimulationMsg,
   generateSimulationMsg,
   queryMessages,
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
 import axios from "axios";
-import { TokenInfo } from "types/token";
-import { contractAddresses } from "constants/dezswap";
+import { TokenInfo, VerifiedTokenInfo } from "types/token";
+import { apiAddresses, contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
 import { LatestBlock } from "types/common";
+import cachedAxios from "utils/cachedAxios";
 
 interface TokenBalance {
   balance: string;
 }
 
-export const useAPI = () => {
+export type ApiVersion = "v1";
+
+export const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
   const connectedWallet = useConnectedWallet();
@@ -29,28 +31,44 @@ export const useAPI = () => {
 
   const getToken = useCallback(
     async (address: string) => {
-      const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+      let res: TokenInfo | (TokenInfo & VerifiedTokenInfo);
+      try {
+        const base = apiAddresses[network.name] || "";
+        res = await cachedAxios.get(`${base}/${version}/tokens/${address}`);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+      res = await lcd.wasm.contractQuery<TokenInfo>(address, {
         token_info: {},
       });
       return res;
     },
-    [lcd],
+    [lcd, network.name, version],
   );
 
   const getPairs = useCallback(
-    (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
+    async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
+      let res: Pairs;
+      try {
+        const base = apiAddresses[network.name] || "";
+        res = await cachedAxios.get(`${base}/${version}/pairs`);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
       const contractAddress = contractAddresses[network.name]?.factory;
       if (!contractAddress) {
         return undefined;
       }
-      const res = lcd.wasm.contractQuery<Pairs>(
+      res = await lcd.wasm.contractQuery<Pairs>(
         contractAddress,
         queryMessages.getPairs(options),
       );
 
       return res;
     },
-    [lcd.wasm, network.name],
+    [lcd.wasm, network.name, version],
   );
 
   const getPair = useCallback(
@@ -58,27 +76,60 @@ export const useAPI = () => {
       if (!contractAddress) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<Pair>(contractAddress, {
+      let res: Pair;
+      try {
+        const base = apiAddresses[network.name] || "";
+        res = await cachedAxios.get(
+          `${base}/${version}/pairs/${contractAddress}`,
+        );
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+
+      res = await lcd.wasm.contractQuery<Pair>(contractAddress, {
         pair: {},
       });
 
       return res;
     },
-    [lcd],
+    [lcd.wasm, network.name, version],
   );
+
+  const getPools = useCallback(async () => {
+    let res: Pool[];
+    try {
+      const base = apiAddresses[network.name] || "";
+      res = await cachedAxios.get(`${base}/${version}/pools`);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+    return [];
+  }, [network.name, version]);
 
   const getPool = useCallback(
     async (contractAddress: string) => {
       if (!contractAddress) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<Pool>(contractAddress, {
+      let res: Pool;
+      try {
+        const base = apiAddresses[network.name] || "";
+        res = await cachedAxios.get(
+          `${base}/${version}/pools/${contractAddress}`,
+        );
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+      res = await lcd.wasm.contractQuery<Pool>(contractAddress, {
         pool: {},
       });
 
       return res;
     },
-    [lcd],
+    [lcd.wasm, network.name, version],
   );
 
   const simulate = useCallback(

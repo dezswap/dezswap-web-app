@@ -17,3 +17,16 @@ export const contractAddresses: {
 };
 
 export const LP_DECIMALS = 6;
+
+export const apiAddresses: {
+  [K in NetworkName]?: {
+    baseUrl: string;
+  };
+} = {
+  mainnet: {
+    baseUrl: "https://dimension-api.dezswap.io",
+  },
+  testnet: {
+    baseUrl: "https://cube-api.dezswap.io",
+  },
+};
