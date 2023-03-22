@@ -281,7 +281,7 @@ function ProvidePage() {
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
-          amountToValue(asset1BalanceMinusFee, asset2?.decimals) || 0,
+          amountToValue(asset2BalanceMinusFee, asset2?.decimals) || 0,
         ),
       )
     ) {
