@@ -12,7 +12,6 @@ import { TokenInfo, VerifiedTokenInfo } from "types/token";
 import { apiAddresses, contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
 import { LatestBlock } from "types/common";
-import cachedAxios from "utils/cachedAxios";
 
 interface TokenBalance {
   balance: string;
@@ -33,8 +32,8 @@ export const useAPI = (version: ApiVersion = "v1") => {
     async (address: string) => {
       let res: TokenInfo | (TokenInfo & VerifiedTokenInfo);
       try {
-        const base = apiAddresses[network.name] || "";
-        res = await cachedAxios.get(`${base}/${version}/tokens/${address}`);
+        const base = apiAddresses[network.name]?.baseUrl || "";
+        res = await axios.get(`${base}/${version}/tokens/${address}`);
         return res;
       } catch (err) {
         console.error(err);
@@ -51,8 +50,8 @@ export const useAPI = (version: ApiVersion = "v1") => {
     async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
       let res: Pairs;
       try {
-        const base = apiAddresses[network.name] || "";
-        res = await cachedAxios.get(`${base}/${version}/pairs`);
+        const base = apiAddresses[network.name]?.baseUrl || "";
+        res = await axios.get(`${base}/${version}/pairs`);
         return res;
       } catch (err) {
         console.error(err);
@@ -78,10 +77,8 @@ export const useAPI = (version: ApiVersion = "v1") => {
       }
       let res: Pair;
       try {
-        const base = apiAddresses[network.name] || "";
-        res = await cachedAxios.get(
-          `${base}/${version}/pairs/${contractAddress}`,
-        );
+        const base = apiAddresses[network.name]?.baseUrl || "";
+        res = await axios.get(`${base}/${version}/pairs/${contractAddress}`);
         return res;
       } catch (err) {
         console.error(err);
@@ -99,8 +96,8 @@ export const useAPI = (version: ApiVersion = "v1") => {
   const getPools = useCallback(async () => {
     let res: Pool[];
     try {
-      const base = apiAddresses[network.name] || "";
-      res = await cachedAxios.get(`${base}/${version}/pools`);
+      const base = apiAddresses[network.name]?.baseUrl || "";
+      res = await axios.get(`${base}/${version}/pools`);
       return res;
     } catch (err) {
       console.error(err);
@@ -115,10 +112,8 @@ export const useAPI = (version: ApiVersion = "v1") => {
       }
       let res: Pool;
       try {
-        const base = apiAddresses[network.name] || "";
-        res = await cachedAxios.get(
-          `${base}/${version}/pools/${contractAddress}`,
-        );
+        const base = apiAddresses[network.name]?.baseUrl || "";
+        res = await axios.get(`${base}/${version}/pools/${contractAddress}`);
         return res;
       } catch (err) {
         console.error(err);
