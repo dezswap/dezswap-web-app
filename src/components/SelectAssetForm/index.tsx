@@ -10,7 +10,6 @@ import {
   formatNumber,
   isNativeTokenAddress,
 } from "utils";
-import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
@@ -33,11 +32,12 @@ export type LPAsset = {
   assets: [Asset, Asset];
   disabled?: boolean;
 };
-interface SelectAssetFormProps {
+
+type SelectAssetFormProps = React.PropsWithChildren<{
   selectedAssetAddress?: string;
   onSelect?(address: string): void;
   addressList?: string[];
-}
+}>;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -157,7 +157,12 @@ const tabs = [
 ];
 
 function SelectAssetForm(props: SelectAssetFormProps) {
-  const { onSelect: handleSelect, selectedAssetAddress, addressList } = props;
+  const {
+    onSelect: handleSelect,
+    selectedAssetAddress,
+    addressList,
+    children,
+  } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
@@ -434,7 +439,10 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </Row>
         <Hr />
       </Panel>
-      <AssetList>{assetList}</AssetList>
+      <AssetList>
+        {assetList}
+        {children}
+      </AssetList>
     </Wrapper>
   );
 }

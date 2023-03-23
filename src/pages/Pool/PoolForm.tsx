@@ -16,7 +16,11 @@ import iconPlus from "assets/icons/icon-plus.svg";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
 
+import Button from "components/Button";
+import useCustomAssets from "hooks/useCustomAssets";
+import { useModal } from "hooks/useModal";
 import PoolButton from "./PoolButton";
+import ImportAssetModal from "./ImportAssetModal";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -48,6 +52,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
   const screenClass = useScreenClass();
 
   const { availableAssetAddresses, findPair } = usePairs();
+  const { customAssets } = useCustomAssets();
+  const customAssetAddresses = useMemo(() => {
+    return customAssets?.map((asset) => asset.address) || [];
+  }, [customAssets]);
 
   const { getAsset } = useAssets();
 
@@ -71,6 +79,8 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
     selectAsset1Modal.close();
     selectAsset2Modal.close();
   }, [selectAsset1Modal, selectAsset2Modal]);
+
+  const importAssetModal = useModal();
 
   return (
     <Wrapper>
@@ -251,8 +261,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         }}
       >
         <SelectAssetForm
-          // TODO: addressList should be changed for pool creation
-          addressList={availableAssetAddresses.addresses}
+          addressList={[
+            ...customAssetAddresses,
+            ...availableAssetAddresses.addresses,
+          ]}
           onSelect={(address) => {
             if (handleChange) {
               const newAddresses = [...(addresses || [])];
@@ -271,8 +283,29 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
               closeSelectAssetModals();
             }
           }}
-        />
+        >
+          <div
+            css={css`
+              padding: 16px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            `}
+          >
+            <Typography color="primary" size={16} weight={700}>
+              Don&apos;t see your token?
+            </Typography>
+            <Button variant="primary" onClick={() => importAssetModal.open()}>
+              Import
+            </Button>
+          </div>
+        </SelectAssetForm>
       </Modal>
+      <ImportAssetModal
+        isOpen={importAssetModal.isOpen}
+        onRequestClose={importAssetModal.close}
+        onFinish={() => importAssetModal.close()}
+      />
     </Wrapper>
   );
 }
