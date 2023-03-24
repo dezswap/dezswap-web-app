@@ -226,10 +226,10 @@ function CreatePage() {
 
   const estimatedLp = useMemo(() => {
     if (!asset1 || !asset2) {
-      return 0;
+      return "0";
     }
     if (!formData.asset1Value && !formData.asset2Value) {
-      return 0;
+      return "0";
     }
     return formatDecimals(
       Numeric.parse(valueToAmount(formData.asset1Value, asset1?.decimals) || 0)
