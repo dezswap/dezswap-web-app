@@ -33,7 +33,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
       let res: TokenInfo | (TokenInfo & VerifiedTokenInfo);
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = await axios.get(`${base}/${version}/tokens/${address}`);
+        res = (await axios.get(`${base}/${version}/tokens/${address}`)).data;
         return res;
       } catch (err) {
         console.error(err);
@@ -51,8 +51,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
       let res: Pairs;
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = await axios.get(`${base}/${version}/pairs`);
-        return res;
+        res = (await axios.get(`${base}/${version}/pairs`)).data;
       } catch (err) {
         console.error(err);
       }
@@ -78,7 +77,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
       let res: Pair;
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = await axios.get(`${base}/${version}/pairs/${contractAddress}`);
+        res = (await axios.get(`${base}/${version}/pairs/${contractAddress}`)).data;
         return res;
       } catch (err) {
         console.error(err);
@@ -97,7 +96,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
     let res: Pool[];
     try {
       const base = apiAddresses[network.name]?.baseUrl || "";
-      res = await axios.get(`${base}/${version}/pools`);
+      res = (await axios.get(`${base}/${version}/pools`)).data;
       return res;
     } catch (err) {
       console.error(err);
@@ -113,7 +112,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
       let res: Pool;
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = await axios.get(`${base}/${version}/pools/${contractAddress}`);
+        res = (await axios.get(`${base}/${version}/pools/${contractAddress}`)).data;
         return res;
       } catch (err) {
         console.error(err);
