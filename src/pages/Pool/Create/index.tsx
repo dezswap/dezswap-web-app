@@ -7,7 +7,6 @@ import {
 } from "react";
 import Modal from "components/Modal";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import usePairs from "hooks/usePair";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -16,7 +15,6 @@ import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
-import useSimulate from "pages/Pool/Provide/useSimulate";
 import {
   amountToValue,
   cutDecimal,
@@ -33,16 +31,14 @@ import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateAddLiquidityMsg } from "utils/dezswap";
+import { generateCreatePoolMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Pool/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
 import { useNetwork } from "hooks/useNetwork";
-import usePool from "hooks/usePool";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
@@ -51,7 +47,6 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import Box from "components/Box";
 import ProgressBar from "components/ProgressBar";
-import { useBalance } from "hooks/useBalance";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -70,16 +65,13 @@ function CreatePage() {
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
   });
-  const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { asset1Address, asset2Address } = useParams<{
     asset1Address: string;
     asset2Address: string;
   }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { pairs } = usePairs();
   const { getAsset } = useAssets();
-  const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
   const [asset1, asset2] = useMemo(
@@ -89,9 +81,6 @@ function CreatePage() {
         : [],
     [asset1Address, asset2Address, getAsset],
   );
-
-  const asset1Balance = useBalanceMinusFee(asset1?.address, asset1?.balance);
-  const asset2Balance = useBalanceMinusFee(asset2?.address, asset2?.balance);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -106,11 +95,118 @@ function CreatePage() {
 
   const { requestPost } = useRequestPost(handleModalClose, true);
 
+  const createTxOptions = useMemo<CreateTxOptions | undefined>(
+    () =>
+      connectedWallet &&
+      asset1?.address &&
+      formData.asset1Value &&
+      asset2?.address &&
+      formData.asset2Value &&
+      !Numeric.parse(formData.asset1Value).isNaN() &&
+      !Numeric.parse(formData.asset2Value).isNaN()
+        ? {
+            msgs: generateCreatePoolMsg(
+              connectedWallet?.network.name as NetworkName,
+              connectedWallet.walletAddress,
+              [
+                {
+                  address: asset1?.address || "",
+                  amount:
+                    valueToAmount(formData.asset1Value, asset1?.decimals) ||
+                    "0",
+                },
+                {
+                  address: asset2?.address || "",
+                  amount:
+                    valueToAmount(formData.asset2Value, asset2?.decimals) ||
+                    "0",
+                },
+              ],
+            ),
+          }
+        : undefined,
+    [
+      connectedWallet,
+      asset1,
+      asset2,
+      formData.asset1Value,
+      formData.asset2Value,
+    ],
+  );
+
+  const {
+    fee,
+    isLoading: isFeeLoading,
+    isFailed: isFeeFailed,
+  } = useFee(createTxOptions);
+
+  const feeAmount = useMemo(() => {
+    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
+  }, [fee]);
+
+  const asset1Balance = useBalanceMinusFee(
+    asset1?.address,
+    asset1?.balance,
+    feeAmount,
+  );
+  const asset2Balance = useBalanceMinusFee(
+    asset2?.address,
+    asset2?.balance,
+    feeAmount,
+  );
+
+  useEffect(() => {
+    if (
+      connectedWallet &&
+      balanceApplied &&
+      asset1?.address === XPLA_ADDRESS &&
+      formData.asset1Value &&
+      Numeric.parse(formData.asset1Value || 0).gt(
+        Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
+      )
+    ) {
+      form.setValue(
+        FormKey.asset1Value,
+        amountToValue(asset1Balance, asset1?.decimals) || "",
+        {
+          shouldValidate: true,
+        },
+      );
+    }
+  }, [asset1Balance, formData.asset1Value, form]);
+
+  useEffect(() => {
+    if (
+      connectedWallet &&
+      balanceApplied &&
+      asset2?.address === XPLA_ADDRESS &&
+      formData.asset2Value &&
+      Numeric.parse(formData.asset2Value || 0).gt(
+        Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
+      )
+    ) {
+      form.setValue(
+        FormKey.asset2Value,
+        amountToValue(asset2Balance, asset2?.decimals) || "",
+        {
+          shouldValidate: true,
+        },
+      );
+    }
+  }, [asset2Balance, formData.asset2Value, form]);
+
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
+      if (event.target && createTxOptions && fee) {
+        requestPost({
+          txOptions: createTxOptions,
+          fee,
+          formElement: event.target as HTMLFormElement,
+        });
+      }
     },
-    [],
+    [createTxOptions, fee, requestPost],
   );
 
   const ratio = useMemo(() => {
@@ -202,11 +298,9 @@ function CreatePage() {
           })}
           asset={asset1}
           onClick={() => {
-            setIsReversed(false);
             setBalanceApplied(false);
           }}
           onBalanceClick={(value) => {
-            setIsReversed(false);
             setBalanceApplied(true);
             form.setValue(FormKey.asset1Value, value, {
               shouldValidate: true,
@@ -247,11 +341,9 @@ function CreatePage() {
           })}
           asset={asset2}
           onClick={() => {
-            setIsReversed(true);
             setBalanceApplied(false);
           }}
           onBalanceClick={(value) => {
-            setIsReversed(true);
             setBalanceApplied(true);
             form.setValue(FormKey.asset2Value, value, {
               shouldValidate: true,
@@ -348,7 +440,14 @@ function CreatePage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: "0 XPLA",
+                    value: feeAmount
+                      ? `${formatNumber(
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
+                      : "",
                   },
                 ]}
               />
@@ -408,7 +507,11 @@ function CreatePage() {
             variant="primary"
             block
             disabled={
-              !form.formState.isValid || form.formState.isValidating || !isValid
+              !form.formState.isValid ||
+              form.formState.isValidating ||
+              !isValid ||
+              isFeeLoading ||
+              isFeeFailed
             }
             css={css`
               margin-bottom: 10px;
