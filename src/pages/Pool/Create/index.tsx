@@ -413,7 +413,10 @@ function CreatePage() {
                     tooltip:
                       "The sum of Locked LP supply and Received LP supply.",
                     value: `${formatNumber(
-                      cutDecimal(estimatedLp, DISPLAY_DECIMAL),
+                      cutDecimal(
+                        amountToValue(estimatedLp, LP_DECIMALS) || 0,
+                        DISPLAY_DECIMAL,
+                      ),
                     )} LP`,
                   },
                   {
@@ -421,7 +424,12 @@ function CreatePage() {
                     label: "Locked LP supply",
                     tooltip:
                       "The amount of LP locked by contract to create a new pool.",
-                    value: `${formatNumber(LOCKED_LP_SUPPLY)} LP`,
+                    value: `${formatNumber(
+                      cutDecimal(
+                        amountToValue(LOCKED_LP_SUPPLY, LP_DECIMALS) || 0,
+                        DISPLAY_DECIMAL,
+                      ),
+                    )} LP`,
                   },
                   {
                     key: "receivedLp",
@@ -429,9 +437,12 @@ function CreatePage() {
                     tooltip: "The amount of LP you may get at the transaction.",
                     value: `${formatNumber(
                       cutDecimal(
-                        Numeric.parse(estimatedLp || 0)
-                          .minus(LOCKED_LP_SUPPLY)
-                          .toString(),
+                        amountToValue(
+                          Numeric.parse(estimatedLp || 0)
+                            .minus(LOCKED_LP_SUPPLY)
+                            .toString(),
+                          LP_DECIMALS,
+                        ) || 0,
                         DISPLAY_DECIMAL,
                       ),
                     )} LP`,
