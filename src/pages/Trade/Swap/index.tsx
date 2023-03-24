@@ -38,7 +38,6 @@ import Copy from "components/Copy";
 import IconButton from "components/IconButton";
 import Message from "components/Message";
 import Select from "components/Select";
-import iconQuestion from "assets/icons/icon-question.svg";
 import iconShift from "assets/icons/icon-shift.svg";
 import Expand from "components/Expanded";
 import styled from "@emotion/styled";
@@ -54,6 +53,7 @@ import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
 import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
+import InfoTable from "components/InfoTable";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -119,9 +119,10 @@ function SelectAssetDrawer({
         screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
       }
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS
+        screenClass !== MOBILE_SCREEN_CLASS &&
+        document.querySelector(".modal-parent")
           ? () =>
-              document.querySelector("#main") ||
+              document.querySelector(".modal-parent") ||
               (document.querySelector("#root") as HTMLElement)
           : undefined
       }
@@ -887,227 +888,70 @@ function SwapPage() {
               }
               isExpanded={false}
             >
-              <Row
-                gutterWidth={10}
-                justify="between"
-                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-              >
-                <Col
-                  xs={5}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                  `}
-                >
-                  <Typography color={theme.colors.text.primary}>
-                    Expected amount
-                  </Typography>
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content={
+              <InfoTable
+                items={[
+                  {
+                    key: "expectedAmount",
+                    label: `Expected${
+                      screenClass === MOBILE_SCREEN_CLASS ? "\n" : " "
+                    }amount`,
+                    tooltip: (
                       <>
                         The result value you may get
                         <br />
                         at the current condition.
                       </>
-                    }
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  xs={7}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                  `}
-                >
-                  <Typography
-                    color={theme.colors.text.primary}
-                    css={css`
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {simulationResult?.estimatedAmount
-                      ? formatNumber(
-                          amountToValue(
-                            simulationResult?.estimatedAmount,
-                            asset2?.decimals,
-                          ) || 0,
-                        )
-                      : ""}
-                    {asset2?.symbol}
-                  </Typography>
-                </Col>
-              </Row>
-              <Row
-                gutterWidth={10}
-                justify="between"
-                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-              >
-                <Col
-                  xs={5}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                  `}
-                >
-                  <Typography color={theme.colors.text.primary}>
-                    Price impact
-                  </Typography>
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content="The impact on the market price of this pool you may encounter by executing your transaction."
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  xs={7}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                  `}
-                >
-                  <Typography
-                    weight="bold"
-                    color={spread.color as keyof Colors}
-                    css={css`
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {formatNumber(spread.rate)}%
-                  </Typography>
-                </Col>
-              </Row>
-              <Row
-                gutterWidth={10}
-                justify="between"
-                style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-              >
-                <Col
-                  xs={5}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                  `}
-                >
-                  <Typography color={theme.colors.text.primary}>Fee</Typography>
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content={
+                    ),
+                    value: `${
+                      simulationResult?.estimatedAmount
+                        ? formatNumber(
+                            amountToValue(
+                              simulationResult?.estimatedAmount,
+                              asset2?.decimals,
+                            ) || 0,
+                          )
+                        : ""
+                    } ${asset2?.symbol}`,
+                  },
+                  {
+                    key: "priceImpact",
+                    label: "Price impact",
+                    tooltip:
+                      "The impact on the market price of this pool you may encounter by executing your transaction.",
+                    value: (
+                      <Typography
+                        weight="bold"
+                        color={spread.color as keyof Colors}
+                      >
+                        {formatNumber(spread.rate)}%
+                      </Typography>
+                    ),
+                  },
+                  {
+                    key: "fee",
+                    label: "Fee",
+                    tooltip: (
                       <>
                         The fee paid for executing
                         <br />
                         the transaction.
                       </>
-                    }
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  xs={7}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                  `}
-                >
-                  <Typography
-                    color={theme.colors.text.primary}
-                    css={css`
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {feeAmount
+                    ),
+                    value: feeAmount
                       ? `${formatNumber(
                           amountToValue(feeAmount) || 0,
-                        )}${XPLA_SYMBOL}`
-                      : ""}
-                  </Typography>
-                </Col>
-              </Row>
-              <Row
-                gutterWidth={10}
-                justify="between"
-                style={{ alignItems: "flex-start" }}
-              >
-                <Col
-                  xs={5}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                  `}
-                >
-                  <Typography color={theme.colors.text.primary}>
-                    Route
-                  </Typography>
-                  <Tooltip
-                    arrow
-                    placement={
-                      screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                    }
-                    content={
-                      <>
-                        Provide a route for
-                        <br />
-                        the optimal price.
-                      </>
-                    }
-                  >
-                    <IconButton
-                      className="cm-hidden"
-                      size={22}
-                      icons={{ default: iconQuestion }}
-                    />
-                  </Tooltip>
-                </Col>
-                <Col
-                  xs={7}
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                  `}
-                >
-                  <Typography
-                    color={theme.colors.text.primary}
-                    css={css`
-                      text-align: right;
-                      word-break: break-word;
-                    `}
-                  >
-                    {asset1?.symbol} → {asset2?.symbol}
-                  </Typography>
-                </Col>
-              </Row>
+                        )} ${XPLA_SYMBOL}`
+                      : "",
+                  },
+                  {
+                    key: "route",
+                    label: "Route",
+                    tooltip: `Provide a route for
+                    the optimal price.`,
+                    value: `${asset1?.symbol} → ${asset2?.symbol}`,
+                  },
+                ]}
+              />
             </Expand>
           </div>
         )}

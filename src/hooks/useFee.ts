@@ -67,7 +67,8 @@ export const useFee = (txOptions?: CreateTxOptions) => {
           }
           if (
             msg.includes("Max spread assertion") ||
-            msg.includes("Max slippage assertion")
+            msg.includes("Max slippage assertion") ||
+            msg.includes("Min amount assertion")
           ) {
             setErrMsg(
               "The estimated slippage has been exceeded the tolerance.",

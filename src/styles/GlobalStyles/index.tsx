@@ -30,29 +30,17 @@ function GlobalStyles() {
           *::before {
             box-sizing: border-box;
             font-family: "Nunito", sans-serif;
-          }
-
-          * {
-            scrollbar-width: thin;
-            scrollbar-color: ${theme.colors.secondary} transparent;
-            &::-webkit-scrollbar {
-              width: 8px;
-              height: 8px;
-            }
-            &::-webkit-scrollbar-thumb {
-              background-color: ${theme.colors.secondary};
-              border-radius: 30px;
-            }
-            &::-webkit-scrollbar-track {
-              background-color: transparent;
-            }
+            outline: none;
           }
         `}
       />
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)) {
+          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)),
+          .ReactModal__Body--open:has(
+              .ReactModal__Overlay .ReactModal__Overlay.inner-modal
+            ) {
             overflow: hidden;
           }
           .ReactModal__Overlay {
@@ -120,6 +108,11 @@ function GlobalStyles() {
                 transform: translateY(100%) scale(1);
               }
             }
+          }
+
+          & .modal-parent:has(.inner-modal) > div:first-of-type {
+            opacity: 0;
+            transition: opacity 10ms step-end;
           }
         `}
       />
@@ -233,6 +226,53 @@ function GlobalStyles() {
               background-size: 16px 6px;
               width: 16px;
               height: 6px;
+            }
+          }
+        `}
+      />
+      {/* Scrollbars */}
+      <Global
+        styles={css`
+          * {
+            scrollbar-width: thin;
+            scrollbar-color: ${theme.colors.secondary} transparent;
+            &::-webkit-scrollbar {
+              width: 8px;
+              height: 8px;
+            }
+
+            [data-simplebar]::-webkit-scrollbar {
+              display: none;
+            }
+            &::-webkit-scrollbar-thumb {
+              background-color: ${theme.colors.secondary};
+              border-radius: 30px;
+            }
+            &::-webkit-scrollbar-track {
+              background-color: transparent;
+            }
+          }
+
+          .simplebar-track {
+            &.simplebar-vertical {
+              width: 8px;
+            }
+            &.simplebar-horizontal {
+              height: 8px;
+            }
+          }
+
+          .simplebar-scrollbar {
+            &.simplebar-visible::before {
+              opacity: 1;
+              top: 0;
+              right: 0;
+              bottom: 0;
+              left: 0;
+            }
+            &::before {
+              background-color: ${theme.colors.secondary};
+              opacity: 1;
             }
           }
         `}

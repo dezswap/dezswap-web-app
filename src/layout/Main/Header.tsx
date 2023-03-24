@@ -409,12 +409,11 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px 18px;
+                                  padding: 12px 12px;
                                   font-weight: bold;
-                                  text-align: center;
-                                  .${MOBILE_SCREEN_CLASS} &,
-                                  .${TABLET_SCREEN_CLASS} & {
-                                    text-align: start;
+                                  text-align: start;
+                                  .${MOBILE_SCREEN_CLASS} & {
+                                    padding: 12px 16px;
                                   }
                                 `}
                               >
@@ -479,7 +478,10 @@ function Header() {
                             <Col style={{ flex: "unset", paddingTop: "4px" }}>
                               <Box
                                 css={css`
-                                  padding: 12px 18px;
+                                  padding: 12px 12px;
+                                  .${MOBILE_SCREEN_CLASS} & {
+                                    padding: 12px 16px;
+                                  }
                                 `}
                               >
                                 <Typography
