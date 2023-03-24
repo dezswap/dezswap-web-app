@@ -342,6 +342,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           display: flex;
           justify-content: center;
           align-items: center;
+          margin-bottom: -72px;
         `}
       >
         <Typography

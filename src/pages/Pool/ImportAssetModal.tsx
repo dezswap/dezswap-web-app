@@ -139,7 +139,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       >
         {page === "form" && (
           <form onSubmit={onSubmit}>
-            <Typography color="primary" size={14} weight={700}>
+            <Typography
+              color="primary"
+              size={14}
+              weight={900}
+              css={css`
+                margin-bottom: 6px;
+              `}
+            >
               Token contract address
             </Typography>
             <div
