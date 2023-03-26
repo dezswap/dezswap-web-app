@@ -6,7 +6,6 @@ import { useTheme, css } from "@emotion/react";
 import Modal from "components/Modal";
 import SelectAssetForm from "components/SelectAssetForm";
 import Typography from "components/Typography";
-import Tooltip from "components/Tooltip";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
@@ -17,8 +16,10 @@ import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
 
 import Button from "components/Button";
-import useCustomAssets from "hooks/useCustomAssets";
 import { useModal } from "hooks/useModal";
+import { useAtom } from "jotai";
+import { useNetwork } from "hooks/useNetwork";
+import { customAssetsAtom } from "stores/assets";
 import PoolButton from "./PoolButton";
 import ImportAssetModal from "./ImportAssetModal";
 
@@ -52,10 +53,11 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
   const screenClass = useScreenClass();
 
   const { availableAssetAddresses, findPair } = usePairs();
-  const { customAssets } = useCustomAssets();
+  const network = useNetwork();
+  const [customAssetStore] = useAtom(customAssetsAtom);
   const customAssetAddresses = useMemo(() => {
-    return customAssets?.map((asset) => asset.address) || [];
-  }, [customAssets]);
+    return customAssetStore[network.name]?.map((asset) => asset.address) || [];
+  }, [customAssetStore, [network.name]]);
 
   const { getAsset } = useAssets();
 
