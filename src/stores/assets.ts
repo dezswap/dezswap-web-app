@@ -7,6 +7,10 @@ const assetsAtom = atomWithStorage<{
   [K in NetworkName]?: Asset[];
 }>("assets", { mainnet: [], testnet: [] });
 
+export const customAssetsAtom = atomWithStorage<{
+  [K in NetworkName]?: Asset[];
+}>("customAssets", { mainnet: [], testnet: [] });
+
 export const verifiedAssetsAtom = atom<VerifiedAssets | undefined>(undefined);
 
 export const bookmarksAtom = atomWithStorage<{

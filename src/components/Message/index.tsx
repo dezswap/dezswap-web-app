@@ -16,9 +16,10 @@ const Wrapper = styled.div<Pick<MessageProps, "variant">>`
   gap: 4px;
   padding: 12px 16px;
   border-radius: 12px;
-  opacity: 0.8;
+  opacity: 0.6;
   font-size: 14px;
   font-weight: 700;
+  line-height: normal;
 
   ${({ variant, theme }) => {
     switch (variant) {

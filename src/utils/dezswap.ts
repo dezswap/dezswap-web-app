@@ -61,22 +61,39 @@ export const generateReverseSimulationMsg = (
 export const generateCreatePoolMsg = (
   networkName: NetworkName,
   senderAddress: string,
-  assets: string[],
-) =>
+  assets: { address: string; amount: string }[],
+) => [
+  ...assets
+    .filter((a) => !isNativeTokenAddress(networkName, a.address))
+    .map(
+      (a) =>
+        new MsgExecuteContract(
+          senderAddress,
+          a.address,
+          {
+            increase_allowance: {
+              amount: a.amount,
+              spender: contractAddresses[networkName]?.factory,
+            },
+          },
+          [],
+        ),
+    ),
   new MsgExecuteContract(
     senderAddress,
     contractAddresses[networkName]?.factory || "",
     {
       create_pair: {
-        asset_infos: assets.map((a) =>
-          isNativeTokenAddress(networkName, a)
-            ? { native_token: { denom: a } }
-            : { token: { contract_addr: a } },
-        ),
+        assets: assets.map((a) => assetMsg(networkName, a)),
       },
     },
-    [],
-  );
+    new Coins(
+      assets
+        .filter((a) => isNativeTokenAddress(networkName, a.address))
+        .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
+    ),
+  ),
+];
 
 export const generateAddLiquidityMsg = (
   networkName: NetworkName,

@@ -5,6 +5,7 @@ import ProvidePage from "pages/Pool/Provide";
 import WithdrawPage from "pages/Pool/Withdraw";
 import PoolPage from "pages/Pool";
 import TradePage from "pages/Trade";
+import CreatePage from "pages/Pool/Create";
 
 export interface RouteObject extends Omit<RouteProps, "children"> {
   children?: RouteObject[];
@@ -27,6 +28,7 @@ const routes: RouteObject[] = [
     path: "pool",
     element: <PoolPage />,
     children: [
+      { path: "create/:asset1Address/:asset2Address", element: <CreatePage /> },
       { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
       { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
       { path: "*", element: <Navigate replace to="add-liquidity" /> },
