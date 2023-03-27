@@ -2,18 +2,22 @@ import { useCallback, useMemo, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useAPI } from "hooks/useAPI";
 import { useNetwork } from "hooks/useNetwork";
-import assetsAtom, { verifiedAssetsAtom } from "stores/assets";
+import assetsAtom, {
+  verifiedAssetsAtom,
+  verifiedIbcAssetsAtom,
+} from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
 import { Asset, NetworkName } from "types/common";
 import { isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
-import useCustomAssets from "./useCustomAssets";
+import useCustomAssets from "hooks/useCustomAssets";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
 const useAssets = () => {
   const [assetStore, setAssetStore] = useAtom(assetsAtom);
   const verifiedAssets = useAtomValue(verifiedAssetsAtom);
+  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
   const api = useAPI();
   const network = useNetwork();
   const { getCustomAsset } = useCustomAssets();
@@ -47,6 +51,24 @@ const useAssets = () => {
               if (asset) {
                 store[index] = {
                   ...asset,
+                  balance: balance || "0",
+                  updatedAt: new Date(),
+                };
+                setAssetStore((current) => ({
+                  ...current,
+                  [networkName]: assetStore[networkName],
+                }));
+              }
+            } else if (verifiedIbcAssets?.[networkName]?.[address.slice(4)]) {
+              const asset =
+                verifiedIbcAssets?.[networkName]?.[address.slice(4)];
+              const balance = await api.getNativeTokenBalance(address);
+              if (asset) {
+                store[index] = {
+                  ...asset,
+                  total_supply: "",
+                  address: asset.denom,
+                  iconSrc: asset.icon,
                   balance: balance || "0",
                   updatedAt: new Date(),
                 };
@@ -95,7 +117,9 @@ const useAssets = () => {
     (address: string, networkName: NetworkName) => {
       if (
         nativeTokens[networkName]?.some((item) => item.address === address) ||
-        AccAddress.validate(address)
+        AccAddress.validate(address) ||
+        (verifiedIbcAssets &&
+          !!verifiedIbcAssets[networkName]?.[address.slice(4)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);

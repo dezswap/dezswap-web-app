@@ -8,17 +8,19 @@ import {
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
 import { useAtomValue, useSetAtom } from "jotai";
-import { verifiedAssetsAtom } from "stores/assets";
+import { verifiedAssetsAtom, verifiedIbcAssetsAtom } from "stores/assets";
 import { useAPI } from "hooks/useAPI";
 import MainLayout from "layout/Main";
 import disclaimerLastSeenAtom from "stores/disclaimer";
 import DisclaimerModal from "components/Modal/DisclaimerModal";
 import globalElementsAtom from "stores/globalElements";
+import { VerifiedIbcAssets } from "types/token";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
+  const setKnownIbcAssets = useSetAtom(verifiedIbcAssetsAtom);
   const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
   const globalElements = useAtomValue(globalElementsAtom);
   const api = useAPI();
@@ -50,6 +52,28 @@ function App() {
   useEffect(() => {
     api.getVerifiedTokenInfo().then((assets) => {
       setKnownAssets(assets);
+    });
+    api.getVerifiedIbcTokenInfo().then((ibcAssets: VerifiedIbcAssets) => {
+      Object.entries(ibcAssets).forEach(([k, v]) => {
+        if (v) {
+          Object.entries(v).forEach(([kk, kv]) => {
+            api.getDecimal(kv?.denom || "").then((d) => {
+              if (d && ibcAssets && ibcAssets[k]?.[kk]) {
+                setKnownIbcAssets({
+                  ...ibcAssets,
+                  [k]: {
+                    ...ibcAssets[k],
+                    [kk]: {
+                      ...ibcAssets[k]?.[kk],
+                      decimals: d,
+                    },
+                  },
+                } as VerifiedIbcAssets);
+              }
+            });
+          });
+        }
+      });
     });
   }, [api, setKnownAssets]);
 

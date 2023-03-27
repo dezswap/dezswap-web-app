@@ -18,6 +18,20 @@ export type VerifiedTokenInfo = {
   token: string;
 };
 
+export type VerifiedIbcTokenInfo = {
+  decimals: number;
+  icon: string;
+  name: string;
+  symbol: string;
+  path: string;
+  base_denom: string;
+  denom: string;
+};
+
 export type VerifiedAssets = {
   [K in NetworkName]?: { [address: string]: VerifiedTokenInfo | undefined };
+};
+
+export type VerifiedIbcAssets = {
+  [K in NetworkName]?: { [address: string]: VerifiedIbcTokenInfo | undefined };
 };

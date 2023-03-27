@@ -2,9 +2,10 @@ import { useCallback, useMemo, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useAPI } from "hooks/useAPI";
 import { useNetwork } from "hooks/useNetwork";
-import assetsAtom, {
+import {
   customAssetsAtom,
   verifiedAssetsAtom,
+  verifiedIbcAssetsAtom,
 } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
 import { Asset, NetworkName } from "types/common";
@@ -16,6 +17,8 @@ const UPDATE_INTERVAL_SEC = 5000;
 const useCustomAssets = () => {
   const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const verifiedAssets = useAtomValue(verifiedAssetsAtom);
+  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+
   const api = useAPI();
   const network = useNetwork();
   const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
@@ -48,6 +51,24 @@ const useCustomAssets = () => {
               if (asset) {
                 store[index] = {
                   ...asset,
+                  balance: balance || "0",
+                  updatedAt: new Date(),
+                };
+                setCustomAssetStore((current) => ({
+                  ...current,
+                  [networkName]: customAssetStore[networkName],
+                }));
+              }
+            } else if (verifiedIbcAssets?.[networkName]?.[address.slice(4)]) {
+              const asset =
+                verifiedIbcAssets?.[networkName]?.[address.slice(4)];
+              const balance = await api.getNativeTokenBalance(address);
+              if (asset) {
+                store[index] = {
+                  ...asset,
+                  total_supply: "",
+                  address: asset.denom,
+                  iconSrc: asset.icon,
                   balance: balance || "0",
                   updatedAt: new Date(),
                 };
@@ -96,7 +117,9 @@ const useCustomAssets = () => {
     (address: string, networkName: NetworkName) => {
       if (
         nativeTokens[networkName]?.some((item) => item.address === address) ||
-        AccAddress.validate(address)
+        AccAddress.validate(address) ||
+        (verifiedIbcAssets &&
+          verifiedIbcAssets[networkName]?.[address.slice(4)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);
