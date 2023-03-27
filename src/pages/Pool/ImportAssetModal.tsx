@@ -21,6 +21,9 @@ import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
 import usePairs from "hooks/usePair";
 import { Asset } from "types/common";
+import { useAtomValue } from "jotai";
+import { verifiedIbcAssetsAtom } from "stores/assets";
+import { useNetwork } from "hooks/useNetwork";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Asset): void;
@@ -33,12 +36,20 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const [page, setPage] = useState<"form" | "confirm">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
+  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+  const network = useNetwork();
 
   const api = useAPI();
 
   const balance = useBalance(address);
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
+  const isIbcTokenAddress = useMemo(
+    () =>
+      verifiedIbcAssets &&
+      verifiedIbcAssets[network.name]?.[address.slice(4)] !== undefined,
+    [address, verifiedIbcAssets, network.name],
+  );
   const isValidAddress = useMemo(() => {
     return AccAddress.validate(address);
   }, [address]);
@@ -50,13 +61,13 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   }, [address, availableAssetAddresses, customAssets]);
 
   const errorMessage = useMemo(() => {
-    if (!isValidAddress) {
+    if (!isValidAddress && !isIbcTokenAddress) {
       return "Only token contract address is allowed.";
     }
-    if (isValidAddress && !tokenInfo) {
+    if ((isValidAddress || isIbcTokenAddress) && !tokenInfo) {
       return "Invalid token address. Please check the address again.";
     }
-    if (isValidAddress && isDuplicated) {
+    if ((isValidAddress || isIbcTokenAddress) && isDuplicated) {
       return "You can't import the token already in the list.";
     }
     return undefined;
@@ -77,6 +88,17 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             setTokenInfo(undefined);
           }
         }
+      } else if (isIbcTokenAddress) {
+        if (verifiedIbcAssets) {
+          const res =
+            verifiedIbcAssets[network.name]?.[deferredAddress.slice(4)];
+          if (!isAborted) {
+            setTokenInfo({
+              ...res,
+              total_supply: "",
+            } as TokenInfo);
+          }
+        }
       }
     };
 
@@ -84,7 +106,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     return () => {
       isAborted = true;
     };
-  }, [api, deferredAddress, isValidAddress]);
+  }, [
+    api,
+    deferredAddress,
+    isValidAddress,
+    isIbcTokenAddress,
+    verifiedIbcAssets,
+    network.name,
+  ]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -200,7 +229,11 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
               block
               size="large"
               type="submit"
-              disabled={!isValidAddress || !tokenInfo || isDuplicated}
+              disabled={
+                (!isValidAddress && !isIbcTokenAddress) ||
+                !tokenInfo ||
+                isDuplicated
+              }
             >
               Next
             </Button>
