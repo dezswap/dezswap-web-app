@@ -6,11 +6,11 @@ import {
   useState,
 } from "react";
 import Modal from "components/Modal";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import { css, useTheme } from "@emotion/react";
+import { useScreenClass } from "react-grid-system";
+import { css } from "@emotion/react";
 import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -58,8 +58,17 @@ const DISPLAY_DECIMAL = 3;
 const MOBILE_DISPLAY_NUMBER_CNT = 20;
 const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
+function formatRatio(value: number) {
+  if (value > 99.99) {
+    return "99.99";
+  }
+  if (value < 0.01 && value > 0) {
+    return "< 0.01";
+  }
+  return value.toFixed(2);
+}
+
 function CreatePage() {
-  const theme = useTheme();
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
@@ -213,15 +222,11 @@ function CreatePage() {
     if (!Number(formData.asset1Value) || !Number(formData.asset2Value)) {
       return [0, 0];
     }
-    return [formData.asset1Value, formData.asset2Value].map((value) =>
-      Numeric.parse(value)
-        .dividedBy(
-          Numeric.parse(formData.asset1Value).add(formData.asset2Value),
-        )
-        .mul(100)
-        .toDP(0)
-        .toNumber(),
-    );
+    const value1 = Numeric.parse(formData.asset1Value)
+      .dividedBy(Numeric.parse(formData.asset1Value).add(formData.asset2Value))
+      .mul(100)
+      .toNumber();
+    return [value1, 100 - value1];
   }, [formData.asset1Value, formData.asset2Value]);
 
   const estimatedLp = useMemo(() => {
@@ -379,8 +384,8 @@ function CreatePage() {
               !Number(formData.asset1Value) || !Number(formData.asset2Value)
             }
             label={[
-              `${asset1?.symbol} ${ratio[0]}%`,
-              `${asset2?.symbol} ${ratio[1]}%`,
+              `${asset1?.symbol} ${formatRatio(ratio[0])}%`,
+              `${asset2?.symbol} ${formatRatio(ratio[1])}%`,
             ]}
           />
         </Box>
