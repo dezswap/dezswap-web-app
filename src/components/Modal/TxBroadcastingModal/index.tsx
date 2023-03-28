@@ -9,7 +9,7 @@ import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { ellipsisCenter, getTransactionLink } from "utils";
 import { TxInfo } from "@xpla/xpla.js";
 import { TxError } from "types/common";
-import { useLCDClient } from "@xpla/wallet-provider";
+import { useLCDClient } from "hooks/useLCDClient";
 import Panel from "components/Panel";
 import Modal from "components/Modal";
 import { useNetwork } from "hooks/useNetwork";
@@ -36,7 +36,7 @@ function TxBroadcastingModal({
   ...modalProps
 }: ReactModal.Props & TxBroadcastingModalProps) {
   const network = useNetwork();
-  const lcd = useLCDClient();
+  const { lcd } = useLCDClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
 

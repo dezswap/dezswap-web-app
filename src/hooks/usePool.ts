@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLCDClient } from "@xpla/wallet-provider";
 import { Pool } from "types/pair";
 import { queryMessages } from "utils/dezswap";
+import { useLCDClient } from "hooks/useLCDClient";
 
 const usePool = (contractAddress?: string) => {
-  const lcd = useLCDClient();
+  const { lcd } = useLCDClient();
   const [pool, setPool] = useState<Pool>();
 
   useEffect(() => {
