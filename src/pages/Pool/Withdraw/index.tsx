@@ -55,6 +55,7 @@ import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -72,12 +73,25 @@ function WithdrawPage() {
   const screenClass = useScreenClass();
   const navigate = useNavigate();
   const network = useNetwork();
+
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+
+  const { requestPost } = useRequestPost(handleModalClose, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const { getPair } = usePairs();
-  const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
-  );
+  const pair = useMemo(() => {
+    const p = pairAddress ? getPair(pairAddress) : undefined;
+    if (!p) {
+      errorMessageModal.open();
+    }
+    return p;
+  }, [getPair, pairAddress]);
   const { getAsset } = useAssets();
   const [asset1, asset2] = useMemo(
     () =>
@@ -107,12 +121,6 @@ function WithdrawPage() {
     pair?.liquidity_token || "",
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
-
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
 
   const balance = useBalance(pair?.liquidity_token || "");
 

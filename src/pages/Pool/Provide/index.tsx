@@ -50,6 +50,7 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import ProgressBar from "components/ProgressBar";
 import Box from "components/Box";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -76,10 +77,24 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
-  const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
-  );
+
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+  const { requestPost } = useRequestPost(handleModalClose, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
+  const pair = useMemo(() => {
+    const p = pairAddress ? getPair(pairAddress) : undefined;
+
+    if (!p) {
+      errorMessageModal.open();
+    }
+
+    return p;
+  }, [getPair, pairAddress]);
   const [asset1, asset2] = useMemo(
     () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
     [getAsset, pair?.asset_addresses],
@@ -231,12 +246,6 @@ function ProvidePage() {
     formData.asset2Value,
   ]);
 
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
-
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -324,17 +333,6 @@ function ProvidePage() {
       );
     }
   }, [simulationResult, isPoolEmpty]);
-
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (pairs?.length && !pair) {
-        handleModalClose();
-      }
-    }, 500); // wait for 500ms to make sure the pair is loaded
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [handleModalClose, pair, pairs?.length]);
 
   return (
     <Modal

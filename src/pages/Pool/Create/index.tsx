@@ -47,6 +47,7 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import Box from "components/Box";
 import ProgressBar from "components/ProgressBar";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -83,13 +84,6 @@ function CreatePage() {
   const { getAsset } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
-  const [asset1, asset2] = useMemo(
-    () =>
-      asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map((address) => getAsset(address))
-        : [],
-    [asset1Address, asset2Address, getAsset],
-  );
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -107,6 +101,21 @@ function CreatePage() {
   }, []);
 
   const { requestPost } = useRequestPost(handleTxSuccess, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
+  const [asset1, asset2] = useMemo(() => {
+    const assets =
+      asset1Address && asset2Address
+        ? [asset1Address, asset2Address].map((address) => getAsset(address))
+        : [];
+
+    if (assets.length < 2 || assets.includes(undefined)) {
+      errorMessageModal.open();
+    }
+    return assets;
+  }, [asset1Address, asset2Address, getAsset]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
