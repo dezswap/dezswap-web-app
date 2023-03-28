@@ -29,7 +29,7 @@ const routes: RouteObject[] = [
     children: [
       { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
       { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
-      { path: "*", element: <Navigate replace to="add-liquidity" /> },
+      { path: "*", element: <Navigate replace to="/pool" /> },
     ],
   },
   { index: true, element: <Navigate replace to="trade" /> },
