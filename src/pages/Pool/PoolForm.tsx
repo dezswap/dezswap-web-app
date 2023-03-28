@@ -10,7 +10,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePair";
-import { formatNumber, formatDecimals, amountToValue } from "utils";
+import {formatNumber, formatDecimals, amountToValue, convertIbcTokenAddressForPath} from "utils";
 import iconPlus from "assets/icons/icon-plus.svg";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -238,7 +238,9 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         ) : undefined}
         {selectedAddress1 && selectedAddress2 && !pair ? (
           <Link
-            to={`/pool/create/${addresses?.join("/")}`}
+            to={`/pool/create/${addresses
+              ?.map((a) => convertIbcTokenAddressForPath(a))
+              .join("/")}`}
             css={css`
               text-decoration: none;
             `}

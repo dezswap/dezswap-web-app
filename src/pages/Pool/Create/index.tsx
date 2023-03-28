@@ -6,11 +6,11 @@ import {
   useState,
 } from "react";
 import Modal from "components/Modal";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import { css, useTheme } from "@emotion/react";
+import { useScreenClass } from "react-grid-system";
+import { css } from "@emotion/react";
 import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -22,7 +22,7 @@ import {
   filterNumberFormat,
   formatDecimals,
   formatNumber,
-  getTokenLink,
+  getTokenLink, revertIbcTokenAddressInPath,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
@@ -59,7 +59,6 @@ const MOBILE_DISPLAY_NUMBER_CNT = 20;
 const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
 function CreatePage() {
-  const theme = useTheme();
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
@@ -77,7 +76,9 @@ function CreatePage() {
   const [asset1, asset2] = useMemo(
     () =>
       asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map((address) => getAsset(address))
+        ? [asset1Address, asset2Address].map((address) =>
+            getAsset(revertIbcTokenAddressInPath(address) || ""),
+          )
         : [],
     [asset1Address, asset2Address, getAsset],
   );

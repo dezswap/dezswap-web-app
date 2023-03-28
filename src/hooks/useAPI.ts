@@ -75,9 +75,10 @@ export const useAPI = () => {
       if (!contractAddress) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<Pool>(contractAddress, {
-        pool: {},
-      });
+      const res = await lcd.wasm.contractQuery<Pool>(
+        contractAddress,
+        queryMessages.getPool(),
+      );
 
       return res;
     },

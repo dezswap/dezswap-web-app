@@ -111,3 +111,9 @@ export const getTokenLink = (address?: string, network?: string) => {
     address === XPLA_ADDRESS ? "xpla" : address
   }`;
 };
+
+export const convertIbcTokenAddressForPath = (address?: string) =>
+  address?.replace("ibc/", "ibc-");
+
+export const revertIbcTokenAddressInPath = (address?: string) =>
+  address?.replace("ibc-", "ibc/");
