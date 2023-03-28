@@ -93,7 +93,11 @@ function CreatePage() {
     navigate("/pool", { replace: true });
   }, [navigate]);
 
-  const { requestPost } = useRequestPost(handleModalClose, true);
+  const handleTxSuccess = useCallback(() => {
+    window.location.replace("/pool");
+  }, []);
+
+  const { requestPost } = useRequestPost(handleTxSuccess, true);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
