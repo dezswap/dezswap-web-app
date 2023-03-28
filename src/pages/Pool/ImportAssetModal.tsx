@@ -11,7 +11,12 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import ReactModal from "react-modal";
 import { TokenInfo } from "types/token";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { amountToValue, cutDecimal, formatNumber } from "utils";
+import {
+  amountToValue,
+  cutDecimal,
+  formatNumber,
+  isNativeTokenAddress,
+} from "utils";
 import {
   DISPLAY_DECIMAL,
   MOBILE_SCREEN_CLASS,
@@ -24,6 +29,7 @@ import { Asset } from "types/common";
 import { useAtomValue } from "jotai";
 import { verifiedIbcAssetsAtom } from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
+import { nativeTokens } from "../../constants/network";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Asset): void;
@@ -44,15 +50,20 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const balance = useBalance(address);
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
-  const isIbcTokenAddress = useMemo(
+  const isNativeToken = useMemo(
+    () => isNativeTokenAddress(network.name, address),
+    [network.name, address],
+  );
+  const isIbcToken = useMemo(
     () =>
       verifiedIbcAssets &&
       verifiedIbcAssets[network.name]?.[address.slice(4)] !== undefined,
     [address, verifiedIbcAssets, network.name],
   );
-  const isValidAddress = useMemo(() => {
-    return AccAddress.validate(address);
-  }, [address]);
+  const isValidAddress = useMemo(
+    () => AccAddress.validate(address) || isNativeToken || isIbcToken,
+    [address, isNativeToken, isIbcToken],
+  );
   const isDuplicated = useMemo(() => {
     return (
       customAssets?.some((item) => item.address === address) ||
@@ -61,13 +72,13 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   }, [address, availableAssetAddresses, customAssets]);
 
   const errorMessage = useMemo(() => {
-    if (!isValidAddress && !isIbcTokenAddress) {
+    if (!isValidAddress) {
       return "Only token contract address is allowed.";
     }
-    if ((isValidAddress || isIbcTokenAddress) && !tokenInfo) {
+    if (isValidAddress && !tokenInfo) {
       return "Invalid token address. Please check the address again.";
     }
-    if ((isValidAddress || isIbcTokenAddress) && isDuplicated) {
+    if (isValidAddress && isDuplicated) {
       return "You can't import the token already in the list.";
     }
     return undefined;
@@ -76,7 +87,25 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   useEffect(() => {
     let isAborted = false;
     const fetchAsset = async () => {
-      if (isValidAddress) {
+      if (isNativeToken) {
+        const asset = nativeTokens[network.name]?.find(
+          (item) => item.address === deferredAddress,
+        );
+        if (!isAborted && asset) {
+          setTokenInfo(asset as TokenInfo);
+        }
+      } else if (isIbcToken) {
+        if (verifiedIbcAssets) {
+          const res =
+            verifiedIbcAssets[network.name]?.[deferredAddress.slice(4)];
+          if (!isAborted) {
+            setTokenInfo({
+              ...res,
+              total_supply: "",
+            } as TokenInfo);
+          }
+        }
+      } else if (isValidAddress) {
         try {
           const res = await api.getToken(deferredAddress);
           if (!isAborted) {
@@ -86,17 +115,6 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
           console.log(error);
           if (!isAborted) {
             setTokenInfo(undefined);
-          }
-        }
-      } else if (isIbcTokenAddress) {
-        if (verifiedIbcAssets) {
-          const res =
-            verifiedIbcAssets[network.name]?.[deferredAddress.slice(4)];
-          if (!isAborted) {
-            setTokenInfo({
-              ...res,
-              total_supply: "",
-            } as TokenInfo);
           }
         }
       }
@@ -110,7 +128,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     api,
     deferredAddress,
     isValidAddress,
-    isIbcTokenAddress,
+    isNativeToken,
+    isIbcToken,
     verifiedIbcAssets,
     network.name,
   ]);
@@ -229,11 +248,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
               block
               size="large"
               type="submit"
-              disabled={
-                (!isValidAddress && !isIbcTokenAddress) ||
-                !tokenInfo ||
-                isDuplicated
-              }
+              disabled={!isValidAddress || !tokenInfo || isDuplicated}
             >
               Next
             </Button>
