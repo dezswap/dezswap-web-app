@@ -27,7 +27,7 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
@@ -86,19 +86,32 @@ function ProvidePage() {
     onReturnClick: handleModalClose,
   });
 
-  const pair = useMemo(() => {
-    const p = pairAddress ? getPair(pairAddress) : undefined;
+  const pair = useMemo(
+    () => (pairAddress ? getPair(pairAddress) : undefined),
+    [getPair, pairAddress],
+  );
 
-    if (!p) {
-      errorMessageModal.open();
-    }
-
-    return p;
-  }, [getPair, pairAddress]);
   const [asset1, asset2] = useMemo(
     () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
     [getAsset, pair?.asset_addresses],
   );
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!asset1 || !asset2) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (pairAddress && !AccAddress.validate(pairAddress)) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",

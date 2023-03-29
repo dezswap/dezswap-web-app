@@ -23,10 +23,11 @@ import {
   formatDecimals,
   formatNumber,
   getTokenLink,
+  isNativeTokenAddress,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
@@ -108,14 +109,44 @@ function CreatePage() {
   const [asset1, asset2] = useMemo(() => {
     const assets =
       asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map((address) => getAsset(address))
-        : [];
-
-    if (assets.length < 2 || assets.includes(undefined)) {
-      errorMessageModal.open();
-    }
+        ? [asset1Address, asset2Address].map(
+            (address) => getAsset(address) || null,
+          )
+        : [undefined, undefined];
     return assets;
   }, [asset1Address, asset2Address, getAsset]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (asset1 === null || asset2 === null) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (
+      asset1Address &&
+      asset2Address &&
+      ((!AccAddress.validate(asset1Address) &&
+        !isNativeTokenAddress(network.name, asset1Address)) ||
+        (!AccAddress.validate(asset2Address) &&
+          !isNativeTokenAddress(network.name, asset2Address)) ||
+        asset1Address === asset2Address)
+    ) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [
+    asset1,
+    asset1Address,
+    asset2,
+    asset2Address,
+    errorMessageModal,
+    network,
+  ]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>

@@ -39,7 +39,7 @@ import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useRequestPost from "hooks/useRequestPost";
 import { useFee } from "hooks/useFee";
@@ -85,13 +85,10 @@ function WithdrawPage() {
 
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const { getPair } = usePairs();
-  const pair = useMemo(() => {
-    const p = pairAddress ? getPair(pairAddress) : undefined;
-    if (!p) {
-      errorMessageModal.open();
-    }
-    return p;
-  }, [getPair, pairAddress]);
+  const pair = useMemo(
+    () => (pairAddress ? getPair(pairAddress) : undefined),
+    [getPair, pairAddress],
+  );
   const { getAsset } = useAssets();
   const [asset1, asset2] = useMemo(
     () =>
@@ -107,6 +104,23 @@ function WithdrawPage() {
         : [undefined, undefined],
     [getAsset, pair],
   );
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!asset1?.address || !asset2?.address) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (pairAddress && !AccAddress.validate(pairAddress)) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
