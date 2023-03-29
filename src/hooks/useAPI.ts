@@ -166,7 +166,7 @@ export const useAPI = () => {
       });
       return res.decimals;
     },
-    [lcd, walletAddress],
+    [network.name, lcd, walletAddress],
   );
 
   const api = useMemo(

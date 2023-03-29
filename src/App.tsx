@@ -15,6 +15,7 @@ import disclaimerLastSeenAtom from "stores/disclaimer";
 import DisclaimerModal from "components/Modal/DisclaimerModal";
 import globalElementsAtom from "stores/globalElements";
 import { VerifiedIbcAssets } from "types/token";
+import { useNetwork } from "./hooks/useNetwork";
 
 setGridConfiguration(gridConfiguration);
 
@@ -24,6 +25,7 @@ function App() {
   const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
   const globalElements = useAtomValue(globalElementsAtom);
   const api = useAPI();
+  const network = useNetwork();
   const screenClass = useScreenClass();
   const isDisclaimerAgreed = useMemo(() => {
     if (!disclaimerLastSeen) return false;
@@ -54,28 +56,29 @@ function App() {
       setKnownAssets(assets);
     });
     api.getVerifiedIbcTokenInfo().then((ibcAssets: VerifiedIbcAssets) => {
-      Object.entries(ibcAssets).forEach(([k, v]) => {
-        if (v) {
-          Object.entries(v).forEach(([kk, kv]) => {
-            api.getDecimal(kv?.denom || "").then((d) => {
-              if (d && ibcAssets && ibcAssets[k]?.[kk]) {
-                setKnownIbcAssets({
-                  ...ibcAssets,
-                  [k]: {
-                    ...ibcAssets[k],
-                    [kk]: {
-                      ...ibcAssets[k]?.[kk],
-                      decimals: d,
-                    },
-                  },
-                } as VerifiedIbcAssets);
+      const updatedIbcAssets = ibcAssets[network.name];
+      if (updatedIbcAssets) {
+        Promise.all(
+          Object.entries(updatedIbcAssets).map(([k, v]) =>
+            api.getDecimal(v?.denom || "").then((d) => {
+              const asset =
+                updatedIbcAssets && updatedIbcAssets?.[k]
+                  ? updatedIbcAssets?.[k]
+                  : undefined;
+              if (d && asset) {
+                asset.decimals = d;
               }
-            });
-          });
-        }
-      });
+            }),
+          ),
+        ).then(() => {
+          setKnownIbcAssets((current) => ({
+            ...current,
+            [network.name]: updatedIbcAssets,
+          }));
+        });
+      }
     });
-  }, [api, setKnownAssets]);
+  }, [api, setKnownAssets, setKnownIbcAssets]);
 
   const renderRoute = useCallback(
     ({ children, element, index, ...props }: RouteObject) => {
