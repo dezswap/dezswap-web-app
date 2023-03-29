@@ -9,7 +9,7 @@ import {
 } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
 import { Asset, NetworkName } from "types/common";
-import { isNativeTokenAddress } from "utils";
+import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 
 const UPDATE_INTERVAL_SEC = 5000;
@@ -59,9 +59,11 @@ const useCustomAssets = () => {
                   [networkName]: customAssetStore[networkName],
                 }));
               }
-            } else if (verifiedIbcAssets?.[networkName]?.[address.slice(4)]) {
+            } else if (
+              verifiedIbcAssets?.[networkName]?.[getIbcTokenHash(address)]
+            ) {
               const asset =
-                verifiedIbcAssets?.[networkName]?.[address.slice(4)];
+                verifiedIbcAssets?.[networkName]?.[getIbcTokenHash(address)];
               const balance = await api.getNativeTokenBalance(address);
               if (asset) {
                 store[index] = {
@@ -119,7 +121,7 @@ const useCustomAssets = () => {
         nativeTokens[networkName]?.some((item) => item.address === address) ||
         AccAddress.validate(address) ||
         (verifiedIbcAssets &&
-          verifiedIbcAssets[networkName]?.[address.slice(4)])
+          verifiedIbcAssets[networkName]?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useAPI } from "hooks/useAPI";
-import { isNativeTokenAddress } from "utils";
+import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { useAtomValue } from "jotai";
 import { verifiedIbcAssetsAtom } from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
@@ -25,7 +25,7 @@ export const useBalance = (asset: string) => {
         if (
           isNativeTokenAddress(connectedWallet?.network.name, asset) ||
           (verifiedIbcAssets &&
-            !!verifiedIbcAssets[network.name]?.[asset.slice(4)])
+            !!verifiedIbcAssets[network.name]?.[getIbcTokenHash(asset)])
         ) {
           api
             .getNativeTokenBalance(asset)

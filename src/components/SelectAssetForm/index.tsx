@@ -8,6 +8,7 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
+  getIbcTokenHash,
   isNativeTokenAddress,
 } from "utils";
 import { Asset as OrgAsset } from "types/common";
@@ -25,8 +26,6 @@ import Panel from "components/Panel";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Tooltip from "components/Tooltip";
 import { useNetwork } from "hooks/useNetwork";
-import { useAtomValue } from "jotai";
-import { verifiedIbcAssetsAtom } from "stores/assets";
 
 type Asset = Partial<OrgAsset & { disabled?: boolean }>;
 export type LPAsset = {
@@ -170,8 +169,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset, verifiedAssets } = useAssets();
-  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+  const { getAsset, verifiedAssets, verifiedIbcAssets } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -210,8 +208,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       const isVerified =
         !!verifiedAssets?.[address] ||
         isNativeTokenAddress(network.name, address) ||
-        (verifiedIbcAssets &&
-          !!verifiedIbcAssets[network.name]?.[address.slice(4)]);
+        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)]);
       return (
         <AssetItem
           key={address}

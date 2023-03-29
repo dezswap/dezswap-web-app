@@ -8,7 +8,7 @@ import assetsAtom, {
 } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
 import { Asset, NetworkName } from "types/common";
-import { isNativeTokenAddress } from "utils";
+import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import useCustomAssets from "hooks/useCustomAssets";
 
@@ -59,9 +59,11 @@ const useAssets = () => {
                   [networkName]: assetStore[networkName],
                 }));
               }
-            } else if (verifiedIbcAssets?.[networkName]?.[address.slice(4)]) {
+            } else if (
+              verifiedIbcAssets?.[networkName]?.[getIbcTokenHash(address)]
+            ) {
               const asset =
-                verifiedIbcAssets?.[networkName]?.[address.slice(4)];
+                verifiedIbcAssets?.[networkName]?.[getIbcTokenHash(address)];
               const balance = await api.getNativeTokenBalance(address);
               if (asset) {
                 store[index] = {
@@ -119,7 +121,7 @@ const useAssets = () => {
         nativeTokens[networkName]?.some((item) => item.address === address) ||
         AccAddress.validate(address) ||
         (verifiedIbcAssets &&
-          !!verifiedIbcAssets[networkName]?.[address.slice(4)])
+          !!verifiedIbcAssets[networkName]?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);
@@ -149,8 +151,12 @@ const useAssets = () => {
   );
 
   return useMemo(
-    () => ({ getAsset, verifiedAssets: verifiedAssets?.[network.name] }),
-    [getAsset, network.name, verifiedAssets],
+    () => ({
+      getAsset,
+      verifiedAssets: verifiedAssets?.[network.name],
+      verifiedIbcAssets: verifiedIbcAssets?.[network.name],
+    }),
+    [getAsset, network.name, verifiedAssets, verifiedIbcAssets],
   );
 };
 

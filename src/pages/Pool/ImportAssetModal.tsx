@@ -15,6 +15,7 @@ import {
   amountToValue,
   cutDecimal,
   formatNumber,
+  getIbcTokenHash,
   isNativeTokenAddress,
 } from "utils";
 import {
@@ -29,7 +30,7 @@ import { Asset } from "types/common";
 import { useAtomValue } from "jotai";
 import { verifiedIbcAssetsAtom } from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
-import { nativeTokens } from "../../constants/network";
+import { nativeTokens } from "constants/network";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Asset): void;
@@ -57,7 +58,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const isIbcToken = useMemo(
     () =>
       verifiedIbcAssets &&
-      verifiedIbcAssets[network.name]?.[address.slice(4)] !== undefined,
+      verifiedIbcAssets[network.name]?.[getIbcTokenHash(address)] !== undefined,
     [address, verifiedIbcAssets, network.name],
   );
   const isValidAddress = useMemo(
@@ -97,7 +98,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       } else if (isIbcToken) {
         if (verifiedIbcAssets) {
           const res =
-            verifiedIbcAssets[network.name]?.[deferredAddress.slice(4)];
+            verifiedIbcAssets[network.name]?.[getIbcTokenHash(deferredAddress)];
           if (!isAborted) {
             setTokenInfo({
               ...res,

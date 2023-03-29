@@ -8,6 +8,8 @@ export type Network = {
 export const XPLA_ADDRESS = "axpla";
 export const XPLA_SYMBOL = "XPLA";
 
+export const IBC_PREFIX = 4;
+
 const networks: Record<string, Network> = {
   dimension: {
     lcd: "https://dimension-lcd.xpla.dev",
