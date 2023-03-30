@@ -770,8 +770,8 @@ function ProvidePage() {
                       align-items: center;
                     `}
                   >
-                    Providing a liquidity of 1,000LP minimum is required to
-                    create a new pool.
+                    Providing a liquidity of {formatNumber(LOCKED_LP_SUPPLY)} LP
+                    minimum is required to create a new pool.
                   </Col>
                 </Row>
               </Message>
