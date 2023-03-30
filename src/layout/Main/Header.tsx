@@ -342,7 +342,17 @@ function Header() {
                                     DISPLAY_DECIMAL,
                                   ),
                                 )} ${XPLA_SYMBOL}`}
-                            <img src={iconDropdown} width={22} alt="dropdown" />
+                            <img
+                              src={iconDropdown}
+                              width={22}
+                              alt="dropdown"
+                              css={css`
+                                ${walletPopover.isOpen &&
+                                css`
+                                  transform: rotateX(-180deg);
+                                `}
+                              `}
+                            />
                           </Button>
                         }
                       >
