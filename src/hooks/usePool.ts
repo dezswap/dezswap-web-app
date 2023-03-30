@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLCDClient } from "@xpla/wallet-provider";
 import { Pool } from "types/pair";
-import { queryMessages } from "utils/dezswap";
+import { useAPI } from "hooks/useAPI";
 
 const usePool = (contractAddress?: string) => {
   const lcd = useLCDClient();
   const [pool, setPool] = useState<Pool>();
+  const api = useAPI();
 
   useEffect(() => {
     const fetchPool = async () => {
@@ -13,10 +14,7 @@ const usePool = (contractAddress?: string) => {
         setPool(undefined);
         return;
       }
-      const res = await lcd?.wasm.contractQuery<Pool>(
-        contractAddress,
-        queryMessages.getPool(),
-      );
+      const res = await api.getPool(contractAddress);
       setPool(res);
     };
 

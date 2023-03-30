@@ -8,6 +8,7 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
+  getIbcTokenHash,
   isNativeTokenAddress,
 } from "utils";
 import { Asset as OrgAsset } from "types/common";
@@ -168,7 +169,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset, verifiedAssets } = useAssets();
+  const { getAsset, verifiedAssets, verifiedIbcAssets } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -206,7 +207,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       const asset = getAsset(address);
       const isVerified =
         !!verifiedAssets?.[address] ||
-        isNativeTokenAddress(network.name, address);
+        isNativeTokenAddress(network.name, address) ||
+        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)]);
       return (
         <AssetItem
           key={address}

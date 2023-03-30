@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useAPI } from "hooks/useAPI";
-import { isNativeTokenAddress } from "utils";
+import { getIbcTokenHash, isNativeTokenAddress } from "utils";
+import { useAtomValue } from "jotai";
+import { verifiedIbcAssetsAtom } from "stores/assets";
+import { useNetwork } from "hooks/useNetwork";
 
 const UPDATE_INTERVAL = 2500;
 
 export const useBalance = (asset: string) => {
   const connectedWallet = useConnectedWallet();
   const [balance, setBalance] = useState<string>();
+  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+  const network = useNetwork();
   const api = useAPI();
 
   useEffect(() => {
@@ -17,7 +22,11 @@ export const useBalance = (asset: string) => {
       }
 
       if (asset && connectedWallet?.network.name) {
-        if (isNativeTokenAddress(connectedWallet?.network.name, asset)) {
+        if (
+          isNativeTokenAddress(connectedWallet?.network.name, asset) ||
+          (verifiedIbcAssets &&
+            !!verifiedIbcAssets[network.name]?.[getIbcTokenHash(asset)])
+        ) {
           api
             .getNativeTokenBalance(asset)
             .then((value) =>
@@ -43,7 +52,7 @@ export const useBalance = (asset: string) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [api, connectedWallet, asset]);
+  }, [api, connectedWallet, asset, verifiedIbcAssets, network.name]);
 
   return useMemo(() => balance, [balance]);
 };

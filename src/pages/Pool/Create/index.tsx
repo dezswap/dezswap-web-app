@@ -22,7 +22,7 @@ import {
   filterNumberFormat,
   formatDecimals,
   formatNumber,
-  getTokenLink,
+  getTokenLink, revertIbcTokenAddressInPath,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
@@ -86,7 +86,9 @@ function CreatePage() {
   const [asset1, asset2] = useMemo(
     () =>
       asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map((address) => getAsset(address))
+        ? [asset1Address, asset2Address].map((address) =>
+            getAsset(revertIbcTokenAddressInPath(address) || ""),
+          )
         : [],
     [asset1Address, asset2Address, getAsset],
   );
