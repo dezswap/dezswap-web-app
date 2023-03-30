@@ -23,6 +23,7 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
+  formatRatio,
   getTokenLink,
   valueToAmount,
 } from "utils";
@@ -255,15 +256,11 @@ function ProvidePage() {
     if (!Number(formData.asset1Value) || !Number(formData.asset2Value)) {
       return [0, 0];
     }
-    return [formData.asset1Value, formData.asset2Value].map((value) =>
-      Numeric.parse(value)
-        .dividedBy(
-          Numeric.parse(formData.asset1Value).add(formData.asset2Value),
-        )
-        .mul(100)
-        .toDP(0)
-        .toNumber(),
-    );
+    const value1 = Numeric.parse(formData.asset1Value)
+      .dividedBy(Numeric.parse(formData.asset1Value).add(formData.asset2Value))
+      .mul(100)
+      .toNumber();
+    return [value1, 100 - value1];
   }, [formData.asset1Value, formData.asset2Value]);
 
   useEffect(() => {
@@ -447,8 +444,8 @@ function ProvidePage() {
                 !Number(formData.asset1Value) || !Number(formData.asset2Value)
               }
               label={[
-                `${asset1?.symbol} ${ratio[0]}%`,
-                `${asset2?.symbol} ${ratio[1]}%`,
+                `${asset1?.symbol} ${formatRatio(ratio[0])}%`,
+                `${asset2?.symbol} ${formatRatio(ratio[1])}%`,
               ]}
             />
           </Box>
