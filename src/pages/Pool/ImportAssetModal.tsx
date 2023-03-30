@@ -50,6 +50,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   }, [address, availableAssetAddresses, customAssets]);
 
   const errorMessage = useMemo(() => {
+    if (!address) {
+      return undefined;
+    }
     if (!isValidAddress) {
       return "Only token contract address is allowed.";
     }
@@ -60,7 +63,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       return "You can't import the token already in the list.";
     }
     return undefined;
-  }, [tokenInfo, isDuplicated, isValidAddress]);
+  }, [address, isValidAddress, tokenInfo, isDuplicated]);
 
   useEffect(() => {
     let isAborted = false;
@@ -151,7 +154,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             </Typography>
             <div
               css={css`
-                margin-bottom: 10px;
+                padding-bottom: 10px;
               `}
             >
               <Input
@@ -174,7 +177,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
                   }
                 `}
                 borderStyle="solid"
-                placeholder="Paste contract address"
+                placeholder="Paste token contract address"
                 onChange={(event) => {
                   setAddress(event.target.value);
                 }}
@@ -182,7 +185,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             </div>
             <div
               css={css`
-                margin-bottom: 10px;
+                padding-bottom: 10px;
               `}
             >
               {errorMessage && (
@@ -200,7 +203,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
               block
               size="large"
               type="submit"
-              disabled={!isValidAddress || !tokenInfo || isDuplicated}
+              disabled={
+                !address || !isValidAddress || !tokenInfo || isDuplicated
+              }
             >
               Next
             </Button>
@@ -211,11 +216,15 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
           <form onSubmit={onConfirm}>
             <div
               css={css`
-                padding: 13px 16px;
+                padding: 16px 27px;
+                .${MOBILE_SCREEN_CLASS} & {
+                  padding: 15px 13px;
+                }
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 gap: 6px;
+                margin-bottom: 20px;
               `}
             >
               <div
