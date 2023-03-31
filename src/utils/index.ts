@@ -129,4 +129,4 @@ export const formatRatio = (value: number) => {
     return "< 0.01";
   }
   return value.toFixed(2);
-}
+};
