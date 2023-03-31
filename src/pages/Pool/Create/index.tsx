@@ -290,10 +290,10 @@ function CreatePage() {
     if (!formData.asset1Value && !formData.asset2Value) {
       return "Enter an amount";
     }
-    if (!formData.asset1Value) {
+    if (!formData.asset1Value || Numeric.parse(formData.asset1Value).lte(0)) {
       return `Enter ${asset1.symbol} amount`;
     }
-    if (!formData.asset2Value) {
+    if (!formData.asset2Value || Numeric.parse(formData.asset2Value).lte(0)) {
       return `Enter ${asset2.symbol} amount`;
     }
     if (
@@ -549,8 +549,12 @@ function CreatePage() {
             `}
           >
             <Message variant="error">
-              Providing a liquidity of {formatNumber(LOCKED_LP_SUPPLY)} LP
-              minimum is required to create a new pool.
+              Please be aware that the initial liquidity provision deducts&nbsp;
+              {formatNumber(
+                amountToValue(LOCKED_LP_SUPPLY, LP_DECIMALS) || "0",
+              )}
+              &nbsp;LP from the share a user will receive and lock in its pair
+              for protection.
             </Message>
           </div>
         </div>
