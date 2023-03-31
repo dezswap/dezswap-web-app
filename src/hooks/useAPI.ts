@@ -24,7 +24,7 @@ interface Decimal {
 
 export const useAPI = () => {
   const network = useNetwork();
-  const { lcd } = useLCDClient();
+  const lcd = useLCDClient();
   const connectedWallet = useConnectedWallet();
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,

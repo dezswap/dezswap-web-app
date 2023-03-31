@@ -6,7 +6,7 @@ import { useLCDClient } from "hooks/useLCDClient";
 
 export const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
-  const { lcd } = useLCDClient();
+  const lcd = useLCDClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);

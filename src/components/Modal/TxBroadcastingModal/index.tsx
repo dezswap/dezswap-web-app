@@ -36,7 +36,7 @@ function TxBroadcastingModal({
   ...modalProps
 }: ReactModal.Props & TxBroadcastingModalProps) {
   const network = useNetwork();
-  const { lcd } = useLCDClient();
+  const lcd = useLCDClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
 

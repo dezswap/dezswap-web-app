@@ -17,7 +17,7 @@ const useSimulate = ({
   amount?: Numeric.Input;
   isReversed?: boolean;
 }) => {
-  const { lcd } = useLCDClient();
+  const lcd = useLCDClient();
   const { findPair } = usePairs();
   const [result, setResult] = useState<
     Simulation | ReverseSimulation | undefined

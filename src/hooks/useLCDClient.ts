@@ -4,15 +4,13 @@ import { useMemo } from "react";
 
 export const useLCDClient = () => {
   const network = useNetwork();
-
   return useMemo(
-    () => ({
-      lcd: new LCDClient({
+    () =>
+      new LCDClient({
         URL: network.lcd,
         chainID: network.chainID,
         gasAdjustment: 1.1,
       }),
-    }),
     [network],
   );
 };
