@@ -12,13 +12,14 @@ const Wrapper = styled.div<Pick<MessageProps, "variant">>`
   position: relative;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 12px;
-  opacity: 0.8;
+  opacity: 0.6;
   font-size: 14px;
   font-weight: 700;
+  line-height: normal;
 
   ${({ variant, theme }) => {
     switch (variant) {
@@ -51,6 +52,7 @@ const Content = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 3px;
 `;
 
 const Icon = styled.div<{ src?: string }>`

@@ -1,10 +1,10 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
 import { ReverseSimulation, Simulation } from "types/pair";
-import { useLCDClient } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePair";
 import { useNetwork } from "hooks/useNetwork";
 import { useAPI } from "hooks/useAPI";
+import { useLCDClient } from "hooks/useLCDClient";
 
 const useSimulate = ({
   fromAddress,

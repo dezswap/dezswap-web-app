@@ -8,9 +8,9 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
+  getIbcTokenHash,
   isNativeTokenAddress,
 } from "utils";
-import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
@@ -33,11 +33,12 @@ export type LPAsset = {
   assets: [Asset, Asset];
   disabled?: boolean;
 };
-interface SelectAssetFormProps {
+
+type SelectAssetFormProps = React.PropsWithChildren<{
   selectedAssetAddress?: string;
   onSelect?(address: string): void;
   addressList?: string[];
-}
+}>;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -153,17 +154,33 @@ const AssetIcon = styled.div<{ src?: string }>`
   background-repeat: no-repeat;
 `;
 
+const NoResult = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  left: 0;
+  top: 0;
+  justify-content: center;
+  align-items: center;
+`;
+
 const tabs = [
   { label: "All", value: "all" },
   { label: "Bookmark", value: "bookmark" },
 ];
 
 function SelectAssetForm(props: SelectAssetFormProps) {
-  const { onSelect: handleSelect, selectedAssetAddress, addressList } = props;
+  const {
+    onSelect: handleSelect,
+    selectedAssetAddress,
+    addressList,
+    children,
+  } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset, verifiedAssets } = useAssets();
+  const { getAsset, verifiedAssets, verifiedIbcAssets } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -177,15 +194,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
 
     if (isBookmark && !filteredList?.length) {
       return (
-        <div
-          css={css`
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          `}
-        >
+        <NoResult>
           <Typography
             size={22}
             weight={900}
@@ -193,7 +202,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           >
             No bookmark found
           </Typography>
-        </div>
+        </NoResult>
       );
     }
 
@@ -201,7 +210,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       const asset = getAsset(address);
       const isVerified =
         !!verifiedAssets?.[address] ||
-        isNativeTokenAddress(network.name, address);
+        isNativeTokenAddress(network.name, address) ||
+        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)]);
       return (
         <AssetItem
           key={address}
@@ -332,15 +342,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     return deferredSearchKeyword &&
       (items === undefined ||
         items?.filter((i) => !i.props.invisible)?.length < 1) ? (
-      <div
-        css={css`
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
+      <NoResult>
         <Typography
           size={22}
           weight={900}
@@ -348,7 +350,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         >
           No result found
         </Typography>
-      </div>
+      </NoResult>
     ) : (
       items
     );
@@ -364,6 +366,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     toggleBookmark,
     network,
     verifiedAssets,
+    children,
   ]);
   return (
     <Wrapper>
@@ -436,7 +439,22 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </Row>
         <Hr />
       </Panel>
-      <AssetList>{assetList}</AssetList>
+      <AssetList>
+        <div
+          css={css`
+            position: relative;
+            min-height: 100%;
+            ${children &&
+            tabIdx === 0 &&
+            css`
+              min-height: calc(100% - 72px);
+            `}
+          `}
+        >
+          {assetList}
+        </div>
+        {tabIdx === 0 && children}
+      </AssetList>
     </Wrapper>
   );
 }

@@ -39,7 +39,7 @@ import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useRequestPost from "hooks/useRequestPost";
 import { useFee } from "hooks/useFee";
@@ -55,6 +55,7 @@ import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -72,6 +73,16 @@ function WithdrawPage() {
   const screenClass = useScreenClass();
   const navigate = useNavigate();
   const network = useNetwork();
+
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+
+  const { requestPost } = useRequestPost(handleModalClose, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const { getPair } = usePairs();
   const pair = useMemo(
@@ -94,6 +105,23 @@ function WithdrawPage() {
     [getAsset, pair],
   );
 
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!asset1?.address || !asset2?.address) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (pairAddress && !AccAddress.validate(pairAddress)) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
+
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -107,12 +135,6 @@ function WithdrawPage() {
     pair?.liquidity_token || "",
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
-
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
 
   const balance = useBalance(pair?.liquidity_token || "");
 
@@ -185,7 +207,7 @@ function WithdrawPage() {
         return "Insufficient LP balance";
       }
 
-      return "Remove liquidity";
+      return "Remove";
     }
 
     return "Enter an amount";

@@ -12,7 +12,7 @@ import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 
 interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
-  asset?: Partial<Asset> | null;
+  asset?: Partial<Asset>;
   onBalanceClick?(
     value: string,
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,

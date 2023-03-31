@@ -23,11 +23,12 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
+  formatRatio,
   getTokenLink,
   valueToAmount,
 } from "utils";
-import { LP_DECIMALS } from "constants/dezswap";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
@@ -48,6 +49,9 @@ import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
+import ProgressBar from "components/ProgressBar";
+import Box from "components/Box";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -74,14 +78,41 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
+
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+  const { requestPost } = useRequestPost(handleModalClose, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
   const pair = useMemo(
     () => (pairAddress ? getPair(pairAddress) : undefined),
     [getPair, pairAddress],
   );
+
   const [asset1, asset2] = useMemo(
     () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
     [getAsset, pair?.asset_addresses],
   );
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!asset1 || !asset2) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (pairAddress && !AccAddress.validate(pairAddress)) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -213,7 +244,7 @@ function ProvidePage() {
       if (formData.asset1Value && !formData.asset2Value) {
         return `Enter ${asset2?.symbol} amount`;
       }
-      return "Add liquidity";
+      return "Add";
     }
 
     if (formData.asset2Value && !formData.asset1Value) {
@@ -229,12 +260,6 @@ function ProvidePage() {
     formData.asset2Value,
   ]);
 
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
-
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -248,6 +273,17 @@ function ProvidePage() {
     },
     [createTxOptions, fee, requestPost],
   );
+
+  const ratio = useMemo(() => {
+    if (!Number(formData.asset1Value) || !Number(formData.asset2Value)) {
+      return [0, 0];
+    }
+    const value1 = Numeric.parse(formData.asset1Value)
+      .dividedBy(Numeric.parse(formData.asset1Value).add(formData.asset2Value))
+      .mul(100)
+      .toNumber();
+    return [value1, 100 - value1];
+  }, [formData.asset1Value, formData.asset2Value]);
 
   useEffect(() => {
     if (
@@ -281,7 +317,7 @@ function ProvidePage() {
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
-          amountToValue(asset1BalanceMinusFee, asset2?.decimals) || 0,
+          amountToValue(asset2BalanceMinusFee, asset2?.decimals) || 0,
         ),
       )
     ) {
@@ -307,17 +343,6 @@ function ProvidePage() {
       );
     }
   }, [simulationResult, isPoolEmpty]);
-
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (pairs?.length && !pair) {
-        handleModalClose();
-      }
-    }, 500); // wait for 500ms to make sure the pair is loaded
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [handleModalClose, pair, pairs?.length]);
 
   return (
     <Modal
@@ -414,6 +439,28 @@ function ProvidePage() {
           }}
           style={{ marginBottom: 10 }}
         />
+        {isPoolEmpty && (
+          <Box
+            css={css`
+              margin-bottom: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 10px;
+            `}
+          >
+            <ProgressBar
+              value={ratio[0]}
+              disabled={
+                !Number(formData.asset1Value) || !Number(formData.asset2Value)
+              }
+              label={[
+                `${asset1?.symbol} ${formatRatio(ratio[0])}%`,
+                `${asset2?.symbol} ${formatRatio(ratio[1])}%`,
+              ]}
+            />
+          </Box>
+        )}
         <div
           css={css`
             margin-bottom: ${isPoolEmpty ? "10px" : "20px"};
@@ -436,110 +483,182 @@ function ProvidePage() {
             }
             preview={
               <InfoTable
-                items={[
-                  {
-                    key: "lpSupply",
-                    label: "LP supply",
-                    tooltip: (
-                      <>
-                        The expected amount of LP
-                        <br />
-                        you may get at the transaction.
-                      </>
-                    ),
-                    value: `${formatNumber(
-                      cutDecimal(
-                        amountToValue(simulationResult?.share, LP_DECIMALS) ||
-                          0,
-                        DISPLAY_DECIMAL,
-                      ),
-                    )} LP`,
-                  },
-                  {
-                    key: "poolLiquidity1",
-                    label: `Pool liquidity (${asset1?.symbol || ""})`,
-                    tooltip: (
-                      <>
-                        Total liquidity of {asset1?.symbol || ""}
-                        <br />
-                        before adding.
-                      </>
-                    ),
-                    value: `${
-                      formatNumber(
-                        cutDecimal(
-                          amountToValue(
-                            pool?.assets?.find((a) =>
-                              "token" in a.info
-                                ? a.info.token.contract_addr
-                                : a.info.native_token.denom === asset1?.address,
-                            )?.amount,
-                            asset1?.decimals,
-                          ) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      ) || "-"
-                    } ${asset1?.symbol || ""}`,
-                  },
-                  {
-                    key: "poolLiquidity2",
-                    label: `Pool liquidity (${asset2?.symbol || ""})`,
-                    tooltip: (
-                      <>
-                        Total liquidity of {asset2?.symbol || ""}
-                        <br />
-                        before adding.
-                      </>
-                    ),
-                    value: `${
-                      formatNumber(
-                        cutDecimal(
-                          amountToValue(
-                            pool?.assets?.find((a) =>
-                              "token" in a.info
-                                ? a.info.token.contract_addr
-                                : a.info.native_token.denom === asset2?.address,
-                            )?.amount,
-                            asset2?.decimals,
-                          ) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      ) || "-"
-                    } ${asset2?.symbol || ""}`,
-                  },
-                  {
-                    key: "yourShare",
-                    label: "Your share",
-                    tooltip: "Share of the total liquidity.",
-                    value: `${
-                      formatNumber(
-                        cutDecimal(
-                          simulationResult?.percentageOfShare || 0,
-                          DISPLAY_DECIMAL,
-                        ),
-                      ) || "-"
-                    }%`,
-                  },
-                  {
-                    key: "fee",
-                    label: "Fee",
-                    tooltip: (
-                      <>
-                        The fee paid for executing
-                        <br />
-                        the transaction.
-                      </>
-                    ),
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
+                items={
+                  isPoolEmpty
+                    ? [
+                        {
+                          key: "totalLp",
+                          label: "Total LP supply",
+                          tooltip:
+                            "The sum of Locked LP supply and Received LP supply.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                simulationResult?.share,
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "lockedLp",
+                          label: "Locked LP supply",
+                          tooltip:
+                            "The amount of LP locked by contract to create a new pool.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(LOCKED_LP_SUPPLY, LP_DECIMALS) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "receivedLp",
+                          label: "Received LP supply",
+                          tooltip:
+                            "The amount of LP you may get at the transaction.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                Numeric.parse(simulationResult?.share || 0)
+                                  .minus(LOCKED_LP_SUPPLY)
+                                  .toString(),
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "fee",
+                          label: "Fee",
+                          tooltip: (
+                            <>
+                              The fee paid for executing
+                              <br />
+                              the transaction.
+                            </>
                           ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
-                  },
-                ]}
+                          value: feeAmount
+                            ? `${formatNumber(
+                                cutDecimal(
+                                  amountToValue(feeAmount) || "0",
+                                  DISPLAY_DECIMAL,
+                                ),
+                              )} ${XPLA_SYMBOL}`
+                            : "",
+                        },
+                      ]
+                    : [
+                        {
+                          key: "lpSupply",
+                          label: "LP supply",
+                          tooltip: (
+                            <>
+                              The expected amount of LP
+                              <br />
+                              you may get at the transaction.
+                            </>
+                          ),
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                simulationResult?.share,
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "poolLiquidity1",
+                          label: `Pool liquidity (${asset1?.symbol || ""})`,
+                          tooltip: (
+                            <>
+                              Total liquidity of {asset1?.symbol || ""}
+                              <br />
+                              before adding.
+                            </>
+                          ),
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                amountToValue(
+                                  pool?.assets?.find((a) =>
+                                    "token" in a.info
+                                      ? a.info.token.contract_addr
+                                      : a.info.native_token.denom ===
+                                        asset1?.address,
+                                  )?.amount,
+                                  asset1?.decimals,
+                                ) || "0",
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          } ${asset1?.symbol || ""}`,
+                        },
+                        {
+                          key: "poolLiquidity2",
+                          label: `Pool liquidity (${asset2?.symbol || ""})`,
+                          tooltip: (
+                            <>
+                              Total liquidity of {asset2?.symbol || ""}
+                              <br />
+                              before adding.
+                            </>
+                          ),
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                amountToValue(
+                                  pool?.assets?.find((a) =>
+                                    "token" in a.info
+                                      ? a.info.token.contract_addr
+                                      : a.info.native_token.denom ===
+                                        asset2?.address,
+                                  )?.amount,
+                                  asset2?.decimals,
+                                ) || "0",
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          } ${asset2?.symbol || ""}`,
+                        },
+                        {
+                          key: "yourShare",
+                          label: "Your share",
+                          tooltip: "Share of the total liquidity.",
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                simulationResult?.percentageOfShare || 0,
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          }%`,
+                        },
+                        {
+                          key: "fee",
+                          label: "Fee",
+                          tooltip: (
+                            <>
+                              The fee paid for executing
+                              <br />
+                              the transaction.
+                            </>
+                          ),
+                          value: feeAmount
+                            ? `${formatNumber(
+                                cutDecimal(
+                                  amountToValue(feeAmount) || "0",
+                                  DISPLAY_DECIMAL,
+                                ),
+                              )} ${XPLA_SYMBOL}`
+                            : "",
+                        },
+                      ]
+                }
               />
             }
           >
@@ -642,26 +761,50 @@ function ProvidePage() {
               margin-bottom: 20px;
             `}
           >
-            <Message variant="guide">
-              <Row
-                justify="between"
-                nogutter
-                css={css`
-                  width: 100%;
-                `}
-              >
-                <Col
+            {formData.asset1Value && formData.asset2Value ? (
+              <Message variant="error">
+                <Row
+                  justify="between"
+                  nogutter
                   css={css`
-                    text-align: left;
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
+                    width: 100%;
                   `}
                 >
-                  Empty pool - Please add liquidity to both tokens
-                </Col>
-              </Row>
-            </Message>
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Providing a liquidity of {formatNumber(LOCKED_LP_SUPPLY)} LP
+                    minimum is required to create a new pool.
+                  </Col>
+                </Row>
+              </Message>
+            ) : (
+              <Message variant="guide">
+                <Row
+                  justify="between"
+                  nogutter
+                  css={css`
+                    width: 100%;
+                  `}
+                >
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Empty pool - Please add liquidity to both tokens
+                  </Col>
+                </Row>
+              </Message>
+            )}
           </div>
         )}
         {connectedWallet ? (

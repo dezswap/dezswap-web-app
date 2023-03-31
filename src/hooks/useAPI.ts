@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
-import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import {
-  Amount,
   generateReverseSimulationMsg,
   generateSimulationMsg,
   queryMessages,
@@ -12,10 +11,15 @@ import axios from "axios";
 import { TokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
+import { useLCDClient } from "hooks/useLCDClient";
 import { LatestBlock } from "types/common";
 
 interface TokenBalance {
   balance: string;
+}
+
+interface Decimal {
+  decimals: number;
 }
 
 export const useAPI = () => {
@@ -72,9 +76,10 @@ export const useAPI = () => {
       if (!contractAddress) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<Pool>(contractAddress, {
-        pool: {},
-      });
+      const res = await lcd.wasm.contractQuery<Pool>(
+        contractAddress,
+        queryMessages.getPool(),
+      );
 
       return res;
     },
@@ -139,12 +144,31 @@ export const useAPI = () => {
     return data;
   }, []);
 
+  const getVerifiedIbcTokenInfo = useCallback(async () => {
+    const { data } = await axios.get("https://assets.xpla.io/ibc/tokens.json");
+    return data;
+  }, []);
+
   const getLatestBlockHeight = useCallback(async () => {
     const { data } = await axios.get<LatestBlock>(
       `${network.lcd}/blocks/latest`,
     );
     return data.block.header.height;
   }, [network.lcd]);
+
+  const getDecimal = useCallback(
+    async (denom: string) => {
+      const contractAddress = contractAddresses[network.name]?.factory;
+      if (!contractAddress || !denom) {
+        return undefined;
+      }
+      const res = await lcd.wasm.contractQuery<Decimal>(contractAddress, {
+        native_token_decimals: { denom },
+      });
+      return res.decimals;
+    },
+    [network.name, lcd, walletAddress],
+  );
 
   const api = useMemo(
     () => ({
@@ -157,7 +181,9 @@ export const useAPI = () => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getVerifiedIbcTokenInfo,
       getLatestBlockHeight,
+      getDecimal,
     }),
     [
       getToken,
@@ -169,7 +195,9 @@ export const useAPI = () => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getVerifiedIbcTokenInfo,
       getLatestBlockHeight,
+      getDecimal,
     ],
   );
 
