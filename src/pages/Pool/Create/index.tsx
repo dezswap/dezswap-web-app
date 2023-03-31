@@ -24,6 +24,7 @@ import {
   formatNumber,
   getTokenLink,
   revertIbcTokenAddressInPath,
+  formatRatio,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
@@ -59,16 +60,6 @@ const DISPLAY_DECIMAL = 3;
 
 const MOBILE_DISPLAY_NUMBER_CNT = 20;
 const BROWSER_DISPLAY_NUMBER_CNT = 31;
-
-function formatRatio(value: number) {
-  if (value > 99.99) {
-    return "99.99";
-  }
-  if (value < 0.01 && value > 0) {
-    return "< 0.01";
-  }
-  return value.toFixed(2);
-}
 
 function CreatePage() {
   const connectedWallet = useConnectedWallet();

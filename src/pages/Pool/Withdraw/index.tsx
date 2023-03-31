@@ -207,7 +207,7 @@ function WithdrawPage() {
         return "Insufficient LP balance";
       }
 
-      return "Remove liquidity";
+      return "Remove";
     }
 
     return "Enter an amount";

@@ -295,7 +295,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         >
           <div
             css={css`
-              padding: 16px;
+              padding: 16px 27px;
+              .${MOBILE_SCREEN_CLASS} & {
+                padding: 15px 13px;
+              }
               display: flex;
               justify-content: space-between;
               align-items: center;

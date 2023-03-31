@@ -37,7 +37,7 @@ const Item = styled.div`
   align-items: flex-start;
 
   & > div {
-    white-space: pre-wrap;
+    white-space: pre-line;
     word-break: normal;
     word-wrap: break-word;
     font-size: 14px;
