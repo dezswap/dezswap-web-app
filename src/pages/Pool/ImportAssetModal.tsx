@@ -5,6 +5,7 @@ import Input from "components/Input";
 import Message from "components/Message";
 import Modal from "components/Modal";
 import Typography from "components/Typography";
+import Hr from "components/Hr";
 import { useAPI } from "hooks/useAPI";
 import { useBalance } from "hooks/useBalance";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -173,6 +174,11 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       onGoBack={() => setPage("form")}
       drawer={screenClass === MOBILE_SCREEN_CLASS}
     >
+      <Hr
+        css={css`
+          margin-bottom: 20px;
+        `}
+      />
       <Typography
         color="danger"
         size={16}
