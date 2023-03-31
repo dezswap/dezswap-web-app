@@ -57,7 +57,8 @@ function InvalidPathModal({
               padding-bottom: 10px;
             `}
           >
-            You are accessing with an invalid URL. Please go back and access it properly.
+            You are accessing with an invalid URL. Please go back and access it
+            properly.
           </Typography>
         </Panel>
         <Button

@@ -23,11 +23,11 @@ import {
   formatDecimals,
   formatNumber,
   getTokenLink,
-  isNativeTokenAddress,
+  revertIbcTokenAddressInPath,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
@@ -91,7 +91,7 @@ function CreatePage() {
     mode: "all",
   });
   const formData = form.watch();
-  const { register, formState } = form;
+  const { register } = form;
 
   const handleModalClose = useCallback(() => {
     navigate("/pool", { replace: true });
@@ -110,7 +110,8 @@ function CreatePage() {
     const assets =
       asset1Address && asset2Address
         ? [asset1Address, asset2Address].map(
-            (address) => getAsset(address) || null,
+            (address) =>
+              getAsset(revertIbcTokenAddressInPath(address) || "") || null,
           )
         : [undefined, undefined];
     return assets;
@@ -125,15 +126,8 @@ function CreatePage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (
-      asset1Address &&
-      asset2Address &&
-      ((!AccAddress.validate(asset1Address) &&
-        !isNativeTokenAddress(network.name, asset1Address)) ||
-        (!AccAddress.validate(asset2Address) &&
-          !isNativeTokenAddress(network.name, asset2Address)) ||
-        asset1Address === asset2Address)
-    ) {
+
+    if (asset1Address === asset2Address) {
       errorMessageModal.open();
     }
     return () => {
