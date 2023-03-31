@@ -120,3 +120,13 @@ export const revertIbcTokenAddressInPath = (address?: string) =>
 
 export const getIbcTokenHash = (address?: string) =>
   address ? address?.slice(IBC_PREFIX) : "";
+
+export const formatRatio = (value: number) => {
+  if (value > 99.99) {
+    return "99.99";
+  }
+  if (value < 0.01 && value > 0) {
+    return "< 0.01";
+  }
+  return value.toFixed(2);
+}
