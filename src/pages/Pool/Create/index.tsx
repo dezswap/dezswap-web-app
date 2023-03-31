@@ -82,7 +82,7 @@ function CreatePage() {
   }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
 
@@ -127,7 +127,11 @@ function CreatePage() {
       errorMessageModal.close();
     }
 
-    if (asset1Address === asset2Address) {
+    if (
+      !validate(revertIbcTokenAddressInPath(asset1Address)) ||
+      !validate(revertIbcTokenAddressInPath(asset2Address)) ||
+      asset1Address === asset2Address
+    ) {
       errorMessageModal.open();
     }
     return () => {

@@ -150,13 +150,23 @@ const useAssets = () => {
     [assetStore, network.name, getCustomAsset, addFetchQueue],
   );
 
+  const validate = useCallback(
+    (address: string | undefined) =>
+      address &&
+      (AccAddress.validate(address) ||
+        isNativeTokenAddress(network.name, address) ||
+        verifiedIbcAssets?.[network.name]?.[getIbcTokenHash(address)]),
+    [network.name, verifiedIbcAssets],
+  );
+
   return useMemo(
     () => ({
       getAsset,
+      validate,
       verifiedAssets: verifiedAssets?.[network.name],
       verifiedIbcAssets: verifiedIbcAssets?.[network.name],
     }),
-    [getAsset, network.name, verifiedAssets, verifiedIbcAssets],
+    [getAsset, validate, network.name, verifiedAssets, verifiedIbcAssets],
   );
 };
 
