@@ -1,7 +1,8 @@
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
-import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
+import { useLCDClient } from "hooks/useLCDClient";
 
 export const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();

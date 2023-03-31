@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLCDClient } from "@xpla/wallet-provider";
 import { Pool } from "types/pair";
 import { useAPI } from "hooks/useAPI";
 
 const usePool = (contractAddress?: string) => {
-  const lcd = useLCDClient();
   const [pool, setPool] = useState<Pool>();
   const api = useAPI();
 
@@ -19,7 +17,7 @@ const usePool = (contractAddress?: string) => {
     };
 
     fetchPool();
-  }, [contractAddress, lcd]);
+  }, [contractAddress, api]);
 
   return useMemo(() => pool, [pool]);
 };

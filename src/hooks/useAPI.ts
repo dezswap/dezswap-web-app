@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
-import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
@@ -11,6 +11,7 @@ import axios from "axios";
 import { TokenInfo } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
+import { useLCDClient } from "hooks/useLCDClient";
 import { LatestBlock } from "types/common";
 
 interface TokenBalance {
