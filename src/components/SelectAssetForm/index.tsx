@@ -154,6 +154,17 @@ const AssetIcon = styled.div<{ src?: string }>`
   background-repeat: no-repeat;
 `;
 
+const NoResult = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  left: 0;
+  top: 0;
+  justify-content: center;
+  align-items: center;
+`;
+
 const tabs = [
   { label: "All", value: "all" },
   { label: "Bookmark", value: "bookmark" },
@@ -183,15 +194,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
 
     if (isBookmark && !filteredList?.length) {
       return (
-        <div
-          css={css`
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          `}
-        >
+        <NoResult>
           <Typography
             size={22}
             weight={900}
@@ -199,7 +202,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           >
             No bookmark found
           </Typography>
-        </div>
+        </NoResult>
       );
     }
 
@@ -339,19 +342,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     return deferredSearchKeyword &&
       (items === undefined ||
         items?.filter((i) => !i.props.invisible)?.length < 1) ? (
-      <div
-        css={css`
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          ${children &&
-          css`
-            height: calc(100% - 72px);
-          `}
-        `}
-      >
+      <NoResult>
         <Typography
           size={22}
           weight={900}
@@ -359,7 +350,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         >
           No result found
         </Typography>
-      </div>
+      </NoResult>
     ) : (
       items
     );
@@ -451,7 +442,13 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       <AssetList>
         <div
           css={css`
-            min-height: calc(100% - 72px);
+            position: relative;
+            min-height: 100%;
+            ${children &&
+            tabIdx === 0 &&
+            css`
+              min-height: calc(100% - 72px);
+            `}
           `}
         >
           {assetList}
