@@ -64,7 +64,11 @@ export const generateCreatePoolMsg = (
   assets: { address: string; amount: string }[],
 ) => [
   ...assets
-    .filter((a) => !isNativeTokenAddress(networkName, a.address))
+    .filter(
+      (a) =>
+        !isNativeTokenAddress(networkName, a.address) &&
+        Numeric.parse(a.amount).gt(0),
+    )
     .map(
       (a) =>
         new MsgExecuteContract(
@@ -89,7 +93,11 @@ export const generateCreatePoolMsg = (
     },
     new Coins(
       assets
-        .filter((a) => isNativeTokenAddress(networkName, a.address))
+        .filter(
+          (a) =>
+            isNativeTokenAddress(networkName, a.address) &&
+            Numeric.parse(a.amount).gt(0),
+        )
         .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
     ),
   ),
