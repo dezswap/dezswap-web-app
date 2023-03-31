@@ -6,6 +6,7 @@ import Message from "components/Message";
 import Modal from "components/Modal";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
+import Panel from "components/Panel";
 import { useAPI } from "hooks/useAPI";
 import { useBalance } from "hooks/useBalance";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -32,6 +33,7 @@ import { useAtomValue } from "jotai";
 import { verifiedIbcAssetsAtom } from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
 import { nativeTokens } from "constants/network";
+import imgSuccess from "assets/images/success-import.svg";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Asset): void;
@@ -41,7 +43,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const screenClass = useScreenClass();
   const theme = useTheme();
   const [address, setAddress] = useState("");
-  const [page, setPage] = useState<"form" | "confirm">("form");
+  const [page, setPage] = useState<"form" | "confirm" | "complete">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
   const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
@@ -150,9 +152,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = { ...tokenInfo, balance: balance || "0", address };
       addCustomAsset(asset);
-      if (onFinish) {
-        onFinish(asset);
-      }
+      setPage("complete");
+    }
+  };
+
+  const onDone = () => {
+    if (onFinish && tokenInfo) {
+      const asset = { ...tokenInfo, balance: balance || "0", address };
+      onFinish(asset);
     }
   };
 
@@ -168,35 +175,40 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   return (
     <Modal
       {...modalProps}
-      title="Import a token"
-      hasCloseButton
+      title={page === "complete" ? "Completed" : "Import a token"}
+      hasCloseButton={page !== "complete"}
       hasGoBackButton={page === "confirm"}
       onGoBack={() => setPage("form")}
       drawer={screenClass === MOBILE_SCREEN_CLASS}
     >
-      <Hr
-        css={css`
-          margin-bottom: 20px;
-        `}
-      />
-      <Typography
-        color="danger"
-        size={16}
-        weight={400}
-        css={css`
-          margin-bottom: 20px;
-        `}
-      >
-        Before manually importing a token, make sure it&apos;s credible by doing
-        your research.
-      </Typography>
-      <div
-        css={css`
-          margin-bottom: 10px;
-        `}
-      >
+      {page !== "complete" && (
+        <>
+          <Hr
+            css={css`
+              margin-bottom: 20px;
+            `}
+          />
+          <Typography
+            color="danger"
+            size={16}
+            weight={400}
+            css={css`
+              margin-bottom: 20px;
+            `}
+          >
+            Before manually importing a token, make sure it&apos;s credible by
+            doing your research.
+          </Typography>
+        </>
+      )}
+      <div>
         {page === "form" && (
-          <form onSubmit={onSubmit}>
+          <form
+            onSubmit={onSubmit}
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
             <Typography
               color="primary"
               size={14}
@@ -268,7 +280,12 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         )}
 
         {page === "confirm" && (
-          <form onSubmit={onConfirm}>
+          <form
+            onSubmit={onConfirm}
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
             <div
               css={css`
                 padding: 16px 27px;
@@ -336,15 +353,56 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             </Button>
           </form>
         )}
+
+        {page === "complete" && (
+          <div
+            css={css`
+              text-align: center;
+            `}
+          >
+            <object
+              type="image/svg+xml"
+              data={imgSuccess}
+              style={{ height: "170px", margin: "-10px 0px 0px" }}
+            >
+              success
+            </object>
+            <Panel
+              border
+              css={css`
+                padding: 16px;
+                background-color: ${theme.colors.text.background};
+              `}
+            >
+              <Typography size={16} weight={400} color="primary">
+                Now the token is successfully imported into the list. Enjoy your
+                token at Dezswap!
+              </Typography>
+            </Panel>
+            <Button
+              size="large"
+              variant="primary"
+              css={css`
+                width: 100%;
+                margin-top: 20px;
+              `}
+              onClick={onDone}
+            >
+              Done
+            </Button>
+          </div>
+        )}
       </div>
-      <Button
-        variant="secondary"
-        block
-        size="large"
-        onClick={modalProps.onRequestClose}
-      >
-        Cancel
-      </Button>
+      {page !== "complete" && (
+        <Button
+          variant="secondary"
+          block
+          size="large"
+          onClick={modalProps.onRequestClose}
+        >
+          Cancel
+        </Button>
+      )}
     </Modal>
   );
 }
