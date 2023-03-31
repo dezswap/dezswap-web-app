@@ -67,10 +67,16 @@ function CreatePage() {
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
   });
-  const { asset1Address, asset2Address } = useParams<{
+  const assetAddresses = useParams<{
     asset1Address: string;
     asset2Address: string;
   }>();
+  const { asset1Address, asset2Address } = useMemo(() => {
+    return {
+      asset1Address: revertIbcTokenAddressInPath(assetAddresses.asset1Address),
+      asset2Address: revertIbcTokenAddressInPath(assetAddresses.asset2Address),
+    };
+  }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getAsset, validate } = useAssets();
@@ -101,8 +107,7 @@ function CreatePage() {
     const assets =
       asset1Address && asset2Address
         ? [asset1Address, asset2Address].map(
-            (address) =>
-              getAsset(revertIbcTokenAddressInPath(address) || "") || null,
+            (address) => getAsset(address) || null,
           )
         : [undefined, undefined];
     return assets;
@@ -119,8 +124,8 @@ function CreatePage() {
     }
 
     if (
-      !validate(revertIbcTokenAddressInPath(asset1Address)) ||
-      !validate(revertIbcTokenAddressInPath(asset2Address)) ||
+      !validate(asset1Address) ||
+      !validate(asset2Address) ||
       asset1Address === asset2Address
     ) {
       errorMessageModal.open();
@@ -135,6 +140,7 @@ function CreatePage() {
     asset2Address,
     errorMessageModal,
     network,
+    validate,
   ]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
