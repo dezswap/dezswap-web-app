@@ -12,8 +12,8 @@ const Wrapper = styled.div<Pick<MessageProps, "variant">>`
   position: relative;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 12px;
   opacity: 0.6;
@@ -52,6 +52,7 @@ const Content = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 3px;
 `;
 
 const Icon = styled.div<{ src?: string }>`
