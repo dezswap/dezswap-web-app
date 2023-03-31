@@ -346,7 +346,10 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           display: flex;
           justify-content: center;
           align-items: center;
-          margin-bottom: -72px;
+          ${children &&
+          css`
+            height: calc(100% - 72px);
+          `}
         `}
       >
         <Typography
@@ -372,6 +375,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     toggleBookmark,
     network,
     verifiedAssets,
+    children,
   ]);
   return (
     <Wrapper>
@@ -445,8 +449,14 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         <Hr />
       </Panel>
       <AssetList>
-        {assetList}
-        {children}
+        <div
+          css={css`
+            min-height: calc(100% - 72px);
+          `}
+        >
+          {assetList}
+        </div>
+        {tabIdx === 0 && children}
       </AssetList>
     </Wrapper>
   );
