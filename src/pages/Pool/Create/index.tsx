@@ -49,6 +49,7 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import Box from "components/Box";
 import ProgressBar from "components/ProgressBar";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -66,31 +67,28 @@ function CreatePage() {
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
   });
-  const { asset1Address, asset2Address } = useParams<{
+  const assetAddresses = useParams<{
     asset1Address: string;
     asset2Address: string;
   }>();
+  const { asset1Address, asset2Address } = useMemo(() => {
+    return {
+      asset1Address: revertIbcTokenAddressInPath(assetAddresses.asset1Address),
+      asset2Address: revertIbcTokenAddressInPath(assetAddresses.asset2Address),
+    };
+  }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
-  const [asset1, asset2] = useMemo(
-    () =>
-      asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map((address) =>
-            getAsset(revertIbcTokenAddressInPath(address) || ""),
-          )
-        : [],
-    [asset1Address, asset2Address, getAsset],
-  );
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
   });
   const formData = form.watch();
-  const { register, formState } = form;
+  const { register } = form;
 
   const handleModalClose = useCallback(() => {
     navigate("/pool", { replace: true });
@@ -101,6 +99,49 @@ function CreatePage() {
   }, []);
 
   const { requestPost } = useRequestPost(handleTxSuccess, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
+  const [asset1, asset2] = useMemo(() => {
+    const assets =
+      asset1Address && asset2Address
+        ? [asset1Address, asset2Address].map(
+            (address) => getAsset(address) || null,
+          )
+        : [undefined, undefined];
+    return assets;
+  }, [asset1Address, asset2Address, getAsset]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (asset1 === null || asset2 === null) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+
+    if (
+      !validate(asset1Address) ||
+      !validate(asset2Address) ||
+      asset1Address === asset2Address
+    ) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [
+    asset1,
+    asset1Address,
+    asset2,
+    asset2Address,
+    errorMessageModal,
+    network,
+    validate,
+  ]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>

@@ -116,7 +116,7 @@ export const convertIbcTokenAddressForPath = (address?: string) =>
   address?.replace("ibc/", "ibc-");
 
 export const revertIbcTokenAddressInPath = (address?: string) =>
-  address?.replace("ibc-", "ibc/");
+  address?.startsWith("ibc-") ? address?.replace("ibc-", "ibc/") : address;
 
 export const getIbcTokenHash = (address?: string) =>
   address ? address?.slice(IBC_PREFIX) : "";
@@ -129,4 +129,4 @@ export const formatRatio = (value: number) => {
     return "< 0.01";
   }
   return value.toFixed(2);
-}
+};
