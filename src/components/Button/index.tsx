@@ -84,12 +84,12 @@ const Button = styled.button<ButtonProps>`
         return css`
           background-color: transparent;
           background-image: ${theme.colors.gradient};
-          border-color: ${theme.colors.primary};
+          border: none;
           color: ${theme.colors.white};
           &:disabled {
             background-image: unset;
             background-color: ${theme.colors.disabled};
-            border-color: ${theme.colors.selected};
+            border: none;
           }
         `;
       case "error":

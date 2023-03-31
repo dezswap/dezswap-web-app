@@ -250,14 +250,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
               text-decoration: none;
             `}
           >
-            <PoolButton
-              variant="gradient"
-              css={css`
-                border: 0px;
-              `}
-            >
-              Create a new pool
-            </PoolButton>
+            <PoolButton variant="gradient">Create a new pool</PoolButton>
           </Link>
         ) : undefined}
       </div>
