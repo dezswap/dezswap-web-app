@@ -37,6 +37,16 @@ const assetMsg = (
   amount: asset.amount,
 });
 
+const getCoins = (assets: { address: string; amount: string }[]) =>
+  new Coins(
+    assets
+      .filter(
+        (a) => !AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
+      )
+      .sort((a, b) => a.address.localeCompare(b.address))
+      .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
+  );
+
 export const generateSimulationMsg = (
   networkName: NetworkName,
   offerAsset: string,
@@ -94,14 +104,7 @@ export const generateCreatePoolMsg = (
         assets: assets.map((a) => assetMsg(networkName, a)),
       },
     },
-    new Coins(
-      assets
-        .filter(
-          (a) =>
-            !AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
-        )
-        .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
-    ),
+    getCoins(assets),
   ),
 ];
 
@@ -140,11 +143,7 @@ export const generateAddLiquidityMsg = (
         ),
       },
     },
-    new Coins(
-      assets
-        .filter((a) => !AccAddress.validate(a.address))
-        .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
-    ),
+    getCoins(assets),
   ),
 ];
 
@@ -233,6 +232,6 @@ export const generateSwapMsg = (
         ),
       },
     },
-    new Coins({ [fromAssetAddress]: amount }),
+    getCoins([{ address: fromAssetAddress, amount }]),
   );
 };
