@@ -42,7 +42,7 @@ function SettingsModal({
         css={css`
           min-height: 324px;
           .${MOBILE_SCREEN_CLASS} & {
-            min-height: unset;
+            min-height: 200px;
           }
         `}
       >
