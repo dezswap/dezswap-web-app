@@ -168,10 +168,25 @@ const useCustomAssets = () => {
     [addFetchQueue, customAssetStore, network.name, setCustomAssetStore],
   );
 
+  const removeCustomAsset = useCallback(
+    (address: string) => {
+      if (customAssetStore[network.name]?.some((a) => a.address === address)) {
+        setCustomAssetStore((current) => ({
+          ...current,
+          [network.name]: customAssetStore[network.name]?.filter(
+            (a) => a.address !== address,
+          ),
+        }));
+      }
+    },
+    [customAssetStore, network.name, setCustomAssetStore],
+  );
+
   return useMemo(
     () => ({
       customAssets: customAssetStore[network.name],
       addCustomAsset,
+      removeCustomAsset,
       getCustomAsset: getAsset,
     }),
     [addCustomAsset, customAssetStore, getAsset, network.name],

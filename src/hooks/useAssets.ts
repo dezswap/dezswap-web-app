@@ -26,6 +26,7 @@ const useAssets = () => {
     testnet: [],
   });
   const isFetching = useRef(false);
+  const { removeCustomAsset } = useCustomAssets();
 
   const fetchAsset = useCallback(async () => {
     isFetching.current = true;
@@ -100,6 +101,7 @@ const useAssets = () => {
                 fetchQueue.current[networkName]?.push(address);
               }
             }
+            removeCustomAsset(address);
           }
         }
       }
