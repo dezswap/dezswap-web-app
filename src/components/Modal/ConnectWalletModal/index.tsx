@@ -66,7 +66,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           ? [
               p as WalletButtonProps,
               {
-                label: `${p.label}\n(C2X Vault)`,
+                label: `${p.label}\n(XPLA GAMES)`,
                 iconSrc: p.iconSrc,
                 isInstalled: true,
                 onClick: (event) => {
