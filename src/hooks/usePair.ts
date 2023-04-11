@@ -6,6 +6,7 @@ import { queryMessages } from "utils/dezswap";
 import pairsAtom, { isPairsLoadingAtom } from "stores/pairs";
 import assetsAtom from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
+import useCustomAssets from "./useCustomAssets";
 
 const LIMIT = 30;
 
@@ -16,6 +17,7 @@ const usePairs = () => {
   const setAssets = useSetAtom(assetsAtom);
   const isMainFetcher = useRef(false);
   const api = useAPI();
+  const { removeCustomAsset } = useCustomAssets();
 
   const fetchPairs = useCallback(
     async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
@@ -124,8 +126,9 @@ const usePairs = () => {
           ],
         };
       });
+      availableAssetAddresses.addresses.forEach((a) => removeCustomAsset(a));
     }
-  }, [availableAssetAddresses, setAssets]);
+  }, [availableAssetAddresses, setAssets, removeCustomAsset]);
 
   const getPair = useCallback(
     (contractAddress: string) => {

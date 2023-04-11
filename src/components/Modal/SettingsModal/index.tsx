@@ -1,12 +1,15 @@
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import Modal from "components/Modal";
-import SettingsForm from "components/SettingsForm";
+import SettingsForm, { SettingsFormProps } from "components/SettingsForm";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
-function SettingsModal({ ...modalProps }: ReactModal.Props) {
+function SettingsModal({
+  items,
+  ...modalProps
+}: ReactModal.Props & SettingsFormProps) {
   const screenClass = useScreenClass();
 
   return (
@@ -21,9 +24,10 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
         screenClass !== MOBILE_SCREEN_CLASS ? 0 : MODAL_CLOSE_TIMEOUT_MS
       }
       parentSelector={
-        screenClass !== MOBILE_SCREEN_CLASS
+        screenClass !== MOBILE_SCREEN_CLASS &&
+        document.querySelector(".modal-parent")
           ? () =>
-              document.querySelector("#main") ||
+              document.querySelector(".modal-parent") ||
               (document.querySelector("#root") as HTMLElement)
           : undefined
       }
@@ -36,13 +40,13 @@ function SettingsModal({ ...modalProps }: ReactModal.Props) {
       />
       <div
         css={css`
-          min-height: 340px;
+          min-height: 324px;
           .${MOBILE_SCREEN_CLASS} & {
-            min-height: unset;
+            min-height: 200px;
           }
         `}
       >
-        <SettingsForm />
+        <SettingsForm items={items} />
       </div>
     </Modal>
   );

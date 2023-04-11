@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { formatDecimals } from "utils";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";
@@ -57,6 +58,9 @@ const Wrapper = styled.div<WrapperProps>`
           ${variant !== "base" &&
           css`
             padding: 14px 16px;
+            .${MOBILE_SCREEN_CLASS} & {
+              padding: 14px 13px;
+            }
           `}
 
           &,

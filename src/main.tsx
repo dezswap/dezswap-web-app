@@ -5,6 +5,11 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import theme from "styles/theme";
 import { QueryClient, QueryClientProvider } from "react-query";
+import "simplebar";
+import "simplebar/dist/simplebar.css";
+import ResizeObserver from "resize-observer-polyfill";
+
+window.ResizeObserver = ResizeObserver;
 
 const queryClient = new QueryClient();
 

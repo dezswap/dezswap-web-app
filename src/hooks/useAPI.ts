@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
-import { useConnectedWallet, useLCDClient } from "@xpla/wallet-provider";
+import { useConnectedWallet } from "@xpla/wallet-provider";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
@@ -11,6 +11,7 @@ import axios from "axios";
 import { TokenInfo, VerifiedTokenInfo } from "types/token";
 import { apiAddresses, contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
+import { useLCDClient } from "hooks/useLCDClient";
 import { LatestBlock } from "types/common";
 
 interface TokenBalance {
@@ -18,6 +19,10 @@ interface TokenBalance {
 }
 
 export type ApiVersion = "v1";
+
+interface Decimal {
+  decimals: number;
+}
 
 export const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
@@ -117,9 +122,10 @@ export const useAPI = (version: ApiVersion = "v1") => {
       } catch (err) {
         console.error(err);
       }
-      res = await lcd.wasm.contractQuery<Pool>(contractAddress, {
-        pool: {},
-      });
+      res = await lcd.wasm.contractQuery<Pool>(
+        contractAddress,
+        queryMessages.getPool(),
+      );
 
       return res;
     },
@@ -184,12 +190,31 @@ export const useAPI = (version: ApiVersion = "v1") => {
     return data;
   }, []);
 
+  const getVerifiedIbcTokenInfo = useCallback(async () => {
+    const { data } = await axios.get("https://assets.xpla.io/ibc/tokens.json");
+    return data;
+  }, []);
+
   const getLatestBlockHeight = useCallback(async () => {
     const { data } = await axios.get<LatestBlock>(
       `${network.lcd}/blocks/latest`,
     );
     return data.block.header.height;
   }, [network.lcd]);
+
+  const getDecimal = useCallback(
+    async (denom: string) => {
+      const contractAddress = contractAddresses[network.name]?.factory;
+      if (!contractAddress || !denom) {
+        return undefined;
+      }
+      const res = await lcd.wasm.contractQuery<Decimal>(contractAddress, {
+        native_token_decimals: { denom },
+      });
+      return res.decimals;
+    },
+    [network.name, lcd, walletAddress],
+  );
 
   const api = useMemo(
     () => ({
@@ -202,7 +227,9 @@ export const useAPI = (version: ApiVersion = "v1") => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getVerifiedIbcTokenInfo,
       getLatestBlockHeight,
+      getDecimal,
     }),
     [
       getToken,
@@ -214,7 +241,9 @@ export const useAPI = (version: ApiVersion = "v1") => {
       getNativeTokenBalance,
       getTokenBalance,
       getVerifiedTokenInfo,
+      getVerifiedIbcTokenInfo,
       getLatestBlockHeight,
+      getDecimal,
     ],
   );
 

@@ -1,11 +1,16 @@
 import { LCDClient } from "@xpla/xpla.js";
-import networks from "constants/network";
+import { useNetwork } from "hooks/useNetwork";
+import { useMemo } from "react";
 
-export const useLCDClient = (network: string) => {
-  const lcd = new LCDClient({
-    URL: networks[network].lcd,
-    chainID: networks[network].lcd,
-  });
-
-  return { lcd };
+export const useLCDClient = () => {
+  const network = useNetwork();
+  return useMemo(
+    () =>
+      new LCDClient({
+        URL: network.lcd,
+        chainID: network.chainID,
+        gasAdjustment: 1.1,
+      }),
+    [network],
+  );
 };

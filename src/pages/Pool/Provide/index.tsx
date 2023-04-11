@@ -23,12 +23,12 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatNumber,
+  formatRatio,
   getTokenLink,
   valueToAmount,
 } from "utils";
-import styled from "@emotion/styled";
-import { LP_DECIMALS } from "constants/dezswap";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import { useFee } from "hooks/useFee";
@@ -42,25 +42,21 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
 import { useNetwork } from "hooks/useNetwork";
-import iconQuestion from "assets/icons/icon-question.svg";
-import Tooltip from "components/Tooltip";
 import usePool from "hooks/usePool";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import InfoTable from "components/InfoTable";
+import iconSetting from "assets/icons/icon-setting.svg";
+import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import useSettingsModal from "hooks/modals/useSettingsModal";
+import ProgressBar from "components/ProgressBar";
+import Box from "components/Box";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 enum FormKey {
   asset1Value = "asset1Value",
   asset2Value = "asset2Value",
 }
-
-const Detail = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 22px;
-  letter-spacing: normal;
-`;
 
 const DISPLAY_DECIMAL = 3;
 
@@ -70,6 +66,9 @@ const BROWSER_DISPLAY_NUMBER_CNT = 31;
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
+  const settingsModal = useSettingsModal({
+    items: ["txDeadline"],
+  });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { pairAddress } = useParams<{ pairAddress: string }>();
   const navigate = useNavigate();
@@ -79,14 +78,41 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
+
+  const handleModalClose = useCallback(() => {
+    navigate("/pool", { replace: true });
+  }, [navigate]);
+  const { requestPost } = useRequestPost(handleModalClose, true);
+  const errorMessageModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
   const pair = useMemo(
     () => (pairAddress ? getPair(pairAddress) : undefined),
     [getPair, pairAddress],
   );
+
   const [asset1, asset2] = useMemo(
     () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
     [getAsset, pair?.asset_addresses],
   );
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!asset1 || !asset2) {
+        errorMessageModal.open();
+      }
+    }, 1500);
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (pairAddress && !AccAddress.validate(pairAddress)) {
+      errorMessageModal.open();
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -218,7 +244,7 @@ function ProvidePage() {
       if (formData.asset1Value && !formData.asset2Value) {
         return `Enter ${asset2?.symbol} amount`;
       }
-      return "Add liquidity";
+      return "Add";
     }
 
     if (formData.asset2Value && !formData.asset1Value) {
@@ -234,12 +260,6 @@ function ProvidePage() {
     formData.asset2Value,
   ]);
 
-  const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
-  }, [navigate]);
-
-  const { requestPost } = useRequestPost(handleModalClose, true);
-
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -253,6 +273,17 @@ function ProvidePage() {
     },
     [createTxOptions, fee, requestPost],
   );
+
+  const ratio = useMemo(() => {
+    if (!Number(formData.asset1Value) || !Number(formData.asset2Value)) {
+      return [0, 0];
+    }
+    const value1 = Numeric.parse(formData.asset1Value)
+      .dividedBy(Numeric.parse(formData.asset1Value).add(formData.asset2Value))
+      .mul(100)
+      .toNumber();
+    return [value1, 100 - value1];
+  }, [formData.asset1Value, formData.asset2Value]);
 
   useEffect(() => {
     if (
@@ -286,7 +317,7 @@ function ProvidePage() {
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
-          amountToValue(asset1BalanceMinusFee, asset2?.decimals) || 0,
+          amountToValue(asset2BalanceMinusFee, asset2?.decimals) || 0,
         ),
       )
     ) {
@@ -313,25 +344,22 @@ function ProvidePage() {
     }
   }, [simulationResult, isPoolEmpty]);
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (pairs?.length && !pair) {
-        handleModalClose();
-      }
-    }, 500); // wait for 500ms to make sure the pair is loaded
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [handleModalClose, pair, pairs?.length]);
-
   return (
     <Modal
       id="provide-modal"
+      className="modal-parent"
       isOpen
       title="Add liquidity"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       onRequestClose={() => handleModalClose()}
+      headerExtra={
+        <IconButton
+          size={38}
+          icons={{ default: iconSetting, hover: iconSettingHover }}
+          onClick={() => settingsModal.open()}
+        />
+      }
     >
       <form onSubmit={handleSubmit}>
         <InputGroup
@@ -411,6 +439,28 @@ function ProvidePage() {
           }}
           style={{ marginBottom: 10 }}
         />
+        {isPoolEmpty && (
+          <Box
+            css={css`
+              margin-bottom: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 10px;
+            `}
+          >
+            <ProgressBar
+              value={ratio[0]}
+              disabled={
+                !Number(formData.asset1Value) || !Number(formData.asset2Value)
+              }
+              label={[
+                `${asset1?.symbol} ${formatRatio(ratio[0])}%`,
+                `${asset2?.symbol} ${formatRatio(ratio[1])}%`,
+              ]}
+            />
+          </Box>
+        )}
         <div
           css={css`
             margin-bottom: ${isPoolEmpty ? "10px" : "20px"};
@@ -432,349 +482,277 @@ function ProvidePage() {
               </Typography>
             }
             preview={
-              <Detail>
-                <Row
-                  justify="between"
-                  style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-                >
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    LP supply
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          The expected amount of LP
-                          <br />
-                          you may get at the transaction.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                      align-items: center;
-                    `}
-                  >
-                    {`${formatNumber(
-                      cutDecimal(
-                        amountToValue(simulationResult?.share, LP_DECIMALS) ||
-                          0,
-                        DISPLAY_DECIMAL,
-                      ),
-                    )} LP` || "-"}
-                  </Col>
-                </Row>
-                <Row
-                  justify="between"
-                  style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-                >
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Pool liquidity{asset1 && ` (${asset1?.symbol})`}
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          Total liquidity of {asset1?.symbol}
-                          <br />
-                          before adding.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                      align-items: center;
-                    `}
-                  >
-                    {formatNumber(
-                      cutDecimal(
-                        amountToValue(
-                          pool?.assets?.find((a) =>
-                            "token" in a.info
-                              ? a.info.token.contract_addr
-                              : a.info.native_token.denom === asset1?.address,
-                          )?.amount,
-                          asset1?.decimals,
-                        ) || "0",
-                        DISPLAY_DECIMAL,
-                      ),
-                    ) || "-"}
-                    &nbsp;{asset1?.symbol}
-                  </Col>
-                </Row>
-                <Row
-                  justify="between"
-                  style={{ paddingBottom: "3px", alignItems: "flex-start" }}
-                >
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Pool liquidity{asset2 && ` (${asset2?.symbol})`}
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          Total liquidity of {asset2?.symbol}
-                          <br />
-                          before adding.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                      align-items: center;
-                    `}
-                  >
-                    {formatNumber(
-                      cutDecimal(
-                        amountToValue(
-                          pool?.assets?.find((a) =>
-                            "token" in a.info
-                              ? a.info.token.contract_addr
-                              : a.info.native_token.denom === asset2?.address,
-                          )?.amount,
-                          asset2?.decimals,
-                        ) || "0",
-                        DISPLAY_DECIMAL,
-                      ),
-                    ) || "-"}
-                    &nbsp;{asset2?.symbol}
-                  </Col>
-                </Row>
-                <Row justify="between" style={{ alignItems: "flex-start" }}>
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Your share
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content="Share of the total liquidity."
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    xs={7}
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                      align-items: center;
-                    `}
-                  >
-                    {formatNumber(
-                      cutDecimal(
-                        simulationResult?.percentageOfShare || 0,
-                        DISPLAY_DECIMAL,
-                      ),
-                    ) || "-"}
-                    %
-                  </Col>
-                </Row>
-                <Row justify="between" style={{ alignItems: "flex-start" }}>
-                  <Col
-                    width="content"
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    Fee
-                    <Tooltip
-                      arrow
-                      placement={
-                        screenClass === MOBILE_SCREEN_CLASS ? "top" : "right"
-                      }
-                      content={
-                        <>
-                          The fee paid for executing
-                          <br />
-                          the transaction.
-                        </>
-                      }
-                    >
-                      <IconButton
-                        className="cm-hidden"
-                        size={22}
-                        icons={{ default: iconQuestion }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col
-                    xs={7}
-                    css={css`
-                      display: flex;
-                      justify-content: flex-end;
-                      text-align: right;
-                      word-break: break-word;
-                      align-items: center;
-                    `}
-                  >
-                    {feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
+              <InfoTable
+                items={
+                  isPoolEmpty
+                    ? [
+                        {
+                          key: "totalLp",
+                          label: "Total LP supply",
+                          tooltip:
+                            "The sum of Locked LP supply and Received LP supply.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                simulationResult?.share,
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "lockedLp",
+                          label: "Locked LP supply",
+                          tooltip:
+                            "The amount of LP locked by contract to create a new pool.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(LOCKED_LP_SUPPLY, LP_DECIMALS) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "receivedLp",
+                          label: "Received LP supply",
+                          tooltip:
+                            "The amount of LP you may get at the transaction.",
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                Numeric.parse(simulationResult?.share || 0)
+                                  .minus(LOCKED_LP_SUPPLY)
+                                  .toString(),
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "fee",
+                          label: "Fee",
+                          tooltip: (
+                            <>
+                              The fee paid for executing
+                              <br />
+                              the transaction.
+                            </>
                           ),
-                        )} ${XPLA_SYMBOL}`
-                      : ""}
-                  </Col>
-                </Row>
-              </Detail>
+                          value: feeAmount
+                            ? `${formatNumber(
+                                cutDecimal(
+                                  amountToValue(feeAmount) || "0",
+                                  DISPLAY_DECIMAL,
+                                ),
+                              )} ${XPLA_SYMBOL}`
+                            : "",
+                        },
+                      ]
+                    : [
+                        {
+                          key: "lpSupply",
+                          label: "LP supply",
+                          tooltip: (
+                            <>
+                              The expected amount of LP
+                              <br />
+                              you may get at the transaction.
+                            </>
+                          ),
+                          value: `${formatNumber(
+                            cutDecimal(
+                              amountToValue(
+                                simulationResult?.share,
+                                LP_DECIMALS,
+                              ) || 0,
+                              DISPLAY_DECIMAL,
+                            ),
+                          )} LP`,
+                        },
+                        {
+                          key: "poolLiquidity1",
+                          label: `Pool liquidity (${asset1?.symbol || ""})`,
+                          tooltip: (
+                            <>
+                              Total liquidity of {asset1?.symbol || ""}
+                              <br />
+                              before adding.
+                            </>
+                          ),
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                amountToValue(
+                                  pool?.assets?.find((a) =>
+                                    "token" in a.info
+                                      ? a.info.token.contract_addr
+                                      : a.info.native_token.denom ===
+                                        asset1?.address,
+                                  )?.amount,
+                                  asset1?.decimals,
+                                ) || "0",
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          } ${asset1?.symbol || ""}`,
+                        },
+                        {
+                          key: "poolLiquidity2",
+                          label: `Pool liquidity (${asset2?.symbol || ""})`,
+                          tooltip: (
+                            <>
+                              Total liquidity of {asset2?.symbol || ""}
+                              <br />
+                              before adding.
+                            </>
+                          ),
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                amountToValue(
+                                  pool?.assets?.find((a) =>
+                                    "token" in a.info
+                                      ? a.info.token.contract_addr
+                                      : a.info.native_token.denom ===
+                                        asset2?.address,
+                                  )?.amount,
+                                  asset2?.decimals,
+                                ) || "0",
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          } ${asset2?.symbol || ""}`,
+                        },
+                        {
+                          key: "yourShare",
+                          label: "Your share",
+                          tooltip: "Share of the total liquidity.",
+                          value: `${
+                            formatNumber(
+                              cutDecimal(
+                                simulationResult?.percentageOfShare || 0,
+                                DISPLAY_DECIMAL,
+                              ),
+                            ) || "-"
+                          }%`,
+                        },
+                        {
+                          key: "fee",
+                          label: "Fee",
+                          tooltip: (
+                            <>
+                              The fee paid for executing
+                              <br />
+                              the transaction.
+                            </>
+                          ),
+                          value: feeAmount
+                            ? `${formatNumber(
+                                cutDecimal(
+                                  amountToValue(feeAmount) || "0",
+                                  DISPLAY_DECIMAL,
+                                ),
+                              )} ${XPLA_SYMBOL}`
+                            : "",
+                        },
+                      ]
+                }
+              />
             }
           >
-            <Detail>
-              <Row
-                justify="between"
-                style={{ paddingTop: "3px", paddingBottom: "3px" }}
-              >
-                <Col width="content">LP Address</Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {ellipsisCenter(pair?.liquidity_token)}&nbsp;
-                  <a
-                    href={getTokenLink(pair?.liquidity_token, network.name)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton size={18} icons={{ default: iconLink }} />
-                  </a>
-                </Col>
-              </Row>
-              <Row justify="between" style={{ paddingBottom: "3px" }}>
-                <Col width="content">
-                  {asset1 && `${asset1?.symbol} `}Address
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {ellipsisCenter(asset1?.address)}&nbsp;
-                  <a
-                    href={getTokenLink(asset1?.address, network.name)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton size={18} icons={{ default: iconLink }} />
-                  </a>
-                </Col>
-              </Row>
-              <Row justify="between">
-                <Col width="content">
-                  {asset2 && `${asset2?.symbol} `}Address
-                </Col>
-                <Col
-                  css={css`
-                    display: flex;
-                    justify-content: flex-end;
-                    text-align: right;
-                    word-break: break-word;
-                    align-items: center;
-                  `}
-                >
-                  {ellipsisCenter(asset2?.address)}&nbsp;
-                  <a
-                    href={getTokenLink(asset2?.address, network.name)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton size={18} icons={{ default: iconLink }} />
-                  </a>
-                </Col>
-              </Row>
-            </Detail>
+            <div
+              css={css`
+                margin-top: 3px;
+              `}
+            >
+              <InfoTable
+                items={[
+                  {
+                    key: "lpAddress",
+                    label: "LP Address",
+                    value: (
+                      <span>
+                        {ellipsisCenter(pair?.liquidity_token)}&nbsp;
+                        <a
+                          href={getTokenLink(
+                            pair?.liquidity_token,
+                            network.name,
+                          )}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "asset1Address",
+                    label: `${asset1?.symbol || ""} Address`,
+                    value: (
+                      <span>
+                        {ellipsisCenter(asset1?.address)}&nbsp;
+                        <a
+                          href={getTokenLink(asset1?.address, network.name)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "asset2Address",
+                    label: `${asset2?.symbol || ""} Address`,
+                    value: (
+                      <span>
+                        {ellipsisCenter(asset2?.address)}&nbsp;
+                        <a
+                          href={getTokenLink(asset2?.address, network.name)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      </span>
+                    ),
+                  },
+                ]}
+              />
+            </div>
           </Expand>
         </div>
         {isPoolEmpty && (
@@ -783,26 +761,50 @@ function ProvidePage() {
               margin-bottom: 20px;
             `}
           >
-            <Message variant="guide">
-              <Row
-                justify="between"
-                nogutter
-                css={css`
-                  width: 100%;
-                `}
-              >
-                <Col
+            {formData.asset1Value && formData.asset2Value ? (
+              <Message variant="error">
+                <Row
+                  justify="between"
+                  nogutter
                   css={css`
-                    text-align: left;
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
+                    width: 100%;
                   `}
                 >
-                  Empty pool - Please add liquidity to both tokens
-                </Col>
-              </Row>
-            </Message>
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Providing a liquidity of {formatNumber(LOCKED_LP_SUPPLY)} LP
+                    minimum is required to create a new pool.
+                  </Col>
+                </Row>
+              </Message>
+            ) : (
+              <Message variant="guide">
+                <Row
+                  justify="between"
+                  nogutter
+                  css={css`
+                    width: 100%;
+                  `}
+                >
+                  <Col
+                    css={css`
+                      text-align: left;
+                      display: flex;
+                      justify-content: flex-start;
+                      align-items: center;
+                    `}
+                  >
+                    Empty pool - Please add liquidity to both tokens
+                  </Col>
+                </Row>
+              </Message>
+            )}
           </div>
         )}
         {connectedWallet ? (

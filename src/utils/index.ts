@@ -1,5 +1,5 @@
 import { Numeric } from "@xpla/xpla.js";
-import { nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
@@ -110,4 +110,23 @@ export const getTokenLink = (address?: string, network?: string) => {
   return `https://explorer.xpla.io/${network}/token/${
     address === XPLA_ADDRESS ? "xpla" : address
   }`;
+};
+
+export const convertIbcTokenAddressForPath = (address?: string) =>
+  address?.replace("ibc/", "ibc-");
+
+export const revertIbcTokenAddressInPath = (address?: string) =>
+  address?.startsWith("ibc-") ? address?.replace("ibc-", "ibc/") : address;
+
+export const getIbcTokenHash = (address?: string) =>
+  address ? address?.slice(IBC_PREFIX) : "";
+
+export const formatRatio = (value: number) => {
+  if (value > 99.99) {
+    return "99.99";
+  }
+  if (value < 0.01 && value > 0) {
+    return "< 0.01";
+  }
+  return value.toFixed(2);
 };

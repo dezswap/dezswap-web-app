@@ -8,9 +8,9 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatNumber,
+  getIbcTokenHash,
   isNativeTokenAddress,
 } from "utils";
-import iconBack from "assets/icons/icon-back.svg";
 import { Asset as OrgAsset } from "types/common";
 import iconToken from "assets/icons/icon-default-token.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
@@ -33,11 +33,12 @@ export type LPAsset = {
   assets: [Asset, Asset];
   disabled?: boolean;
 };
-interface SelectAssetFormProps {
+
+type SelectAssetFormProps = React.PropsWithChildren<{
   selectedAssetAddress?: string;
   onSelect?(address: string): void;
   addressList?: string[];
-}
+}>;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -61,6 +62,8 @@ const AssetList = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 
   &::-webkit-scrollbar-track {
     margin-bottom: 10px;
@@ -71,8 +74,10 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  column-gap: 6px;
 
   width: 100%;
+  max-width: 100%;
   height: auto;
   position: relative;
   padding: 16px 27px;
@@ -132,6 +137,8 @@ const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
 const AssetIcon = styled.div<{ src?: string }>`
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   position: relative;
   display: inline-block;
   padding: 0px 6px;
@@ -147,17 +154,33 @@ const AssetIcon = styled.div<{ src?: string }>`
   background-repeat: no-repeat;
 `;
 
+const NoResult = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  left: 0;
+  top: 0;
+  justify-content: center;
+  align-items: center;
+`;
+
 const tabs = [
   { label: "All", value: "all" },
   { label: "Bookmark", value: "bookmark" },
 ];
 
 function SelectAssetForm(props: SelectAssetFormProps) {
-  const { onSelect: handleSelect, selectedAssetAddress, addressList } = props;
+  const {
+    onSelect: handleSelect,
+    selectedAssetAddress,
+    addressList,
+    children,
+  } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset, verifiedAssets } = useAssets();
+  const { getAsset, verifiedAssets, verifiedIbcAssets } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -171,15 +194,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
 
     if (isBookmark && !filteredList?.length) {
       return (
-        <div
-          css={css`
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          `}
-        >
+        <NoResult>
           <Typography
             size={22}
             weight={900}
@@ -187,7 +202,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
           >
             No bookmark found
           </Typography>
-        </div>
+        </NoResult>
       );
     }
 
@@ -195,7 +210,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
       const asset = getAsset(address);
       const isVerified =
         !!verifiedAssets?.[address] ||
-        isNativeTokenAddress(network.name, address);
+        isNativeTokenAddress(network.name, address) ||
+        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)]);
       return (
         <AssetItem
           key={address}
@@ -225,49 +241,55 @@ function SelectAssetForm(props: SelectAssetFormProps) {
               toggleBookmark(address);
             }}
           />
-          <Row
-            gutterWidth={6}
-            style={{
-              display: "flex",
-              flex: 6,
-              flexShrink: 0,
-              alignItems: "center",
-            }}
-            justify="start"
-            wrap="nowrap"
-          >
-            <Col
-              xs="content"
-              css={css`
+
+          <AssetIcon src={asset?.iconSrc}>
+            {isVerified && (
+              <Tooltip arrow content={`${asset?.symbol} is verified token`}>
+                <div
+                  css={css`
+                    position: absolute;
+                    bottom: -3px;
+                    right: -3px;
+                    width: 18px;
+                    height: 18px;
+                    background-image: url(${iconVerified});
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: 50% 50%;
+                  `}
+                />
+              </Tooltip>
+            )}
+          </AssetIcon>
+          <div
+            css={css`
+              min-width: 0;
+              display: block;
+              flex: 1;
+              flex-shrink: 0;
+              flex-basis: 0;
+              position: relative;
+              & > div {
+                display: inline-block;
                 vertical-align: middle;
+              }
+            `}
+          >
+            <div
+              css={css`
+                width: 50%;
+                max-width: 50%;
+                font-size: 0;
+                line-height: 1;
+                padding-right: 10px;
               `}
             >
-              <AssetIcon src={asset?.iconSrc}>
-                {isVerified && (
-                  <Tooltip arrow content={`${asset?.symbol} is verified token`}>
-                    <div
-                      css={css`
-                        position: absolute;
-                        bottom: -3px;
-                        right: -3px;
-                        width: 18px;
-                        height: 18px;
-                        background-image: url(${iconVerified});
-                        background-size: contain;
-                        background-repeat: no-repeat;
-                        background-position: 50% 50%;
-                      `}
-                    />
-                  </Tooltip>
-                )}
-              </AssetIcon>
-            </Col>
-            <Col xs={8}>
               <Typography
                 size={16}
                 weight="bold"
                 color={theme.colors.text.primary}
                 css={css`
+                  display: block;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -280,6 +302,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                 weight="normal"
                 color={theme.colors.text.primary}
                 css={css`
+                  display: block;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -291,25 +314,27 @@ function SelectAssetForm(props: SelectAssetFormProps) {
                   {ellipsisCenter(address, 6)}
                 </span>
               </Typography>
-            </Col>
-          </Row>
-          <Typography
-            size={16}
-            css={css`
-              overflow: hidden;
-              white-space: nowrap;
-              text-align: right;
-              margin-left: auto;
-              flex: 4;
-            `}
-          >
-            {formatNumber(
-              cutDecimal(
-                amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                3,
-              ),
-            )}
-          </Typography>
+            </div>
+            <Typography
+              size={16}
+              css={css`
+                width: 50%;
+                max-width: 50%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                text-align: right;
+                padding-left: 10px;
+              `}
+            >
+              {formatNumber(
+                cutDecimal(
+                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
+                  3,
+                ),
+              )}
+            </Typography>
+          </div>
         </AssetItem>
       );
     });
@@ -317,15 +342,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     return deferredSearchKeyword &&
       (items === undefined ||
         items?.filter((i) => !i.props.invisible)?.length < 1) ? (
-      <div
-        css={css`
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
+      <NoResult>
         <Typography
           size={22}
           weight={900}
@@ -333,7 +350,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         >
           No result found
         </Typography>
-      </div>
+      </NoResult>
     ) : (
       items
     );
@@ -349,6 +366,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     toggleBookmark,
     network,
     verifiedAssets,
+    children,
   ]);
   return (
     <Wrapper>
@@ -421,7 +439,22 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </Row>
         <Hr />
       </Panel>
-      <AssetList>{assetList}</AssetList>
+      <AssetList>
+        <div
+          css={css`
+            position: relative;
+            min-height: 100%;
+            ${children &&
+            tabIdx === 0 &&
+            css`
+              min-height: calc(100% - 72px);
+            `}
+          `}
+        >
+          {assetList}
+        </div>
+        {tabIdx === 0 && children}
+      </AssetList>
     </Wrapper>
   );
 }

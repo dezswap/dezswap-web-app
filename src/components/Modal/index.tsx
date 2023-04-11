@@ -9,7 +9,9 @@ import ReactModal from "react-modal";
 import iconClose from "assets/icons/icon-close-28px.svg";
 import iconBack from "assets/icons/icon-back.svg";
 import { useEffect, useMemo, useState } from "react";
-import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+
+import SimpleBar from "simplebar/dist";
 
 ReactModal.setAppElement("#root");
 
@@ -23,6 +25,7 @@ interface ModalProps extends Omit<ReactModal.Props, "style"> {
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
   style?: ReactModal.Props["style"] & { panel?: React.CSSProperties };
+  headerExtra?: React.ReactNode;
 }
 
 const defaultContentStyle: React.CSSProperties = {
@@ -80,6 +83,7 @@ function Modal({
   overlay = true,
   error,
   style,
+  headerExtra,
   className: _className,
   overlayClassName: _overlayClassName,
   ...modalProps
@@ -147,7 +151,31 @@ function Modal({
       }
     };
     return () => {
-      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 100);
+      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 10);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleModalPop = () => {
+      const simpleBar = SimpleBar.instances.get(document.body);
+      if (simpleBar?.onWindowResize) {
+        simpleBar.onWindowResize();
+        setTimeout(() => {
+          simpleBar.onWindowResize();
+        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+      }
+
+      if (simpleBar?.recalculate) {
+        simpleBar.recalculate();
+        setTimeout(() => {
+          simpleBar.recalculate();
+        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+      }
+    };
+
+    handleModalPop();
+    return () => {
+      handleModalPop();
     };
   }, [isOpen]);
 
@@ -184,7 +212,9 @@ function Modal({
           height: 100%;
           ${isInnerModal &&
           css`
-            padding: 0 !important;
+            :not(.ReactModalPortal .ReactModalPortal &) {
+              padding: 0 !important;
+            }
           `}
         `}
       >
@@ -241,17 +271,30 @@ function Modal({
                   onClick={onGoBack}
                 />
               )}
-              {hasCloseButton && (
-                <IconButton
-                  icons={{ default: iconClose }}
-                  size={28}
+              {(hasCloseButton || headerExtra) && (
+                <div
                   css={css`
                     position: absolute;
-                    top: 0;
+                    top: 50%;
                     right: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    transform: translateY(-50%);
+                    .${MOBILE_SCREEN_CLASS} & {
+                      gap: 2px;
+                    }
                   `}
-                  onClick={modalProps.onRequestClose}
-                />
+                >
+                  {headerExtra}
+                  {hasCloseButton && (
+                    <IconButton
+                      icons={{ default: iconClose }}
+                      size={28}
+                      onClick={modalProps.onRequestClose}
+                    />
+                  )}
+                </div>
               )}
             </div>
           </ModalHeader>

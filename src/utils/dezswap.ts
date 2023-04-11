@@ -1,6 +1,11 @@
-import { Coin, Coins, MsgExecuteContract, Numeric } from "@xpla/xpla.js";
+import {
+  AccAddress,
+  Coin,
+  Coins,
+  MsgExecuteContract,
+  Numeric,
+} from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
-import { isNativeTokenAddress } from "utils";
 import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 
@@ -26,11 +31,21 @@ const assetMsg = (
   networkName: NetworkName,
   asset: { address: string; amount: string },
 ) => ({
-  info: isNativeTokenAddress(networkName, asset.address)
-    ? { native_token: { denom: asset.address } }
-    : { token: { contract_addr: asset.address } },
+  info: AccAddress.validate(asset.address)
+    ? { token: { contract_addr: asset.address } }
+    : { native_token: { denom: asset.address } },
   amount: asset.amount,
 });
+
+const getCoins = (assets: { address: string; amount: string }[]) =>
+  new Coins(
+    assets
+      .filter(
+        (a) => !AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
+      )
+      .sort((a, b) => a.address.localeCompare(b.address))
+      .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
+  );
 
 export const generateSimulationMsg = (
   networkName: NetworkName,
@@ -61,22 +76,37 @@ export const generateReverseSimulationMsg = (
 export const generateCreatePoolMsg = (
   networkName: NetworkName,
   senderAddress: string,
-  assets: string[],
-) =>
+  assets: { address: string; amount: string }[],
+) => [
+  ...assets
+    .filter(
+      (a) => AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
+    )
+    .map(
+      (a) =>
+        new MsgExecuteContract(
+          senderAddress,
+          a.address,
+          {
+            increase_allowance: {
+              amount: a.amount,
+              spender: contractAddresses[networkName]?.factory,
+            },
+          },
+          [],
+        ),
+    ),
   new MsgExecuteContract(
     senderAddress,
     contractAddresses[networkName]?.factory || "",
     {
       create_pair: {
-        asset_infos: assets.map((a) =>
-          isNativeTokenAddress(networkName, a)
-            ? { native_token: { denom: a } }
-            : { token: { contract_addr: a } },
-        ),
+        assets: assets.map((a) => assetMsg(networkName, a)),
       },
     },
-    [],
-  );
+    getCoins(assets),
+  ),
+];
 
 export const generateAddLiquidityMsg = (
   networkName: NetworkName,
@@ -86,7 +116,7 @@ export const generateAddLiquidityMsg = (
   txDeadlineSeconds = 1200,
 ) => [
   ...assets
-    .filter((a) => !isNativeTokenAddress(networkName, a.address))
+    .filter((a) => AccAddress.validate(a.address))
     .map(
       (a) =>
         new MsgExecuteContract(
@@ -113,11 +143,7 @@ export const generateAddLiquidityMsg = (
         ),
       },
     },
-    new Coins(
-      assets
-        .filter((a) => isNativeTokenAddress(networkName, a.address))
-        .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
-    ),
+    getCoins(assets),
   ),
 ];
 
@@ -127,7 +153,7 @@ export const generateWithdrawLiquidityMsg = (
   contractAddress: string,
   lpTokenAddress: string,
   amount: string,
-  // assets: { address: string; amount: string }[],
+  minAssets?: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
 ) =>
   new MsgExecuteContract(
@@ -138,7 +164,7 @@ export const generateWithdrawLiquidityMsg = (
         msg: window.btoa(
           JSON.stringify({
             withdraw_liquidity: {
-              // min_assets: assets.map((a) => assetMsg(networkName, a)),
+              min_assets: minAssets?.map((a) => assetMsg(networkName, a)),
               deadline: Number(
                 Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
               ),
@@ -163,49 +189,49 @@ export const generateSwapMsg = (
   txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
-  if (isNativeTokenAddress(networkName, fromAssetAddress)) {
-    return new MsgExecuteContract(
-      senderAddress,
-      contractAddress,
-      {
+  if (AccAddress.validate(fromAssetAddress)) {
+    const sendMsg = window.btoa(
+      JSON.stringify({
         swap: {
-          offer_asset: assetMsg(networkName, {
-            address: fromAssetAddress,
-            amount,
-          }),
           max_spread: `${maxSpreadFixed}`,
           belief_price: `${beliefPrice}`,
           deadline: Number(
             Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
           ),
         },
+      }),
+    );
+
+    return new MsgExecuteContract(
+      senderAddress,
+      fromAssetAddress,
+      {
+        send: {
+          msg: sendMsg,
+          amount,
+          contract: contractAddress,
+        },
       },
-      new Coins({ [fromAssetAddress]: amount }),
+      [],
     );
   }
 
-  const sendMsg = window.btoa(
-    JSON.stringify({
+  return new MsgExecuteContract(
+    senderAddress,
+    contractAddress,
+    {
       swap: {
+        offer_asset: assetMsg(networkName, {
+          address: fromAssetAddress,
+          amount,
+        }),
         max_spread: `${maxSpreadFixed}`,
         belief_price: `${beliefPrice}`,
         deadline: Number(
           Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
         ),
       },
-    }),
-  );
-
-  return new MsgExecuteContract(
-    senderAddress,
-    fromAssetAddress,
-    {
-      send: {
-        msg: sendMsg,
-        amount,
-        contract: contractAddress,
-      },
     },
-    [],
+    getCoins([{ address: fromAssetAddress, amount }]),
   );
 };

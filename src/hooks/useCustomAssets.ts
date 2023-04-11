@@ -2,7 +2,8 @@ import { useCallback, useMemo, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useAPI } from "hooks/useAPI";
 import { useNetwork } from "hooks/useNetwork";
-import assetsAtom, {
+import {
+  customAssetsAtom,
   verifiedAssetsAtom,
   verifiedIbcAssetsAtom,
 } from "stores/assets";
@@ -10,29 +11,27 @@ import { AccAddress } from "@xpla/xpla.js";
 import { Asset, NetworkName } from "types/common";
 import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
-import useCustomAssets from "hooks/useCustomAssets";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
-const useAssets = () => {
-  const [assetStore, setAssetStore] = useAtom(assetsAtom);
+const useCustomAssets = () => {
+  const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const verifiedAssets = useAtomValue(verifiedAssetsAtom);
   const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+
   const api = useAPI();
   const network = useNetwork();
-  const { getCustomAsset } = useCustomAssets();
   const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
     mainnet: [],
     testnet: [],
   });
   const isFetching = useRef(false);
-  const { removeCustomAsset } = useCustomAssets();
 
   const fetchAsset = useCallback(async () => {
     isFetching.current = true;
     try {
       const networkName = network.name;
-      const store = assetStore[networkName] || [];
+      const store = customAssetStore[networkName] || [];
       const address = fetchQueue.current[networkName]?.[0];
 
       if (address) {
@@ -55,9 +54,9 @@ const useAssets = () => {
                   balance: balance || "0",
                   updatedAt: new Date(),
                 };
-                setAssetStore((current) => ({
+                setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: assetStore[networkName],
+                  [networkName]: customAssetStore[networkName],
                 }));
               }
             } else if (
@@ -75,9 +74,9 @@ const useAssets = () => {
                   balance: balance || "0",
                   updatedAt: new Date(),
                 };
-                setAssetStore((current) => ({
+                setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: assetStore[networkName],
+                  [networkName]: customAssetStore[networkName],
                 }));
               }
             } else {
@@ -93,15 +92,14 @@ const useAssets = () => {
                   iconSrc: verifiedAsset?.icon,
                   updatedAt: new Date(),
                 };
-                setAssetStore((current) => ({
+                setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: assetStore[networkName],
+                  [networkName]: customAssetStore[networkName],
                 }));
               } else if (!fetchQueue.current[networkName]?.includes(address)) {
                 fetchQueue.current[networkName]?.push(address);
               }
             }
-            removeCustomAsset(address);
           }
         }
       }
@@ -115,7 +113,7 @@ const useAssets = () => {
         fetchAsset();
       }
     }, 100);
-  }, [network, assetStore, api, verifiedAssets, setAssetStore]);
+  }, [network, customAssetStore, api, verifiedAssets, setCustomAssetStore]);
 
   const addFetchQueue = useCallback(
     (address: string, networkName: NetworkName) => {
@@ -123,7 +121,7 @@ const useAssets = () => {
         nativeTokens[networkName]?.some((item) => item.address === address) ||
         AccAddress.validate(address) ||
         (verifiedIbcAssets &&
-          !!verifiedIbcAssets[networkName]?.[getIbcTokenHash(address)])
+          verifiedIbcAssets[networkName]?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
           fetchQueue.current[networkName]?.push(address);
@@ -138,38 +136,61 @@ const useAssets = () => {
 
   const getAsset = useCallback(
     (address: string): Partial<Asset> | undefined => {
-      const asset = assetStore[network.name]?.find(
+      const asset = customAssetStore[network.name]?.find(
         (item) => item.address === address,
       );
       if (!asset?.address) {
-        return getCustomAsset(address);
+        return undefined;
       }
       if (window.navigator.onLine) {
         addFetchQueue(asset.address, network.name);
       }
       return asset;
     },
-    [assetStore, network.name, getCustomAsset, addFetchQueue],
+    [customAssetStore, network, addFetchQueue],
   );
 
-  const validate = useCallback(
-    (address: string | undefined) =>
-      address &&
-      (AccAddress.validate(address) ||
-        isNativeTokenAddress(network.name, address) ||
-        verifiedIbcAssets?.[network.name]?.[getIbcTokenHash(address)]),
-    [network.name, verifiedIbcAssets],
+  const addCustomAsset = useCallback(
+    (asset: Asset) => {
+      const store = customAssetStore[network.name] || [];
+      const index = store.findIndex((item) => item.address === asset.address);
+      if (index >= 0) {
+        store[index] = asset;
+      } else {
+        store.push(asset);
+      }
+      setCustomAssetStore((current) => ({
+        ...current,
+        [network.name]: store,
+      }));
+      addFetchQueue(asset.address, network.name);
+    },
+    [addFetchQueue, customAssetStore, network.name, setCustomAssetStore],
+  );
+
+  const removeCustomAsset = useCallback(
+    (address: string) => {
+      if (customAssetStore[network.name]?.some((a) => a.address === address)) {
+        setCustomAssetStore((current) => ({
+          ...current,
+          [network.name]: customAssetStore[network.name]?.filter(
+            (a) => a.address !== address,
+          ),
+        }));
+      }
+    },
+    [customAssetStore, network.name, setCustomAssetStore],
   );
 
   return useMemo(
     () => ({
-      getAsset,
-      validate,
-      verifiedAssets: verifiedAssets?.[network.name],
-      verifiedIbcAssets: verifiedIbcAssets?.[network.name],
+      customAssets: customAssetStore[network.name],
+      addCustomAsset,
+      removeCustomAsset,
+      getCustomAsset: getAsset,
     }),
-    [getAsset, validate, network.name, verifiedAssets, verifiedIbcAssets],
+    [addCustomAsset, customAssetStore, getAsset, network.name],
   );
 };
 
-export default useAssets;
+export default useCustomAssets;

@@ -5,12 +5,13 @@ import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
-import { MouseEventHandler } from "react";
+import React, { MouseEventHandler } from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import iconInstall from "assets/icons/icon-install.svg";
 import iconInstalled from "assets/icons/icon-installed.svg";
+import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 
 const WalletButton = styled.button`
   width: auto;
@@ -47,19 +48,36 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const buttons: WalletButtonProps[] = [
     ...availableConnections
       .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(
-        ({ type, icon, name, identifier }) =>
-          ({
-            label: name,
-            iconSrc: icon,
-            isInstalled: true,
-            onClick: (event) => {
-              connect(type, identifier, false);
-              if (props.onRequestClose) {
-                props.onRequestClose(event);
-              }
-            },
-          } as WalletButtonProps),
+      .map(({ type, icon, name, identifier }) => ({
+        label: name,
+        identifier,
+        type,
+        iconSrc: icon,
+        isInstalled: true,
+        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+          connect(type, identifier, false);
+          if (props.onRequestClose) {
+            props.onRequestClose(event);
+          }
+        },
+      }))
+      .flatMap((p) =>
+        isMobile() && p.label === "Wallet Connect"
+          ? [
+              p as WalletButtonProps,
+              {
+                label: `${p.label}\n(XPLA GAMES)`,
+                iconSrc: p.iconSrc,
+                isInstalled: true,
+                onClick: (event) => {
+                  connect(p.type, p.identifier, true);
+                  if (props.onRequestClose) {
+                    props.onRequestClose(event);
+                  }
+                },
+              } as WalletButtonProps,
+            ]
+          : (p as WalletButtonProps),
       ),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
@@ -86,6 +104,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
         weight="normal"
         css={css`
           padding-top: 20px;
+          padding-bottom: ${screenClass === MOBILE_SCREEN_CLASS
+            ? "15px"
+            : "0px"};
         `}
       >
         By connecting a wallet, you understand and agree to Dezswap’s
@@ -93,23 +114,31 @@ function ConnectWalletModal(props: ReactModal.Props) {
         wallet is considered that you agree to their terms and conditions.
         Always trade at your own risk.
       </Typography>
-      <Row gutterWidth={0}>
+      <Row
+        gutterWidth={0}
+        style={{
+          flexWrap: "wrap",
+          height: "100%",
+        }}
+      >
         {buttons.map((item) => (
           <Col
             xs={6}
             sm={4}
             key={item.label}
             style={{
-              paddingTop: screenClass === MOBILE_SCREEN_CLASS ? "30px" : "20px",
+              marginTop: screenClass === MOBILE_SCREEN_CLASS ? "15px" : "20px",
+              marginBottom:
+                screenClass === MOBILE_SCREEN_CLASS ? "15px" : "0px",
               textAlign: "center",
             }}
           >
             <WalletButton
               onClick={item.onClick}
-              style={{ justifyContent: "center" }}
+              style={{ height: "max-content" }}
             >
-              <Row direction="column" style={{ height: "100%" }}>
-                <Col style={{ flex: "unset" }}>
+              <Row direction="column">
+                <Col style={{ minHeight: "60px", marginBottom: "10px" }}>
                   <div
                     css={css`
                       width: 60px;
@@ -148,11 +177,11 @@ function ConnectWalletModal(props: ReactModal.Props) {
                     />
                   </div>
                 </Col>
-                <Col style={{ height: "20px" }}>
+                <Col style={{ minHeight: "max-content" }}>
                   <Typography
                     color={theme.colors.primary}
                     weight={900}
-                    style={{ whiteSpace: "nowrap" }}
+                    style={{ whiteSpace: "pre-line" }}
                   >
                     {item.label}
                   </Typography>
