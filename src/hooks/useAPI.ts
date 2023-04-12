@@ -1,3 +1,7 @@
+import axios from "axios";
+import http from "http";
+import https from "https";
+
 import { useCallback, useMemo } from "react";
 import { Pair, Pool, ReverseSimulation, Simulation } from "types/pair";
 import { useConnectedWallet } from "@xpla/wallet-provider";
@@ -7,7 +11,6 @@ import {
   queryMessages,
 } from "utils/dezswap";
 import { Pairs } from "types/factory";
-import axios from "axios";
 import { TokenInfo, VerifiedTokenInfo } from "types/token";
 import { apiAddresses, contractAddresses } from "constants/dezswap";
 import { useNetwork } from "hooks/useNetwork";
@@ -28,22 +31,40 @@ export const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
   const connectedWallet = useConnectedWallet();
+  const apiClient = axios.create({
+    httpAgent: new http.Agent({ keepAlive: true }),
+    httpsAgent: new https.Agent({ keepAlive: true }),
+  });
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,
     [connectedWallet],
   );
 
+  const getTokens = useCallback(async () => {
+    try {
+      const base = apiAddresses[network.name]?.baseUrl || "";
+      const { data } = await apiClient.get<(TokenInfo & VerifiedTokenInfo)[]>(
+        `${base}/${version}/tokens`,
+      );
+      return data;
+    } catch (err) {
+      console.error(err);
+    }
+    return [];
+  }, [lcd, network.name, version]);
+
   const getToken = useCallback(
     async (address: string) => {
-      let res: TokenInfo | (TokenInfo & VerifiedTokenInfo);
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = (await axios.get(`${base}/${version}/tokens/${address}`)).data;
-        return res;
+        const { data } = await apiClient.get<TokenInfo & VerifiedTokenInfo>(
+          `${base}/${version}/tokens/${address}`,
+        );
+        return data;
       } catch (err) {
         console.error(err);
       }
-      res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+      const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
         token_info: {},
       });
       return res;
@@ -53,18 +74,19 @@ export const useAPI = (version: ApiVersion = "v1") => {
 
   const getPairs = useCallback(
     async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
-      let res: Pairs;
-      try {
-        const base = apiAddresses[network.name]?.baseUrl || "";
-        res = (await axios.get(`${base}/${version}/pairs`)).data;
-      } catch (err) {
-        console.error(err);
-      }
       const contractAddress = contractAddresses[network.name]?.factory;
       if (!contractAddress) {
         return undefined;
       }
-      res = await lcd.wasm.contractQuery<Pairs>(
+
+      try {
+        const base = apiAddresses[network.name]?.baseUrl || "";
+        const { data } = await apiClient.get<Pairs>(`${base}/${version}/pairs`);
+        return data;
+      } catch (err) {
+        console.error(err);
+      }
+      const res: Pairs = await lcd.wasm.contractQuery<Pairs>(
         contractAddress,
         queryMessages.getPairs(options),
       );
@@ -79,16 +101,17 @@ export const useAPI = (version: ApiVersion = "v1") => {
       if (!contractAddress) {
         return undefined;
       }
-      let res: Pair;
+
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = (await axios.get(`${base}/${version}/pairs/${contractAddress}`)).data;
-        return res;
+        const { data } = await apiClient.get<Pair>(
+          `${base}/${version}/pairs/${contractAddress}`,
+        );
+        return data;
       } catch (err) {
         console.error(err);
       }
-
-      res = await lcd.wasm.contractQuery<Pair>(contractAddress, {
+      const res = await lcd.wasm.contractQuery<Pair>(contractAddress, {
         pair: {},
       });
 
@@ -98,11 +121,10 @@ export const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getPools = useCallback(async () => {
-    let res: Pool[];
     try {
       const base = apiAddresses[network.name]?.baseUrl || "";
-      res = (await axios.get(`${base}/${version}/pools`)).data;
-      return res;
+      const { data } = await apiClient.get<Pool[]>(`${base}/${version}/pools`);
+      return data;
     } catch (err) {
       console.error(err);
     }
@@ -114,15 +136,17 @@ export const useAPI = (version: ApiVersion = "v1") => {
       if (!contractAddress) {
         return undefined;
       }
-      let res: Pool;
+
       try {
         const base = apiAddresses[network.name]?.baseUrl || "";
-        res = (await axios.get(`${base}/${version}/pools/${contractAddress}`)).data;
-        return res;
+        const { data } = await apiClient.get<Pool>(
+          `${base}/${version}/pools/${contractAddress}`,
+        );
+        return data;
       } catch (err) {
         console.error(err);
       }
-      res = await lcd.wasm.contractQuery<Pool>(
+      const res: Pool = await lcd.wasm.contractQuery<Pool>(
         contractAddress,
         queryMessages.getPool(),
       );
@@ -186,17 +210,17 @@ export const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getVerifiedTokenInfo = useCallback(async () => {
-    const { data } = await axios.get("https://assets.xpla.io/cw20/tokens.json");
+    const { data } = await apiClient.get("https://assets.xpla.io/cw20/tokens.json");
     return data;
   }, []);
 
   const getVerifiedIbcTokenInfo = useCallback(async () => {
-    const { data } = await axios.get("https://assets.xpla.io/ibc/tokens.json");
+    const { data } = await apiClient.get("https://assets.xpla.io/ibc/tokens.json");
     return data;
   }, []);
 
   const getLatestBlockHeight = useCallback(async () => {
-    const { data } = await axios.get<LatestBlock>(
+    const { data } = await apiClient.get<LatestBlock>(
       `${network.lcd}/blocks/latest`,
     );
     return data.block.header.height;
@@ -218,6 +242,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
 
   const api = useMemo(
     () => ({
+      getTokens,
       getToken,
       getPairs,
       getPair,
@@ -232,6 +257,7 @@ export const useAPI = (version: ApiVersion = "v1") => {
       getDecimal,
     }),
     [
+      getTokens,
       getToken,
       getPairs,
       getPair,
