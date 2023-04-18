@@ -18,6 +18,7 @@ ReactModal.setAppElement("#root");
 interface ModalProps extends Omit<ReactModal.Props, "style"> {
   drawer?: boolean;
   error?: boolean;
+  gradient?: boolean;
   hasCloseButton?: boolean;
   hasGoBackButton?: boolean;
   noPadding?: boolean;
@@ -82,6 +83,7 @@ function Modal({
   drawer,
   overlay = true,
   error,
+  gradient,
   style,
   headerExtra,
   className: _className,
@@ -238,6 +240,15 @@ function Modal({
                 }
               : {}),
             borderColor: error ? theme.colors.danger : theme.colors.primary,
+            ...(gradient
+              ? {
+                  backgroundImage: `linear-gradient(#fff, #fff), ${theme.colors.gradient}`,
+                  borderImageSlice: 1,
+                  backgroundOrigin: "border-box",
+                  backgroundClip: "padding-box, border-box",
+                  border: "3px solid transparent",
+                }
+              : {}),
             maxHeight: "80vh",
             overflowY: "auto",
             display: "flex",
@@ -252,7 +263,18 @@ function Modal({
                   size={20}
                   weight={900}
                   color={error ? "danger" : "primary"}
-                  css={{ textAlign: "center" }}
+                  css={
+                    gradient
+                      ? css`
+                          text-align: center;
+                          background-image: ${theme.colors.gradient};
+                          background-clip: text;
+                          color: transparent;
+                        `
+                      : css`
+                          text-align: center;
+                        `
+                  }
                 >
                   {title}
                 </Typography>
