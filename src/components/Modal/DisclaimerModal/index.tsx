@@ -52,6 +52,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
         css={css`
           border: 3px solid ${theme.colors.primary};
           height: 200px;
+          overflow-x: hidden;
           overflow-y: auto;
           &::-webkit-scrollbar-track {
             margin: 5px;
@@ -114,9 +115,20 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
           We reserve the right, in our sole discretion, to modify this Agreement
           from time to time. If we make any material modifications, we will
           notify you by updating the date at the top of the Agreement and by
-          maintaining a current version of the Agreement at
-          https://docs.dezswap.io/docs/introduction/terms-of-service. All
-          modifications will be effective when they are posted, and your
+          maintaining a current version of the Agreement at&nbsp;
+          <a
+            href="https://docs.dezswap.io/docs/introduction/terms-of-service"
+            target="_blank"
+            rel="noreferrer noopener"
+            css={css`
+              white-space: wrap;
+              word-break: break-all;
+              display: inline-block;
+            `}
+          >
+            https://docs.dezswap.io/docs/introduction/terms-of-service
+          </a>
+          . All modifications will be effective when they are posted, and your
           continued accessing or use of the Interface will serve as confirmation
           of your acceptance of those modifications. If you do not agree with
           any modifications to this Agreement, you must immediately stop
