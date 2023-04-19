@@ -29,11 +29,10 @@ import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
 import usePairs from "hooks/usePair";
 import { Asset } from "types/common";
-import { useAtomValue } from "jotai";
-import { verifiedIbcAssetsAtom } from "stores/assets";
 import { useNetwork } from "hooks/useNetwork";
 import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
+import useAssets from "hooks/useAssets";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Asset): void;
@@ -46,7 +45,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const [page, setPage] = useState<"form" | "confirm" | "complete">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
-  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+  const { verifiedAssets, verifiedIbcAssets } = useAssets();
   const network = useNetwork();
 
   const api = useAPI();
@@ -59,10 +58,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     [network.name, address],
   );
   const isIbcToken = useMemo(
-    () =>
-      verifiedIbcAssets &&
-      verifiedIbcAssets[network.name]?.[getIbcTokenHash(address)] !== undefined,
-    [address, verifiedIbcAssets, network.name],
+    () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
+    [address, verifiedIbcAssets],
   );
   const isValidAddress = useMemo(
     () => AccAddress.validate(address) || isNativeToken || isIbcToken,
@@ -74,6 +71,13 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       availableAssetAddresses?.addresses?.some((item) => item === address)
     );
   }, [address, availableAssetAddresses, customAssets]);
+
+  const iconSrc = useMemo(() => {
+    return (
+      verifiedIbcAssets?.[getIbcTokenHash(address)]?.icon ||
+      verifiedAssets?.[address]?.icon
+    );
+  }, [address, verifiedAssets, verifiedIbcAssets]);
 
   const errorMessage = useMemo(() => {
     if (!address) {
@@ -103,8 +107,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isIbcToken) {
         if (verifiedIbcAssets) {
-          const res =
-            verifiedIbcAssets[network.name]?.[getIbcTokenHash(deferredAddress)];
+          const res = verifiedIbcAssets?.[getIbcTokenHash(deferredAddress)];
           if (!isAborted) {
             setTokenInfo({
               ...res,
@@ -305,7 +308,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
                   height: 32px;
                   position: relative;
                   border-radius: 50%;
-                  background-image: url(${iconDefaultToken});
+                  background-image: url(${iconSrc || iconDefaultToken});
                   background-size: contain;
                   background-repeat: no-repeat;
                   background-position: center;
