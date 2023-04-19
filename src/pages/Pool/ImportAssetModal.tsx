@@ -288,9 +288,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
           >
             <div
               css={css`
-                padding: 16px 27px;
+                padding: 16px 0;
                 .${MOBILE_SCREEN_CLASS} & {
-                  padding: 15px 13px;
+                  padding: 15px 0;
                 }
                 display: flex;
                 align-items: center;
