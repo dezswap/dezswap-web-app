@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import routes, { RouteObject } from "routes";
 import { Fragment, useCallback, useEffect, useMemo } from "react";
 import GlobalStyles from "styles/GlobalStyles";
@@ -15,11 +15,13 @@ import disclaimerLastSeenAtom from "stores/disclaimer";
 import DisclaimerModal from "components/Modal/DisclaimerModal";
 import globalElementsAtom from "stores/globalElements";
 import { VerifiedIbcAssets } from "types/token";
+import SimpleBar from "simplebar/dist";
 import { useNetwork } from "./hooks/useNetwork";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
+  const location = useLocation();
   const setKnownAssets = useSetAtom(verifiedAssetsAtom);
   const setKnownIbcAssets = useSetAtom(verifiedIbcAssetsAtom);
   const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
@@ -95,6 +97,18 @@ function App() {
     },
     [],
   );
+
+  useEffect(() => {
+    try {
+      const simpleBar = SimpleBar.instances.get(document.body);
+      const scrollElement = simpleBar?.getScrollElement?.();
+      if (scrollElement) {
+        scrollElement.scrollTop = 0;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [location.pathname]);
 
   return (
     <>

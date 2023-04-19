@@ -317,6 +317,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         isOpen={importAssetModal.isOpen}
         onRequestClose={importAssetModal.close}
         onFinish={() => importAssetModal.close()}
+        preventScroll
       />
     </Wrapper>
   );
