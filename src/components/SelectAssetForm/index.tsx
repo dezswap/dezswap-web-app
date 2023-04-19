@@ -1,7 +1,13 @@
 import { Col, Row } from "react-grid-system";
 import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
-import React, { useDeferredValue, useMemo, useState } from "react";
+import React, {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Typography from "components/Typography";
 import {
   amountToValue,
@@ -184,6 +190,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const assetList = useMemo(() => {
     const isBookmark = tabs[tabIdx].value === "bookmark";
@@ -368,6 +375,13 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     verifiedAssets,
     children,
   ]);
+
+  useEffect(() => {
+    if (divRef.current) {
+      divRef.current.scrollTo(0, 0);
+    }
+  }, [addressList?.length]);
+
   return (
     <Wrapper>
       <Panel border={false} style={{ paddingTop: 0, paddingBottom: 0 }}>
@@ -439,7 +453,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         </Row>
         <Hr />
       </Panel>
-      <AssetList>
+      <AssetList ref={divRef}>
         <div
           css={css`
             position: relative;
