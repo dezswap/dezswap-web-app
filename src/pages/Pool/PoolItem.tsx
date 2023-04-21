@@ -338,7 +338,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             min-width: 260px;
           `}
         >
-          <Label>Total Liquidity Ratio</Label>
+          <Label>Pool Composition</Label>
           <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
             <Col width="auto" style={{ flex: 1 }}>
               <Typography
@@ -357,7 +357,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset1?.symbol} - 50%
+                {asset1?.symbol}
               </Typography>
               <Typography color="primary" size={16} weight={500}>
                 {formatNumber(
@@ -368,7 +368,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   ),
                 )}
                 &nbsp;
-                {asset2?.symbol} - 50%
+                {asset2?.symbol}
               </Typography>
             </Col>
           </Row>
