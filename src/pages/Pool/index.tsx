@@ -18,6 +18,7 @@ import { Numeric } from "@xpla/xpla.js";
 import IconButton from "components/IconButton";
 import iconReload from "assets/icons/icon-reload.svg";
 import iconReloadHover from "assets/icons/icon-reload-hover.svg";
+import ScrollToTop from "components/ScrollToTop";
 import PoolList from "./PoolList";
 import Select from "./Select";
 import PoolForm from "./PoolForm";
@@ -136,6 +137,7 @@ function PoolPage() {
           }
         `}
       />
+      <ScrollToTop />
       <Container>
         <Row
           justify="between"
