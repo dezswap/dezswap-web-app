@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAPI } from "hooks/useAPI";
 import { NetworkName } from "types/common";
 import { useAtom, useSetAtom } from "jotai";
@@ -18,6 +18,7 @@ const usePairs = () => {
   const isMainFetcher = useRef(false);
   const api = useAPI();
   const { removeCustomAsset } = useCustomAssets();
+  const lastPairAddr = useRef("");
 
   const fetchPairs = useCallback(
     async (options?: Parameters<typeof queryMessages.getPairs>[0]) => {
@@ -36,7 +37,9 @@ const usePairs = () => {
                 : asset.native_token.denom,
             ),
           }));
-          if (newPairs.length) {
+          const newLastPairAddr = newPairs[newPairs.length - 1].contract_addr;
+          if (newPairs.length && lastPairAddr.current !== newLastPairAddr) {
+            lastPairAddr.current = newLastPairAddr;
             setPairs((current) => {
               const currentPairs = current[network.name]?.data || [];
               return {
