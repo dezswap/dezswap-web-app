@@ -210,12 +210,16 @@ export const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getVerifiedTokenInfo = useCallback(async () => {
-    const { data } = await apiClient.get("https://assets.xpla.io/cw20/tokens.json");
+    const { data } = await apiClient.get(
+      "https://assets.xpla.io/cw20/tokens.json",
+    );
     return data;
   }, []);
 
   const getVerifiedIbcTokenInfo = useCallback(async () => {
-    const { data } = await apiClient.get("https://assets.xpla.io/ibc/tokens.json");
+    const { data } = await apiClient.get(
+      "https://assets.xpla.io/ibc/tokens.json",
+    );
     return data;
   }, []);
 

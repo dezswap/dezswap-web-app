@@ -52,6 +52,7 @@ import useSettingsModal from "hooks/modals/useSettingsModal";
 import ProgressBar from "components/ProgressBar";
 import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useSlippageTolerance from "hooks/useSlippageTolerance";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -67,7 +68,7 @@ function ProvidePage() {
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
-    items: ["txDeadline"],
+    items: ["slippageTolerance", "txDeadline"],
   });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { pairAddress } = useParams<{ pairAddress: string }>();
@@ -78,6 +79,7 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
+  const { value: slippageTolerance } = useSlippageTolerance();
 
   const handleModalClose = useCallback(() => {
     navigate("/pool", { replace: true });
@@ -181,6 +183,7 @@ function ProvidePage() {
                     "0",
                 },
               ],
+              `${slippageTolerance}`,
               txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
             ),
           }

@@ -113,6 +113,7 @@ export const generateAddLiquidityMsg = (
   senderAddress: string,
   contractAddress: string,
   assets: { address: string; amount: string }[],
+  slippageTolerance: string,
   txDeadlineSeconds = 1200,
 ) => [
   ...assets
@@ -141,6 +142,9 @@ export const generateAddLiquidityMsg = (
         deadline: Number(
           Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
         ),
+        slippage_tolerance: `${(parseFloat(slippageTolerance) / 100).toFixed(
+          4,
+        )}`,
       },
     },
     getCoins(assets),
