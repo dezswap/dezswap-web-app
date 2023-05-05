@@ -11,7 +11,9 @@ import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import iconInstall from "assets/icons/icon-install.svg";
 import iconInstalled from "assets/icons/icon-installed.svg";
+import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
+import useCosmostationWallet from "hooks/useCosmostationWallet";
 
 const WalletButton = styled.button`
   width: auto;
@@ -44,6 +46,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const { connect } = useWallet();
   const theme = useTheme();
   const screenClass = useScreenClass();
+  const cosmostationWallet = useCosmostationWallet();
 
   const buttons: WalletButtonProps[] = [
     ...availableConnections
@@ -79,6 +82,21 @@ function ConnectWalletModal(props: ReactModal.Props) {
             ]
           : (p as WalletButtonProps),
       ),
+    ...(cosmostationWallet.isInstalled
+      ? [
+          {
+            label: "Cosmostation",
+            iconSrc: iconCosmostation,
+            isInstalled: true,
+            onClick: (event) => {
+              cosmostationWallet.connect();
+              if (props.onRequestClose) {
+                props.onRequestClose(event);
+              }
+            },
+          } as WalletButtonProps,
+        ]
+      : []),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ icon, name, url }) => ({

@@ -46,6 +46,7 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
+import useCosmostationWallet from "hooks/useCosmostationWallet";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -233,6 +234,7 @@ function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
   const wallet = useWallet();
+  const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
   const balance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
@@ -529,6 +531,7 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   wallet.disconnect();
+                                  cosmostationWallet.disconnect();
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);
