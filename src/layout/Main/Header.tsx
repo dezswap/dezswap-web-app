@@ -45,6 +45,7 @@ import Banner from "components/Banner";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
+import SimpleBar from "simplebar/dist";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -241,14 +242,22 @@ function Header() {
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = (event?: Event) => {
       const { current } = wrapperRef;
       if (!current) return;
-      current.classList.toggle("scrolled", window.scrollY > 0);
+      const scrollY = event?.target
+        ? (event?.target as HTMLElement).scrollTop
+        : window.scrollY;
+      current.classList.toggle("scrolled", scrollY > 0);
     };
     handleScroll();
+    const simpleBar = SimpleBar.instances.get(document.body);
+    simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      simpleBar.getScrollElement().removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
