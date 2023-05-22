@@ -1,5 +1,6 @@
 import { cosmos, InstallError } from "@cosmostation/extension-client";
 import {
+  ConnectType,
   TxFailed,
   TxResult,
   WalletStatus,
@@ -160,7 +161,7 @@ const useCosmostationWallet = () => {
     if (
       // If the user is connected to the wallet, but read-only
       xplaWallet.status === WalletStatus.WALLET_CONNECTED &&
-      !xplaWallet.supportFeatures.has("post")
+      xplaWallet.connection?.type === ConnectType.READONLY
     ) {
       connect();
     }

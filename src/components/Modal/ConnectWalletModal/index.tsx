@@ -43,7 +43,7 @@ type WalletButtonProps = {
 
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
-  const { connect } = useWallet();
+  const { connect, availableConnectTypes } = useWallet();
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
@@ -106,6 +106,19 @@ function ConnectWalletModal(props: ReactModal.Props) {
           window.open(url);
         },
       })),
+    ...(!cosmostationWallet.isInstalled && !isMobile()
+      ? [
+          {
+            label: "Cosmostation",
+            iconSrc: iconCosmostation,
+            onClick: () => {
+              window.open(
+                "https://chrome.google.com/webstore/detail/cosmostation/fpkhgmpbidmiogeglndfbkegfdlnajnf",
+              );
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
