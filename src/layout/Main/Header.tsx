@@ -19,7 +19,7 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
   TABLET_SCREEN_CLASS,
 } from "constants/layout";
-import { useModal } from "hooks/useModal";
+import useModal from "hooks/useModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
 import {
   amountToValue,
@@ -28,7 +28,7 @@ import {
   formatNumber,
   getAddressLink,
 } from "utils";
-import { useBalance } from "hooks/useBalance";
+import useBalance from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconXpla from "assets/icons/icon-xpla-24px.svg";
@@ -37,7 +37,7 @@ import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
 import { css, useTheme } from "@emotion/react";
 import Hr from "components/Hr";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Box from "components/Box";
 import Modal from "components/Modal";
 import Copy from "components/Copy";

@@ -21,7 +21,7 @@ export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
 
 export const isNativeTokenAddress = (network: string, address: string) =>
-  nativeTokens[network].filter((n) => n.address === address).length > 0;
+  nativeTokens[network].filter((n) => n.token === address).length > 0;
 
 export const ellipsisCenter = (text = "", letterCountPerSide = 6) => {
   if (text.length <= letterCountPerSide * 2 + 3) {

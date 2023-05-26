@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
-import { useModal } from "hooks/useModal";
+import useModal from "hooks/useModal";
 
 type Value = string | number;
 

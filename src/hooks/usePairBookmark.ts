@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import { bookmarksAtom } from "stores/pairs";
 import { useAtom } from "jotai";
 

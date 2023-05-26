@@ -9,31 +9,19 @@ import React, {
   useState,
 } from "react";
 import Typography from "components/Typography";
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatNumber,
-  getIbcTokenHash,
-  isNativeTokenAddress,
-} from "utils";
-import { Asset as OrgAsset } from "types/common";
-import iconToken from "assets/icons/icon-default-token.svg";
-import iconVerified from "assets/icons/icon-verified.svg";
-import IconButton from "components/IconButton";
+import { isNativeTokenAddress } from "utils";
 import Input from "components/Input";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
 import useAssets from "hooks/useAssets";
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import useBookmark from "hooks/useBookmark";
 import Panel from "components/Panel";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Tooltip from "components/Tooltip";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
+import { Token } from "types/api";
+import AssetItem from "./AssetItem";
 
-type Asset = Partial<OrgAsset & { disabled?: boolean }>;
+type Asset = Partial<Token & { disabled?: boolean }>;
 export type LPAsset = {
   address: string;
   assets: [Asset, Asset];
@@ -76,90 +64,6 @@ const AssetList = styled.div`
   }
 `;
 
-const AssetItem = styled.div<{ selected?: boolean; invisible?: boolean }>`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  column-gap: 6px;
-
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  position: relative;
-  padding: 16px 27px;
-  .${MOBILE_SCREEN_CLASS} & {
-    padding: 15px 13px;
-  }
-
-  background-color: transparent;
-  cursor: pointer;
-  border: none;
-  margin: 0;
-  text-align: left;
-  overflow: hidden;
-  transition: all 0.125s cubic-bezier(0, 1, 0, 1);
-  max-height: 1280px;
-
-  & .asset-address {
-    display: none;
-  }
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.text.background};
-    & .asset-name {
-      display: none;
-    }
-    & .asset-address {
-      display: unset;
-    }
-  }
-
-  ${({ selected, theme }) =>
-    selected &&
-    css`
-      background-color: ${theme.colors.text.background};
-      & .asset-name {
-        display: none;
-      }
-      & .asset-address {
-        display: unset;
-      }
-    `}
-  ${({ invisible }) =>
-    invisible &&
-    css`
-      max-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      opacity: 0;
-      pointer-events: none;
-      .${MOBILE_SCREEN_CLASS} & {
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-    `}
-`;
-
-const AssetIcon = styled.div<{ src?: string }>`
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  position: relative;
-  display: inline-block;
-  padding: 0px 6px;
-
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 50%;
-
-  ${({ src = iconToken }) => css`
-    background-image: url(${src || iconToken});
-  `};
-  background-size: 32px 32px;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-`;
-
 const NoResult = styled.div`
   position: absolute;
   width: 100%;
@@ -186,7 +90,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword);
-  const { getAsset, verifiedAssets, verifiedIbcAssets } = useAssets();
+  const { getAsset } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
@@ -216,133 +120,25 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     const items = filteredList?.map((address) => {
       const asset = getAsset(address);
       const isVerified =
-        !!verifiedAssets?.[address] ||
-        isNativeTokenAddress(network.name, address) ||
-        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)]);
+        asset?.verified || isNativeTokenAddress(network.name, address);
       return (
         <AssetItem
-          key={address}
+          key={asset?.token}
+          asset={asset}
           selected={selectedAssetAddress === address}
-          invisible={
-            !!deferredSearchKeyword &&
-            [asset?.name, asset?.address, asset?.symbol].findIndex((item) =>
-              item?.toLowerCase().includes(deferredSearchKeyword.toLowerCase()),
-            ) < 0
+          hidden={
+            !asset?.symbol?.toLowerCase().includes(deferredSearchKeyword) &&
+            !asset?.name?.toLowerCase().includes(deferredSearchKeyword)
           }
+          isVerified={isVerified}
           onClick={() => {
             if (handleSelect) {
               handleSelect(address);
             }
           }}
-        >
-          <IconButton
-            size={32}
-            style={{ alignItems: "center" }}
-            icons={{
-              default: bookmarks?.includes(address)
-                ? iconBookmarkSelected
-                : iconBookmark,
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleBookmark(address);
-            }}
-          />
-
-          <AssetIcon src={asset?.iconSrc}>
-            {isVerified && (
-              <Tooltip arrow content={`${asset?.symbol} is verified token`}>
-                <div
-                  css={css`
-                    position: absolute;
-                    bottom: -3px;
-                    right: -3px;
-                    width: 18px;
-                    height: 18px;
-                    background-image: url(${iconVerified});
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                    background-position: 50% 50%;
-                  `}
-                />
-              </Tooltip>
-            )}
-          </AssetIcon>
-          <div
-            css={css`
-              min-width: 0;
-              display: block;
-              flex: 1;
-              flex-shrink: 0;
-              flex-basis: 0;
-              position: relative;
-              & > div {
-                display: inline-block;
-                vertical-align: middle;
-              }
-            `}
-          >
-            <div
-              css={css`
-                width: 50%;
-                max-width: 50%;
-                font-size: 0;
-                line-height: 1;
-                padding-right: 10px;
-              `}
-            >
-              <Typography
-                size={16}
-                weight="bold"
-                color={theme.colors.text.primary}
-                css={css`
-                  display: block;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                `}
-              >
-                {asset?.symbol}
-              </Typography>
-              <Typography
-                size={13}
-                weight="normal"
-                color={theme.colors.text.primary}
-                css={css`
-                  display: block;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                  opacity: 0.5;
-                `}
-              >
-                <span className="asset-name">{asset?.name}</span>
-                <span className="asset-address">
-                  {ellipsisCenter(address, 6)}
-                </span>
-              </Typography>
-            </div>
-            <Typography
-              size={16}
-              css={css`
-                width: 50%;
-                max-width: 50%;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                text-align: right;
-                padding-left: 10px;
-              `}
-            >
-              {formatNumber(
-                cutDecimal(
-                  amountToValue(asset?.balance || 0, asset?.decimals) || 0,
-                  3,
-                ),
-              )}
-            </Typography>
-          </div>
-        </AssetItem>
+          isBookmarked={bookmarks?.includes(address)}
+          onBookmarkToggle={toggleBookmark}
+        />
       );
     });
 
@@ -372,8 +168,6 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     theme,
     toggleBookmark,
     network,
-    verifiedAssets,
-    children,
   ]);
 
   useEffect(() => {

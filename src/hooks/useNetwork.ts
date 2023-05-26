@@ -2,7 +2,7 @@ import { useWallet } from "@xpla/wallet-provider";
 import { useMemo } from "react";
 import { NetworkName } from "types/common";
 
-export const useNetwork = () => {
+const useNetwork = () => {
   const wallet = useWallet();
 
   return useMemo(
@@ -10,3 +10,5 @@ export const useNetwork = () => {
     [wallet.network],
   );
 };
+
+export default useNetwork;

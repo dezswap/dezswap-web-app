@@ -2,9 +2,9 @@ import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
-import { useLCDClient } from "hooks/useLCDClient";
+import useLCDClient from "hooks/useLCDClient";
 
-export const useFee = (txOptions?: CreateTxOptions) => {
+const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
   const lcd = useLCDClient();
   const [fee, setFee] = useState<Fee>();
@@ -106,3 +106,5 @@ export const useFee = (txOptions?: CreateTxOptions) => {
 
   return { fee, isLoading, isFailed, errMsg };
 };
+
+export default useFee;

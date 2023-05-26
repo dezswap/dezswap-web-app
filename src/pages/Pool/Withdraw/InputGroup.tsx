@@ -10,13 +10,13 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { LP_DECIMALS } from "constants/dezswap";
-import { useBalance } from "hooks/useBalance";
+import useBalance from "hooks/useBalance";
 import { DISPLAY_DECIMAL } from "constants/layout";
-import { Asset } from "types/common";
+import { Token } from "types/api";
 
 interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
   lpToken?: string;
-  assets?: (Partial<Asset> | undefined)[];
+  assets?: (Partial<Token> | undefined)[];
   onBalanceClick?(
     value: string,
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -46,7 +46,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>
                 <AssetButton block={screenClass === "xs"}>
                   <img
-                    src={assets?.[0]?.iconSrc || iconDefaultToken}
+                    src={assets?.[0]?.icon || iconDefaultToken}
                     width={24}
                     alt={assets?.[0]?.symbol}
                     css={css`
@@ -57,7 +57,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
                   />
                   {assets?.[0]?.symbol}&nbsp;-&nbsp;
                   <img
-                    src={assets?.[1]?.iconSrc || iconDefaultToken}
+                    src={assets?.[1]?.icon || iconDefaultToken}
                     width={24}
                     alt={assets?.[1]?.symbol}
                     css={css`
