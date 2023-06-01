@@ -32,6 +32,7 @@ import { useBalance } from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconXpla from "assets/icons/icon-xpla-24px.svg";
+import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -243,6 +244,11 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
 
+  const isCosmostationWalletConnected = useMemo(
+    () => !!cosmostationWallet?.account,
+    [cosmostationWallet],
+  );
+
   useEffect(() => {
     const handleScroll = (event?: Event) => {
       const { current } = wrapperRef;
@@ -398,7 +404,11 @@ function Header() {
                                 <Col width="auto">
                                   <IconButton
                                     size={24}
-                                    icons={{ default: iconXpla }}
+                                    icons={{
+                                      default: isCosmostationWalletConnected
+                                        ? iconCosmostation
+                                        : iconXpla,
+                                    }}
                                   />
                                 </Col>
                                 <Col style={{ paddingLeft: "4px" }}>
@@ -407,7 +417,9 @@ function Header() {
                                     color={theme.colors.primary}
                                     weight="bold"
                                   >
-                                    {connectedWallet.connection.name}
+                                    {isCosmostationWalletConnected
+                                      ? "Cosmostation"
+                                      : connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
