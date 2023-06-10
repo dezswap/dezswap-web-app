@@ -13,13 +13,6 @@
     "prepare": "husky install",
     "lint-staged": "lint-staged"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint",
-      "prettier --write",
-      "git add"
-    ]
-  },
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
@@ -64,8 +57,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.0.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
     "prettier": "^2.7.1",
     "typescript": "^5.0.4",
     "vite": "^4.1.4",
