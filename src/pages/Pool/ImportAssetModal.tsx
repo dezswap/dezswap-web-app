@@ -33,6 +33,7 @@ import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import { Token } from "types/api";
+import useLCDClient from "hooks/useLCDClient";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -47,6 +48,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const network = useNetwork();
+  const lcd = useLCDClient();
 
   const api = useAPI();
 
@@ -117,7 +119,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isValidAddress) {
         try {
-          const res = await api.getToken(deferredAddress);
+          const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+            token_info: {},
+          });
           if (!isAborted) {
             setTokenInfo(res);
           }
@@ -141,7 +145,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    network.name,
+    network,
+    lcd,
+    address,
   ]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
