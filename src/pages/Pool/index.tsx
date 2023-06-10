@@ -51,7 +51,7 @@ function PoolPage() {
   const [selectedPair, setSelectedPair] = useState<PairExtended>();
   const api = useAPI();
 
-  const balanceQueryResults = useQueries({
+  const balances = useQueries({
     queries:
       pools?.map((pool) => ({
         queryKey: ["pool", pool.address],
@@ -69,11 +69,7 @@ function PoolPage() {
         refetchOnReconnect: true,
         refetchOnWindowFocus: false,
       })) || [],
-  });
-
-  const balances = useMemo(() => {
-    return balanceQueryResults.map((item) => item.data);
-  }, [balanceQueryResults]);
+  }).map((item) => item.data);
 
   const poolList = useMemo(() => {
     return pools?.filter((item, index) => {
