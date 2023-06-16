@@ -64,6 +64,7 @@ const Wrapper = styled.header<WrapperProps>`
   position: sticky;
   left: 0;
   z-index: 5000;
+  pointer-events: none;
 
   .${MOBILE_SCREEN_CLASS} & {
     height: ${`${MOBILE_HEADER_HEIGHT}px`};
@@ -79,6 +80,7 @@ const Wrapper = styled.header<WrapperProps>`
         `}
 
   & > div {
+    pointer-events: auto;
     position: absolute;
     left: 0;
     top: 0;
