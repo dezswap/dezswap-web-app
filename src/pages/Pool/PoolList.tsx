@@ -7,11 +7,11 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import usePairBookmark from "hooks/usePairBookmark";
 import { useScreenClass } from "react-grid-system";
 import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
-import { PoolExtended } from ".";
+import { Pool } from "types/api";
 import PoolItem from "./PoolItem";
 
 interface PoolListProps {
-  pools: PoolExtended[];
+  pools: Pool[];
   emptyMessage?: string;
 }
 
@@ -129,10 +129,10 @@ function PoolList({
         {pools.map((pool) => {
           return (
             <PoolItem
-              key={pool?.pair?.contract_addr}
+              key={pool?.address}
               pool={pool}
-              bookmarked={bookmarks?.includes(pool.pair.contract_addr)}
-              onBookmarkClick={() => toggleBookmark(pool.pair.contract_addr)}
+              bookmarked={bookmarks?.includes(pool.address)}
+              onBookmarkClick={() => toggleBookmark(pool.address)}
             />
           );
         })}

@@ -13,7 +13,7 @@ import iconTrade from "assets/icons/icon-trade.svg";
 import iconPool from "assets/icons/icon-pool.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Tooltip from "components/Tooltip";
 import Footer from "./Footer";
 

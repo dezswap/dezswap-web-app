@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-export const useModal = (defaultOption = false) => {
+const useModal = (defaultOption = false) => {
   const [isOpen, setIsOpen] = useState(defaultOption);
 
   const open = useCallback((state = true) => setIsOpen(state), []);
@@ -12,3 +12,5 @@ export const useModal = (defaultOption = false) => {
     [close, isOpen, open, toggle],
   );
 };
+
+export default useModal;

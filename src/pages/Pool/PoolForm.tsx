@@ -9,7 +9,7 @@ import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
-import usePairs from "hooks/usePair";
+import usePairs from "hooks/usePairs";
 import {
   formatNumber,
   formatDecimals,
@@ -21,10 +21,11 @@ import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
 
 import Button from "components/Button";
-import { useModal } from "hooks/useModal";
+import useModal from "hooks/useModal";
 import { useAtom } from "jotai";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
+import useBalance from "hooks/useBalance";
 import PoolButton from "./PoolButton";
 import ImportAssetModal from "./ImportAssetModal";
 
@@ -61,8 +62,8 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
   const network = useNetwork();
   const [customAssetStore] = useAtom(customAssetsAtom);
   const customAssetAddresses = useMemo(() => {
-    return customAssetStore[network.name]?.map((asset) => asset.address) || [];
-  }, [customAssetStore, [network.name]]);
+    return customAssetStore[network.name]?.map((asset) => asset.token) || [];
+  }, [customAssetStore, network.name]);
 
   const { getAsset } = useAssets();
 
@@ -76,6 +77,10 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
       return address ? getAsset(address) : undefined;
     });
   }, [getAsset, selectedAddress1, selectedAddress2]);
+
+  const balance1 = useBalance(asset1?.token);
+  const balance2 = useBalance(asset2?.token);
+
   const pair = useMemo(() => {
     return selectedAddress1 && selectedAddress2
       ? findPair([selectedAddress1, selectedAddress2])
@@ -105,9 +110,19 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
           `}
         >
           {[
-            { key: "asset1", asset: asset1, modal: selectAsset1Modal },
-            { key: "asset2", asset: asset2, modal: selectAsset2Modal },
-          ].map(({ key, asset, modal }) => (
+            {
+              key: "asset1",
+              asset: asset1,
+              modal: selectAsset1Modal,
+              balance: balance1,
+            },
+            {
+              key: "asset2",
+              asset: asset2,
+              modal: selectAsset2Modal,
+              balance: balance2,
+            },
+          ].map(({ key, asset, modal, balance }) => (
             <Col xs={12} sm={6} key={key}>
               <PoolButton variant="default" onClick={() => modal.open()}>
                 <Row
@@ -153,7 +168,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                               background-color: ${theme.colors.white};
                               border-radius: 50%;
                               background-image: ${`url(${
-                                asset.iconSrc || iconDefaultAsset
+                                asset.icon || iconDefaultAsset
                               })`};
                               background-size: contain;
                               background-position: 50% 50%;
@@ -188,7 +203,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                       >
                         {formatNumber(
                           formatDecimals(
-                            amountToValue(asset?.balance, asset?.decimals) || 0,
+                            amountToValue(balance, asset?.decimals) || 0,
                             3,
                           ),
                         )}
@@ -270,10 +285,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
         }}
       >
         <SelectAssetForm
-          addressList={[
-            ...customAssetAddresses,
-            ...availableAssetAddresses.addresses,
-          ]}
+          addressList={[...customAssetAddresses, ...availableAssetAddresses]}
           onSelect={(address) => {
             if (handleChange) {
               const newAddresses = [...(addresses || [])];

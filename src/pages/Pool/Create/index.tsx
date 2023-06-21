@@ -31,7 +31,7 @@ import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { useFee } from "hooks/useFee";
+import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
@@ -40,7 +40,7 @@ import InputGroup from "pages/Pool/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
@@ -146,9 +146,9 @@ function CreatePage() {
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
       connectedWallet &&
-      asset1?.address &&
+      asset1?.token &&
       formData.asset1Value &&
-      asset2?.address &&
+      asset2?.token &&
       formData.asset2Value &&
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
@@ -158,13 +158,13 @@ function CreatePage() {
               connectedWallet.walletAddress,
               [
                 {
-                  address: asset1?.address || "",
+                  address: asset1?.token || "",
                   amount:
                     valueToAmount(formData.asset1Value, asset1?.decimals) ||
                     "0",
                 },
                 {
-                  address: asset2?.address || "",
+                  address: asset2?.token || "",
                   amount:
                     valueToAmount(formData.asset2Value, asset2?.decimals) ||
                     "0",
@@ -192,22 +192,14 @@ function CreatePage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const asset1Balance = useBalanceMinusFee(
-    asset1?.address,
-    asset1?.balance,
-    feeAmount,
-  );
-  const asset2Balance = useBalanceMinusFee(
-    asset2?.address,
-    asset2?.balance,
-    feeAmount,
-  );
+  const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
+  const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
 
   useEffect(() => {
     if (
       connectedWallet &&
       balanceApplied &&
-      asset1?.address === XPLA_ADDRESS &&
+      asset1?.token === XPLA_ADDRESS &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
@@ -227,7 +219,7 @@ function CreatePage() {
     if (
       connectedWallet &&
       balanceApplied &&
-      asset2?.address === XPLA_ADDRESS &&
+      asset2?.token === XPLA_ADDRESS &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
@@ -515,13 +507,13 @@ function CreatePage() {
             >
               <InfoTable
                 items={[asset1, asset2].map((asset) => ({
-                  key: asset?.address,
+                  key: asset?.token,
                   label: `${asset?.symbol} Address`,
                   value: (
                     <>
-                      {ellipsisCenter(asset?.address)}&nbsp;
+                      {ellipsisCenter(asset?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset?.address, network.name)}
+                        href={getTokenLink(asset?.token, network.name)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`

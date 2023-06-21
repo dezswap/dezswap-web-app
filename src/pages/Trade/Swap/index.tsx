@@ -19,11 +19,11 @@ import {
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import usePairs from "hooks/usePair";
+import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
-import { useBalance } from "hooks/useBalance";
-import { useFee } from "hooks/useFee";
+import useBalance from "hooks/useBalance";
+import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useHashModal from "hooks/useHashModal";
@@ -277,7 +277,7 @@ function SwapPage() {
       simulationResult?.isLoading ||
       !connectedWallet ||
       !selectedPair ||
-      !asset1?.address ||
+      !asset1?.token ||
       !asset1Value ||
       isPoolEmpty ||
       Numeric.parse(asset1Value).isNaN()
@@ -290,7 +290,7 @@ function SwapPage() {
           connectedWallet?.network.name as NetworkName,
           connectedWallet.walletAddress,
           selectedPair.contract_addr,
-          asset1.address,
+          asset1.token,
           valueToAmount(asset1Value, asset1?.decimals) || "",
           beliefPrice || "",
           `${slippageTolerance}`,
@@ -323,11 +323,7 @@ function SwapPage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const asset1BalanceMinusFee = useBalanceMinusFee(
-    asset1Address,
-    asset1Balance,
-    feeAmount,
-  );
+  const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
   const buttonMsg = useMemo(() => {
     if (asset1 === undefined || asset2 === undefined) {
@@ -434,11 +430,9 @@ function SwapPage() {
         }}
       >
         <SelectAssetForm
-          addressList={availableAssetAddresses.addresses}
+          addressList={availableAssetAddresses}
           selectedAssetAddress={
-            selectAsset1Modal.isOpen
-              ? asset1?.address || ""
-              : asset2?.address || ""
+            selectAsset1Modal.isOpen ? asset1?.token || "" : asset2?.token || ""
           }
           onSelect={(address) => {
             const target = selectAsset1Modal.isOpen
@@ -509,7 +503,7 @@ function SwapPage() {
                                   height: 20px;
                                   position: relative;
                                   background-image: ${`url(${
-                                    asset1?.iconSrc || iconDefaultAsset
+                                    asset1?.icon || iconDefaultAsset
                                   })`};
                                   background-position: 50% 50%;
                                   background-size: auto 20px;
@@ -726,7 +720,7 @@ function SwapPage() {
                                   height: 20px;
                                   position: relative;
                                   background-image: ${`url(${
-                                    asset2?.iconSrc || iconDefaultAsset
+                                    asset2?.icon || iconDefaultAsset
                                   })`};
                                   background-position: 50% 50%;
                                   background-size: auto 20px;
