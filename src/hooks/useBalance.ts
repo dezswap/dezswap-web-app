@@ -1,58 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import { useAPI } from "hooks/useAPI";
+import useAPI from "hooks/useAPI";
 import { getIbcTokenHash, isNativeTokenAddress } from "utils";
-import { useAtomValue } from "jotai";
-import { verifiedIbcAssetsAtom } from "stores/assets";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
+import { useQuery } from "@tanstack/react-query";
+import useVerifiedAssets from "./useVerifiedAssets";
 
-const UPDATE_INTERVAL = 2500;
+const UPDATE_INTERVAL = 30000;
 
-export const useBalance = (asset: string) => {
+const useBalance = (address?: string) => {
   const connectedWallet = useConnectedWallet();
-  const [balance, setBalance] = useState<string>();
-  const verifiedIbcAssets = useAtomValue(verifiedIbcAssetsAtom);
+  const { verifiedIbcAssets } = useVerifiedAssets();
   const network = useNetwork();
   const api = useAPI();
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!connectedWallet?.walletAddress || !asset) {
-        setBalance("0");
+  const fetchBalance = useCallback(async () => {
+    if (
+      address &&
+      connectedWallet?.network.name &&
+      connectedWallet?.walletAddress
+    ) {
+      if (
+        isNativeTokenAddress(connectedWallet?.network.name, address) ||
+        (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)])
+      ) {
+        const value = await api.getNativeTokenBalance(address);
+        return `${value || 0}`;
       }
+      const value = await api.getTokenBalance(address);
+      return `${value || 0}`;
+    }
+    return "0";
+  }, [api, address, connectedWallet, verifiedIbcAssets]);
 
-      if (asset && connectedWallet?.network.name) {
-        if (
-          isNativeTokenAddress(connectedWallet?.network.name, asset) ||
-          (verifiedIbcAssets &&
-            !!verifiedIbcAssets[network.name]?.[getIbcTokenHash(asset)])
-        ) {
-          api
-            .getNativeTokenBalance(asset)
-            .then((value) =>
-              typeof value !== "undefined"
-                ? setBalance(`${value}`)
-                : setBalance("0"),
-            );
-        } else {
-          api
-            .getTokenBalance(asset)
-            .then((value) =>
-              typeof value !== "undefined"
-                ? setBalance(value)
-                : setBalance("0"),
-            );
-        }
-      }
-    };
-
-    const intervalId = setInterval(() => fetchBalance(), UPDATE_INTERVAL);
-    fetchBalance();
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [api, connectedWallet, asset, verifiedIbcAssets, network.name]);
+  const { data: balance } = useQuery({
+    queryKey: ["balance", address, network.name],
+    queryFn: fetchBalance,
+    refetchInterval: UPDATE_INTERVAL,
+    refetchIntervalInBackground: true,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    cacheTime: UPDATE_INTERVAL,
+    enabled: !!address,
+  });
 
   return useMemo(() => balance, [balance]);
 };
+
+export default useBalance;

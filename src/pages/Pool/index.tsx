@@ -2,16 +2,15 @@ import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { css, Global } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import usePairs from "hooks/usePair";
-import { useAPI } from "hooks/useAPI";
-import { Pool } from "types/pair";
+import usePairs from "hooks/usePairs";
+import useAPI from "hooks/useAPI";
 import { PairExtended } from "types/common";
 import usePairBookmark from "hooks/usePairBookmark";
 import { Numeric } from "@xpla/xpla.js";
@@ -19,6 +18,8 @@ import IconButton from "components/IconButton";
 import iconReload from "assets/icons/icon-reload.svg";
 import iconReloadHover from "assets/icons/icon-reload-hover.svg";
 import ScrollToTop from "components/ScrollToTop";
+import usePools from "hooks/usePools";
+import { useQueries } from "@tanstack/react-query";
 import PoolList from "./PoolList";
 import Select from "./Select";
 import PoolForm from "./PoolForm";
@@ -36,45 +37,57 @@ const mobileTabs = [
 ];
 const LIMIT = 8;
 
-export interface PoolExtended extends Pool {
-  pair: PairExtended;
-  hasBalance: boolean;
-}
-
 function PoolPage() {
-  const location = useLocation();
   const screenClass = useScreenClass();
   const [selectedTimeBase, setSelectedTimeBase] = useState(timeBaseOptions[0]);
   const [currentPage, setCurrentPage] = useState(1);
-  const { pairs, findPair } = usePairs();
-  const api = useAPI();
+  const { findPair, getPair } = usePairs();
   const { bookmarks } = usePairBookmark();
-  const [pools, setPools] = useState<PoolExtended[]>([]);
+  const { pools } = usePools();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const [addresses, setAddresses] =
     useState<[string | undefined, string | undefined]>();
   const [selectedPair, setSelectedPair] = useState<PairExtended>();
+  const api = useAPI();
+
+  const balances = useQueries({
+    queries:
+      pools?.map((pool) => ({
+        queryKey: ["pool", pool.address],
+        queryFn: async () => {
+          const lpAddress = getPair(pool.address)?.liquidity_token;
+          if (lpAddress) {
+            const balance = await api.getTokenBalance(lpAddress);
+            return balance;
+          }
+          return "0";
+        },
+        enabled: !!pool.address,
+        refetchInterval: 30000,
+        refetchOnMount: false,
+        refetchOnReconnect: true,
+        refetchOnWindowFocus: false,
+      })) || [],
+  }).map((item) => item.data);
 
   const poolList = useMemo(() => {
-    return pools.filter((item) => {
+    return pools?.filter((item, index) => {
       const isSelectedPair =
-        !selectedPair || item.pair.contract_addr === selectedPair.contract_addr;
+        !selectedPair || item.address === selectedPair.contract_addr;
       switch (selectedTabIndex) {
         case 0:
           return isSelectedPair;
         case 1:
-          return isSelectedPair && item.hasBalance;
+          return isSelectedPair && Numeric.parse(balances[index] || 0).gt(0);
         case 2:
-          return (
-            isSelectedPair && !!bookmarks?.includes(item.pair.contract_addr)
-          );
+          return isSelectedPair && !!bookmarks?.includes(item.address);
         default:
         // do nothing
       }
       return false;
     });
-  }, [bookmarks, pools, selectedTabIndex, selectedPair]);
+  }, [pools, selectedPair, selectedTabIndex, balances, bookmarks]);
 
   const handleReloadClick = useCallback(() => {
     setAddresses(undefined);
@@ -88,37 +101,6 @@ function PoolPage() {
       setSelectedPair(undefined);
     }
   }, [addresses, findPair]);
-
-  useEffect(() => {
-    let isAborted = false;
-    const fetchPools = async () => {
-      if (pairs) {
-        const res = await Promise.all(
-          pairs.map(async (item) => {
-            if (isAborted) {
-              return undefined;
-            }
-            const pool = await api.getPool(item.contract_addr);
-            let hasBalance = false;
-            try {
-              const balance = await api.getTokenBalance(item.liquidity_token);
-              hasBalance = Numeric.parse(balance || 0).gt(0);
-            } catch (error) {
-              console.log(error);
-            }
-            return { ...pool, pair: item, hasBalance };
-          }),
-        );
-        if (!isAborted) {
-          setPools(res.filter((pool) => pool) as PoolExtended[]);
-        }
-      }
-    };
-    fetchPools();
-    return () => {
-      isAborted = true;
-    };
-  }, [api, pairs, location]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -250,10 +232,12 @@ function PoolPage() {
             `}
           >
             <PoolList
-              pools={poolList.slice(
-                (currentPage - 1) * LIMIT,
-                currentPage * LIMIT,
-              )}
+              pools={
+                poolList?.slice(
+                  (currentPage - 1) * LIMIT,
+                  currentPage * LIMIT,
+                ) || []
+              }
               emptyMessage={
                 [
                   undefined,
@@ -264,7 +248,7 @@ function PoolPage() {
             />
           </div>
 
-          {!!poolList.length && (
+          {!!poolList?.length && (
             <Pagination
               current={currentPage}
               total={Math.floor((poolList.length - 1) / LIMIT) + 1}

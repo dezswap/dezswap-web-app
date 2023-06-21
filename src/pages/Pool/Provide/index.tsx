@@ -7,7 +7,7 @@ import {
 } from "react";
 import Modal from "components/Modal";
 import { useNavigate, useParams } from "react-router-dom";
-import usePairs from "hooks/usePair";
+import usePairs from "hooks/usePairs";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -31,7 +31,7 @@ import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { useFee } from "hooks/useFee";
+import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
@@ -41,7 +41,7 @@ import InputGroup from "pages/Pool/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import usePool from "hooks/usePool";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -135,18 +135,16 @@ function ProvidePage() {
     isPoolEmpty
       ? {
           pairAddress: pairAddress || "",
-          asset1Address: asset1?.address || "",
+          asset1Address: asset1?.token || "",
           asset1Amount:
             valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
-          asset2Address: asset2?.address || "",
+          asset2Address: asset2?.token || "",
           asset2Amount:
             valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
         }
       : {
           pairAddress: pairAddress || "",
-          asset1Address: isReversed
-            ? asset2?.address || ""
-            : asset1?.address || "",
+          asset1Address: isReversed ? asset2?.token || "" : asset1?.token || "",
           asset1Amount: isReversed
             ? valueToAmount(formData.asset2Value, asset2?.decimals) || "0"
             : valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
@@ -158,9 +156,9 @@ function ProvidePage() {
       simulationResult?.estimatedAmount &&
       !simulationResult?.isLoading &&
       connectedWallet &&
-      asset1?.address &&
+      asset1?.token &&
       formData.asset1Value &&
-      asset2?.address &&
+      asset2?.token &&
       formData.asset2Value &&
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
@@ -171,13 +169,13 @@ function ProvidePage() {
               pairAddress || "",
               [
                 {
-                  address: asset1?.address || "",
+                  address: asset1?.token || "",
                   amount:
                     valueToAmount(formData.asset1Value, asset1?.decimals) ||
                     "0",
                 },
                 {
-                  address: asset2?.address || "",
+                  address: asset2?.token || "",
                   amount:
                     valueToAmount(formData.asset2Value, asset2?.decimals) ||
                     "0",
@@ -209,17 +207,9 @@ function ProvidePage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const asset1BalanceMinusFee = useBalanceMinusFee(
-    asset1?.address,
-    asset1?.balance,
-    feeAmount,
-  );
+  const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 
-  const asset2BalanceMinusFee = useBalanceMinusFee(
-    asset2?.address,
-    asset2?.balance,
-    feeAmount,
-  );
+  const asset2BalanceMinusFee = useBalanceMinusFee(asset2?.token, feeAmount);
 
   const buttonMsg = useMemo(() => {
     if (formData.asset1Value) {
@@ -293,7 +283,7 @@ function ProvidePage() {
       connectedWallet &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
-      asset1?.address === XPLA_ADDRESS &&
+      asset1?.token === XPLA_ADDRESS &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(
@@ -316,7 +306,7 @@ function ProvidePage() {
       connectedWallet &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
-      asset2?.address === XPLA_ADDRESS &&
+      asset2?.token === XPLA_ADDRESS &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
@@ -592,7 +582,7 @@ function ProvidePage() {
                                     "token" in a.info
                                       ? a.info.token.contract_addr
                                       : a.info.native_token.denom ===
-                                        asset1?.address,
+                                        asset1?.token,
                                   )?.amount,
                                   asset1?.decimals,
                                 ) || "0",
@@ -619,7 +609,7 @@ function ProvidePage() {
                                     "token" in a.info
                                       ? a.info.token.contract_addr
                                       : a.info.native_token.denom ===
-                                        asset2?.address,
+                                        asset2?.token,
                                   )?.amount,
                                   asset2?.decimals,
                                 ) || "0",
@@ -706,9 +696,9 @@ function ProvidePage() {
                     label: `${asset1?.symbol || ""} Address`,
                     value: (
                       <span>
-                        {ellipsisCenter(asset1?.address)}&nbsp;
+                        {ellipsisCenter(asset1?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset1?.address, network.name)}
+                          href={getTokenLink(asset1?.token, network.name)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`
@@ -732,9 +722,9 @@ function ProvidePage() {
                     label: `${asset2?.symbol || ""} Address`,
                     value: (
                       <span>
-                        {ellipsisCenter(asset2?.address)}&nbsp;
+                        {ellipsisCenter(asset2?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset2?.address, network.name)}
+                          href={getTokenLink(asset2?.token, network.name)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`

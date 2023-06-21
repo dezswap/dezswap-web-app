@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useModal } from "hooks/useModal";
+import useModal from "hooks/useModal";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDropdownDisabled from "assets/icons/icon-dropdown-arrow-disabled.svg";
 import { css } from "@emotion/react";

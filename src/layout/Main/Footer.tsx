@@ -18,7 +18,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
 import { useLatestBlock } from "hooks/useLatestBlock";
 import { getBlockLink } from "utils";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Tooltip from "components/Tooltip";
 
 const Wrapper = styled.footer`

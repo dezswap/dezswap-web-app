@@ -1,10 +1,4 @@
-import {
-  FormEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
 import Typography from "components/Typography";
 import {
   BROWSER_DISPLAY_NUMBER_CNT,
@@ -31,8 +25,8 @@ import Button from "components/Button";
 import Modal from "components/Modal";
 import { useNavigate, useParams } from "react-router-dom";
 import useSimulate from "pages/Pool/Withdraw/useSimulate";
-import usePairs from "hooks/usePair";
-import { useNetwork } from "hooks/useNetwork";
+import usePairs from "hooks/usePairs";
+import useNetwork from "hooks/useNetwork";
 import { useForm } from "react-hook-form";
 import useAssets from "hooks/useAssets";
 import { css, useTheme } from "@emotion/react";
@@ -42,13 +36,13 @@ import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useRequestPost from "hooks/useRequestPost";
-import { useFee } from "hooks/useFee";
+import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
-import { useBalance } from "hooks/useBalance";
+import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
@@ -93,21 +87,14 @@ function WithdrawPage() {
   const [asset1, asset2] = useMemo(
     () =>
       pair
-        ? pair.asset_addresses
-            .map((address) => getAsset(address))
-            .map((a) => ({
-              address: a?.address,
-              symbol: a?.symbol,
-              decimals: a?.decimals,
-              iconSrc: a?.iconSrc,
-            }))
+        ? pair.asset_addresses.map((address) => getAsset(address))
         : [undefined, undefined],
     [getAsset, pair],
   );
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (!asset1?.address || !asset2?.address) {
+      if (!asset1?.token || !asset2?.token) {
         errorMessageModal.open();
       }
     }, 1500);
@@ -126,7 +113,7 @@ function WithdrawPage() {
     criteriaMode: "all",
     mode: "all",
   });
-  const { register, formState } = form;
+  const { register } = form;
 
   const { lpValue } = form.watch();
 
@@ -161,7 +148,7 @@ function WithdrawPage() {
                 pairAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
-                [asset1?.address, asset2?.address].map((address) => ({
+                [asset1?.token, asset2?.token].map((address) => ({
                   address: address || "",
                   amount: Numeric.parse(
                     simulationResult?.estimatedAmount?.find(
@@ -301,7 +288,7 @@ function WithdrawPage() {
                     `}
                   >
                     <img
-                      src={asset1?.iconSrc || iconDefaultToken}
+                      src={asset1?.icon || iconDefaultToken}
                       width={24}
                       alt={asset1?.symbol}
                       css={css`
@@ -336,7 +323,7 @@ function WithdrawPage() {
                 {formatNumber(
                   amountToValue(
                     simulationResult?.estimatedAmount?.find(
-                      (a) => a.address === asset1?.address,
+                      (a) => a.address === asset1?.token,
                     )?.amount,
                     asset1?.decimals,
                   ) || "0",
@@ -383,7 +370,7 @@ function WithdrawPage() {
                     `}
                   >
                     <img
-                      src={asset2?.iconSrc || iconDefaultToken}
+                      src={asset2?.icon || iconDefaultToken}
                       width={24}
                       alt={asset2?.symbol}
                       css={css`
@@ -418,7 +405,7 @@ function WithdrawPage() {
                 {formatNumber(
                   amountToValue(
                     simulationResult?.estimatedAmount?.find(
-                      (a) => a.address === asset2?.address,
+                      (a) => a.address === asset2?.token,
                     )?.amount,
                     asset2?.decimals,
                   ) || "0",
@@ -467,7 +454,7 @@ function WithdrawPage() {
                     value: `${formatNumber(
                       amountToValue(
                         simulationResult?.estimatedAmount?.find(
-                          (a) => a.address === asset1?.address,
+                          (a) => a.address === asset1?.token,
                         )?.amount,
                         asset1?.decimals,
                       ) || "",
@@ -475,7 +462,7 @@ function WithdrawPage() {
                       ${formatNumber(
                         amountToValue(
                           simulationResult?.estimatedAmount?.find(
-                            (a) => a.address === asset2?.address,
+                            (a) => a.address === asset2?.token,
                           )?.amount,
                           asset1?.decimals,
                         ) || "",
@@ -540,9 +527,9 @@ function WithdrawPage() {
                   label: `${asset1?.symbol} Address`,
                   value: (
                     <>
-                      {ellipsisCenter(asset1?.address)}&nbsp;
+                      {ellipsisCenter(asset1?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset1?.address, network.name)}
+                        href={getTokenLink(asset1?.token, network.name)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`
@@ -566,9 +553,9 @@ function WithdrawPage() {
                   label: `${asset2?.symbol} Address`,
                   value: (
                     <>
-                      {ellipsisCenter(asset2?.address)}&nbsp;
+                      {ellipsisCenter(asset2?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset2?.address, network.name)}
+                        href={getTokenLink(asset2?.token, network.name)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`

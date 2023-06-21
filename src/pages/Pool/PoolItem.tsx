@@ -4,8 +4,8 @@ import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import { LP_DECIMALS } from "constants/dezswap";
 import useAssets from "hooks/useAssets";
-import { useBalance } from "hooks/useBalance";
-import { useNetwork } from "hooks/useNetwork";
+import useBalance from "hooks/useBalance";
+import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import {
@@ -24,8 +24,9 @@ import Button from "components/Button";
 import { Link } from "react-router-dom";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Tooltip from "components/Tooltip";
+import { Pool } from "types/api";
+import usePairs from "hooks/usePairs";
 import Expand from "./Expand";
-import { PoolExtended } from ".";
 
 const SimplePieChart = styled.div<{ data: number[] }>`
   width: 100%;
@@ -145,7 +146,7 @@ const IconButtonAnchor = styled(IconButton.withComponent("a"))`
 `;
 
 interface PoolItemProps {
-  pool: PoolExtended;
+  pool: Pool;
   bookmarked?: boolean;
   onBookmarkClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
@@ -157,11 +158,13 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
   );
   const { getAsset } = useAssets();
   const network = useNetwork();
-  const lpBalance = useBalance(pool.pair.liquidity_token);
+  const { getPair } = usePairs();
+  const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
+  const lpBalance = useBalance(pair?.liquidity_token);
 
   const [asset1, asset2] = useMemo(
-    () => pool.pair.asset_addresses.map((address) => getAsset(address)),
-    [getAsset, pool],
+    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
+    [getAsset, pair],
   );
 
   const userShare = useMemo(() => {
@@ -184,7 +187,11 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       />,
       <IconButtonAnchor
         key="link"
-        href={getAddressLink(pool.pair.contract_addr, network.name)}
+        href={
+          pair?.contract_addr
+            ? getAddressLink(pair?.contract_addr, network.name)
+            : "#"
+        }
         target="_blank"
         rel="noreferrer noopener"
         size={19}
@@ -194,7 +201,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         `}
       />,
     ],
-    [bookmarked, network, onBookmarkClick, pool],
+    [bookmarked, network, onBookmarkClick, pair],
   );
 
   const [overflowActive, setOverflowActive] = useState(false);
@@ -232,9 +239,9 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   font-size: 0;
                 `}
               >
-                <AssetIcon src={asset1?.iconSrc} />
+                <AssetIcon src={asset1?.icon} />
                 <AssetIcon
-                  src={asset2?.iconSrc}
+                  src={asset2?.icon}
                   css={css`
                     margin-left: -9px;
                   `}
@@ -483,7 +490,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           style={{ marginLeft: "auto" }}
         >
           <LinkButton
-            to={`/pool/add-liquidity/${pool.pair.contract_addr}`}
+            to={`/pool/add-liquidity/${pool.address}`}
             variant="primary"
             block
             css={css`
@@ -493,7 +500,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
             Add liquidity
           </LinkButton>
           <LinkButton
-            to={`/pool/withdraw/${pool.pair.contract_addr}`}
+            to={`/pool/withdraw/${pool.address}`}
             variant="secondary"
             block
           >

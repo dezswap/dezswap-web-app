@@ -7,8 +7,8 @@ import Modal from "components/Modal";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import Panel from "components/Panel";
-import { useAPI } from "hooks/useAPI";
-import { useBalance } from "hooks/useBalance";
+import useAPI from "hooks/useAPI";
+import useBalance from "hooks/useBalance";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import ReactModal from "react-modal";
 import { TokenInfo } from "types/token";
@@ -27,15 +27,16 @@ import {
 } from "constants/layout";
 import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
-import usePairs from "hooks/usePair";
-import { Asset } from "types/common";
-import { useNetwork } from "hooks/useNetwork";
+import usePairs from "hooks/usePairs";
+import useNetwork from "hooks/useNetwork";
 import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
-import useAssets from "hooks/useAssets";
+import useVerifiedAssets from "hooks/useVerifiedAssets";
+import { Token } from "types/api";
+import useLCDClient from "hooks/useLCDClient";
 
 interface ImportAssetModalProps extends ReactModal.Props {
-  onFinish?(asset: Asset): void;
+  onFinish?(asset: Token): void;
 }
 
 function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
@@ -45,8 +46,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const [page, setPage] = useState<"form" | "confirm" | "complete">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
-  const { verifiedAssets, verifiedIbcAssets } = useAssets();
+  const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const network = useNetwork();
+  const lcd = useLCDClient();
 
   const api = useAPI();
 
@@ -67,8 +69,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   );
   const isDuplicated = useMemo(() => {
     return (
-      customAssets?.some((item) => item.address === address) ||
-      availableAssetAddresses?.addresses?.some((item) => item === address)
+      customAssets?.some((item) => item.token === address) ||
+      availableAssetAddresses.some((item) => item === address)
     );
   }, [address, availableAssetAddresses, customAssets]);
 
@@ -100,10 +102,10 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     const fetchAsset = async () => {
       if (isNativeToken) {
         const asset = nativeTokens[network.name]?.find(
-          (item) => item.address === deferredAddress,
+          (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
-          setTokenInfo(asset as TokenInfo);
+          setTokenInfo(asset);
         }
       } else if (isIbcToken) {
         if (verifiedIbcAssets) {
@@ -117,7 +119,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isValidAddress) {
         try {
-          const res = await api.getToken(deferredAddress);
+          const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+            token_info: {},
+          });
           if (!isAborted) {
             setTokenInfo(res);
           }
@@ -141,7 +145,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    network.name,
+    network,
+    lcd,
+    address,
   ]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
@@ -153,7 +159,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     event.preventDefault();
 
     if (tokenInfo) {
-      const asset = { ...tokenInfo, balance: balance || "0", address };
+      const asset = {
+        ...tokenInfo,
+        chainId: network.chainID,
+        icon: iconSrc || "",
+        protocol: "",
+        token: address,
+        verified: false,
+      };
       addCustomAsset(asset);
       setPage("complete");
     }
@@ -161,7 +174,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
 
   const onDone = () => {
     if (onFinish && tokenInfo) {
-      const asset = { ...tokenInfo, balance: balance || "0", address };
+      const asset = {
+        ...tokenInfo,
+        chainId: network.chainID,
+        icon: iconSrc || "",
+        protocol: "",
+        token: address,
+        verified: false,
+      };
       onFinish(asset);
     }
   };

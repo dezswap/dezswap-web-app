@@ -7,12 +7,13 @@ import Copy from "components/Copy";
 import { NumberInput } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { Asset } from "types/common";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
+import { Token } from "types/api";
+import useBalance from "hooks/useBalance";
 
 interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
-  asset?: Partial<Asset> | null;
+  asset?: Partial<Token> | null;
   onBalanceClick?(
     value: string,
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -44,6 +45,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
   ({ asset, onBalanceClick, style, ...inputProps }, ref) => {
     const screenClass = useScreenClass();
     const theme = useTheme();
+    const balance = useBalance(asset?.token);
 
     return (
       <Box style={style}>
@@ -51,15 +53,12 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
           <Col xs={12} sm="content">
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
               <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>
-                <AssetButton
-                  block={screenClass === "xs"}
-                  iconSrc={asset?.iconSrc}
-                >
+                <AssetButton block={screenClass === "xs"} iconSrc={asset?.icon}>
                   {asset?.symbol}
                 </AssetButton>
               </Col>
               <Col xs="content" className="cm-hidden">
-                <Copy size={38} value={asset?.address} />
+                <Copy size={38} value={asset?.token} />
               </Col>
             </Row>
           </Col>
@@ -74,7 +73,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               onClick={(event) => {
                 if (onBalanceClick) {
                   onBalanceClick(
-                    amountToValue(asset?.balance, asset?.decimals) || "",
+                    amountToValue(balance, asset?.decimals) || "",
                     event,
                   );
                 }
@@ -90,7 +89,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               >
                 {formatNumber(
                   formatDecimals(
-                    amountToValue(asset?.balance, asset?.decimals) || 0,
+                    amountToValue(balance, asset?.decimals) || 0,
                     3,
                   ),
                 )}

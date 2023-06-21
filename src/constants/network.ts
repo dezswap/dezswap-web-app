@@ -1,4 +1,4 @@
-import { Asset } from "types/common";
+import { Token } from "types/api";
 
 export type Network = {
   lcd: string;
@@ -21,27 +21,31 @@ const networks: Record<string, Network> = {
   },
 };
 
-export const nativeTokens: Record<string, Asset[]> = {
+export const nativeTokens: Record<string, Token[]> = {
   mainnet: [
     {
-      address: XPLA_ADDRESS,
+      token: XPLA_ADDRESS,
       decimals: 18,
       name: XPLA_SYMBOL,
       symbol: XPLA_SYMBOL,
       total_supply: "",
-      iconSrc: "https://assets.xpla.io/icon/svg/XPLA.svg",
-      balance: "0",
+      icon: "https://assets.xpla.io/icon/svg/XPLA.svg",
+      chainId: networks.dimension.chainId,
+      verified: true,
+      protocol: "",
     },
   ],
   testnet: [
     {
-      address: XPLA_ADDRESS,
+      token: XPLA_ADDRESS,
       decimals: 18,
       name: XPLA_SYMBOL,
       symbol: XPLA_SYMBOL,
       total_supply: "",
-      iconSrc: "https://assets.xpla.io/icon/svg/XPLA.svg",
-      balance: "0",
+      icon: "https://assets.xpla.io/icon/svg/XPLA.svg",
+      chainId: networks.cube.chainId,
+      verified: true,
+      protocol: "",
     },
   ],
 };
