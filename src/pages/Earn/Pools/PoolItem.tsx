@@ -26,7 +26,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Tooltip from "components/Tooltip";
 import { Pool } from "types/api";
 import usePairs from "hooks/usePairs";
-import Expand from "./Expand";
+import Expand from "../Expand";
 
 const SimplePieChart = styled.div<{ data: number[] }>`
   width: 100%;

@@ -76,9 +76,9 @@ const navLinks = [
     label: "Trade",
   },
   {
-    path: "/pool",
+    path: "/earn",
     icon: iconPool,
-    label: "Pool",
+    label: "Earn",
   },
 ];
 

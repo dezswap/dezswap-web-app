@@ -36,7 +36,7 @@ import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import InputGroup from "pages/Pool/Provide/InputGroup";
+import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";

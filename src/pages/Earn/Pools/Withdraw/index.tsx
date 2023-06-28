@@ -6,7 +6,7 @@ import {
   MOBILE_DISPLAY_NUMBER_CNT,
   MOBILE_SCREEN_CLASS,
 } from "constants/layout";
-import InputGroup from "pages/Pool/Withdraw/InputGroup";
+import InputGroup from "pages/Earn/Pools/Withdraw/InputGroup";
 import {
   amountToValue,
   cutDecimal,
@@ -24,7 +24,7 @@ import iconLink from "assets/icons/icon-link.svg";
 import Button from "components/Button";
 import Modal from "components/Modal";
 import { useNavigate, useParams } from "react-router-dom";
-import useSimulate from "pages/Pool/Withdraw/useSimulate";
+import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import usePairs from "hooks/usePairs";
 import useNetwork from "hooks/useNetwork";
 import { useForm } from "react-hook-form";

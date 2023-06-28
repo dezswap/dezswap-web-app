@@ -1,28 +1,26 @@
-import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 import { css, Global } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePairs";
 import useAPI from "hooks/useAPI";
 import { PairExtended } from "types/common";
 import usePairBookmark from "hooks/usePairBookmark";
 import { Numeric } from "@xpla/xpla.js";
-import IconButton from "components/IconButton";
-import iconReload from "assets/icons/icon-reload.svg";
-import iconReloadHover from "assets/icons/icon-reload-hover.svg";
 import ScrollToTop from "components/ScrollToTop";
 import usePools from "hooks/usePools";
 import { useQueries } from "@tanstack/react-query";
+import { convertIbcTokenAddressForPath } from "utils";
 import PoolList from "./PoolList";
 import Select from "./Select";
-import PoolForm from "./PoolForm";
+import AssetSelector from "../AssetSelector";
+import AssetFormButton from "../AssetFormButton";
 
 const timeBaseOptions = ["24h", "7d", "1m"];
 const tabs = [
@@ -89,10 +87,6 @@ function PoolPage() {
     });
   }, [pools, selectedPair, selectedTabIndex, balances, bookmarks]);
 
-  const handleReloadClick = useCallback(() => {
-    setAddresses(undefined);
-  }, []);
-
   useEffect(() => {
     const [address1, address2] = addresses || [];
     if (address1 && address2) {
@@ -121,46 +115,49 @@ function PoolPage() {
       />
       <ScrollToTop />
       <Container>
-        <Row
-          justify="between"
-          align="center"
-          gutterWidth={0}
-          css={css`
-            padding-top: 20px;
-            margin-bottom: 19px;
-
-            .${MOBILE_SCREEN_CLASS} & {
-              padding-top: 10px;
-              margin-bottom: 20px;
-            }
-          `}
-        >
-          <Col xs="content">
-            <Typography size={32} color="primary" weight={900}>
-              Pool
-            </Typography>
-          </Col>
-          <Col xs="content">
-            <IconButton
-              size={38}
-              icons={{ default: iconReload, hover: iconReloadHover }}
-              onClick={handleReloadClick}
-            />
-          </Col>
-        </Row>
-        <Hr
-          css={css`
-            margin-bottom: 20px;
-          `}
-        />
         <div
           css={css`
             margin-bottom: 20px;
           `}
         >
-          <PoolForm
+          <AssetSelector
             addresses={addresses}
             onChange={(value) => setAddresses(value)}
+            extra={
+              <>
+                {!addresses?.[0] || !addresses?.[1] ? (
+                  <AssetFormButton variant="primary" disabled>
+                    Select tokens first
+                  </AssetFormButton>
+                ) : undefined}
+                {addresses?.[0] && addresses?.[1] && selectedPair ? (
+                  <Link
+                    to={`/pool/add-liquidity/${selectedPair.contract_addr}`}
+                    css={css`
+                      text-decoration: none;
+                    `}
+                  >
+                    <AssetFormButton as="div" variant="primary">
+                      Add liquidity
+                    </AssetFormButton>
+                  </Link>
+                ) : undefined}
+                {addresses?.[0] && addresses?.[1] && !selectedPair ? (
+                  <Link
+                    to={`/pool/create/${addresses
+                      ?.map((a) => convertIbcTokenAddressForPath(a))
+                      .join("/")}`}
+                    css={css`
+                      text-decoration: none;
+                    `}
+                  >
+                    <AssetFormButton variant="gradient">
+                      Create a new pool
+                    </AssetFormButton>
+                  </Link>
+                ) : undefined}
+              </>
+            }
           />
         </div>
 

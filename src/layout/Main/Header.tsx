@@ -155,8 +155,18 @@ const navLinks = [
     label: "Trade",
   },
   {
-    path: "/pool",
-    label: "Pool",
+    path: "/earn",
+    label: "Earn",
+    children: [
+      {
+        path: "/earn/pools",
+        label: "Pools",
+      },
+      {
+        path: "/earn/lockdrop",
+        label: "Lock&Drop",
+      },
+    ],
   },
 ];
 
@@ -304,6 +314,16 @@ function Header() {
                       key: item.path,
                       to: item.path,
                       disabled: item.disabled,
+                      css: css`
+                        .sub-menu {
+                          display: none;
+                        }
+                        &:hover {
+                          .sub-menu {
+                            display: block;
+                          }
+                        }
+                      `,
                       children: item.disabled ? (
                         <Tooltip arrow content="Coming soon">
                           <Typography size={18} weight={900} color="primary">
@@ -313,6 +333,63 @@ function Header() {
                       ) : (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
+                          {item.children && (
+                            <div
+                              className="sub-menu"
+                              css={css`
+                                position: absolute;
+                                padding-top: 3px;
+                                left: 50%;
+                                z-index: 6000;
+                                transform: translateX(-50%);
+                                top: 100%;
+                              `}
+                            >
+                              <Panel
+                                border
+                                noPadding
+                                css={css`
+                                  min-width: 123px;
+                                `}
+                              >
+                                {item.children.map((child) => (
+                                  <Link
+                                    key={child.path}
+                                    to={child.path}
+                                    css={css`
+                                      display: block;
+                                      padding: 10px 0px;
+                                      text-align: center;
+                                      text-decoration: none;
+
+                                      &:hover {
+                                        background-color: ${theme.colors.text
+                                          .background};
+                                      }
+
+                                      &:first-child {
+                                        border-top-left-radius: 12px;
+                                        border-top-right-radius: 12px;
+                                      }
+
+                                      &:last-child {
+                                        border-bottom-left-radius: 12px;
+                                        border-bottom-right-radius: 12px;
+                                      }
+                                    `}
+                                  >
+                                    <Typography
+                                      size={16}
+                                      weight={900}
+                                      color="primary"
+                                    >
+                                      {child.label}
+                                    </Typography>
+                                  </Link>
+                                ))}
+                              </Panel>
+                            </div>
+                          )}
                         </Typography>
                       ),
                     }))}
