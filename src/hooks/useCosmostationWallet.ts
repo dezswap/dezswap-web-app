@@ -22,15 +22,14 @@ import { useLCDClient } from "./useLCDClient";
 // TODO: support testnet
 const CHAIN_ID = networks.dimension.chainId;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isInstalled = !!(window as any).cosmostation;
-
 const useCosmostationWallet = () => {
   // const [provider, setProvider] = useState<Cosmos>();
   // const [account, setAccount] = useState<RequestAccountResponse>();
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
   const lcd = useLCDClient();
   const xplaWallet = useWallet();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isInstalled = !!(window as any).cosmostation;
 
   const connect = useCallback(async () => {
     try {
@@ -175,7 +174,7 @@ const useCosmostationWallet = () => {
 
   return useMemo(
     () => ({ connect, post, disconnect, isInstalled, ...cosmostationWallet }),
-    [connect, post, disconnect, cosmostationWallet],
+    [connect, post, disconnect, isInstalled, cosmostationWallet],
   );
 };
 
