@@ -9,9 +9,11 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
+import useCosmostationWallet from "./useCosmostationWallet";
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
+  const cosmostationWallet = useCosmostationWallet();
   const [txOptions, setTxOptions] = useState<CreateTxOptions>();
 
   const [txResult, setTxResult] = useState<TxResult>();
@@ -24,29 +26,45 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
   const [fee, setFee] = useState<Fee>();
   const handleConfirm = useCallback(async () => {
-    if (txOptions && fee && connectedWallet?.availablePost) {
-      try {
-        txBroadcastModal.open();
-        const result = await connectedWallet.post({
-          ...txOptions,
-          fee,
-        });
-        setTxResult(result);
-      } catch (error) {
-        console.log(error);
-        if (
-          error instanceof CreateTxFailed &&
-          connectedWallet?.connectType === ConnectType.WALLETCONNECT
-        ) {
-          error.message =
-            "Transaction creation failed, please check the details in your wallet and try again";
+    if (txOptions && fee) {
+      if (connectedWallet?.availablePost) {
+        try {
+          txBroadcastModal.open();
+          const result = await connectedWallet.post({
+            ...txOptions,
+            fee,
+          });
+          setTxResult(result);
+        } catch (error) {
+          console.log(error);
+          if (
+            error instanceof CreateTxFailed &&
+            connectedWallet?.connectType === ConnectType.WALLETCONNECT
+          ) {
+            error.message =
+              "Transaction creation failed, please check the details in your wallet and try again";
+          }
+          if (error instanceof Error) {
+            setTxError(error);
+          }
         }
-        if (error instanceof Error) {
-          setTxError(error);
+      }
+
+      // Cosmostation
+      if (connectedWallet?.xplaAddress && !connectedWallet?.availablePost) {
+        try {
+          txBroadcastModal.open();
+          const result = await cosmostationWallet.post(txOptions, fee);
+          setTxResult(result);
+        } catch (error) {
+          console.log(error);
+          if (error instanceof Error) {
+            setTxError(error);
+          }
         }
       }
     }
-  }, [connectedWallet, fee, txOptions, txBroadcastModal]);
+  }, [txOptions, fee, connectedWallet, txBroadcastModal, cosmostationWallet]);
 
   const [node, setNode] = useState<Node>();
   const confirmationModal = useConfirmationModal({

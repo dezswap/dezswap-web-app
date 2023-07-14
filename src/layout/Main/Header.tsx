@@ -32,6 +32,7 @@ import { useBalance } from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconXpla from "assets/icons/icon-xpla-24px.svg";
+import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -46,6 +47,7 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
+import useCosmostationWallet from "hooks/useCosmostationWallet";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -233,6 +235,7 @@ function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
   const wallet = useWallet();
+  const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
   const balance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
@@ -240,6 +243,11 @@ function Header() {
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
+
+  const isCosmostationWalletConnected = useMemo(
+    () => !!cosmostationWallet?.account,
+    [cosmostationWallet],
+  );
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -396,7 +404,11 @@ function Header() {
                                 <Col width="auto">
                                   <IconButton
                                     size={24}
-                                    icons={{ default: iconXpla }}
+                                    icons={{
+                                      default: isCosmostationWalletConnected
+                                        ? iconCosmostation
+                                        : iconXpla,
+                                    }}
                                   />
                                 </Col>
                                 <Col style={{ paddingLeft: "4px" }}>
@@ -405,7 +417,9 @@ function Header() {
                                     color={theme.colors.primary}
                                     weight="bold"
                                   >
-                                    {connectedWallet.connection.name}
+                                    {isCosmostationWalletConnected
+                                      ? "Cosmostation"
+                                      : connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
@@ -529,6 +543,7 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   wallet.disconnect();
+                                  cosmostationWallet.disconnect();
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);
