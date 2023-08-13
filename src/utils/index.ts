@@ -130,3 +130,27 @@ export const formatRatio = (value: number) => {
   }
   return value.toFixed(2);
 };
+
+export const formatDateTime = (input: string | number | Date) => {
+  const date = new Date(input);
+
+  return Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  }).format(date);
+};
+
+export const getRemainDays = (input: string | number | Date) => {
+  const date = new Date(input);
+  const now = new Date();
+
+  const diff = date.getTime() - now.getTime();
+  const res = Math.ceil(diff / (1000 * 3600 * 24));
+  return res > 0 ? res : 0;
+};
+
+console.log(formatDateTime(new Date()));

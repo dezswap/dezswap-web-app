@@ -9,6 +9,7 @@ import CreatePage from "pages/Earn/Pools/Create";
 import Error404 from "pages/Error404";
 import EarnPage from "pages/Earn";
 import LockdropPage from "pages/Earn/Lockdrop";
+import StakePage from "pages/Earn/Lockdrop/Stake";
 
 export interface RouteObject extends Omit<RouteProps, "children"> {
   children?: RouteObject[];
@@ -72,6 +73,7 @@ const routes: RouteObject[] = [
       {
         path: "lockdrop",
         element: <LockdropPage />,
+        children: [{ path: ":eventAddress", element: <StakePage /> }],
       },
       { index: true, element: <Navigate replace to="pools" /> },
     ],

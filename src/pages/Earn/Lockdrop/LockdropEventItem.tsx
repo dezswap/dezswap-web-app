@@ -1,0 +1,759 @@
+import Box from "components/Box";
+import styled from "@emotion/styled";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import { Col, Hidden, Row, Visible, useScreenClass } from "react-grid-system";
+import Button from "components/Button";
+import { css } from "@emotion/react";
+import Tooltip from "components/Tooltip";
+import Typography from "components/Typography";
+import { LP_DECIMALS } from "constants/dezswap";
+import {
+  formatNumber,
+  formatDecimals,
+  amountToValue,
+  formatDateTime,
+  getRemainDays,
+  getAddressLink,
+} from "utils";
+import iconDefaultToken from "assets/icons/icon-default-token.svg";
+import iconOutlink from "assets/icons/icon-link.svg";
+import iconVerified from "assets/icons/icon-verified.svg";
+import iconAlarm from "assets/icons/icon-alarm.svg";
+
+import iconBookmark from "assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
+import useAssets from "hooks/useAssets";
+import useNetwork from "hooks/useNetwork";
+import usePairs from "hooks/usePairs";
+import { useMemo } from "react";
+import ProgressBar from "components/ProgressBar";
+import { Link } from "react-router-dom";
+import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
+import IconButton from "components/IconButton";
+import useBalance from "hooks/useBalance";
+import Hr from "components/Hr";
+import { Numeric } from "@xpla/xpla.js";
+import Expand from "../Expand";
+
+const TableRow = styled(Box)`
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 20px;
+  background: none;
+  gap: 20px;
+  & > div {
+    width: 160px;
+    color: ${({ theme }) => theme.colors.primary};
+    font-size: 16px;
+    font-weight: 500;
+    &:first-of-type {
+      width: 32px;
+    }
+    &:nth-of-type(2) {
+      width: 244px;
+    }
+    &:last-of-type {
+      width: 116px;
+    }
+
+    & > div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      .${MOBILE_SCREEN_CLASS} &,
+      .${TABLET_SCREEN_CLASS} & {
+        overflow: unset;
+        white-space: normal;
+        text-overflow: unset;
+        word-break: break-all;
+      }
+    }
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+    gap: 20px;
+
+    & > div {
+      width: 100%;
+      &:first-of-type {
+        width: 100%;
+      }
+    }
+  }
+`;
+
+const Label = styled(Typography)`
+  line-height: 1;
+  white-space: nowrap;
+  margin-bottom: 15px;
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    margin-bottom: 6px;
+  }
+`;
+
+Label.defaultProps = {
+  color: "primary",
+  weight: 900,
+};
+
+const AssetIcon = styled.div<{ src?: string }>`
+  width: 32px;
+  height: 32px;
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: ${({ theme }) => theme.colors.white};
+    border-radius: 50%;
+    background-image: ${({ src }) => `url(${src || iconDefaultToken})`};
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+  }
+`;
+
+const BodyWrapper = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  gap: 40px;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    display: block;
+
+    & > div {
+      &:first-of-type {
+        margin-bottom: 16px;
+      }
+    }
+  }
+`;
+
+const OutlinkList = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  width: auto;
+  height: auto;
+  position: relative;
+
+  gap: 10px;
+`;
+
+const OutlinkItem = styled.a`
+  display: inline-block;
+  line-height: 19px;
+  font-size: 14px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: ${({ theme }) => theme.colors.text.primary};
+  text-decoration: none;
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    margin-left: 5px;
+    background-image: url(${iconOutlink});
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    line-height: 19px;
+    vertical-align: middle;
+  }
+`;
+
+const Verified = styled.div`
+  display: inline-block;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  padding: 5px 10px;
+  border-radius: 30px;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    margin-right: 2px;
+    background-image: url(${iconVerified});
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    line-height: 19px;
+    vertical-align: middle;
+  }
+
+  &::after {
+    content: "Verified";
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 19px;
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const LockdropUserInfoItem = styled(Box)`
+  padding: 16px;
+  background-color: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+
+  & > div {
+    &,
+    & *:not([type="button"]) {
+      color: ${({ theme }) => theme.colors.primary};
+    }
+
+    &:first-of-type {
+      flex: 1;
+    }
+    &:last-of-type {
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+    gap: 20px;
+
+    & > div {
+      &:first-of-type {
+        width: 100%;
+      }
+      &:last-of-type {
+        width: 100%;
+      }
+    }
+  }
+`;
+
+function LockdropUserInfoTable({
+  data,
+}: {
+  data: {
+    label: string;
+    value: string;
+  }[];
+}) {
+  return (
+    <Row
+      justify="between"
+      align="start"
+      gutterWidth={20}
+      css={css`
+        .${MOBILE_SCREEN_CLASS} &,
+        .${TABLET_SCREEN_CLASS} & {
+          gap: 16px;
+        }
+      `}
+    >
+      {data.map(({ label, value }) => (
+        <Col xs={12} md={12 / data.length}>
+          <Typography
+            color="primary"
+            size={14}
+            weight={900}
+            css={css`
+              margin-bottom: 15px;
+              .${MOBILE_SCREEN_CLASS} &,
+              .${TABLET_SCREEN_CLASS} & {
+                margin-bottom: 6px;
+              }
+            `}
+          >
+            {label}
+          </Typography>
+          <Typography color="primary" size={14} weight={400}>
+            {value}
+          </Typography>
+        </Col>
+      ))}
+    </Row>
+  );
+}
+
+function LockdropEventItem({
+  event: lockdropEvent,
+  isBookmarked,
+  onBookmarkToggle,
+  userInfo: lockdropUserInfo,
+}: {
+  event: LockdropEvent;
+  userInfo?: LockdropUserInfo;
+  isBookmarked?: boolean;
+  onBookmarkToggle?: (isBookmarked: boolean, eventAddress: string) => void;
+}) {
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
+
+  const { getAsset } = useAssets();
+  const network = useNetwork();
+  const { findPairByLpAddress } = usePairs();
+  const pair = useMemo(
+    () => findPairByLpAddress(lockdropEvent.lp_token_addr),
+    [findPairByLpAddress, lockdropEvent],
+  );
+
+  const [asset1, asset2] = useMemo(
+    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
+    [getAsset, pair],
+  );
+  const rewardAsset = useMemo(
+    () => getAsset(lockdropEvent.reward_token_addr),
+    [getAsset, lockdropEvent],
+  );
+  const lpBalance = useBalance(lockdropEvent.lp_token_addr);
+
+  const isStakable = useMemo(() => {
+    const startAt = new Date(lockdropEvent.start_at * 1000);
+    const endAt = new Date(lockdropEvent.end_at * 1000);
+    const now = new Date();
+
+    return now >= startAt && now <= endAt;
+  }, [lockdropEvent]);
+
+  const isCancelable = useMemo(() => {
+    const cancelableUntil = new Date(lockdropEvent.cancelable_until * 1000);
+    const now = new Date();
+
+    return now <= cancelableUntil;
+  }, [lockdropEvent]);
+
+  const isNeedAction = useMemo(() => {
+    return lockdropUserInfo?.lockup_infos.some((info) =>
+      Numeric.parse(info.claimable).gt(0),
+    );
+  }, [lockdropUserInfo]);
+
+  const extra = useMemo(
+    () =>
+      isStakable
+        ? [
+            <Link to={lockdropEvent.addr} relative="route">
+              <Button as="div" variant="primary" block>
+                Stake
+              </Button>
+            </Link>,
+          ]
+        : [],
+    [lockdropEvent, isStakable],
+  );
+
+  const bookmarkButton = useMemo(
+    () => (
+      <IconButton
+        size={32}
+        style={{ alignItems: "center" }}
+        icons={{
+          default: isBookmarked ? iconBookmarkSelected : iconBookmark,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onBookmarkToggle && lockdropEvent.addr) {
+            onBookmarkToggle(!isBookmarked, lockdropEvent.addr);
+          }
+        }}
+      />
+    ),
+    [isBookmarked, lockdropEvent, onBookmarkToggle],
+  );
+
+  return (
+    <Expand
+      header={
+        <TableRow>
+          <Hidden xs sm>
+            <div
+              css={css`
+                margin-right: -10px;
+              `}
+            >
+              {bookmarkButton}
+            </div>
+          </Hidden>
+          <div>
+            {isSmallScreen && <Label>Pool</Label>}
+            <Row justify="between" align="center" gutterWidth={0}>
+              <Col xs="content">
+                <Row
+                  justify="start"
+                  align="center"
+                  gutterWidth={6}
+                  wrap="nowrap"
+                >
+                  <Col
+                    width="auto"
+                    css={css`
+                      white-space: nowrap;
+                      line-height: 1;
+                      font-size: 0;
+                    `}
+                  >
+                    <AssetIcon src={asset1?.icon} />
+                    <AssetIcon
+                      src={asset2?.icon}
+                      css={css`
+                        margin-left: -9px;
+                      `}
+                    />
+                  </Col>
+                  <Tooltip
+                    arrow
+                    content={`${asset1?.symbol}-${asset2?.symbol}`}
+                  >
+                    <Col
+                      width="auto"
+                      css={css`
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                      `}
+                    >
+                      {asset1?.symbol}-{asset2?.symbol}
+                    </Col>
+                  </Tooltip>
+                </Row>
+              </Col>
+              <Visible xs sm>
+                <Col xs="content">{bookmarkButton}</Col>
+              </Visible>
+            </Row>
+          </div>
+          <div>
+            {isSmallScreen && <Label>Total Staked LP</Label>}
+            <div>
+              {formatNumber(
+                formatDecimals(
+                  amountToValue(lockdropEvent.total_locked_lp, LP_DECIMALS) ||
+                    "",
+                  2,
+                ),
+              )}
+              &nbsp;LP
+            </div>
+          </div>
+          <div>
+            {isSmallScreen && <Label>Allocation</Label>}
+            <div>
+              {formatNumber(
+                formatDecimals(
+                  amountToValue(
+                    lockdropEvent.total_reward,
+                    rewardAsset?.decimals,
+                  ) || "",
+                  2,
+                ),
+              )}
+              &nbsp;
+              {rewardAsset?.symbol}
+            </div>
+          </div>
+          <div>
+            {isSmallScreen && <Label>My LP Balance</Label>}
+            <div>
+              {formatNumber(
+                formatDecimals(
+                  amountToValue(lpBalance || 0, LP_DECIMALS) || "",
+                  2,
+                ),
+              )}
+              &nbsp;LP
+            </div>
+          </div>
+          <div>
+            {isSmallScreen && <Label>Event Ends In</Label>}
+            <div>
+              {getRemainDays(lockdropEvent.end_at * 1000)} days
+              <Tooltip
+                content={
+                  <>
+                    <Typography size={14} weight={700} color="primary">
+                      Lock begins at
+                      <br />
+                      {formatDateTime(lockdropEvent.end_at * 1000)}
+                    </Typography>
+                    <Hr
+                      css={css`
+                        margin: 10px 0;
+                      `}
+                    />
+                    <Typography size={12} weight={500}>
+                      Cancellation is available
+                      <br />
+                      until&nbsp;
+                      {formatDateTime(lockdropEvent.cancelable_until * 1000)}
+                    </Typography>
+                  </>
+                }
+                arrow
+              >
+                <IconButton
+                  size={20}
+                  icons={{ default: iconAlarm }}
+                  css={css`
+                    vertical-align: middle;
+                    margin-left: 2px;
+                  `}
+                />
+              </Tooltip>
+            </div>
+          </div>
+          {isSmallScreen && !!extra.length && <div>{extra}</div>}
+        </TableRow>
+      }
+      extra={!isSmallScreen ? extra : undefined}
+    >
+      <BodyWrapper>
+        <OutlinkList>
+          <OutlinkItem>Project Site</OutlinkItem>
+          <OutlinkItem
+            href={getAddressLink(lockdropEvent.addr, network.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Pair Info
+          </OutlinkItem>
+          <Verified />
+        </OutlinkList>
+
+        <div
+          css={css`
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          `}
+        >
+          {!lockdropUserInfo?.lockup_infos?.length ? (
+            <LockdropUserInfoItem>
+              <div>
+                <LockdropUserInfoTable
+                  data={[
+                    {
+                      label: "Your Staked LP",
+                      value: "0",
+                    },
+                    {
+                      label: "Reward",
+                      value: `0 ${rewardAsset?.symbol}`,
+                    },
+                    {
+                      label: "Claimable",
+                      value: `0 ${rewardAsset?.symbol}`,
+                    },
+                    {
+                      label: "Claimed",
+                      value: `0 ${rewardAsset?.symbol}`,
+                    },
+                  ]}
+                />
+              </div>
+              <Hidden xs sm>
+                <div>&nbsp;</div>
+              </Hidden>
+            </LockdropUserInfoItem>
+          ) : (
+            lockdropUserInfo.lockup_infos.map((lockupInfo) => {
+              const eventEndAt = new Date(lockdropEvent.end_at * 1000);
+              const unlockAt = new Date(lockupInfo.unlock_second * 1000);
+              const now = new Date();
+
+              const isClaimable = Numeric.parse(lockupInfo.claimable || 0).gt(
+                0,
+              );
+              const isUnstakable = now >= unlockAt;
+              const isLocking = now > eventEndAt && now < unlockAt;
+
+              return (
+                <LockdropUserInfoItem>
+                  <div>
+                    <Row
+                      justify="between"
+                      align="start"
+                      css={css`
+                        margin-bottom: 15px;
+                      `}
+                    >
+                      <Col xs={12} md="content">
+                        <Typography weight={900} size={14}>
+                          Locking Period
+                          <Hidden xs sm>
+                            :&nbsp;
+                          </Hidden>
+                          <Visible xs sm>
+                            <br />
+                          </Visible>
+                          <span
+                            css={css`
+                              font-weight: 400;
+                            `}
+                          >
+                            {formatDateTime(lockdropEvent.end_at * 1000)}&nbsp;
+                            -&nbsp;
+                            {formatDateTime(lockupInfo.unlock_second * 1000)} (
+                            {lockupInfo.duration} weeks)
+                          </span>
+                        </Typography>
+                      </Col>
+                      <Col xs={12} md="content">
+                        <Typography weight={900} size={14}>
+                          Remaining
+                          <Hidden xs sm>
+                            :&nbsp;
+                          </Hidden>
+                          <Visible xs sm>
+                            <br />
+                          </Visible>
+                          <span
+                            css={css`
+                              font-weight: 400;
+                            `}
+                          >
+                            {getRemainDays(lockupInfo.unlock_second * 1000)}
+                            &nbsp;days
+                          </span>
+                        </Typography>
+                      </Col>
+                    </Row>
+                    <div
+                      css={css`
+                        margin-bottom: 19px;
+                      `}
+                    >
+                      <ProgressBar
+                        variant="gradient"
+                        size="small"
+                        min={lockdropEvent.start_at}
+                        max={lockupInfo.unlock_second}
+                        value={new Date().getTime() / 1000}
+                      />
+                    </div>
+                    <Hr
+                      css={css`
+                        margin-bottom: 20px;
+                      `}
+                    />
+                    <LockdropUserInfoTable
+                      data={[
+                        {
+                          label: "Your Staked LP",
+                          value: formatNumber(
+                            formatDecimals(
+                              amountToValue(
+                                lockupInfo.locked_lp_token || 0,
+                                LP_DECIMALS,
+                              ) || "",
+                              2,
+                            ),
+                          ),
+                        },
+                        {
+                          label: "Reward",
+                          value: `${formatNumber(
+                            formatDecimals(
+                              amountToValue(
+                                lockupInfo.total_reward || 0,
+                                rewardAsset?.decimals,
+                              ) || "",
+                              2,
+                            ),
+                          )} ${rewardAsset?.symbol}`,
+                        },
+                        {
+                          label: "Claimable",
+                          value: `${formatNumber(
+                            formatDecimals(
+                              amountToValue(
+                                lockupInfo.claimable || 0,
+                                rewardAsset?.decimals,
+                              ) || "",
+                              2,
+                            ),
+                          )} ${rewardAsset?.symbol}`,
+                        },
+                        {
+                          label: "Claimed",
+                          value: `${formatNumber(
+                            formatDecimals(
+                              amountToValue(
+                                lockupInfo.claimed || 0,
+                                rewardAsset?.decimals,
+                              ) || "",
+                              2,
+                            ),
+                          )} ${rewardAsset?.symbol}`,
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div>
+                    {isStakable && (
+                      <Link
+                        to={`${lockdropEvent.addr}?duration=${lockupInfo.duration}`}
+                        relative="route"
+                      >
+                        <Button as="div" variant="primary" block>
+                          Stake More
+                        </Button>
+                      </Link>
+                    )}
+                    {isCancelable && (
+                      <Button variant="secondary" block>
+                        Cancel
+                      </Button>
+                    )}
+                    {(isLocking || isUnstakable) && (
+                      <Button variant="primary" block disabled={!isClaimable}>
+                        Claim
+                      </Button>
+                    )}
+                    {(isLocking || isUnstakable) && (
+                      <Button variant="secondary" block disabled={isLocking}>
+                        Unstake
+                      </Button>
+                    )}
+                  </div>
+                </LockdropUserInfoItem>
+              );
+            })
+          )}
+        </div>
+      </BodyWrapper>
+    </Expand>
+  );
+}
+
+export default LockdropEventItem;

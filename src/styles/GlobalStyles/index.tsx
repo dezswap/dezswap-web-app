@@ -32,6 +32,11 @@ function GlobalStyles() {
             font-family: "Nunito", sans-serif;
             outline: none;
           }
+
+          a:active {
+            text-decoration: none;
+            color: inherit;
+          }
         `}
       />
       {/* React Modal */}

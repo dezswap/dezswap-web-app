@@ -239,3 +239,29 @@ export const generateSwapMsg = (
     getCoins([{ address: fromAssetAddress, amount }]),
   );
 };
+
+export const generateIncreaseLockupContractMsg = ({
+  senderAddress,
+  contractAddress,
+  lpTokenAddress,
+  amount,
+  duration,
+}: {
+  senderAddress: string;
+  contractAddress: string;
+  lpTokenAddress: string;
+  duration: number | string;
+  amount?: number | string;
+}) => {
+  return new MsgExecuteContract(senderAddress, lpTokenAddress, {
+    send: {
+      msg: window.btoa(
+        JSON.stringify({
+          increase_lockup: { duration: Number(duration) },
+        }),
+      ),
+      amount: `${amount}`,
+      contract: contractAddress,
+    },
+  });
+};

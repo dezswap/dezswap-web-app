@@ -67,6 +67,9 @@ const Button = styled.button<ButtonProps>`
           &.active {
             background-color: ${theme.colors.selected};
           }
+          &:disabled {
+            opacity: 0.5;
+          }
         `;
       case "link":
         return css`
