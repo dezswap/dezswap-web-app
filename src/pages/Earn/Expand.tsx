@@ -34,6 +34,7 @@ const Header = styled(Box)`
     position: unset;
   }
   padding: 0;
+  padding-right: 20px;
 
   .${SMALL_BROWSER_SCREEN_CLASS} &,
   .${LARGE_BROWSER_SCREEN_CLASS} & {

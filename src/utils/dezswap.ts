@@ -265,3 +265,51 @@ export const generateIncreaseLockupContractMsg = ({
     },
   });
 };
+
+export const generateCancelLockdropMsg = ({
+  senderAddress,
+  contractAddress,
+  duration,
+}: {
+  senderAddress: string;
+  contractAddress: string;
+  duration: number | string;
+}) => {
+  return new MsgExecuteContract(senderAddress, contractAddress, {
+    cancel: {
+      duration: Number(duration),
+    },
+  });
+};
+
+export const generateClaimLockdropMsg = ({
+  senderAddress,
+  contractAddress,
+  duration,
+}: {
+  senderAddress: string;
+  contractAddress: string;
+  duration: number | string;
+}) => {
+  return new MsgExecuteContract(senderAddress, contractAddress, {
+    claim: {
+      duration: Number(duration),
+    },
+  });
+};
+
+export const generateUnstakeLockdropMsg = ({
+  senderAddress,
+  contractAddress,
+  duration,
+}: {
+  senderAddress: string;
+  contractAddress: string;
+  duration: number | string;
+}) => {
+  return new MsgExecuteContract(senderAddress, contractAddress, {
+    unlock: {
+      duration: Number(duration),
+    },
+  });
+};

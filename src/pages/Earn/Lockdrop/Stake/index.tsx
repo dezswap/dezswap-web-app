@@ -126,11 +126,6 @@ function StakePage() {
   }, [asset1, asset2, simulationResult]);
 
   useEffect(() => {
-    console.log("lockdropEvent");
-    console.log(lockdropEvent);
-  }, [lockdropEvent]);
-
-  useEffect(() => {
     const defaultDuration = searchParams.get("duration");
     if (defaultDuration) {
       form.setValue(FormKey.duration, defaultDuration);
@@ -187,11 +182,7 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-
-      console.log("fdsafdsafdsa");
       if (txOptions && fee) {
-        console.log(txOptions);
-        console.log(fee);
         requestPost({ txOptions, fee, formElement: event.currentTarget });
       }
     },

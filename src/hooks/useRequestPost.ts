@@ -23,30 +23,37 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   });
 
   const [fee, setFee] = useState<Fee>();
-  const handleConfirm = useCallback(async () => {
-    if (txOptions && fee && connectedWallet?.availablePost) {
-      try {
-        txBroadcastModal.open();
-        const result = await connectedWallet.post({
-          ...txOptions,
-          fee,
-        });
-        setTxResult(result);
-      } catch (error) {
-        console.log(error);
-        if (
-          error instanceof CreateTxFailed &&
-          connectedWallet?.connectType === ConnectType.WALLETCONNECT
-        ) {
-          error.message =
-            "Transaction creation failed, please check the details in your wallet and try again";
-        }
-        if (error instanceof Error) {
-          setTxError(error);
+
+  const postTx = useCallback(
+    async (createTxOptions: CreateTxOptions) => {
+      if (connectedWallet?.availablePost) {
+        try {
+          txBroadcastModal.open();
+          const result = await connectedWallet.post(createTxOptions);
+          setTxResult(result);
+        } catch (error) {
+          console.log(error);
+          if (
+            error instanceof CreateTxFailed &&
+            connectedWallet?.connectType === ConnectType.WALLETCONNECT
+          ) {
+            error.message =
+              "Transaction creation failed, please check the details in your wallet and try again";
+          }
+          if (error instanceof Error) {
+            setTxError(error);
+          }
         }
       }
+    },
+    [connectedWallet, txBroadcastModal],
+  );
+
+  const handleConfirm = useCallback(async () => {
+    if (txOptions) {
+      postTx({ ...txOptions, fee: fee ?? txOptions.fee });
     }
-  }, [connectedWallet, fee, txOptions, txBroadcastModal]);
+  }, [fee, postTx, txOptions]);
 
   const [node, setNode] = useState<Node>();
   const confirmationModal = useConfirmationModal({
@@ -71,21 +78,34 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const requestPost = useCallback(
     (args: {
       txOptions: CreateTxOptions;
-      fee: Fee;
-      formElement: HTMLFormElement;
+      fee?: Fee;
+      formElement?: HTMLFormElement;
+      skipConfirmation?: boolean;
     }) => {
+      if (args.skipConfirmation) {
+        if (args.txOptions) {
+          postTx({ ...args.txOptions, fee: args.fee ?? args.txOptions.fee });
+        }
+        return;
+      }
+
       startTransition(() => {
         setTxOptions(args.txOptions);
         setFee(args.fee);
+        if (!args.formElement) {
+          setNode(undefined);
+          return;
+        }
         const newNode = document.importNode(args.formElement, true);
         newNode.addEventListener("submit", (e) => {
           e.preventDefault();
         });
         setNode(newNode);
       });
+
       confirmationModal.open();
     },
-    [confirmationModal],
+    [confirmationModal, postTx],
   );
 
   return { requestPost };

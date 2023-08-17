@@ -152,5 +152,3 @@ export const getRemainDays = (input: string | number | Date) => {
   const res = Math.ceil(diff / (1000 * 3600 * 24));
   return res > 0 ? res : 0;
 };
-
-console.log(formatDateTime(new Date()));

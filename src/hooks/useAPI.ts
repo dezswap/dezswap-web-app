@@ -18,6 +18,7 @@ import {
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
+import { CreateTxOptions } from "@xpla/xpla.js";
 
 interface TokenBalance {
   balance: string;
@@ -200,6 +201,27 @@ const useAPI = (version: ApiVersion = "v1") => {
     [lcd.wasm, walletAddress],
   );
 
+  const estimateFee = useCallback(
+    async (txOptions: CreateTxOptions) => {
+      if (!connectedWallet) {
+        return undefined;
+      }
+      const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
+      const res = await lcd.tx.estimateFee(
+        [
+          {
+            sequenceNumber: account.getSequenceNumber(),
+            publicKey: account.getPublicKey(),
+          },
+        ],
+        txOptions,
+      );
+
+      return res;
+    },
+    [connectedWallet, lcd],
+  );
+
   return useMemo(
     () => ({
       ...apiClient,
@@ -214,6 +236,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropEvents,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
+      estimateFee,
     }),
     [
       apiClient,
@@ -228,6 +251,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropEvents,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
+      estimateFee,
     ],
   );
 };
