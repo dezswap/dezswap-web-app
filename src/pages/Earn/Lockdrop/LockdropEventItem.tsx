@@ -388,7 +388,9 @@ function LockdropEventItem({
   const needActionBadge = useMemo(
     () =>
       isNeedAction ? (
-        <IconButton size={18} icons={{ default: iconBadge }} />
+        <Tooltip content="Action required!" arrow>
+          <IconButton size={18} icons={{ default: iconBadge }} />
+        </Tooltip>
       ) : null,
     [isNeedAction],
   );
@@ -610,6 +612,8 @@ function LockdropEventItem({
                     left: 100%;
                     top: 50%;
                     transform: translateY(-50%);
+                    line-height: 1;
+                    font-size: 0;
                   `}
                 >
                   {needActionBadge}
@@ -833,7 +837,7 @@ function LockdropEventItem({
                         <Button
                           variant="primary"
                           block
-                          // disabled={!isClaimable}
+                          disabled={!isClaimable}
                           onClick={() =>
                             lockdropAction("claim", lockupInfo.duration)
                           }
@@ -845,7 +849,7 @@ function LockdropEventItem({
                         <Button
                           variant="secondary"
                           block
-                          // disabled={isLocking}
+                          disabled={isLocking}
                           onClick={() =>
                             lockdropAction("unstake", lockupInfo.duration)
                           }
