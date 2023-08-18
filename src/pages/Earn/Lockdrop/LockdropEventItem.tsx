@@ -52,7 +52,7 @@ const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
       padding: 2px;
       background-image: ${theme.colors.gradient};
     `}
-
+  padding: 0;
   border-radius: 14px;
 `;
 
