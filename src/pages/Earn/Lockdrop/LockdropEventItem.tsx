@@ -66,15 +66,12 @@ const TableRow = styled(Box)`
   gap: 20px;
   & > div {
     position: relative;
-    width: 160px;
+    width: 240px;
     color: ${({ theme }) => theme.colors.primary};
     font-size: 16px;
     font-weight: 500;
     &:first-of-type {
       width: 32px;
-    }
-    &:nth-of-type(2) {
-      width: 244px;
     }
     &:last-of-type {
       width: 116px;
@@ -550,18 +547,6 @@ function LockdropEventItem({
               </div>
             </div>
             <div>
-              {isSmallScreen && <Label>My LP Balance</Label>}
-              <div>
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(lpBalance || 0, LP_DECIMALS) || "",
-                    2,
-                  ),
-                )}
-                &nbsp;LP
-              </div>
-            </div>
-            <div>
               {isSmallScreen && (
                 <Label>
                   <Row justify="between" align="center">
@@ -634,7 +619,7 @@ function LockdropEventItem({
               target="_blank"
               rel="noopener noreferrer"
             >
-              Pair Info
+              Event Info
             </OutlinkItem>
             <Verified />
           </OutlinkList>

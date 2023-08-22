@@ -4,7 +4,6 @@ import Typography from "components/Typography";
 import RCSlider, { SliderProps as RCSliderProps } from "rc-slider";
 import "rc-slider/assets/index.css";
 import { ReactElement, ReactNode } from "react";
-import iconHandle from "assets/icons/icon-slider-handle.svg";
 
 interface SliderProps extends RCSliderProps {
   showValue?: boolean;
@@ -13,7 +12,7 @@ interface SliderProps extends RCSliderProps {
 
 const Wrapper = styled.div`
   position: relative;
-  padding: 0 7px;
+  padding: 0;
 
   .rc-slider {
     height: 28px;
@@ -24,7 +23,7 @@ const Wrapper = styled.div`
 
     &-handle {
       border: none !important;
-      background-color: transparent !important;
+      background-color: ${({ theme }) => theme.colors.primary} !important;
       box-shadow: none !important;
       width: 14px;
       height: 28px;
@@ -33,10 +32,6 @@ const Wrapper = styled.div`
       opacity: 1;
       transform: translateX(0);
       z-index: 2;
-      background-image: url(${iconHandle});
-      background-repeat: no-repeat;
-      background-position: 50% 50%;
-      background-size: contain;
 
       &-dragging {
         border-color: ${({ theme }) => theme.colors.primary} !important;
@@ -51,7 +46,7 @@ const Wrapper = styled.div`
       height: 10px;
     }
     &-rail {
-      width: calc(100% + 7px);
+      width: 100%;
       background-color: ${({ theme }) => theme.colors.text.placeholder};
       height: 10px;
     }
@@ -76,17 +71,6 @@ const Wrapper = styled.div`
     &:has(.rc-slider-handle-dragging)::after {
       display: block;
     }
-  }
-
-  &::before {
-    content: "";
-    width: 12px;
-    height: 28px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: ${({ theme }) => theme.colors.disabled};
-    z-index: 1;
   }
 `;
 

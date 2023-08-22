@@ -5,7 +5,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo } from "react";
-import Box from "components/Box";
+import box from "components/Box";
 import Typography from "components/Typography";
 import Slider from "components/Slider";
 import { css } from "@emotion/react";
@@ -35,6 +35,7 @@ import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
+import styled from "@emotion/styled";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -42,6 +43,16 @@ enum FormKey {
   lpValue = "lpValue",
   duration = "duration",
 }
+
+const Box = styled(box)`
+  & > * {
+    margin-bottom: 5px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+`;
 
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
@@ -257,40 +268,36 @@ function StakePage() {
             </Typography>
             &nbsp;weeks
           </Typography>
-          <div
-            className="cm-hidden"
-            css={css`
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              gap: 4px;
-              padding-bottom: 20px;
-            `}
-          >
-            <Typography>4 WK</Typography>
+
+          <div className="cm-hidden">
+            <Controller
+              name={FormKey.duration}
+              control={form.control}
+              render={({ field }) => (
+                <Slider
+                  min={4}
+                  max={52}
+                  step={1}
+                  onBlur={field.onBlur}
+                  onChange={(value) => field.onChange(`${value}`)}
+                  value={Number(field.value)}
+                />
+              )}
+            />
+
             <div
               css={css`
-                flex: 1;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 4px;
+                padding-bottom: 20px;
               `}
             >
-              <Controller
-                name={FormKey.duration}
-                control={form.control}
-                render={({ field }) => (
-                  <Slider
-                    min={4}
-                    max={52}
-                    step={1}
-                    showValue
-                    transformValue={(value) => `${value} WK`}
-                    onBlur={field.onBlur}
-                    onChange={(value) => field.onChange(`${value}`)}
-                    value={Number(field.value)}
-                  />
-                )}
-              />
+              <Typography weight={700}>4 WK</Typography>
+
+              <Typography weight={700}>52 WK</Typography>
             </div>
-            <Typography>52 WK</Typography>
           </div>
         </Box>
         <Box>

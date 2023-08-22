@@ -40,8 +40,9 @@ const TableHeader = styled(Box)`
   padding: 14px 20px;
   margin-bottom: 10px;
   gap: 20px;
+
   & > div {
-    width: 160px;
+    width: 240px;
     color: ${({ theme }) => theme.colors.primary};
     font-size: 14px;
     font-weight: 900;
@@ -213,7 +214,7 @@ function LockdropPage() {
             align="center"
             css={css`
               gap: 20px;
-              margin-bottom: 25px;
+              margin-bottom: 20px;
             `}
           >
             <Col xs={12} sm={6}>
@@ -259,12 +260,25 @@ function LockdropPage() {
           <div
             css={css`
               margin-bottom: 25px;
+              width: 100%;
+              height: auto;
+              position: relative;
+              overflow-x: auto;
+              overflow-y: hidden;
+
+              & > div {
+                min-width: 1111px;
+                .${MOBILE_SCREEN_CLASS} &,
+                .${TABLET_SCREEN_CLASS} & {
+                  min-width: unset;
+                }
+              }
             `}
           >
             {!isSmallScreen && (
               <TableHeader>
                 <div style={{ width: 32, marginRight: -10 }}>&nbsp;</div>
-                <div style={{ width: 244 }}>Pool</div>
+                <div>Pool</div>
                 <div>
                   Total Staked LP
                   <IconButton
@@ -297,22 +311,6 @@ function LockdropPage() {
                     onClick={() => onSortClick("total_reward")}
                   />
                 </div>
-                <div>
-                  My LP Balance
-                  <IconButton
-                    css={css`
-                      vertical-align: middle;
-                    `}
-                    size={22}
-                    icons={{
-                      default:
-                        sortBy === "balance"
-                          ? sortIcons[sortDirection]
-                          : iconSortDefault,
-                    }}
-                    onClick={() => onSortClick("balance")}
-                  />
-                </div>
                 <div style={{ width: 116 }}>
                   Event Ends In
                   <IconButton
@@ -343,15 +341,22 @@ function LockdropPage() {
                   .map((item) => lockdropUserInfos[item.index])
                   .slice((currentPage - 1) * LIMIT, currentPage * LIMIT) || []
               }
+              emptyMessage={
+                selectedTabIndex === 2
+                  ? "No bookmark found."
+                  : "No event found."
+              }
             />
           </div>
-          <Pagination
-            current={currentPage}
-            total={Math.floor((sortedLockdropEvents.length - 1) / LIMIT) + 1}
-            onChange={(value) => {
-              setCurrentPage(value);
-            }}
-          />
+          {!!sortedLockdropEvents?.length && (
+            <Pagination
+              current={currentPage}
+              total={Math.floor((sortedLockdropEvents.length - 1) / LIMIT) + 1}
+              onChange={(value) => {
+                setCurrentPage(value);
+              }}
+            />
+          )}
         </Panel>
       </Container>
       <Outlet />

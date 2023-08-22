@@ -5,9 +5,9 @@ const Wrapper = styled.label`
   position: relative;
   width: 48px;
   height: 24px;
-  border: 5px solid ${({ theme }) => theme.colors.primary};
+  border: 5px solid ${({ theme }) => theme.colors.disabled};
   border-radius: 30px;
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.disabled};
   box-sizing: content-box;
 
   cursor: pointer;
@@ -18,6 +18,11 @@ const Wrapper = styled.label`
     opacity: 0;
     position: absolute;
     z-index: -1;
+  }
+
+  &:has(input:checked) {
+    border-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 

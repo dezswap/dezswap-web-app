@@ -45,7 +45,11 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
           align="center"
           gutterWidth={0}
           style={{ gap: 3 }}
-          wrap={screenClass === MOBILE_SCREEN_CLASS ? "wrap" : "nowrap"}
+          css={css`
+            & > div:last-of-type {
+              margin-left: auto !important;
+            }
+          `}
         >
           <Col xs={12} sm="content">
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
@@ -126,6 +130,17 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               size="large"
               placeholder="0"
               align="right"
+              suffix={
+                <Typography
+                  size={14}
+                  weight={700}
+                  css={css`
+                    padding-top: 4px;
+                  `}
+                >
+                  LP
+                </Typography>
+              }
               {...inputProps}
             />
           </Col>
