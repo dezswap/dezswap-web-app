@@ -28,14 +28,14 @@ const Wrapper = styled(Box)`
 
 const Header = styled(Box)`
   position: relative;
+  padding: 0;
+  padding-right: 20px;
 
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     position: unset;
+    padding-right: 0;
   }
-  padding: 0;
-  padding-right: 20px;
-
   .${SMALL_BROWSER_SCREEN_CLASS} &,
   .${LARGE_BROWSER_SCREEN_CLASS} & {
     &:hover {

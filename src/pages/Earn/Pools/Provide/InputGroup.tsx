@@ -49,7 +49,11 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
 
     return (
       <Box style={style}>
-        <Row justify="between" align="center" style={{ gap: 3 }}>
+        <Row
+          justify="between"
+          align="center"
+          style={{ gap: 3, marginBottom: 5 }}
+        >
           <Col xs={12} sm="content">
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
               <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>

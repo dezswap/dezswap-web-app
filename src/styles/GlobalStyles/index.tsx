@@ -35,7 +35,6 @@ function GlobalStyles() {
 
           a:active {
             text-decoration: none;
-            color: inherit;
           }
         `}
       />

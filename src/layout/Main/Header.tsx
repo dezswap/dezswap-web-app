@@ -164,7 +164,7 @@ const navLinks = [
       },
       {
         path: "/earn/lockdrop",
-        label: "Lock&Drop",
+        label: "LP Lock&Drop",
       },
     ],
   },

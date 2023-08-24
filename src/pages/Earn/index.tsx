@@ -17,7 +17,7 @@ const NavBar = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
 `;
 
 const NavLink = styled(navLink)`
@@ -58,7 +58,7 @@ function EarnPage() {
               color="primary"
               weight={900}
             >
-              Lock&Drop
+              LP Lock&Drop
             </Typography>
           </NavLink>
           <IconButton

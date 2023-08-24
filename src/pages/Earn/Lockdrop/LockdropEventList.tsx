@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   height: auto;
   position: relative;
   overflow-x: auto;
+  overflow-y: hidden;
 
   & > div {
     width: 100%;

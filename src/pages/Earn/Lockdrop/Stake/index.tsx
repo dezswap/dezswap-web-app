@@ -205,7 +205,7 @@ function StakePage() {
       id="stake-modal"
       className="modal-parent"
       isOpen
-      title="Lock&Drop"
+      title={searchParams.get("duration") ? "Lock more LP" : "LP Lock&Drop"}
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       onRequestClose={() => handleModalClose()}
@@ -270,20 +270,26 @@ function StakePage() {
           </Typography>
 
           <div className="cm-hidden">
-            <Controller
-              name={FormKey.duration}
-              control={form.control}
-              render={({ field }) => (
-                <Slider
-                  min={4}
-                  max={52}
-                  step={1}
-                  onBlur={field.onBlur}
-                  onChange={(value) => field.onChange(`${value}`)}
-                  value={Number(field.value)}
-                />
-              )}
-            />
+            <div
+              css={css`
+                margin-bottom: 8px;
+              `}
+            >
+              <Controller
+                name={FormKey.duration}
+                control={form.control}
+                render={({ field }) => (
+                  <Slider
+                    min={4}
+                    max={52}
+                    step={1}
+                    onBlur={field.onBlur}
+                    onChange={(value) => field.onChange(`${value}`)}
+                    value={Number(field.value)}
+                  />
+                )}
+              />
+            </div>
 
             <div
               css={css`
@@ -291,12 +297,15 @@ function StakePage() {
                 justify-content: space-between;
                 align-items: center;
                 gap: 4px;
-                padding-bottom: 20px;
               `}
             >
-              <Typography weight={700}>4 WK</Typography>
+              <Typography size={14} weight={700}>
+                4 WK
+              </Typography>
 
-              <Typography weight={700}>52 WK</Typography>
+              <Typography size={14} weight={700}>
+                52 WK
+              </Typography>
             </div>
           </div>
         </Box>

@@ -52,7 +52,7 @@ const TableHeader = styled(Box)`
   }
 `;
 
-const LIMIT = 8;
+const LIMIT = 10;
 
 function LockdropPage() {
   const location = useLocation();

@@ -398,7 +398,7 @@ function LockdropEventItem({
         ? [
             <Link to={lockdropEvent.addr} relative="route">
               <Button as="div" variant="primary" block>
-                Stake
+                Lock LP
               </Button>
             </Link>,
           ]
@@ -803,17 +803,18 @@ function LockdropEventItem({
                           relative="route"
                         >
                           <Button as="div" variant="primary" block>
-                            Stake More
+                            Lock more LP
                           </Button>
                         </Link>
                       )}
-                      {isCancelable && (
+                      {isStakable && (
                         <Button
                           variant="secondary"
                           block
                           onClick={() =>
                             lockdropAction("cancel", lockupInfo.duration)
                           }
+                          disabled={!isCancelable}
                         >
                           Cancel
                         </Button>

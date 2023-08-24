@@ -33,7 +33,7 @@ const mobileTabs = [
   { value: "my-pool", label: "My LP" },
   { value: "bookmark", label: "Bookmark" },
 ];
-const LIMIT = 8;
+const LIMIT = 10;
 
 function PoolPage() {
   const screenClass = useScreenClass();

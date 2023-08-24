@@ -46,6 +46,7 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
           gutterWidth={0}
           style={{ gap: 3 }}
           css={css`
+            margin-bottom: 5px;
             & > div:last-of-type {
               margin-left: auto !important;
             }
