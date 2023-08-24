@@ -133,7 +133,8 @@ function TxBroadcastingModal({
             />
             <Typography size={16} color="primary" weight={400}>
               Go to the connected wallet and sign-in to proceed with the
-              transaction
+              transaction. If there is no response, please refresh your browser
+              and try again.
             </Typography>
           </Panel>
         </div>
