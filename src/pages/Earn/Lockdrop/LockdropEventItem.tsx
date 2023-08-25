@@ -838,7 +838,7 @@ function LockdropEventItem({
                             lockdropAction("unstake", lockupInfo.duration)
                           }
                         >
-                          Unstake
+                          Unlock
                         </Button>
                       )}
                     </div>
