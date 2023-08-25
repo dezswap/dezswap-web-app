@@ -82,7 +82,7 @@ function ProvidePage() {
   const { value: slippageTolerance } = useSlippageTolerance();
 
   const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
+    navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
   const { requestPost } = useRequestPost(handleModalClose, true);
   const errorMessageModal = useInvalidPathModal({

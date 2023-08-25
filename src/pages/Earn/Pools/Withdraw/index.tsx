@@ -69,7 +69,7 @@ function WithdrawPage() {
   const network = useNetwork();
 
   const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
+    navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
 
   const { requestPost } = useRequestPost(handleModalClose, true);

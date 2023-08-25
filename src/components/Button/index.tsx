@@ -56,7 +56,7 @@ const Button = styled.button<ButtonProps>`
         `;
       case "secondary":
         return css`
-          background-color: transparent;
+          background-color: ${theme.colors.text.background};
           border-color: ${theme.colors.disabled};
           color: ${theme.colors.text.primary}b2;
           border-width: 1px;

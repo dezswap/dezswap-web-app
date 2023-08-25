@@ -16,7 +16,6 @@ import {
   getAddressLink,
 } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import iconOutlink from "assets/icons/icon-link.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
 import iconAlarm from "assets/icons/icon-alarm.svg";
 
@@ -43,6 +42,7 @@ import {
   generateUnstakeLockdropMsg,
 } from "utils/dezswap";
 import { useConnectedWallet } from "@xpla/wallet-provider";
+import Outlink from "components/Outlink";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
@@ -174,33 +174,6 @@ const OutlinkList = styled.div`
   position: relative;
 
   gap: 10px;
-`;
-
-const OutlinkItem = styled.a`
-  display: inline-block;
-  line-height: 19px;
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  letter-spacing: normal;
-  text-align: left;
-  color: ${({ theme }) => theme.colors.text.primary};
-  text-decoration: none;
-  &::after {
-    content: "";
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    position: relative;
-    margin-left: 5px;
-    background-image: url(${iconOutlink});
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    line-height: 19px;
-    vertical-align: middle;
-  }
 `;
 
 const VerifiedBadge = styled.div`
@@ -609,14 +582,14 @@ function LockdropEventItem({
       >
         <BodyWrapper>
           <OutlinkList>
-            <OutlinkItem>Project Site</OutlinkItem>
-            <OutlinkItem
+            <Outlink>Project Site</Outlink>
+            <Outlink
               href={getAddressLink(lockdropEvent.addr, network.name)}
               target="_blank"
               rel="noopener noreferrer"
             >
               Event Info
-            </OutlinkItem>
+            </Outlink>
             <Tooltip content="Whitelisted on XPLA">
               <VerifiedBadge />
             </Tooltip>
@@ -682,7 +655,7 @@ function LockdropEventItem({
                       >
                         <Col xs={12} md="content">
                           <Typography weight={900} size={14}>
-                            Locking Period
+                            Lock Period
                             <Hidden xs sm>
                               :&nbsp;
                             </Hidden>

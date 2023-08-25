@@ -37,6 +37,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
+import useNetwork from "hooks/useNetwork";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -58,6 +59,7 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
+  const network = useNetwork();
   const connectedWallet = useConnectedWallet();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -73,7 +75,7 @@ function StakePage() {
   const { getLockdropEventInfo } = useLockdropEvents();
 
   const { data: lockdropEventInfo } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress],
+    queryKey: ["lockdropEventInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
         return null;

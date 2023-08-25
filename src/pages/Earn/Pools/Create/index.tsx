@@ -102,7 +102,7 @@ function CreatePage() {
   const { register } = form;
 
   const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
+    navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
 
   const handleTxSuccess = useCallback(() => {

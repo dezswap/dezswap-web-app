@@ -7,7 +7,7 @@ import useAssets from "hooks/useAssets";
 import useBalance from "hooks/useBalance";
 import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Row, Col, useScreenClass } from "react-grid-system";
+import { Row, Col, useScreenClass, Hidden } from "react-grid-system";
 import {
   formatNumber,
   formatDecimals,
@@ -17,15 +17,20 @@ import {
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import iconLink from "assets/icons/icon-link.svg";
 import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import {
+  LARGE_BROWSER_SCREEN_CLASS,
+  MOBILE_SCREEN_CLASS,
+  SMALL_BROWSER_SCREEN_CLASS,
+  TABLET_SCREEN_CLASS,
+} from "constants/layout";
 import Tooltip from "components/Tooltip";
 import { Pool } from "types/api";
 import usePairs from "hooks/usePairs";
+import Outlink from "components/Outlink";
 import Expand from "../Expand";
 
 const SimplePieChart = styled.div<{ data: number[] }>`
@@ -53,19 +58,19 @@ const SimplePieChart = styled.div<{ data: number[] }>`
 
 const TableRow = styled(Box)`
   display: inline-flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
   padding: 20px;
   background: none;
+  gap: 20px;
+
   & > div {
+    position: relative;
     width: 190px;
     color: ${({ theme }) => theme.colors.primary};
     font-size: 16px;
     font-weight: 500;
-    &:first-of-type {
-      width: 244px;
-    }
 
     & > div {
       white-space: nowrap;
@@ -140,9 +145,71 @@ Label.defaultProps = {
   color: "primary",
 };
 
-const IconButtonAnchor = styled(IconButton.withComponent("a"))`
-  cursor: pointer;
-  display: inline-block;
+const BodyWrapper = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  gap: 40px;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    display: block;
+
+    & > div {
+      &:first-of-type {
+        margin-bottom: 16px;
+      }
+    }
+  }
+`;
+
+const BodyContent = styled(Box)`
+  padding: 0;
+  background-color: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+  }
+`;
+
+const BodyContentInfo = styled(Box)`
+  background-color: ${({ theme }) => theme.colors.white};
+
+  .${SMALL_BROWSER_SCREEN_CLASS} &,
+  .${LARGE_BROWSER_SCREEN_CLASS} & {
+    padding-right: 30px;
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    padding-bottom: 8px;
+  }
+`;
+const BodyContentButtons = styled(Box)`
+  background-color: ${({ theme }) => theme.colors.white};
+
+  .${SMALL_BROWSER_SCREEN_CLASS} &,
+  .${LARGE_BROWSER_SCREEN_CLASS} & {
+    width: 166px;
+    padding-left: 0;
+  }
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    padding-top: 8px;
+  }
 `;
 
 interface PoolItemProps {
@@ -175,33 +242,21 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
     );
   }, [lpBalance, pool]);
 
-  const extra = useMemo(
-    () => [
+  const bookmarkButton = useMemo(
+    () => (
       <IconButton
         key="bookmark"
         size={32}
         icons={{
           default: bookmarked ? iconBookmarkSelected : iconBookmark,
         }}
-        onClick={onBookmarkClick}
-      />,
-      <IconButtonAnchor
-        key="link"
-        href={
-          pair?.contract_addr
-            ? getAddressLink(pair?.contract_addr, network.name)
-            : "#"
-        }
-        target="_blank"
-        rel="noreferrer noopener"
-        size={19}
-        icons={{ default: iconLink }}
-        css={css`
-          margin-bottom: -2px;
-        `}
-      />,
-    ],
-    [bookmarked, network, onBookmarkClick, pair],
+        onClick={(event) => {
+          event.stopPropagation();
+          onBookmarkClick?.(event);
+        }}
+      />
+    ),
+    [bookmarked, onBookmarkClick],
   );
 
   const [overflowActive, setOverflowActive] = useState(false);
@@ -228,7 +283,10 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
     <Expand
       header={
         <TableRow>
-          <div>
+          <Hidden xs sm>
+            <div style={{ width: 32, marginRight: -10 }}>{bookmarkButton}</div>
+          </Hidden>
+          <div style={{ width: !isSmallScreen ? 244 : "100%" }}>
             {isSmallScreen && <Label>Pool</Label>}
             <Row justify="start" align="center" gutterWidth={6} wrap="nowrap">
               <Col
@@ -265,20 +323,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
               </Tooltip>
               {isSmallScreen && (
                 <Col width="auto" style={{ marginLeft: "auto" }}>
-                  <Row
-                    justify="end"
-                    align="center"
-                    gutterWidth={4}
-                    aria-hidden
-                    onClick={(event) => {
-                      event.stopPropagation();
-                    }}
-                    wrap="nowrap"
-                  >
-                    {extra.map((item) => (
-                      <Col key={item.key}>{item}</Col>
-                    ))}
-                  </Row>
+                  {bookmarkButton}
                 </Col>
               )}
             </Row>
@@ -309,204 +354,213 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           </div>
         </TableRow>
       }
-      extra={!isSmallScreen ? extra : undefined}
     >
-      <Row
-        justify="start"
-        align="start"
-        gutterWidth={0}
-        wrap={!isSmallScreen ? "nowrap" : "wrap"}
-        style={{ columnGap: 20 }}
-        css={css`
-          min-width: 100%;
-          .${MOBILE_SCREEN_CLASS} &,
-          .${TABLET_SCREEN_CLASS} & {
-            width: 100%;
-            min-width: unset;
-            & > div {
-              margin-bottom: 16px;
-
-              &:first-of-type {
-                margin-bottom: 20px;
-              }
-              &:last-of-type {
-                margin-top: 4px;
-                margin-bottom: 0;
-              }
+      <BodyWrapper>
+        <div>
+          <Outlink
+            href={
+              pair?.contract_addr
+                ? getAddressLink(pair?.contract_addr, network.name)
+                : "#"
             }
-          }
-        `}
-      >
-        <Col
-          xs={12}
-          md="content"
+          >
+            Pair info
+          </Outlink>
+        </div>
+        <div
           css={css`
-            min-width: 260px;
+            flex: 1;
+            position: relative;
           `}
         >
-          <Label>Pool Composition</Label>
-          <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
-            <Col width="auto" style={{ flex: 1 }}>
-              <Typography
-                color="primary"
-                size={16}
-                weight={500}
+          <BodyContent>
+            <div
+              css={css`
+                width: 100%;
+                position: relative;
+                flex: 1;
+                overflow-x: auto;
+                overflow-y: hidden;
+                &::-webkit-scrollbar-track {
+                  margin-left: 16px;
+                  margin-right: 10px;
+                }
+              `}
+            >
+              <BodyContentInfo>
+                <Row
+                  justify="start"
+                  align="start"
+                  gutterWidth={0}
+                  wrap={!isSmallScreen ? "nowrap" : "wrap"}
+                  style={{ columnGap: 20 }}
+                  css={css`
+                    min-width: 100%;
+                    .${MOBILE_SCREEN_CLASS} &,
+                    .${TABLET_SCREEN_CLASS} & {
+                      width: 100%;
+                      min-width: unset;
+                      & > div {
+                        margin-bottom: 16px;
+
+                        &:first-of-type {
+                          margin-bottom: 20px;
+                        }
+                        &:last-of-type {
+                          margin-top: 4px;
+                          margin-bottom: 0;
+                        }
+                      }
+                    }
+                  `}
+                >
+                  <Col
+                    xs={12}
+                    md="content"
+                    css={css`
+                      min-width: 260px;
+                      .${MOBILE_SCREEN_CLASS} &,
+                      .${TABLET_SCREEN_CLASS} & {
+                        min-width: unset;
+                      }
+                    `}
+                  >
+                    <Label>Your Liquidity</Label>
+                    <Typography color="primary" size={16} weight={500}>
+                      {formatNumber(
+                        formatDecimals(
+                          amountToValue(lpBalance, LP_DECIMALS) || "0",
+                          3,
+                        ),
+                      )}
+                      &nbsp;LP
+                    </Typography>
+                  </Col>
+                  <Col
+                    xs={12}
+                    md="content"
+                    css={css`
+                      min-width: 260px;
+                      .${MOBILE_SCREEN_CLASS} &,
+                      .${TABLET_SCREEN_CLASS} & {
+                        min-width: unset;
+                      }
+                    `}
+                  >
+                    <Label>Asset Pooled</Label>
+                    <Typography
+                      color="primary"
+                      size={16}
+                      weight={500}
+                      css={css`
+                        white-space: nowrap;
+                        margin-bottom: 4px;
+                      `}
+                    >
+                      {formatNumber(
+                        formatDecimals(
+                          amountToValue(
+                            Numeric.parse(pool.assets[0].amount)
+                              .times(userShare)
+                              .toFixed(0),
+                            asset1?.decimals,
+                          ) || "0",
+                          3,
+                        ),
+                      )}
+                      &nbsp;
+                      {asset1?.symbol}
+                    </Typography>
+                    <Typography
+                      color="primary"
+                      size={16}
+                      weight={500}
+                      css={css`
+                        white-space: nowrap;
+                      `}
+                    >
+                      {formatNumber(
+                        formatDecimals(
+                          amountToValue(
+                            Numeric.parse(pool.assets[1].amount)
+                              .times(userShare)
+                              .toFixed(0),
+                            asset2?.decimals,
+                          ) || "0",
+                          3,
+                        ),
+                      )}
+                      &nbsp;
+                      {asset2?.symbol}
+                    </Typography>
+                  </Col>
+                  <Col
+                    xs={12}
+                    md="content"
+                    css={css`
+                      min-width: 132px;
+                      .${MOBILE_SCREEN_CLASS} &,
+                      .${TABLET_SCREEN_CLASS} & {
+                        min-width: unset;
+                      }
+                    `}
+                  >
+                    <Label
+                      css={css`
+                        margin-bottom: 10px;
+                      `}
+                    >
+                      Your Share
+                    </Label>
+                    <Row justify="start" align="center" gutterWidth={15}>
+                      <Col xs="content">
+                        <div
+                          css={css`
+                            width: 59px;
+                          `}
+                        >
+                          <SimplePieChart data={[userShare * 100, 0]} />
+                        </div>
+                      </Col>
+                      <Col>
+                        <Typography color="secondary" size={16} weight={900}>
+                          {formatDecimals(userShare * 100, 2)}%
+                        </Typography>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </BodyContentInfo>
+            </div>
+            <BodyContentButtons
+              aria-hidden
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              <LinkButton
+                to={`add-liquidity/${pool.address}`}
+                relative="route"
+                variant="primary"
+                block
                 css={css`
-                  margin-bottom: 4px;
+                  margin-bottom: 10px;
                 `}
               >
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(pool.assets[0].amount, asset1?.decimals) ||
-                      "0",
-                    3,
-                  ),
-                )}
-                &nbsp;
-                {asset1?.symbol}
-              </Typography>
-              <Typography color="primary" size={16} weight={500}>
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(pool.assets[1].amount, asset2?.decimals) ||
-                      "0",
-                    3,
-                  ),
-                )}
-                &nbsp;
-                {asset2?.symbol}
-              </Typography>
-            </Col>
-          </Row>
-        </Col>
-        <Col
-          xs={12}
-          md="content"
-          css={css`
-            min-width: 200px;
-          `}
-        >
-          <Label>Your Liquidity</Label>
-          <Typography color="primary" size={16} weight={500}>
-            {formatNumber(
-              formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 3),
-            )}
-            &nbsp;LP
-          </Typography>
-        </Col>
-        <Col
-          xs={12}
-          md="content"
-          css={css`
-            min-width: 200px;
-          `}
-        >
-          <Label>Asset Pooled</Label>
-          <Typography
-            color="primary"
-            size={16}
-            weight={500}
-            css={css`
-              white-space: nowrap;
-              margin-bottom: 4px;
-            `}
-          >
-            {formatNumber(
-              formatDecimals(
-                amountToValue(
-                  Numeric.parse(pool.assets[0].amount)
-                    .times(userShare)
-                    .toFixed(0),
-                  asset1?.decimals,
-                ) || "0",
-                3,
-              ),
-            )}
-            &nbsp;
-            {asset1?.symbol}
-          </Typography>
-          <Typography
-            color="primary"
-            size={16}
-            weight={500}
-            css={css`
-              white-space: nowrap;
-            `}
-          >
-            {formatNumber(
-              formatDecimals(
-                amountToValue(
-                  Numeric.parse(pool.assets[1].amount)
-                    .times(userShare)
-                    .toFixed(0),
-                  asset2?.decimals,
-                ) || "0",
-                3,
-              ),
-            )}
-            &nbsp;
-            {asset2?.symbol}
-          </Typography>
-        </Col>
-        <Col
-          xs={12}
-          md="content"
-          css={css`
-            min-width: 132px;
-          `}
-        >
-          <Label
-            css={css`
-              margin-bottom: 10px;
-            `}
-          >
-            Your Share
-          </Label>
-          <Row justify="start" align="center" gutterWidth={15}>
-            <Col xs="content">
-              <div
-                css={css`
-                  width: 59px;
-                `}
+                Add liquidity
+              </LinkButton>
+              <LinkButton
+                to={`withdraw/${pool.address}`}
+                relative="route"
+                variant="secondary"
+                block
               >
-                <SimplePieChart data={[userShare * 100, 0]} />
-              </div>
-            </Col>
-            <Col>
-              <Typography color="secondary" size={16} weight={900}>
-                {formatDecimals(userShare * 100, 2)}%
-              </Typography>
-            </Col>
-          </Row>
-        </Col>
-        <Col
-          xs={12}
-          md="content"
-          aria-hidden
-          onClick={(event) => {
-            event.stopPropagation();
-          }}
-          style={{ marginLeft: "auto" }}
-        >
-          <LinkButton
-            to={`/pool/add-liquidity/${pool.address}`}
-            variant="primary"
-            block
-            css={css`
-              margin-bottom: 10px;
-            `}
-          >
-            Add liquidity
-          </LinkButton>
-          <LinkButton
-            to={`/pool/withdraw/${pool.address}`}
-            variant="secondary"
-            block
-          >
-            Remove liquidity
-          </LinkButton>
-        </Col>
-      </Row>
+                Remove liquidity
+              </LinkButton>
+            </BodyContentButtons>
+          </BodyContent>
+        </div>
+      </BodyWrapper>
     </Expand>
   );
 }

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import useAPI from "hooks/useAPI";
+import useNetwork from "hooks/useNetwork";
 import { useMemo } from "react";
 
 const useExpectedReward = ({
@@ -12,12 +13,14 @@ const useExpectedReward = ({
   duration?: number;
 }) => {
   const { getEstimatedLockdropReward } = useAPI();
+  const network = useNetwork();
   const { data } = useQuery({
     queryKey: [
       "estimatedLockdropReward",
       lockdropEventAddress,
       amount,
       duration,
+      network.name,
     ],
     queryFn: async () => {
       if (!lockdropEventAddress || !amount || !duration) {

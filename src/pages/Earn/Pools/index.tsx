@@ -17,6 +17,9 @@ import ScrollToTop from "components/ScrollToTop";
 import usePools from "hooks/usePools";
 import { useQueries } from "@tanstack/react-query";
 import { convertIbcTokenAddressForPath } from "utils";
+import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
+import styled from "@emotion/styled";
+import Box from "components/Box";
 import PoolList from "./PoolList";
 import Select from "./Select";
 import AssetSelector from "../AssetSelector";
@@ -35,8 +38,30 @@ const mobileTabs = [
 ];
 const LIMIT = 10;
 
+const TableHeader = styled(Box)`
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 14px 20px;
+  margin-bottom: 10px;
+  gap: 20px;
+  & > div {
+    width: 190px;
+    color: ${({ theme }) => theme.colors.primary};
+    font-size: 14px;
+    font-weight: 900;
+    & > img {
+      vertical-align: middle;
+    }
+  }
+`;
+
 function PoolPage() {
   const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const [selectedTimeBase, setSelectedTimeBase] = useState(timeBaseOptions[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const { findPair, getPair } = usePairs();
@@ -132,7 +157,8 @@ function PoolPage() {
                 ) : undefined}
                 {addresses?.[0] && addresses?.[1] && selectedPair ? (
                   <Link
-                    to={`/pool/add-liquidity/${selectedPair.contract_addr}`}
+                    to={`add-liquidity/${selectedPair.contract_addr}`}
+                    relative="route"
                     css={css`
                       text-decoration: none;
                     `}
@@ -144,9 +170,10 @@ function PoolPage() {
                 ) : undefined}
                 {addresses?.[0] && addresses?.[1] && !selectedPair ? (
                   <Link
-                    to={`/pool/create/${addresses
+                    to={`create/${addresses
                       ?.map((a) => convertIbcTokenAddressForPath(a))
                       .join("/")}`}
+                    relative="route"
                     css={css`
                       text-decoration: none;
                     `}
@@ -167,7 +194,7 @@ function PoolPage() {
             align="center"
             css={css`
               gap: 20px;
-              margin-bottom: 25px;
+              margin-bottom: 20px;
             `}
           >
             <Col xs={12} sm={6}>
@@ -226,23 +253,62 @@ function PoolPage() {
           <div
             css={css`
               margin-bottom: 25px;
+              overflow-x: auto;
             `}
           >
-            <PoolList
-              pools={
-                poolList?.slice(
-                  (currentPage - 1) * LIMIT,
-                  currentPage * LIMIT,
-                ) || []
-              }
-              emptyMessage={
-                [
-                  undefined,
-                  selectedPair ? "No my pool found." : "No pool found.",
-                  "No bookmark found.",
-                ][selectedTabIndex]
-              }
-            />
+            <div
+              css={css`
+                width: 100%;
+                position: relative;
+                height: auto;
+
+                & > div {
+                  min-width: 1111px;
+                  .${MOBILE_SCREEN_CLASS} &,
+                  .${TABLET_SCREEN_CLASS} & {
+                    min-width: unset;
+                  }
+                }
+              `}
+            >
+              {!isSmallScreen && (
+                <TableHeader>
+                  <div style={{ width: 32, marginRight: -10 }}>&nbsp;</div>
+                  <div style={{ width: 244 }}>Pool</div>
+                  <div>
+                    Total Liquidity
+                    <img src={iconSortDisabled} width={22} alt="sort" />
+                  </div>
+                  <div>
+                    Volume(24H)
+                    <img src={iconSortDisabled} width={22} alt="sort" />
+                  </div>
+                  <div>
+                    Fees(24H)
+                    <img src={iconSortDisabled} width={22} alt="sort" />
+                  </div>
+                  <div>
+                    APR
+                    <img src={iconSortDisabled} width={22} alt="sort" />
+                  </div>
+                </TableHeader>
+              )}
+              <PoolList
+                pools={
+                  poolList?.slice(
+                    (currentPage - 1) * LIMIT,
+                    currentPage * LIMIT,
+                  ) || []
+                }
+                emptyMessage={
+                  [
+                    undefined,
+                    selectedPair ? "No my pool found." : "No pool found.",
+                    "No bookmark found.",
+                  ][selectedTabIndex]
+                }
+              />
+            </div>
           </div>
 
           {!!poolList?.length && (
