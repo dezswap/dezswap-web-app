@@ -15,6 +15,7 @@ import { LatestBlock } from "types/common";
 import api, { ApiVersion } from "api";
 import {
   LockdropEstimatedReward,
+  LockdropEventInfo,
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
@@ -160,6 +161,19 @@ const useAPI = (version: ApiVersion = "v1") => {
     [lcd, network.name],
   );
 
+  const getLockdropEventInfo = useCallback(
+    async (lockdropEventAddress: string) => {
+      const res = await lcd.wasm.contractQuery<LockdropEventInfo>(
+        lockdropEventAddress,
+        {
+          event_info: {},
+        },
+      );
+      return res;
+    },
+    [lcd],
+  );
+
   const getLockdropUserInfo = useCallback(
     async (lockdropEventAddress: string) => {
       if (!walletAddress || !lockdropEventAddress) {
@@ -234,6 +248,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLatestBlockHeight,
       getDecimal,
       getLockdropEvents,
+      getLockdropEventInfo,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
@@ -249,6 +264,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLatestBlockHeight,
       getDecimal,
       getLockdropEvents,
+      getLockdropEventInfo,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,

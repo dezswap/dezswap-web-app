@@ -28,7 +28,7 @@ const useExpectedReward = ({
         amount,
         duration,
       );
-      return res;
+      return res || null;
     },
   });
 

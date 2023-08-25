@@ -36,6 +36,7 @@ import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
+import { useQuery } from "@tanstack/react-query";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -69,16 +70,22 @@ function StakePage() {
 
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
-  const { getLockdropEvent } = useLockdropEvents();
+  const { getLockdropEventInfo } = useLockdropEvents();
 
-  const lockdropEvent = useMemo(
-    () => (eventAddress ? getLockdropEvent(eventAddress) : undefined),
-    [getLockdropEvent, eventAddress],
-  );
+  const { data: lockdropEventInfo } = useQuery({
+    queryKey: ["lockdropEventInfo", eventAddress],
+    queryFn: async () => {
+      if (!eventAddress) {
+        return null;
+      }
+      const res = await getLockdropEventInfo(eventAddress);
+      return res;
+    },
+  });
 
   const lpValue = form.watch(FormKey.lpValue);
   const duration = form.watch(FormKey.duration);
-  const lpBalance = useBalance(lockdropEvent?.lp_token_addr);
+  const lpBalance = useBalance(lockdropEventInfo?.lp_token_addr);
 
   const { register, formState } = form;
 
@@ -90,10 +97,10 @@ function StakePage() {
 
   const pair = useMemo(
     () =>
-      lockdropEvent
-        ? findPairByLpAddress(lockdropEvent.lp_token_addr)
+      lockdropEventInfo
+        ? findPairByLpAddress(lockdropEventInfo.lp_token_addr)
         : undefined,
-    [findPairByLpAddress, lockdropEvent],
+    [findPairByLpAddress, lockdropEventInfo],
   );
 
   const [asset1, asset2] = useMemo(
@@ -103,8 +110,10 @@ function StakePage() {
 
   const rewardAsset = useMemo(
     () =>
-      lockdropEvent ? getAsset(lockdropEvent.reward_token_addr) : undefined,
-    [getAsset, lockdropEvent],
+      lockdropEventInfo
+        ? getAsset(lockdropEventInfo.reward_token_addr)
+        : undefined,
+    [getAsset, lockdropEventInfo],
   );
 
   const simulationResult = useSimulate(
@@ -114,7 +123,7 @@ function StakePage() {
   );
 
   const { expectedReward } = useExpectedReward({
-    lockdropEventAddress: lockdropEvent?.addr,
+    lockdropEventAddress: eventAddress,
     amount: valueToAmount(lpValue, LP_DECIMALS) || "0",
     duration: Number(duration),
   });
@@ -146,8 +155,8 @@ function StakePage() {
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (
       !connectedWallet?.walletAddress ||
-      !lockdropEvent?.addr ||
-      !lockdropEvent?.lp_token_addr
+      !eventAddress ||
+      !lockdropEventInfo?.lp_token_addr
     ) {
       return undefined;
     }
@@ -155,14 +164,14 @@ function StakePage() {
       msgs: [
         generateIncreaseLockupContractMsg({
           senderAddress: connectedWallet?.walletAddress,
-          contractAddress: lockdropEvent?.addr,
-          lpTokenAddress: lockdropEvent?.lp_token_addr,
+          contractAddress: eventAddress,
+          lpTokenAddress: lockdropEventInfo?.lp_token_addr,
           amount: valueToAmount(lpValue, LP_DECIMALS),
           duration: Number(duration),
         }),
       ],
     };
-  }, [connectedWallet, duration, lockdropEvent, lpValue]);
+  }, [connectedWallet, duration, eventAddress, lockdropEventInfo, lpValue]);
 
   const { fee } = useFee(txOptions);
 
@@ -219,7 +228,7 @@ function StakePage() {
         `}
       >
         <InputGroup
-          lpToken={lockdropEvent?.lp_token_addr}
+          lpToken={lockdropEventInfo?.lp_token_addr}
           assets={[asset1, asset2]}
           onBalanceClick={(value) => {
             form.setValue(FormKey.lpValue, value);
@@ -234,19 +243,15 @@ function StakePage() {
           <Row justify="between" align="start">
             <Col xs="content">
               <Typography color="primary" weight={900} size={14}>
-                Lock time
+                Locked Until
               </Typography>
             </Col>
             <Col xs="content">
               <Typography color="primary" weight={900} size={14}>
-                <span
-                  css={css`
-                    font-weight: 700;
-                  `}
-                >
-                  End date:&nbsp;
-                </span>
-                {formatDateTime((lockdropEvent?.end_at || 0) * 1000)}
+                {formatDateTime(
+                  (lockdropEventInfo?.event_end_second || 0) * 1000 +
+                    Number(duration) * 7 * 24 * 60 * 60 * 1000,
+                )}
               </Typography>
             </Col>
           </Row>
@@ -280,8 +285,8 @@ function StakePage() {
                 control={form.control}
                 render={({ field }) => (
                   <Slider
-                    min={4}
-                    max={52}
+                    min={lockdropEventInfo?.min_lock_duration || 4}
+                    max={lockdropEventInfo?.max_lock_duration || 52}
                     step={1}
                     onBlur={field.onBlur}
                     onChange={(value) => field.onChange(`${value}`)}
@@ -300,11 +305,11 @@ function StakePage() {
               `}
             >
               <Typography size={14} weight={700}>
-                4 WK
+                {lockdropEventInfo?.min_lock_duration || 4} WK
               </Typography>
 
               <Typography size={14} weight={700}>
-                52 WK
+                {lockdropEventInfo?.max_lock_duration || 52} WK
               </Typography>
             </div>
           </div>
@@ -368,14 +373,6 @@ function StakePage() {
             <InfoTable
               items={[
                 {
-                  key: "lockedTill",
-                  label: "Locked till",
-                  value: formatDateTime(
-                    (lockdropEvent?.end_at || 0) * 1000 +
-                      Number(duration) * 7 * 24 * 60 * 60 * 1000,
-                  ),
-                },
-                {
                   key: "estimatedTokens",
                   label: "Estimated Tokens",
                   value: (
@@ -417,7 +414,7 @@ function StakePage() {
                 {
                   key: "lpAddress",
                   label: "LP Address",
-                  value: ellipsisCenter(lockdropEvent?.lp_token_addr, 6),
+                  value: ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6),
                 },
                 {
                   key: "asset1Address",
@@ -433,10 +430,10 @@ function StakePage() {
             />
           </div>
         </Expand>
-        {lockdropEvent?.cancelable_until && (
+        {lockdropEventInfo?.event_cancelable_until && (
           <Message variant="guide" showIcon={false}>
             You can cancel until&nbsp;
-            {formatDateTime(lockdropEvent.cancelable_until * 1000)}
+            {formatDateTime(lockdropEventInfo.event_cancelable_until * 1000)}
           </Message>
         )}
         <Button

@@ -14,6 +14,20 @@ export interface LockdropEvents {
   events: LockdropEvent[];
 }
 
+export type LockdropEventInfo = {
+  reward_token_addr: string;
+  lp_token_addr: string;
+  event_start_second: number;
+  event_end_second: number;
+  event_cancelable_until: number;
+  reward_vesting_duration: number;
+  min_lock_duration: number;
+  max_lock_duration: number;
+  total_locked_lp_token: string;
+  total_lockdrop_reward: string;
+  total_weighted_score: string;
+};
+
 export type LockdropLockupInfo = {
   duration: number;
   unlock_second: number;

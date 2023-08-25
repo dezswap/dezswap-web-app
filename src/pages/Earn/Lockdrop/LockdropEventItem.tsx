@@ -377,7 +377,7 @@ function LockdropEventItem({
   }, [lockdropEvent]);
 
   const isNeedAction = useMemo(() => {
-    return lockdropUserInfo?.lockup_infos.some((info) =>
+    return lockdropUserInfo?.lockup_infos?.some((info) =>
       Numeric.parse(info.claimable).gt(0),
     );
   }, [lockdropUserInfo]);

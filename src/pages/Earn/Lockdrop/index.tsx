@@ -74,7 +74,7 @@ function LockdropPage() {
 
   const lockdropUserInfoResults = useQueries({
     queries: lockdropEvents.map((lockdropEvent) => ({
-      queryKey: ["lockdropEvent", lockdropEvent.addr],
+      queryKey: ["lockdropUserInfo", lockdropEvent.addr],
       queryFn: async () => {
         const res = await api.getLockdropUserInfo(lockdropEvent.addr);
         if (!res) {

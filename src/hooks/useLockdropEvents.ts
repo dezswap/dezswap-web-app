@@ -14,41 +14,52 @@ const useLockdropEvents = () => {
     },
   });
 
-  const getLockdropEvent = useCallback(
-    (address: string) => {
-      return lockdropEvents?.find((event) => event.addr === address);
+  const getLockdropEventInfo = useCallback(
+    async (address: string) => {
+      const res = await api.getLockdropEventInfo(address);
+      return res;
     },
-    [lockdropEvents],
+    [api],
   );
 
-  const getLockdropEventByRewardToken = useCallback(
-    (address: string) => {
-      return lockdropEvents?.find(
-        (event) => event.reward_token_addr === address,
-      );
+  const getLockdropEventInfoByRewardToken = useCallback(
+    (rewardTokenAddress: string) => {
+      const lockdropEventAddress = lockdropEvents?.find(
+        (event) => event.reward_token_addr === rewardTokenAddress,
+      )?.addr;
+      if (!lockdropEventAddress) {
+        return undefined;
+      }
+      return getLockdropEventInfo(lockdropEventAddress);
     },
-    [lockdropEvents],
+    [getLockdropEventInfo, lockdropEvents],
   );
 
-  const getLockdropEventByLPToken = useCallback(
-    (address: string) => {
-      return lockdropEvents?.find((event) => event.lp_token_addr === address);
+  const getLockdropEventInfoByLPToken = useCallback(
+    (lpTokenAddress: string) => {
+      const lockdropEventAddress = lockdropEvents?.find(
+        (event) => event.lp_token_addr === lpTokenAddress,
+      )?.addr;
+      if (!lockdropEventAddress) {
+        return undefined;
+      }
+      return getLockdropEventInfo(lockdropEventAddress);
     },
-    [lockdropEvents],
+    [getLockdropEventInfo, lockdropEvents],
   );
 
   return useMemo(
     () => ({
       lockdropEvents: lockdropEvents || [],
       isLoading,
-      getLockdropEvent,
-      getLockdropEventByRewardToken,
-      getLockdropEventByLPToken,
+      getLockdropEventInfo,
+      getLockdropEventInfoByRewardToken,
+      getLockdropEventInfoByLPToken,
     }),
     [
-      getLockdropEvent,
-      getLockdropEventByLPToken,
-      getLockdropEventByRewardToken,
+      getLockdropEventInfo,
+      getLockdropEventInfoByLPToken,
+      getLockdropEventInfoByRewardToken,
       isLoading,
       lockdropEvents,
     ],
