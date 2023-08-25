@@ -248,7 +248,6 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 />
               </Col>
               <Tooltip
-                arrow
                 content={`${asset1?.symbol}-${asset2?.symbol}`}
                 disabled={!overflowActive}
               >

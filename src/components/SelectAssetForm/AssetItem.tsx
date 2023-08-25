@@ -171,7 +171,7 @@ function AssetItem({
 
       <AssetIcon src={asset?.icon}>
         {isVerified && (
-          <Tooltip arrow content={`${asset?.symbol} is verified token`}>
+          <Tooltip content={`${asset?.symbol} is verified token`}>
             <div
               css={css`
                 position: absolute;

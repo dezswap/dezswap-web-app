@@ -41,7 +41,7 @@ function TradePage() {
                 `}
               >
                 <Col style={{ paddingRight: 0 }}>
-                  <Tooltip arrow content="Coming soon">
+                  <Tooltip content="Coming soon">
                     <IconButton
                       size={38}
                       icons={{
@@ -59,7 +59,7 @@ function TradePage() {
                       { label: "Swap", value: "trade/swap" },
                       {
                         label: (
-                          <Tooltip arrow content="Coming soon">
+                          <Tooltip content="Coming soon">
                             <span>Limit</span>
                           </Tooltip>
                         ),

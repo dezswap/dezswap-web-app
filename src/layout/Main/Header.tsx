@@ -325,7 +325,7 @@ function Header() {
                         }
                       `,
                       children: item.disabled ? (
-                        <Tooltip arrow content="Coming soon">
+                        <Tooltip content="Coming soon">
                           <Typography size={18} weight={900} color="primary">
                             {item.label}
                           </Typography>
@@ -349,7 +349,7 @@ function Header() {
                                 border
                                 noPadding
                                 css={css`
-                                  min-width: 123px;
+                                  min-width: 138px;
                                 `}
                               >
                                 {item.children.map((child) => (

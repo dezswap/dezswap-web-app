@@ -315,7 +315,7 @@ function StakePage() {
               {/* TODO: add tooltip */}
               <Typography color="primary" weight={900} size={14}>
                 Expected Rewards
-                <TooltipWithIcon content="Lorem ipsum" size={22} arrow />
+                <TooltipWithIcon content="Lorem ipsum" size={22} />
               </Typography>
             </Col>
           </Row>

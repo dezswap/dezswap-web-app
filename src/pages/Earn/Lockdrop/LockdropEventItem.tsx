@@ -203,7 +203,7 @@ const OutlinkItem = styled.a`
   }
 `;
 
-const Verified = styled.div`
+const VerifiedBadge = styled.div`
   display: inline-block;
   border: 2px solid ${({ theme }) => theme.colors.primary};
   padding: 5px 10px;
@@ -385,7 +385,7 @@ function LockdropEventItem({
   const needActionBadge = useMemo(
     () =>
       isNeedAction ? (
-        <Tooltip content="Action required!" arrow>
+        <Tooltip content="Action required!">
           <IconButton size={18} icons={{ default: iconBadge }} />
         </Tooltip>
       ) : null,
@@ -495,10 +495,7 @@ function LockdropEventItem({
                         `}
                       />
                     </Col>
-                    <Tooltip
-                      arrow
-                      content={`${asset1?.symbol}-${asset2?.symbol}`}
-                    >
+                    <Tooltip content={`${asset1?.symbol}-${asset2?.symbol}`}>
                       <Col
                         width="auto"
                         css={css`
@@ -578,7 +575,6 @@ function LockdropEventItem({
                       </Typography>
                     </>
                   }
-                  arrow
                 >
                   <IconButton
                     size={20}
@@ -621,7 +617,9 @@ function LockdropEventItem({
             >
               Event Info
             </OutlinkItem>
-            <Verified />
+            <Tooltip content="Whitelisted on XPLA">
+              <VerifiedBadge />
+            </Tooltip>
           </OutlinkList>
 
           <div

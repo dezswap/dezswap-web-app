@@ -983,7 +983,6 @@ function SwapPage() {
         )}
         {spread.message && (
           <Tooltip
-            arrow
             placement="top"
             content="The impact on the market price of this pool you may encounter by executing your transaction."
           >

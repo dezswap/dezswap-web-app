@@ -2,6 +2,7 @@ import { css, Global, useTheme } from "@emotion/react";
 import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import reset from "emotion-reset";
 import "tippy.js/dist/tippy.css";
+import "tippy.js/dist/svg-arrow.css";
 
 function GlobalStyles() {
   const theme = useTheme();
@@ -167,7 +168,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="top"] > .tippy-svg-arrow > svg {
-              top: 16px;
+              top: 27px;
             }
             &[data-placement^="top"] > .tippy-svg-arrow:after {
               top: 17px;
@@ -184,7 +185,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="bottom"] > .tippy-svg-arrow > svg {
-              bottom: 16px;
+              bottom: 27px;
             }
             &[data-placement^="bottom"] > .tippy-svg-arrow:after {
               bottom: 17px;
@@ -200,7 +201,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(1px);
             }
             &[data-placement^="left"] > .tippy-svg-arrow > svg {
-              left: 11px;
+              left: 18.5px;
             }
             &[data-placement^="left"] > .tippy-svg-arrow:after {
               left: 12px;
@@ -217,19 +218,21 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(-1px);
             }
             &[data-placement^="right"] > .tippy-svg-arrow > svg {
-              right: 11px;
+              right: 19px;
             }
             &[data-placement^="right"] > .tippy-svg-arrow:after {
               right: 12px;
             }
             & > .tippy-svg-arrow {
-              fill: ${theme.colors.white};
+              width: 28px;
+              height: 28px;
+              & > svg {
+                width: 28px;
+                height: 10.2px;
+              }
             }
-            & > .tippy-svg-arrow:after {
-              background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCA2czEuNzk2LS4wMTMgNC42Ny0zLjYxNUM1Ljg1MS45IDYuOTMuMDA2IDggMGMxLjA3LS4wMDYgMi4xNDguODg3IDMuMzQzIDIuMzg1QzE0LjIzMyA2LjAwNSAxNiA2IDE2IDZIMHoiIGZpbGw9InJnYmEoMCwgOCwgMTYsIDAuMikiLz48L3N2Zz4=);
-              background-size: 16px 6px;
-              width: 16px;
-              height: 6px;
+            & > .tippy-svg-arrow::after {
+              content: unset;
             }
           }
         `}
