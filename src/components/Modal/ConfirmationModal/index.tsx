@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import Button from "components/Button";
 import Modal from "components/Modal";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 
 const Content = styled.div`
@@ -13,10 +13,7 @@ const Content = styled.div`
   & .cm-hidden {
     display: none;
   }
-  & button,
-  & input {
-    pointer-events: none;
-  }
+  pointer-events: none;
 `;
 
 interface ConfirmationModalProps extends Omit<ReactModal.Props, "children"> {
@@ -33,19 +30,23 @@ function ConfirmationModal({
 }: ConfirmationModalProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
+
+  const [contentHTML, setContentHTML] = useState("");
+
   useEffect(() => {
-    if (divRef.current) {
-      divRef.current.innerHTML = "";
-      if (node) {
-        divRef.current.appendChild(node);
-        const inputs = divRef.current.getElementsByTagName("input");
-        Array.from(inputs).forEach((elInput) => {
-          // eslint-disable-next-line no-param-reassign
-          elInput.size = elInput.value.length;
-        });
-      }
+    if (node) {
+      const elDiv = document.createElement("div");
+      elDiv.appendChild(node);
+      const inputs = elDiv.getElementsByTagName("input");
+      Array.from(inputs).forEach((elInput) => {
+        // eslint-disable-next-line no-param-reassign
+        elInput.size = elInput.value.length;
+        elInput.setAttribute("value", elInput.value);
+      });
+      setContentHTML(elDiv.innerHTML);
     }
-  }, [node, modalProps.isOpen]);
+  }, [node]);
+
   return (
     <Modal
       {...modalProps}
@@ -72,7 +73,11 @@ function ConfirmationModal({
       hasCloseButton={screenClass === MOBILE_SCREEN_CLASS}
       onGoBack={modalProps.onRequestClose}
     >
-      <Content ref={divRef} className="cm" />
+      <Content
+        ref={divRef}
+        className="cm"
+        dangerouslySetInnerHTML={{ __html: contentHTML }}
+      />
       <Button
         block
         size="large"
