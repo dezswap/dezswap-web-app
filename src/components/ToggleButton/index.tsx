@@ -1,70 +1,85 @@
 import styled from "@emotion/styled";
-import { forwardRef } from "react";
+import { useId } from "react";
 
-const Wrapper = styled.label`
+interface ToggleButtonProps {
+  items: string[];
+  defaultSelectedIndex?: number;
+  selectedIndex?: number;
+  onSelect?: (index: number) => void;
+}
+
+const Wrapper = styled.div`
+  width: auto;
+  height: auto;
   position: relative;
-  width: 58px;
-  height: 33.5px;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+
+  background-color: ${({ theme }) => theme.colors.secondary};
+  padding: 4px;
   border-radius: 30px;
-  border: 3px solid ${({ theme }) => theme.colors.disabled};
-  padding: 2px;
+`;
+
+const Item = styled.label`
+  width: auto;
+  height: auto;
+  position: relative;
+  padding: 3px 16px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 900;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+
+  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  user-select: none;
+
+  cursor: pointer;
 
   & > input {
     width: 0%;
     height: 0%;
-    opacity: 0;
     position: absolute;
-    z-index: -1;
+    opacity: 0;
+    left: -100%;
+    top: -100%;
   }
 
   &:has(input:checked) {
-    border-color: ${({ theme }) => theme.colors.primary};
-  }
-  &:has(input:disabled) {
-    cursor: default;
+    background-color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
-const Handle = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-
-  &::after {
-    content: "";
-    position: absolute;
-
-    width: 24px;
-    height: 24px;
-    border-radius: 30px;
-    background-color: ${({ theme }) => theme.colors.disabled};
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.125s ease-in-out;
-  }
-
-  input:checked ~ &::after {
-    left: 100%;
-    background-color: ${({ theme }) => theme.colors.primary};
-    transform: translate(-100%, -50%);
-  }
-`;
-
-const ToggleButton = forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ style, ...inputProps }, ref) => {
+function ToggleButton({
+  items,
+  defaultSelectedIndex = 0,
+  selectedIndex,
+  onSelect,
+}: ToggleButtonProps) {
+  const name = useId();
   return (
-    <Wrapper style={style}>
-      <input ref={ref} type="checkbox" {...inputProps} />
-      <Handle />
+    <Wrapper>
+      {items.map((item, index) => (
+        <Item key={item}>
+          <input
+            type="radio"
+            name={name}
+            value={item}
+            defaultChecked={defaultSelectedIndex === index}
+            checked={
+              selectedIndex !== undefined ? selectedIndex === index : undefined
+            }
+            onChange={() => onSelect?.(index)}
+          />
+          {item}
+        </Item>
+      ))}
     </Wrapper>
   );
-});
+}
 
 export default ToggleButton;

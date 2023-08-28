@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
 import Copy from "components/Copy";
-import { NumberInput } from "components/Input";
+import { NumberInput, NumberInputProps } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
@@ -14,7 +14,7 @@ import useBalance from "hooks/useBalance";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Token } from "types/api";
 
-interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
+interface InputGroupProps extends NumberInputProps {
   lpToken?: string;
   assets?: (Partial<Token> | undefined)[];
   onBalanceClick?(

@@ -4,9 +4,7 @@ import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { useEffect, useMemo, useState } from "react";
 import Panel from "components/Panel";
 import TabButton from "components/TabButton";
-import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import Switch from "components/Switch";
 import { Outlet, useLocation } from "react-router-dom";
 import useLockdropEvents from "hooks/useLockdropEvents";
 import Pagination from "components/Pagination";
@@ -23,6 +21,7 @@ import iconSortDefault from "assets/icons/icon-sort-default.svg";
 import iconSortAsc from "assets/icons/icon-sort-asc.svg";
 import iconSortDesc from "assets/icons/icon-sort-desc.svg";
 import IconButton from "components/IconButton";
+import ToggleButton from "components/ToggleButton";
 import AssetSelector from "../AssetSelector";
 import LockdropEventList from "./LockdropEventList";
 
@@ -126,10 +125,7 @@ function LockdropPage() {
 
   const filteredLockdropEvents = lockdropEvents.filter(
     (lockdropEvent, index) => {
-      if (
-        isLiveOnly &&
-        lockdropEvent.end_at + 52 * 7 * 60 * 60 * 24 < Date.now() / 1000
-      ) {
+      if (isLiveOnly && lockdropEvent.end_at * 1000 < Date.now()) {
         return false;
       }
       if (selectedPair) {
@@ -242,15 +238,11 @@ function LockdropPage() {
             <Col xs={12} sm="content">
               <Row align="center" justify="center" gutterWidth={8}>
                 <Col xs="content">
-                  <Typography color="primary" size={14} weight={900}>
-                    Live only
-                  </Typography>
-                </Col>
-                <Col width={80}>
-                  <Switch
-                    defaultChecked={isLiveOnly}
-                    onClick={(event) => {
-                      setIsLiveOnly(event.currentTarget.checked);
+                  <ToggleButton
+                    items={["Live", "Finished"]}
+                    selectedIndex={isLiveOnly ? 0 : 1}
+                    onSelect={(index) => {
+                      setIsLiveOnly(index === 0);
                     }}
                   />
                 </Col>

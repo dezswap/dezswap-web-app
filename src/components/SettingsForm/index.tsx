@@ -10,7 +10,7 @@ import { slippagePresets } from "stores/settings";
 
 import iconQuestion from "assets/icons/icon-question.svg";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
-import ToggleButton from "components/ToggleButton";
+import Switch from "components/Switch";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import React, { useCallback } from "react";
 
@@ -229,7 +229,7 @@ function SettingsForm({
               <Col xs="content">
                 <Tooltip content="Coming soon" placement="right">
                   <div>
-                    <ToggleButton disabled />
+                    <Switch disabled />
                   </div>
                 </Tooltip>
               </Col>

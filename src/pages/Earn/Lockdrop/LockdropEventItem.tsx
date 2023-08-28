@@ -54,6 +54,10 @@ const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
     `}
   padding: 0;
   border-radius: 14px;
+
+  a:has(button:disabled) {
+    pointer-events: none;
+  }
 `;
 
 const TableRow = styled(Box)`
@@ -779,40 +783,46 @@ function LockdropEventItem({
                         </Link>
                       )}
                       {isStakable && (
-                        <Button
-                          variant="secondary"
-                          block
-                          onClick={() =>
-                            lockdropAction("cancel", lockupInfo.duration)
-                          }
-                          disabled={!isCancelable}
+                        <Link
+                          to={`${lockdropEvent.addr}/cancel?duration=${lockupInfo.duration}`}
+                          relative="route"
                         >
-                          Cancel
-                        </Button>
+                          <Button
+                            variant="secondary"
+                            block
+                            disabled={!isCancelable}
+                          >
+                            Cancel
+                          </Button>
+                        </Link>
                       )}
                       {(isLocking || isUnstakable) && (
-                        <Button
-                          variant="primary"
-                          block
-                          disabled={!isClaimable}
-                          onClick={() =>
-                            lockdropAction("claim", lockupInfo.duration)
-                          }
+                        <Link
+                          to={`${lockdropEvent.addr}/claim?duration=${lockupInfo.duration}`}
+                          relative="route"
                         >
-                          Claim
-                        </Button>
+                          <Button
+                            variant="primary"
+                            block
+                            disabled={!isClaimable}
+                          >
+                            Claim
+                          </Button>
+                        </Link>
                       )}
                       {(isLocking || isUnstakable) && (
-                        <Button
-                          variant="secondary"
-                          block
-                          disabled={isLocking}
-                          onClick={() =>
-                            lockdropAction("unstake", lockupInfo.duration)
-                          }
+                        <Link
+                          to={`${lockdropEvent.addr}/unlock?duration=${lockupInfo.duration}`}
+                          relative="route"
                         >
-                          Unlock
-                        </Button>
+                          <Button
+                            variant="secondary"
+                            block
+                            disabled={isLocking}
+                          >
+                            Unlock
+                          </Button>
+                        </Link>
                       )}
                     </div>
                   </LockdropUserInfoItem>

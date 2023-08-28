@@ -10,6 +10,9 @@ import Error404 from "pages/Error404";
 import EarnPage from "pages/Earn";
 import LockdropPage from "pages/Earn/Lockdrop";
 import StakePage from "pages/Earn/Lockdrop/Stake";
+import ClaimPage from "pages/Earn/Lockdrop/Claim";
+import UnlockPage from "pages/Earn/Lockdrop/Unlock";
+import CancelPage from "pages/Earn/Lockdrop/Cancel";
 
 export interface RouteObject extends Omit<RouteProps, "children"> {
   children?: RouteObject[];
@@ -73,7 +76,17 @@ const routes: RouteObject[] = [
       {
         path: "lockdrop",
         element: <LockdropPage />,
-        children: [{ path: ":eventAddress", element: <StakePage /> }],
+        children: [
+          {
+            path: ":eventAddress",
+            children: [
+              { index: true, element: <StakePage /> },
+              { path: "claim", element: <ClaimPage /> },
+              { path: "unlock", element: <UnlockPage /> },
+              { path: "cancel", element: <CancelPage /> },
+            ],
+          },
+        ],
       },
       { index: true, element: <Navigate replace to="pools" /> },
     ],

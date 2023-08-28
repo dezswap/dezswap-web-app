@@ -4,10 +4,9 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
-import Slider from "components/Slider";
 import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
@@ -18,33 +17,25 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
   formatDateTime,
   formatDecimals,
   formatNumber,
-  valueToAmount,
 } from "utils";
-import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import { generateIncreaseLockupContractMsg } from "utils/dezswap";
+import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
-import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
-import InputGroup from "./InputGroup";
-import useExpectedReward from "./useEstimatedReward";
-
-enum FormKey {
-  lpValue = "lpValue",
-  duration = "duration",
-}
+import useAPI from "hooks/useAPI";
+import InputGroup from "../Stake/InputGroup";
+import useExpectedReward from "../Stake/useEstimatedReward";
 
 const Box = styled(box)`
   & > * {
@@ -56,20 +47,12 @@ const Box = styled(box)`
   }
 `;
 
-function StakePage() {
+function CancelPage() {
+  const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const network = useNetwork();
   const connectedWallet = useConnectedWallet();
-  const form = useForm<Record<FormKey, string>>({
-    criteriaMode: "all",
-    mode: "all",
-    defaultValues: {
-      lpValue: "",
-      duration: "8",
-    },
-  });
-
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
@@ -85,17 +68,27 @@ function StakePage() {
     },
   });
 
-  const lpValue = form.watch(FormKey.lpValue);
-  const duration = form.watch(FormKey.duration);
-  const lpBalance = useBalance(lockdropEventInfo?.lp_token_addr);
-
-  const { register, formState } = form;
-
-  const screenClass = useScreenClass();
+  const api = useAPI();
   const navigate = useNavigate();
   const handleModalClose = () => {
-    navigate("..", { relative: "route" });
+    navigate("../..", { relative: "route" });
   };
+
+  const { data: lockdropUserInfo } = useQuery({
+    queryKey: ["lockdropUserInfo", eventAddress, network.name],
+    queryFn: async () => {
+      if (!eventAddress) {
+        return null;
+      }
+      const res = await api.getLockdropUserInfo(eventAddress);
+      return res || null;
+    },
+  });
+
+  const duration = useMemo(() => {
+    const value = searchParams.get("duration");
+    return value ? Number(value) : undefined;
+  }, [searchParams]);
 
   const pair = useMemo(
     () =>
@@ -110,6 +103,12 @@ function StakePage() {
     [getAsset, pair],
   );
 
+  const lockupInfo = useMemo(() => {
+    return lockdropUserInfo?.lockup_infos.find(
+      (item) => item.duration === duration,
+    );
+  }, [duration, lockdropUserInfo]);
+
   const rewardAsset = useMemo(
     () =>
       lockdropEventInfo
@@ -121,12 +120,12 @@ function StakePage() {
   const simulationResult = useSimulate(
     pair?.contract_addr || "",
     pair?.liquidity_token || "",
-    valueToAmount(lpValue, LP_DECIMALS) || "0",
+    lockupInfo?.locked_lp_token || "0",
   );
 
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
-    amount: valueToAmount(lpValue, LP_DECIMALS) || "0",
+    amount: lockupInfo?.locked_lp_token || "0",
     duration: Number(duration),
   });
 
@@ -147,33 +146,20 @@ function StakePage() {
     );
   }, [asset1, asset2, simulationResult]);
 
-  useEffect(() => {
-    const defaultDuration = searchParams.get("duration");
-    if (defaultDuration) {
-      form.setValue(FormKey.duration, defaultDuration);
-    }
-  }, [form, searchParams]);
-
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (
-      !connectedWallet?.walletAddress ||
-      !eventAddress ||
-      !lockdropEventInfo?.lp_token_addr
-    ) {
+    if (!connectedWallet || !eventAddress || !duration) {
       return undefined;
     }
     return {
       msgs: [
-        generateIncreaseLockupContractMsg({
+        generateCancelLockdropMsg({
           senderAddress: connectedWallet?.walletAddress,
           contractAddress: eventAddress,
-          lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-          amount: valueToAmount(lpValue, LP_DECIMALS),
-          duration: Number(duration),
+          duration,
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress, lockdropEventInfo, lpValue]);
+  }, [connectedWallet, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
 
@@ -181,31 +167,13 @@ function StakePage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const buttonMsg = useMemo(() => {
-    if (lpValue && Numeric.parse(lpValue).gt(0)) {
-      if (
-        Numeric.parse(valueToAmount(lpValue, LP_DECIMALS) || 0).gt(
-          lpBalance || 0,
-        )
-      ) {
-        return "Insufficient LP balance";
-      }
-
-      return "Lock";
-    }
-
-    return "Enter an amount";
-  }, [lpBalance, lpValue]);
-
-  const isValid = buttonMsg === "Lock";
-
   const { requestPost } = useRequestPost(handleModalClose);
 
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
-    async (event) => {
+    (event) => {
       event.preventDefault();
       if (txOptions && fee) {
-        requestPost({ txOptions, fee, formElement: event.currentTarget });
+        requestPost({ txOptions, fee, skipConfirmation: true });
       }
     },
     [fee, requestPost, txOptions],
@@ -213,10 +181,10 @@ function StakePage() {
 
   return (
     <Modal
-      id="stake-modal"
+      id="cancel-modal"
       className="modal-parent"
       isOpen
-      title={searchParams.get("duration") ? "Lock more LP" : "LP Lock"}
+      title="Cancel LP Lock"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       onRequestClose={() => handleModalClose()}
@@ -232,13 +200,8 @@ function StakePage() {
         <InputGroup
           lpToken={lockdropEventInfo?.lp_token_addr}
           assets={[asset1, asset2]}
-          onBalanceClick={(value) => {
-            form.setValue(FormKey.lpValue, value);
-          }}
-          {...register(FormKey.lpValue, {
-            setValueAs: (value) => filterNumberFormat(value, LP_DECIMALS),
-            required: true,
-          })}
+          readOnly
+          value={amountToValue(lockupInfo?.locked_lp_token || "0", LP_DECIMALS)}
         />
 
         <Box>
@@ -275,46 +238,6 @@ function StakePage() {
             </Typography>
             &nbsp;weeks
           </Typography>
-
-          <div className="cm-hidden">
-            <div
-              css={css`
-                margin-bottom: 8px;
-              `}
-            >
-              <Controller
-                name={FormKey.duration}
-                control={form.control}
-                render={({ field }) => (
-                  <Slider
-                    min={lockdropEventInfo?.min_lock_duration || 4}
-                    max={lockdropEventInfo?.max_lock_duration || 52}
-                    step={1}
-                    onBlur={field.onBlur}
-                    onChange={(value) => field.onChange(`${value}`)}
-                    value={Number(field.value)}
-                  />
-                )}
-              />
-            </div>
-
-            <div
-              css={css`
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 4px;
-              `}
-            >
-              <Typography size={14} weight={700}>
-                {lockdropEventInfo?.min_lock_duration || 4} WK
-              </Typography>
-
-              <Typography size={14} weight={700}>
-                {lockdropEventInfo?.max_lock_duration || 52} WK
-              </Typography>
-            </div>
-          </div>
         </Box>
         <Box>
           <Row justify="between" align="start">
@@ -443,9 +366,9 @@ function StakePage() {
           block
           variant="primary"
           size="large"
-          disabled={!isValid}
+          disabled={Numeric.parse(lockupInfo?.locked_lp_token || 0).lte(0)}
         >
-          {buttonMsg}
+          Confirm cancellation
         </Button>
         <Button
           block
@@ -461,4 +384,4 @@ function StakePage() {
   );
 }
 
-export default StakePage;
+export default CancelPage;
