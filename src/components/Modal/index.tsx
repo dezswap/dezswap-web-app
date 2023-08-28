@@ -86,6 +86,7 @@ function Modal({
   gradient,
   style,
   headerExtra,
+  contentRef: _contentRef,
   className: _className,
   overlayClassName: _overlayClassName,
   ...modalProps
@@ -96,6 +97,35 @@ function Modal({
     () => !!modalProps.parentSelector,
     [modalProps.parentSelector],
   );
+  const elParent = useMemo(() => {
+    return modalProps.parentSelector?.();
+  }, [modalProps]);
+
+  const [elContent, setElContent] = useState<HTMLDivElement>();
+
+  useEffect(() => {
+    const originalMinHeight = elParent?.style.minHeight;
+    const handleResize = () => {
+      if (elParent && elContent) {
+        elParent.style.setProperty("min-height", `${elContent.scrollHeight}px`);
+      }
+    };
+    handleResize();
+    let resizeObserver: ResizeObserver;
+    if (elContent) {
+      resizeObserver = new ResizeObserver(handleResize);
+      resizeObserver.observe(elContent);
+    }
+
+    return () => {
+      if (elParent) {
+        elParent.style.setProperty("min-height", originalMinHeight || "");
+      }
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [elParent, elContent]);
 
   const overlayClassName = useMemo(() => {
     const additionalClasses = [];
@@ -140,7 +170,7 @@ function Modal({
       if (resizeTrigger) {
         setResizeTrigger(false);
       }
-    }, 1);
+    }, 100);
     return () => {
       clearTimeout(timerId);
     };
@@ -204,6 +234,12 @@ function Modal({
           ...defaultContentStyle,
           ...style?.content,
         },
+      }}
+      contentRef={(instance) => {
+        if (_contentRef) {
+          _contentRef(instance);
+        }
+        setElContent(instance);
       }}
       {...modalProps}
     >

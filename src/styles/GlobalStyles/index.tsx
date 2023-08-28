@@ -21,7 +21,7 @@ function GlobalStyles() {
 
           #root {
             & > div {
-              overflow-x: hidden;
+              overflow: hidden;
             }
           }
 
