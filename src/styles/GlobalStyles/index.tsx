@@ -34,6 +34,7 @@ function GlobalStyles() {
             outline: none;
           }
 
+          a,
           a:active {
             text-decoration: none;
           }
@@ -170,9 +171,6 @@ function GlobalStyles() {
             &[data-placement^="top"] > .tippy-svg-arrow > svg {
               top: 27px;
             }
-            &[data-placement^="top"] > .tippy-svg-arrow:after {
-              top: 17px;
-            }
             &[data-placement^="bottom"] > .tippy-arrow:before {
               border-bottom-color: ${theme.colors.white};
               bottom: 16px;
@@ -187,9 +185,6 @@ function GlobalStyles() {
             &[data-placement^="bottom"] > .tippy-svg-arrow > svg {
               bottom: 27px;
             }
-            &[data-placement^="bottom"] > .tippy-svg-arrow:after {
-              bottom: 17px;
-            }
             &[data-placement^="left"] > .tippy-arrow:before {
               border-left-color: ${theme.colors.white};
             }
@@ -202,9 +197,6 @@ function GlobalStyles() {
             }
             &[data-placement^="left"] > .tippy-svg-arrow > svg {
               left: 18.5px;
-            }
-            &[data-placement^="left"] > .tippy-svg-arrow:after {
-              left: 12px;
             }
             &[data-placement^="right"] > .tippy-arrow:before {
               border-right-color: ${theme.colors.white};
@@ -220,9 +212,6 @@ function GlobalStyles() {
             &[data-placement^="right"] > .tippy-svg-arrow > svg {
               right: 19px;
             }
-            &[data-placement^="right"] > .tippy-svg-arrow:after {
-              right: 12px;
-            }
             & > .tippy-svg-arrow {
               width: 28px;
               height: 28px;
@@ -230,9 +219,18 @@ function GlobalStyles() {
                 width: 28px;
                 height: 10.2px;
               }
-            }
-            & > .tippy-svg-arrow::after {
-              content: unset;
+              &::after {
+                content: "";
+                width: 28px;
+                height: 28px;
+                background-color: #ffffff;
+                z-index: 1;
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: unset;
+                bottom: unset;
+              }
             }
           }
         `}
