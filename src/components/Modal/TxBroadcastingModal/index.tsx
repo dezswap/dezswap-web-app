@@ -177,7 +177,7 @@ function TxBroadcastingModal({
               style={{ justifyContent: "space-between" }}
             >
               <Col width="auto" style={{ flexShrink: "0" }}>
-                <Typography>Tx Hash</Typography>
+                <Typography>TX Hash</Typography>
               </Col>
               <Col>
                 <a
@@ -246,7 +246,7 @@ function TxBroadcastingModal({
             >
               <Row wrap="nowrap" style={{ justifyContent: "space-between" }}>
                 <Col width="auto" style={{ flexShrink: "0" }}>
-                  <Typography>Tx Hash</Typography>
+                  <Typography>TX Hash</Typography>
                 </Col>
                 <Col width="auto">
                   <a

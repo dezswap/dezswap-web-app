@@ -319,10 +319,12 @@ function StakePage() {
         <Box>
           <Row justify="between" align="start">
             <Col xs="content">
-              {/* TODO: add tooltip */}
               <Typography color="primary" weight={900} size={14}>
                 Expected Rewards
-                <TooltipWithIcon content="Lorem ipsum" size={22} />
+                <TooltipWithIcon
+                  content="The result value you may get at the current condition."
+                  size={22}
+                />
               </Typography>
             </Col>
           </Row>
@@ -375,21 +377,6 @@ function StakePage() {
             <InfoTable
               items={[
                 {
-                  key: "estimatedTokens",
-                  label: "Estimated Tokens",
-                  value: (
-                    <>
-                      {estimatedLockingAmounts.map((string) => (
-                        <>
-                          {string}
-                          <br />
-                        </>
-                      ))}
-                    </>
-                  ),
-                  tooltip: "Lorem ipsum", // TODO: add tooltip
-                },
-                {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
@@ -401,6 +388,18 @@ function StakePage() {
                         ),
                       )} ${XPLA_SYMBOL}`
                     : "",
+                },
+                {
+                  key: "shareOfPool",
+                  label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
+                  value: `${formatNumber(
+                    cutDecimal(
+                      Numeric.parse(expectedReward || "0")
+                        .div(lockdropEventInfo?.total_lockdrop_reward || "1")
+                        .mul(100),
+                      2,
+                    ),
+                  )}%`,
                 },
               ]}
             />
@@ -417,16 +416,6 @@ function StakePage() {
                   key: "lpAddress",
                   label: "LP Address",
                   value: ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6),
-                },
-                {
-                  key: "asset1Address",
-                  label: `${asset1?.name || ""} Address`,
-                  value: ellipsisCenter(asset1?.token || "", 6),
-                },
-                {
-                  key: "asset2Address",
-                  label: `${asset2?.name || ""} Address`,
-                  value: ellipsisCenter(asset2?.token || "", 6),
                 },
               ]}
             />
