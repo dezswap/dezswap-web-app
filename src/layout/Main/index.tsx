@@ -16,6 +16,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
 import Tooltip from "components/Tooltip";
 import Footer from "./Footer";
+import DelegateButton from "./DelegateButton";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -113,6 +114,7 @@ function MainLayout({ children }: PropsWithChildren) {
     <>
       <Header />
       <Wrapper hasBanner={network.name !== "mainnet"}>
+        <DelegateButton />
         {children}
         <FooterWrapper>
           <Footer />
