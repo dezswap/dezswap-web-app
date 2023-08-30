@@ -128,6 +128,9 @@ function LockdropPage() {
       if (isLiveOnly && lockdropEvent.end_at * 1000 < Date.now()) {
         return false;
       }
+      if (!isLiveOnly && lockdropEvent.end_at * 1000 >= Date.now()) {
+        return false;
+      }
       if (selectedPair) {
         return lockdropEvent.lp_token_addr === selectedPair.liquidity_token;
       }
@@ -172,7 +175,7 @@ function LockdropPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTabIndex]);
+  }, [selectedTabIndex, isLiveOnly]);
 
   useEffect(() => {
     lockdropUserInfoResults.forEach((result) => {
