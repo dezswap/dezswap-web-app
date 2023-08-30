@@ -30,12 +30,13 @@ import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -72,7 +73,7 @@ function StakePage() {
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
-  const { data: lockdropEventInfo } = useQuery({
+  const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -91,9 +92,13 @@ function StakePage() {
 
   const screenClass = useScreenClass();
   const navigate = useNavigate();
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     navigate("..", { relative: "route" });
-  };
+  }, [navigate]);
+
+  const invalidPathModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
 
   const pair = useMemo(
     () =>
@@ -186,11 +191,28 @@ function StakePage() {
     [fee, requestPost, txOptions],
   );
 
+  useEffect(() => {
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      (lockdropEventInfo &&
+        (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
+          lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
+      lockdropEventInfoError
+    ) {
+      invalidPathModal.open();
+    }
+  }, [
+    lockdropEventInfo,
+    lockdropEventInfoError,
+    invalidPathModal,
+    eventAddress,
+  ]);
+
   return (
     <Modal
       id="stake-modal"
       className="modal-parent"
-      isOpen
+      isOpen={!!lockdropEventInfo}
       title={searchParams.get("duration") ? "Lock more LP" : "LP Lock"}
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}

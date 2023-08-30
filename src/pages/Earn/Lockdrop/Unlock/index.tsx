@@ -3,7 +3,7 @@ import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
 import Expand from "components/Expanded";
@@ -14,7 +14,7 @@ import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
@@ -23,6 +23,7 @@ import useRequestPost from "hooks/useRequestPost";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
 import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import InputGroup from "../Stake/InputGroup";
 
 function UnlockPage() {
@@ -39,7 +40,7 @@ function UnlockPage() {
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
 
-  const { data: lockdropEventInfo } = useQuery({
+  const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -50,7 +51,7 @@ function UnlockPage() {
     },
   });
 
-  const { data: lockdropUserInfo } = useQuery({
+  const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -110,9 +111,13 @@ function UnlockPage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
-  };
+  }, [navigate]);
+
+  const invalidPathModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
 
   const { requestPost } = useRequestPost(handleModalClose);
 
@@ -127,11 +132,32 @@ function UnlockPage() {
     [fee, requestPost, txOptions],
   );
 
+  useEffect(() => {
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      lockdropEventInfoError ||
+      lockdropUserInfoError ||
+      (!lockdropEventInfoError && !lockdropUserInfo && !lockupInfo) ||
+      (lockupInfo &&
+        (lockupInfo.unlock_second * 1000 > Date.now() ||
+          Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
+    ) {
+      invalidPathModal.open();
+    }
+  }, [
+    eventAddress,
+    invalidPathModal,
+    lockdropEventInfoError,
+    lockdropUserInfo,
+    lockdropUserInfoError,
+    lockupInfo,
+  ]);
+
   return (
     <Modal
       id="unlock-modal"
       className="modal-parent"
-      isOpen
+      isOpen={!!lockdropEventInfo}
       title="Unlock LP"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}

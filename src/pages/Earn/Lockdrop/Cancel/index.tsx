@@ -4,7 +4,7 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
@@ -26,12 +26,13 @@ import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import InputGroup from "../Stake/InputGroup";
 import useExpectedReward from "../Stake/useEstimatedReward";
 
@@ -55,7 +56,7 @@ function CancelPage() {
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
-  const { data: lockdropEventInfo } = useQuery({
+  const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -68,9 +69,13 @@ function CancelPage() {
 
   const api = useAPI();
   const navigate = useNavigate();
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
-  };
+  }, [navigate]);
+
+  const invalidPathModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
 
   const { data: lockdropUserInfo } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, network.name],
@@ -153,6 +158,22 @@ function CancelPage() {
     },
     [fee, requestPost, txOptions],
   );
+
+  useEffect(() => {
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      (lockdropEventInfo &&
+        lockdropEventInfo.event_cancelable_until * 1000 < Date.now()) ||
+      lockdropEventInfoError
+    ) {
+      invalidPathModal.open();
+    }
+  }, [
+    lockdropEventInfo,
+    lockdropEventInfoError,
+    invalidPathModal,
+    eventAddress,
+  ]);
 
   return (
     <Modal

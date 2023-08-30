@@ -3,7 +3,7 @@ import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
@@ -16,13 +16,14 @@ import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
 import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 
 const Box = styled(box)`
   & > * {
@@ -47,7 +48,7 @@ function ClaimPage() {
 
   const { getAsset } = useAssets();
 
-  const { data: lockdropEventInfo } = useQuery({
+  const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -58,7 +59,7 @@ function ClaimPage() {
     },
   });
 
-  const { data: lockdropUserInfo } = useQuery({
+  const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, network.name],
     queryFn: async () => {
       if (!eventAddress) {
@@ -106,9 +107,13 @@ function ClaimPage() {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
-  };
+  }, [navigate]);
+
+  const invalidPathModal = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
 
   const { requestPost } = useRequestPost(handleModalClose);
 
@@ -123,11 +128,29 @@ function ClaimPage() {
     [fee, requestPost, txOptions],
   );
 
+  useEffect(() => {
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      lockdropEventInfoError ||
+      lockdropUserInfoError ||
+      (!lockdropEventInfoError && !lockdropUserInfoError && !lockupInfo) ||
+      (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
+    ) {
+      invalidPathModal.open();
+    }
+  }, [
+    eventAddress,
+    invalidPathModal,
+    lockdropEventInfoError,
+    lockdropUserInfoError,
+    lockupInfo,
+  ]);
+
   return (
     <Modal
       id="claim-modal"
       className="modal-parent"
-      isOpen
+      isOpen={!!lockdropEventInfo}
       title="Claim Reward"
       hasCloseButton
       drawer={screenClass === MOBILE_SCREEN_CLASS}
