@@ -18,12 +18,10 @@ import {
   cutDecimal,
   ellipsisCenter,
   formatDateTime,
-  formatDecimals,
   formatNumber,
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
@@ -117,34 +115,11 @@ function CancelPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const simulationResult = useSimulate(
-    pair?.contract_addr || "",
-    pair?.liquidity_token || "",
-    lockupInfo?.locked_lp_token || "0",
-  );
-
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
     amount: lockupInfo?.locked_lp_token || "0",
     duration: Number(duration),
   });
-
-  const estimatedLockingAmounts = useMemo(() => {
-    return [asset1, asset2].map(
-      (asset) =>
-        `${formatNumber(
-          formatDecimals(
-            amountToValue(
-              simulationResult?.estimatedAmount?.find(
-                (a) => a.address === asset?.token,
-              )?.amount,
-              asset?.decimals,
-            ) || "0",
-            3,
-          ),
-        )} ${asset?.symbol}`,
-    );
-  }, [asset1, asset2, simulationResult]);
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (!connectedWallet || !eventAddress || !duration) {

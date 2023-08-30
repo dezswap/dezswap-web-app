@@ -20,14 +20,12 @@ import {
   ellipsisCenter,
   filterNumberFormat,
   formatDateTime,
-  formatDecimals,
   formatNumber,
   valueToAmount,
 } from "utils";
 import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
@@ -118,34 +116,11 @@ function StakePage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const simulationResult = useSimulate(
-    pair?.contract_addr || "",
-    pair?.liquidity_token || "",
-    valueToAmount(lpValue, LP_DECIMALS) || "0",
-  );
-
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
     amount: valueToAmount(lpValue, LP_DECIMALS) || "0",
     duration: Number(duration),
   });
-
-  const estimatedLockingAmounts = useMemo(() => {
-    return [asset1, asset2].map(
-      (asset) =>
-        `${formatNumber(
-          formatDecimals(
-            amountToValue(
-              simulationResult?.estimatedAmount?.find(
-                (a) => a.address === asset?.token,
-              )?.amount,
-              asset?.decimals,
-            ) || "0",
-            3,
-          ),
-        )} ${asset?.symbol}`,
-    );
-  }, [asset1, asset2, simulationResult]);
 
   useEffect(() => {
     const defaultDuration = searchParams.get("duration");
