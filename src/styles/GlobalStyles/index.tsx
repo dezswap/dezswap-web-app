@@ -124,7 +124,6 @@ function GlobalStyles() {
       />
       {/* Tippy.js */}
       <Global
-        /* // TODO: arrow style  */
         styles={css`
           .tippy-box[data-theme~="light-border"] {
             background-color: ${theme.colors.white};
@@ -169,7 +168,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="top"] > .tippy-svg-arrow > svg {
-              top: 27px;
+              top: 24px;
             }
             &[data-placement^="bottom"] > .tippy-arrow:before {
               border-bottom-color: ${theme.colors.white};
@@ -183,7 +182,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="bottom"] > .tippy-svg-arrow > svg {
-              bottom: 27px;
+              bottom: 24px;
             }
             &[data-placement^="left"] > .tippy-arrow:before {
               border-left-color: ${theme.colors.white};
@@ -196,7 +195,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(1px);
             }
             &[data-placement^="left"] > .tippy-svg-arrow > svg {
-              left: 18.5px;
+              left: 17.5px;
             }
             &[data-placement^="right"] > .tippy-arrow:before {
               border-right-color: ${theme.colors.white};
@@ -210,23 +209,23 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(-1px);
             }
             &[data-placement^="right"] > .tippy-svg-arrow > svg {
-              right: 19px;
+              right: 17.5px;
             }
             & > .tippy-svg-arrow {
               width: 28px;
               height: 28px;
               & > svg {
                 width: 28px;
-                height: 10.2px;
+                height: 12px;
               }
               &::after {
                 content: "";
-                width: 28px;
+                width: 30px;
                 height: 28px;
                 background-color: #ffffff;
                 z-index: 1;
                 position: absolute;
-                left: 0;
+                left: -1px;
                 top: 0;
                 right: unset;
                 bottom: unset;
