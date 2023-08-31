@@ -21,6 +21,7 @@ import {
   filterNumberFormat,
   formatDateTime,
   formatNumber,
+  getTokenLink,
   valueToAmount,
 } from "utils";
 import { Controller, useForm } from "react-hook-form";
@@ -37,6 +38,8 @@ import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import IconButton from "components/IconButton";
+import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -389,13 +392,14 @@ function StakePage() {
                 {
                   key: "shareOfPool",
                   label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                  value: `${formatNumber(
-                    cutDecimal(
-                      Numeric.parse(expectedReward || "0")
-                        .div(lockdropEventInfo?.total_lockdrop_reward || "1")
-                        .mul(100),
-                      2,
-                    ),
+                  value: `${cutDecimal(
+                    Numeric.parse(expectedReward || "0")
+                      .dividedBy(
+                        lockdropEventInfo?.total_lockdrop_reward || "1",
+                      )
+                      .mul(100)
+                      .toString(),
+                    2,
                   )}%`,
                 },
               ]}
@@ -412,7 +416,32 @@ function StakePage() {
                 {
                   key: "lpAddress",
                   label: "LP Address",
-                  value: ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6),
+                  value: (
+                    <span>
+                      {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
+                      &nbsp;
+                      <a
+                        href={getTokenLink(
+                          lockdropEventInfo?.lp_token_addr,
+                          network.name,
+                        )}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
+                    </span>
+                  ),
                 },
               ]}
             />

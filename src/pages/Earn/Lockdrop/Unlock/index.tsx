@@ -9,7 +9,13 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import { amountToValue, cutDecimal, ellipsisCenter, formatNumber } from "utils";
+import {
+  amountToValue,
+  cutDecimal,
+  ellipsisCenter,
+  formatNumber,
+  getTokenLink,
+} from "utils";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
@@ -24,6 +30,8 @@ import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
 import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import IconButton from "components/IconButton";
+import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
 
 function UnlockPage() {
@@ -245,7 +253,32 @@ function UnlockPage() {
                   {
                     key: "lpAddress",
                     label: "LP Address",
-                    value: ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6),
+                    value: (
+                      <span>
+                        {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
+                        &nbsp;
+                        <a
+                          href={getTokenLink(
+                            lockdropEventInfo?.lp_token_addr,
+                            network.name,
+                          )}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      </span>
+                    ),
                   },
                   {
                     key: "asset1Address",

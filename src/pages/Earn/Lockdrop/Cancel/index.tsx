@@ -19,6 +19,7 @@ import {
   ellipsisCenter,
   formatDateTime,
   formatNumber,
+  getTokenLink,
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
@@ -33,8 +34,9 @@ import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import IconButton from "components/IconButton";
+import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
-import useExpectedReward from "../Stake/useEstimatedReward";
 
 const Box = styled(box)`
   & > * {
@@ -119,12 +121,6 @@ function CancelPage() {
         : undefined,
     [getAsset, lockdropEventInfo],
   );
-
-  const { expectedReward } = useExpectedReward({
-    lockdropEventAddress: eventAddress,
-    amount: lockupInfo?.locked_lp_token || "0",
-    duration: Number(duration),
-  });
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
     if (!connectedWallet || !eventAddress || !duration) {
@@ -264,7 +260,10 @@ function CancelPage() {
             >
               {formatNumber(
                 cutDecimal(
-                  amountToValue(expectedReward, rewardAsset?.decimals) || 0,
+                  amountToValue(
+                    lockupInfo?.total_reward || "0",
+                    rewardAsset?.decimals,
+                  ) || 0,
                   DISPLAY_DECIMAL,
                 ),
               )}
@@ -311,13 +310,14 @@ function CancelPage() {
                 {
                   key: "shareOfPool",
                   label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                  value: `${formatNumber(
-                    cutDecimal(
-                      Numeric.parse(expectedReward || "0")
-                        .div(lockdropEventInfo?.total_lockdrop_reward || "1")
-                        .mul(100),
-                      2,
-                    ),
+                  value: `${cutDecimal(
+                    Numeric.parse(lockupInfo?.total_reward || "0")
+                      .dividedBy(
+                        lockdropEventInfo?.total_lockdrop_reward || "1",
+                      )
+                      .mul(100)
+                      .toString(),
+                    2,
                   )}%`,
                 },
               ]}
@@ -334,7 +334,32 @@ function CancelPage() {
                 {
                   key: "lpAddress",
                   label: "LP Address",
-                  value: ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6),
+                  value: (
+                    <span>
+                      {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
+                      &nbsp;
+                      <a
+                        href={getTokenLink(
+                          lockdropEventInfo?.lp_token_addr,
+                          network.name,
+                        )}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
+                    </span>
+                  ),
                 },
               ]}
             />
