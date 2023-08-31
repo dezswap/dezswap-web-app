@@ -1,7 +1,7 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Typography from "components/Typography";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface ProgressBarProps {
   value: number;
@@ -116,14 +116,31 @@ function ProgressBar(props: ProgressBarProps) {
     return percent;
   }, [value, min, max]);
 
+  const divRef = useRef<HTMLDivElement>(null);
+  const [progressBarWidth, setProgressBarWidth] = useState(100);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (divRef.current) {
+        setProgressBarWidth(divRef.current.offsetWidth);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <Wrapper>
+    <Wrapper ref={divRef}>
       <Row>
         <Bar {...props}>
           <div
             style={{
               width: `${progress}%`,
               paddingLeft: props.variant === "gradient" ? 8 : 0,
+              backgroundSize: `${progressBarWidth}px 100%`,
             }}
           />
         </Bar>
