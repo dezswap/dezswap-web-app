@@ -43,6 +43,7 @@ import {
 } from "utils/dezswap";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import Outlink from "components/Outlink";
+import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
@@ -260,6 +261,7 @@ function LockdropUserInfoTable({
   data: {
     label: string;
     value: string;
+    tooltip?: React.ReactNode;
   }[];
 }) {
   return (
@@ -274,7 +276,7 @@ function LockdropUserInfoTable({
         }
       `}
     >
-      {data.map(({ label, value }) => (
+      {data.map(({ label, value, tooltip }) => (
         <Col xs={12} md={12 / data.length}>
           <Typography
             color="primary"
@@ -289,6 +291,7 @@ function LockdropUserInfoTable({
             `}
           >
             {label}
+            {tooltip && <TooltipWithIcon size={22} content={tooltip} />}
           </Typography>
           <Typography color="primary" size={14} weight={400}>
             {value}
@@ -617,7 +620,9 @@ function LockdropEventItem({
                         value: "0",
                       },
                       {
-                        label: "Reward",
+                        label: "Rewards",
+                        tooltip:
+                          "The amount for Rewards may vary due to the composition of the pool changes during the Lock&Drop event period. It will be fixed when the event is over.",
                         value: `0 ${rewardAsset?.symbol}`,
                       },
                       {
@@ -655,6 +660,7 @@ function LockdropEventItem({
                         align="start"
                         css={css`
                           margin-bottom: 15px;
+                          gap: 16px;
                         `}
                       >
                         <Col xs={12} md="content">
@@ -734,7 +740,9 @@ function LockdropEventItem({
                             ),
                           },
                           {
-                            label: "Reward",
+                            label: "Rewards",
+                            tooltip:
+                              "The amount for Rewards may vary due to the composition of the pool changes during the Lock&Drop event period. It will be fixed when the event is over.",
                             value: `${formatNumber(
                               formatDecimals(
                                 amountToValue(

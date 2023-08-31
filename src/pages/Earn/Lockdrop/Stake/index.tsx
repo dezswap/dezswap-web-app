@@ -322,7 +322,7 @@ function StakePage() {
               <Typography color="primary" weight={900} size={14}>
                 Expected Rewards
                 <TooltipWithIcon
-                  content="The result value you may get at the current condition."
+                  content="The amount for Expected Rewards may vary due to the composition of the pool changes during the Lock&Drop event period. It will be fixed when the event is over."
                   size={22}
                 />
               </Typography>
