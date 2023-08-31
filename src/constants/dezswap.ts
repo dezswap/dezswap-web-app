@@ -15,7 +15,7 @@ export const contractAddresses: {
   testnet: {
     factory: "xpla1j4kgjl6h4rt96uddtzdxdu39h0mhn4vrtydufdrk4uxxnrpsnw2qug2yx2",
     router: "xpla1pr40depxf8w50y58swdyhc0s2yjptd2xtqgnyfvkz6k40ng53gqqnyftkm",
-    lockdrop: "xpla1470mu6u8f4vspuuh3qt9julgme3mq0ua8ktm37svjkapzyxu62hq4882n8",
+    lockdrop: "xpla1qyp2krkwsrereghsxpz50lc7tuqquxfy36zl2k7ewk8pqa65wvvqhenwfj",
   },
 };
 
