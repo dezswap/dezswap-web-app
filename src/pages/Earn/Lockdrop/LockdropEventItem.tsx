@@ -708,7 +708,8 @@ function LockdropEventItem({
                         <ProgressBar
                           variant="gradient"
                           size="small"
-                          min={lockdropEvent.start_at}
+                          barStyle="rounded"
+                          min={lockdropEvent.end_at}
                           max={lockupInfo.unlock_second}
                           value={new Date().getTime() / 1000}
                         />

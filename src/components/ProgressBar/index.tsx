@@ -107,7 +107,13 @@ function ProgressBar(props: ProgressBarProps) {
 
   const progress = useMemo(() => {
     const percent = ((value - min) / (max - min)) * 100;
-    return percent > 100 ? 100 : percent;
+    if (percent < 0) {
+      return 0;
+    }
+    if (percent > 100) {
+      return 100;
+    }
+    return percent;
   }, [value, min, max]);
 
   return (
@@ -117,6 +123,7 @@ function ProgressBar(props: ProgressBarProps) {
           <div
             style={{
               width: `${progress}%`,
+              paddingLeft: props.variant === "gradient" ? 8 : 0,
             }}
           />
         </Bar>
