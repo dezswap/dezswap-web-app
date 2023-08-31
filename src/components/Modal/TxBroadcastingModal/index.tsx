@@ -19,6 +19,7 @@ import IconButton from "components/IconButton";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
+import LoadingIndicator from "components/LoadingIndicator";
 
 interface TxBroadcastingModalProps {
   txHash?: string;
@@ -86,6 +87,23 @@ function TxBroadcastingModal({
     return undefined;
   }, [txError, txHash, txInfo]);
 
+  const [waitingSecond, setWaitingSecond] = useState(0);
+
+  useEffect(() => {
+    setWaitingSecond(0);
+    const intervalId = !txInfo
+      ? setInterval(() => {
+          setWaitingSecond((current) => current + 0.01);
+        }, 10)
+      : undefined;
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isOpen, txHash, txError, txInfo]);
+
   return (
     <Modal
       shouldCloseOnEsc={false}
@@ -114,6 +132,7 @@ function TxBroadcastingModal({
             css={css`
               padding: 16px;
               background-color: ${theme.colors.text.background};
+              margin-bottom: 20px;
             `}
           >
             <Typography
@@ -133,10 +152,24 @@ function TxBroadcastingModal({
             />
             <Typography size={16} color="primary" weight={400}>
               Go to the connected wallet and sign-in to proceed with the
-              transaction. If there is no response, please refresh your browser
+              transaction. If there is no response, please reload your browser
               and try again.
             </Typography>
           </Panel>
+          <Button
+            block
+            size="large"
+            variant="primary"
+            disabled={waitingSecond <= 7}
+            onClick={() => {
+              document.location.reload();
+            }}
+          >
+            Reload&nbsp;
+            {waitingSecond <= 7 && (
+              <LoadingIndicator value={7 - waitingSecond} min={0} max={7} />
+            )}
+          </Button>
         </div>
       )}
 
