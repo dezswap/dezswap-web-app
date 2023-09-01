@@ -133,7 +133,10 @@ function ClaimPage() {
       !AccAddress.validate(eventAddress || "") ||
       lockdropEventInfoError ||
       lockdropUserInfoError ||
-      (!lockdropEventInfoError && !lockdropUserInfoError && !lockupInfo) ||
+      (!lockdropEventInfoError &&
+        !lockdropUserInfoError &&
+        lockdropUserInfo &&
+        !lockupInfo) ||
       (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
     ) {
       invalidPathModal.open();
@@ -143,6 +146,7 @@ function ClaimPage() {
     invalidPathModal,
     lockdropEventInfoError,
     lockdropUserInfoError,
+    lockdropUserInfo,
     lockupInfo,
   ]);
 
@@ -246,6 +250,7 @@ function ClaimPage() {
           />
         </div>
         <Button
+          type="submit"
           size="large"
           block
           variant="primary"

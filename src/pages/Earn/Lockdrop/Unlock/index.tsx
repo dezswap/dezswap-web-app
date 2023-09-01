@@ -145,7 +145,10 @@ function UnlockPage() {
       !AccAddress.validate(eventAddress || "") ||
       lockdropEventInfoError ||
       lockdropUserInfoError ||
-      (!lockdropEventInfoError && !lockdropUserInfo && !lockupInfo) ||
+      (!lockdropEventInfoError &&
+        !lockdropUserInfo &&
+        lockdropUserInfo &&
+        !lockupInfo) ||
       (lockupInfo &&
         (lockupInfo.unlock_second * 1000 > Date.now() ||
           Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
@@ -296,6 +299,7 @@ function UnlockPage() {
           </Expand>
         </div>
         <Button
+          type="submit"
           size="large"
           block
           variant="primary"

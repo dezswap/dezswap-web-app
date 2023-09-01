@@ -135,9 +135,7 @@ function LockdropPage() {
         return lockdropEvent.lp_token_addr === selectedPair.liquidity_token;
       }
       if (selectedTabIndex === 1) {
-        return Numeric.parse(
-          lockdropUserInfos[index]?.user_total_locked_lp_token || 0,
-        ).gt(0);
+        return !!lockdropUserInfos[index]?.lockup_infos.length;
       }
       if (selectedTabIndex === 2) {
         return bookmarks?.includes(lockdropEvent.addr);
