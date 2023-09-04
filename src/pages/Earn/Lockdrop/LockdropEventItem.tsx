@@ -47,14 +47,13 @@ import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
+  padding: 2px;
+  border-radius: 14px;
   ${({ isNeedAction, theme }) =>
     isNeedAction &&
     css`
-      padding: 2px;
       background-image: ${theme.colors.gradient};
     `}
-  padding: 0;
-  border-radius: 14px;
 
   a:has(button:disabled) {
     pointer-events: none;
@@ -66,7 +65,7 @@ const TableRow = styled(Box)`
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  padding: 20px;
+  padding: 18px;
   background: none;
   gap: 20px;
   & > div {
@@ -813,7 +812,10 @@ function LockdropEventItem({
                           <Button
                             variant="primary"
                             block
-                            disabled={!isClaimable}
+                            disabled={
+                              !isClaimable ||
+                              Numeric.parse(lockupInfo.claimable || 0).lte(0)
+                            }
                           >
                             Claim
                           </Button>
@@ -827,7 +829,12 @@ function LockdropEventItem({
                           <Button
                             variant="secondary"
                             block
-                            disabled={isLocking}
+                            disabled={
+                              isLocking ||
+                              Numeric.parse(
+                                lockupInfo.locked_lp_token || 0,
+                              ).lte(0)
+                            }
                           >
                             Unlock
                           </Button>
