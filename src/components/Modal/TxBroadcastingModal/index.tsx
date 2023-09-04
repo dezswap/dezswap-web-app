@@ -87,15 +87,20 @@ function TxBroadcastingModal({
     return undefined;
   }, [txError, txHash, txInfo]);
 
-  const [waitingSecond, setWaitingSecond] = useState(0);
+  const [waitingFrom, setWaitingFrom] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const waitingSecond = useMemo(() => {
+    return (currentTime.getTime() - waitingFrom.getTime()) / 1000;
+  }, [currentTime, waitingFrom]);
 
   useEffect(() => {
-    setWaitingSecond(0);
-    const intervalId = !txInfo
-      ? setInterval(() => {
-          setWaitingSecond((current) => current + 0.01);
-        }, 10)
-      : undefined;
+    setWaitingFrom(new Date());
+    const intervalId =
+      !txInfo && isOpen
+        ? setInterval(() => {
+            setCurrentTime(new Date());
+          }, 10)
+        : undefined;
 
     return () => {
       if (intervalId) {
