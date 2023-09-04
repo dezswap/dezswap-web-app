@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import Typography from "components/Typography";
 import RCSlider, { SliderProps as RCSliderProps } from "rc-slider";
 import "rc-slider/assets/index.css";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 
 interface SliderProps extends RCSliderProps {
   showValue?: boolean;
@@ -102,10 +102,32 @@ function SliderHandle({
   );
 }
 
-function Slider({ showValue, transformValue, ...rcSliderProps }: SliderProps) {
+function Slider({
+  showValue,
+  transformValue,
+  trackStyle,
+  ...rcSliderProps
+}: SliderProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [wrapperWidth, setWrapperWidth] = useState(
+    wrapperRef.current?.offsetWidth,
+  );
+  useEffect(() => {
+    const handleResize = () => {
+      if (wrapperRef.current) {
+        setWrapperWidth(wrapperRef.current.offsetWidth);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
-    <Wrapper>
+    <Wrapper ref={wrapperRef}>
       <RCSlider
+        trackStyle={{ backgroundSize: `${wrapperWidth}px 100%`, ...trackStyle }}
         handleRender={
           showValue
             ? // eslint-disable-next-line react/no-unstable-nested-components
