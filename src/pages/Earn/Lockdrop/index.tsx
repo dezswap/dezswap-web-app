@@ -21,9 +21,12 @@ import iconSortDefault from "assets/icons/icon-sort-default.svg";
 import iconSortAsc from "assets/icons/icon-sort-asc.svg";
 import iconSortDesc from "assets/icons/icon-sort-desc.svg";
 import IconButton from "components/IconButton";
-import ToggleButton from "components/ToggleButton";
+import Typography from "components/Typography";
 import AssetSelector from "../AssetSelector";
 import LockdropEventList from "./LockdropEventList";
+import Select from "../Pools/Select";
+
+type EventStatus = "Live" | "Upcoming" | "Closed";
 
 const sortIcons = {
   default: iconSortDefault,
@@ -113,7 +116,8 @@ function LockdropPage() {
   const [addresses, setAddresses] =
     useState<[string | undefined, string | undefined]>();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [isLiveOnly, setIsLiveOnly] = useState(true);
+  const [eventStatusFilter, setEventStatusFilter] =
+    useState<EventStatus>("Live");
   const [currentPage, setCurrentPage] = useState(1);
   const { bookmarks } = useLockdropBookmark();
 
@@ -125,14 +129,29 @@ function LockdropPage() {
 
   const filteredLockdropEvents = lockdropEvents.filter(
     (lockdropEvent, index) => {
-      if (isLiveOnly && lockdropEvent.end_at * 1000 < Date.now()) {
-        return false;
-      }
-      if (!isLiveOnly && lockdropEvent.end_at * 1000 >= Date.now()) {
-        return false;
-      }
       if (selectedPair) {
         return lockdropEvent.lp_token_addr === selectedPair.liquidity_token;
+      }
+      if (selectedTabIndex === 0) {
+        if (
+          eventStatusFilter === "Live" &&
+          (lockdropEvent.end_at * 1000 < Date.now() ||
+            lockdropEvent.start_at * 1000 > Date.now())
+        ) {
+          return false;
+        }
+        if (
+          eventStatusFilter === "Upcoming" &&
+          lockdropEvent.start_at * 1000 <= Date.now()
+        ) {
+          return false;
+        }
+        if (
+          eventStatusFilter === "Closed" &&
+          lockdropEvent.end_at * 1000 >= Date.now()
+        ) {
+          return false;
+        }
       }
       if (selectedTabIndex === 1) {
         return !!lockdropUserInfos[index]?.lockup_infos.length;
@@ -144,16 +163,33 @@ function LockdropPage() {
     },
   );
 
-  const [sortBy, setSortBy] = useState<keyof LockdropEvent | "balance">(
+  const [sortBy, setSortBy] = useState<keyof LockdropEvent | "bookmarkedAt">(
     "end_at",
   );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  useEffect(() => {
+    if (selectedTabIndex === 0) {
+      setSortBy("start_at");
+      setSortDirection("desc");
+      setEventStatusFilter("Live");
+    }
+    if (selectedTabIndex === 1) {
+      setSortBy("end_at");
+      setSortDirection("asc");
+    }
+    if (selectedTabIndex === 2) {
+      setSortBy("bookmarkedAt");
+      setSortDirection("asc");
+    }
+  }, [selectedTabIndex]);
+
   const sortedLockdropEvents = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
     return filteredLockdropEvents.sort((a, b) => {
-      if (sortBy === "balance") {
-        return Numeric.parse(balances[a.index] || 0).gt(balances[b.index] || 0)
+      if (sortBy === "bookmarkedAt") {
+        return (bookmarks?.indexOf(a.addr) || 0) <
+          (bookmarks?.indexOf(b.addr) || 0)
           ? dir
           : -dir;
       }
@@ -173,7 +209,7 @@ function LockdropPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTabIndex, isLiveOnly]);
+  }, [selectedTabIndex, eventStatusFilter]);
 
   useEffect(() => {
     lockdropUserInfoResults.forEach((result) => {
@@ -236,19 +272,32 @@ function LockdropPage() {
                 />
               </div>
             </Col>
-            <Col xs={12} sm="content">
-              <Row align="center" justify="center" gutterWidth={8}>
-                <Col xs="content">
-                  <ToggleButton
-                    items={["Live", "Finished"]}
-                    selectedIndex={isLiveOnly ? 0 : 1}
-                    onSelect={(index) => {
-                      setIsLiveOnly(index === 0);
-                    }}
-                  />
-                </Col>
-              </Row>
-            </Col>
+            {selectedTabIndex === 0 && (
+              <Col xs={12} sm="content">
+                <Row align="center" justify="center" gutterWidth={8}>
+                  <Col xs="content">
+                    <Typography color="primary" size={14} weight={900}>
+                      Event status
+                    </Typography>
+                  </Col>
+                  <Col width={125}>
+                    <Select
+                      block
+                      options={(
+                        ["Live", "Upcoming", "Closed"] as EventStatus[]
+                      ).map((value) => ({
+                        value,
+                        label: value,
+                      }))}
+                      onChange={(value) =>
+                        setEventStatusFilter(value as EventStatus)
+                      }
+                      value={eventStatusFilter}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            )}
           </Row>
           <div
             css={css`
@@ -304,22 +353,41 @@ function LockdropPage() {
                     onClick={() => onSortClick("total_reward")}
                   />
                 </div>
-                <div style={{ width: 116 }}>
-                  Event Ends In
-                  <IconButton
-                    css={css`
-                      vertical-align: middle;
-                    `}
-                    size={22}
-                    icons={{
-                      default:
-                        sortBy === "end_at"
-                          ? sortIcons[sortDirection]
-                          : iconSortDefault,
-                    }}
-                    onClick={() => onSortClick("end_at")}
-                  />
-                </div>
+                {eventStatusFilter === "Upcoming" ? (
+                  <div style={{ width: 116 }}>
+                    Event Starts In
+                    <IconButton
+                      css={css`
+                        vertical-align: middle;
+                      `}
+                      size={22}
+                      icons={{
+                        default:
+                          sortBy === "start_at"
+                            ? sortIcons[sortDirection]
+                            : iconSortDefault,
+                      }}
+                      onClick={() => onSortClick("start_at")}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ width: 116 }}>
+                    Event Ends In
+                    <IconButton
+                      css={css`
+                        vertical-align: middle;
+                      `}
+                      size={22}
+                      icons={{
+                        default:
+                          sortBy === "end_at"
+                            ? sortIcons[sortDirection]
+                            : iconSortDefault,
+                      }}
+                      onClick={() => onSortClick("end_at")}
+                    />
+                  </div>
+                )}
               </TableHeader>
             )}
             <LockdropEventList
@@ -339,6 +407,7 @@ function LockdropPage() {
                   ? "No bookmark found."
                   : "No event found."
               }
+              isUpcoming={eventStatusFilter === "Upcoming"}
             />
           </div>
           {!!sortedLockdropEvents?.length && (

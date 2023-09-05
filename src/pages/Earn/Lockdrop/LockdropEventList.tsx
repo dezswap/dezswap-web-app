@@ -44,10 +44,12 @@ function LockdropEventList({
   events: lockdropEvents,
   userInfos: lockdropUserInfos,
   emptyMessage = "No event found.",
+  isUpcoming,
 }: {
   events?: LockdropEvent[];
   userInfos?: (LockdropUserInfo | undefined)[];
   emptyMessage?: string;
+  isUpcoming?: boolean;
 }) {
   const { bookmarks, toggleBookmark } = useLockdropBookmark();
 
@@ -84,6 +86,7 @@ function LockdropEventList({
             isBookmarked={bookmarks?.includes(lockdropEvent.addr)}
             onBookmarkToggle={() => toggleBookmark(lockdropEvent.addr)}
             userInfo={lockdropUserInfos?.[index]}
+            isUpcoming={isUpcoming}
           />
         ))}
       </List>

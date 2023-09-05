@@ -306,11 +306,13 @@ function LockdropEventItem({
   isBookmarked,
   onBookmarkToggle,
   userInfo: lockdropUserInfo,
+  isUpcoming,
 }: {
   event: LockdropEvent;
   userInfo?: LockdropUserInfo;
   isBookmarked?: boolean;
   onBookmarkToggle?: (isBookmarked: boolean, eventAddress: string) => void;
+  isUpcoming?: boolean;
 }) {
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
@@ -526,19 +528,38 @@ function LockdropEventItem({
               {isSmallScreen && (
                 <Label>
                   <Row justify="between" align="center">
-                    <Col xs="content">Event Ends In</Col>
+                    <Col xs="content">
+                      {isUpcoming ? "Event Starts In" : "Event Ends In"}
+                    </Col>
                     <Col xs="content">{needActionBadge}</Col>
                   </Row>
                 </Label>
               )}
               <div>
-                {getRemainDays(lockdropEvent.end_at * 1000)} days
+                {getRemainDays(
+                  (isUpcoming ? lockdropEvent.start_at : lockdropEvent.end_at) *
+                    1000,
+                )}
+                &nbsp;days
                 <Tooltip
                   content={
                     <>
+                      <Typography size={14} weight={900} color="primary">
+                        Event Period
+                      </Typography>
                       <Typography size={14} weight={700} color="primary">
+                        {formatDateTime(lockdropEvent.start_at * 1000)} ~ <br />
+                        {formatDateTime(lockdropEvent.end_at * 1000)}
+                      </Typography>
+                      <Hr
+                        css={css`
+                          margin: 10px 0;
+                        `}
+                      />
+                      <Typography size={14} weight={900} color="primary">
                         Lock begins at
-                        <br />
+                      </Typography>
+                      <Typography size={14} weight={700} color="primary">
                         {formatDateTime(lockdropEvent.end_at * 1000)}
                       </Typography>
                       <Hr
