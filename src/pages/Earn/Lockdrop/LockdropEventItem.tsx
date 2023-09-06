@@ -31,7 +31,6 @@ import ProgressBar from "components/ProgressBar";
 import { Link } from "react-router-dom";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
-import useBalance from "hooks/useBalance";
 import Hr from "components/Hr";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useAPI from "hooks/useAPI";
@@ -340,7 +339,6 @@ function LockdropEventItem({
     () => getAsset(lockdropEvent.reward_token_addr),
     [getAsset, lockdropEvent],
   );
-  const lpBalance = useBalance(lockdropEvent.lp_token_addr);
 
   const isStakable = useMemo(() => {
     const startAt = new Date(lockdropEvent.start_at * 1000);
@@ -375,16 +373,16 @@ function LockdropEventItem({
 
   const extra = useMemo(
     () =>
-      isStakable
+      isStakable || isUpcoming
         ? [
             <Link to={lockdropEvent.addr} relative="route">
-              <Button as="div" variant="primary" block>
+              <Button variant="primary" block disabled={isUpcoming}>
                 Lock LP
               </Button>
             </Link>,
           ]
         : [],
-    [lockdropEvent, isStakable],
+    [isStakable, isUpcoming, lockdropEvent],
   );
 
   const bookmarkButton = useMemo(
@@ -496,19 +494,6 @@ function LockdropEventItem({
               </Row>
             </div>
             <div>
-              {isSmallScreen && <Label>Total Staked LP</Label>}
-              <div>
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(lockdropEvent.total_locked_lp, LP_DECIMALS) ||
-                      "",
-                    2,
-                  ),
-                )}
-                &nbsp;LP
-              </div>
-            </div>
-            <div>
               {isSmallScreen && <Label>Allocation</Label>}
               <div>
                 {formatNumber(
@@ -522,6 +507,19 @@ function LockdropEventItem({
                 )}
                 &nbsp;
                 {rewardAsset?.symbol}
+              </div>
+            </div>
+            <div>
+              {isSmallScreen && <Label>Total Staked LP</Label>}
+              <div>
+                {formatNumber(
+                  formatDecimals(
+                    amountToValue(lockdropEvent.total_locked_lp, LP_DECIMALS) ||
+                      "",
+                    2,
+                  ),
+                )}
+                &nbsp;LP
               </div>
             </div>
             <div>
@@ -615,7 +613,7 @@ function LockdropEventItem({
               target="_blank"
               rel="noopener noreferrer"
             >
-              Event Info
+              Contract Info
             </Outlink>
             <Tooltip content="Whitelisted on XPLA">
               <VerifiedBadge />

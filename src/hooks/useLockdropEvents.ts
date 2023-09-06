@@ -6,7 +6,11 @@ import useNetwork from "./useNetwork";
 const useLockdropEvents = () => {
   const network = useNetwork();
   const api = useAPI();
-  const { data: lockdropEvents, isLoading } = useQuery({
+  const {
+    data: lockdropEvents,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["lockdropEvents", network?.chainID],
     queryFn: async () => {
       const res = await api.getLockdropEvents();
@@ -52,6 +56,7 @@ const useLockdropEvents = () => {
     () => ({
       lockdropEvents: lockdropEvents || [],
       isLoading,
+      refetch,
       getLockdropEventInfo,
       getLockdropEventInfoByRewardToken,
       getLockdropEventInfoByLPToken,
@@ -62,6 +67,7 @@ const useLockdropEvents = () => {
       getLockdropEventInfoByRewardToken,
       isLoading,
       lockdropEvents,
+      refetch,
     ],
   );
 };

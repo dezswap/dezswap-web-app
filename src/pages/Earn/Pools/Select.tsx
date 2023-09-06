@@ -134,7 +134,7 @@ const OptionItem = styled.button`
   font-size: 14px;
   font-weight: 900;
   color: ${({ theme }) => theme.colors.primary};
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: transparent;
   border: none;
   cursor: pointer;
 

@@ -22,11 +22,15 @@ import iconSortAsc from "assets/icons/icon-sort-asc.svg";
 import iconSortDesc from "assets/icons/icon-sort-desc.svg";
 import IconButton from "components/IconButton";
 import Typography from "components/Typography";
+import useSearchParamState from "hooks/useSearchParamState";
 import AssetSelector from "../AssetSelector";
 import LockdropEventList from "./LockdropEventList";
 import Select from "../Pools/Select";
 
 type EventStatus = "Live" | "Upcoming" | "Closed";
+type Tab = "all" | "my" | "bookmark";
+
+const tabs: readonly Tab[] = ["all", "my", "bookmark"] as const;
 
 const sortIcons = {
   default: iconSortDefault,
@@ -63,7 +67,10 @@ function LockdropPage() {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const { lockdropEvents: originalLockdropEvents } = useLockdropEvents();
+  const {
+    lockdropEvents: originalLockdropEvents,
+    refetch: refetchLockdropEvents,
+  } = useLockdropEvents();
   const api = useAPI();
   const { findPair } = usePairs();
 
@@ -97,27 +104,12 @@ function LockdropPage() {
     (result) => result.data || undefined,
   );
 
-  const balances = useQueries({
-    queries:
-      lockdropEvents?.map((item) => ({
-        queryKey: ["balance", item.lp_token_addr],
-        queryFn: async () => {
-          const balance = await api.getTokenBalance(item.lp_token_addr);
-          return balance;
-        },
-        enabled: !!item.lp_token_addr,
-        refetchInterval: 30000,
-        refetchOnMount: false,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-      })) || [],
-  }).map((item) => item.data);
-
   const [addresses, setAddresses] =
     useState<[string | undefined, string | undefined]>();
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [selectedTab, setSelectedTab] = useSearchParamState<Tab>("tab", "all");
+  const selectedTabIndex = tabs.indexOf(selectedTab || "all");
   const [eventStatusFilter, setEventStatusFilter] =
-    useState<EventStatus>("Live");
+    useSearchParamState<EventStatus>("status", "Live");
   const [currentPage, setCurrentPage] = useState(1);
   const { bookmarks } = useLockdropBookmark();
 
@@ -132,7 +124,7 @@ function LockdropPage() {
       if (selectedPair) {
         return lockdropEvent.lp_token_addr === selectedPair.liquidity_token;
       }
-      if (selectedTabIndex === 0) {
+      if (selectedTab === "all") {
         if (
           eventStatusFilter === "Live" &&
           (lockdropEvent.end_at * 1000 < Date.now() ||
@@ -153,10 +145,10 @@ function LockdropPage() {
           return false;
         }
       }
-      if (selectedTabIndex === 1) {
+      if (selectedTab === "my") {
         return !!lockdropUserInfos[index]?.lockup_infos.length;
       }
-      if (selectedTabIndex === 2) {
+      if (selectedTab === "bookmark") {
         return bookmarks?.includes(lockdropEvent.addr);
       }
       return true;
@@ -169,20 +161,22 @@ function LockdropPage() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
-    if (selectedTabIndex === 0) {
+    if (selectedTab === "all") {
       setSortBy("start_at");
       setSortDirection("desc");
       setEventStatusFilter("Live");
     }
-    if (selectedTabIndex === 1) {
+    if (selectedTab === "my") {
       setSortBy("end_at");
       setSortDirection("asc");
+      setEventStatusFilter(undefined);
     }
-    if (selectedTabIndex === 2) {
+    if (selectedTab === "bookmark") {
       setSortBy("bookmarkedAt");
       setSortDirection("asc");
+      setEventStatusFilter(undefined);
     }
-  }, [selectedTabIndex]);
+  }, [selectedTab, setEventStatusFilter]);
 
   const sortedLockdropEvents = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -205,18 +199,19 @@ function LockdropPage() {
       }
       return a[sortBy] > b[sortBy] ? dir : -dir;
     });
-  }, [balances, filteredLockdropEvents, sortBy, sortDirection]);
+  }, [bookmarks, filteredLockdropEvents, sortBy, sortDirection]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTabIndex, eventStatusFilter]);
+  }, [selectedTab, eventStatusFilter]);
 
   useEffect(() => {
+    refetchLockdropEvents();
     lockdropUserInfoResults.forEach((result) => {
       result.refetch();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+  }, [location.pathname]);
 
   const onSortClick = (newSortBy: typeof sortBy) => {
     setSortDirection((current) =>
@@ -268,11 +263,11 @@ function LockdropPage() {
                     { value: "bookmark", label: "Bookmark" },
                   ]}
                   selectedIndex={selectedTabIndex}
-                  onChange={(index) => setSelectedTabIndex(index)}
+                  onChange={(index) => setSelectedTab(tabs[index])}
                 />
               </div>
             </Col>
-            {selectedTabIndex === 0 && (
+            {selectedTab === "all" && (
               <Col xs={12} sm="content">
                 <Row align="center" justify="center" gutterWidth={8}>
                   <Col xs="content">
@@ -322,22 +317,6 @@ function LockdropPage() {
                 <div style={{ width: 32, marginRight: -10 }}>&nbsp;</div>
                 <div>Pool</div>
                 <div>
-                  Total Staked LP
-                  <IconButton
-                    css={css`
-                      vertical-align: middle;
-                    `}
-                    size={22}
-                    icons={{
-                      default:
-                        sortBy === "total_locked_lp"
-                          ? sortIcons[sortDirection]
-                          : iconSortDefault,
-                    }}
-                    onClick={() => onSortClick("total_locked_lp")}
-                  />
-                </div>
-                <div>
                   Allocation
                   <IconButton
                     css={css`
@@ -353,8 +332,24 @@ function LockdropPage() {
                     onClick={() => onSortClick("total_reward")}
                   />
                 </div>
+                <div>
+                  Total Staked LP
+                  <IconButton
+                    css={css`
+                      vertical-align: middle;
+                    `}
+                    size={22}
+                    icons={{
+                      default:
+                        sortBy === "total_locked_lp"
+                          ? sortIcons[sortDirection]
+                          : iconSortDefault,
+                    }}
+                    onClick={() => onSortClick("total_locked_lp")}
+                  />
+                </div>
                 {eventStatusFilter === "Upcoming" ? (
-                  <div style={{ width: 116 }}>
+                  <div>
                     Event Starts In
                     <IconButton
                       css={css`
@@ -371,7 +366,7 @@ function LockdropPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ width: 116 }}>
+                  <div>
                     Event Ends In
                     <IconButton
                       css={css`
@@ -403,7 +398,7 @@ function LockdropPage() {
                   .slice((currentPage - 1) * LIMIT, currentPage * LIMIT) || []
               }
               emptyMessage={
-                selectedTabIndex === 2
+                selectedTab === "bookmark"
                   ? "No bookmark found."
                   : "No event found."
               }
