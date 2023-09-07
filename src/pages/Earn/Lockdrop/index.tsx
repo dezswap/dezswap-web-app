@@ -163,8 +163,8 @@ function LockdropPage() {
   useEffect(() => {
     if (selectedTab === "all") {
       setSortBy("start_at");
-      setSortDirection("desc");
-      setEventStatusFilter("Live");
+      setSortDirection("asc");
+      setEventStatusFilter((current) => current || "Live");
     }
     if (selectedTab === "my") {
       setSortBy("end_at");

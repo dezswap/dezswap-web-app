@@ -1,4 +1,4 @@
-import { Dispatch, useCallback, useEffect, useMemo, useState } from "react";
+import { Dispatch, useCallback, useEffect, useState } from "react";
 import {
   NavigateOptions,
   useLocation,
@@ -9,7 +9,7 @@ const useSearchParamState = <S extends string>(
   paramName: string,
   defaultValue?: S,
   navigateOptions?: NavigateOptions,
-): [S | undefined, Dispatch<S | undefined>] => {
+): [S | undefined, Dispatch<React.SetStateAction<S | undefined>>] => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [value, setValue] = useState<S | undefined>(
