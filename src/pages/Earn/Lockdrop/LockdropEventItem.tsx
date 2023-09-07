@@ -615,7 +615,7 @@ function LockdropEventItem({
             >
               Contract Info
             </Outlink>
-            <Tooltip content="Whitelisted on XPLA">
+            <Tooltip content="Verified by Dezswap">
               <VerifiedBadge />
             </Tooltip>
           </OutlinkList>
