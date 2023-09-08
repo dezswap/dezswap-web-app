@@ -3,6 +3,7 @@ import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
+import iconLink from "assets/icons/icon-link.svg";
 import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
@@ -10,7 +11,14 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import { amountToValue, cutDecimal, formatDecimals, formatNumber } from "utils";
+import {
+  amountToValue,
+  cutDecimal,
+  ellipsisCenter,
+  formatDecimals,
+  formatNumber,
+  getTokenLink,
+} from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateClaimLockdropMsg } from "utils/dezswap";
@@ -24,6 +32,8 @@ import useAPI from "hooks/useAPI";
 import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import IconButton from "components/IconButton";
+import usePairs from "hooks/usePairs";
 
 const Box = styled(box)`
   & > * {
@@ -46,6 +56,7 @@ function ClaimPage() {
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
+  const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
@@ -75,11 +86,24 @@ function ClaimPage() {
     return value ? Number(value) : undefined;
   }, [searchParams]);
 
+  const pair = useMemo(
+    () =>
+      lockdropEventInfo
+        ? findPairByLpAddress(lockdropEventInfo.lp_token_addr)
+        : undefined,
+    [findPairByLpAddress, lockdropEventInfo],
+  );
+
   const lockupInfo = useMemo(() => {
     return lockdropUserInfo?.lockup_infos.find(
       (item) => item.duration === duration,
     );
   }, [duration, lockdropUserInfo]);
+
+  const [asset1, asset2] = useMemo(
+    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
+    [getAsset, pair],
+  );
 
   const rewardAsset = useMemo(
     () => getAsset(lockdropEventInfo?.reward_token_addr || ""),
@@ -228,6 +252,11 @@ function ClaimPage() {
           `}
         >
           <Expand
+            label={
+              <Typography weight="bold">
+                {asset1?.symbol || ""} - {asset2?.symbol || ""}
+              </Typography>
+            }
             preview={
               <InfoTable
                 items={[
@@ -244,10 +273,64 @@ function ClaimPage() {
                         )} ${XPLA_SYMBOL}`
                       : "",
                   },
+                  {
+                    key: "shareOfPool",
+                    label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
+                    value: `${cutDecimal(
+                      Numeric.parse(lockupInfo?.total_reward || "0")
+                        .dividedBy(
+                          lockdropEventInfo?.total_lockdrop_reward || "1",
+                        )
+                        .mul(100)
+                        .toString(),
+                      2,
+                    )}%`,
+                  },
                 ]}
               />
             }
-          />
+          >
+            <div
+              css={css`
+                margin-top: 3px;
+              `}
+            >
+              <InfoTable
+                items={[
+                  {
+                    key: "lpAddress",
+                    label: "LP Address",
+                    value: (
+                      <span>
+                        {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
+                        &nbsp;
+                        <a
+                          href={getTokenLink(
+                            lockdropEventInfo?.lp_token_addr,
+                            network.name,
+                          )}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      </span>
+                    ),
+                  },
+                ]}
+              />
+            </div>
+          </Expand>
         </div>
         <Button
           type="submit"

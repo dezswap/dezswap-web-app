@@ -28,7 +28,6 @@ import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
-import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
@@ -108,11 +107,7 @@ function UnlockPage() {
       ],
     };
   }, [connectedWallet, duration, eventAddress]);
-  const simulationResult = useSimulate(
-    pair?.contract_addr || "",
-    pair?.liquidity_token || "",
-    lockupInfo?.locked_lp_token || "0",
-  );
+
   const { fee } = useFee(txOptions);
 
   const feeAmount = useMemo(() => {
@@ -203,33 +198,6 @@ function UnlockPage() {
               <InfoTable
                 items={[
                   {
-                    key: "expectedAmount",
-                    label: "Expected Tokens",
-                    tooltip: (
-                      <>
-                        The result value you may get
-                        <br />
-                        at the current condition.
-                      </>
-                    ),
-                    value: `${formatNumber(
-                      amountToValue(
-                        simulationResult?.estimatedAmount?.find(
-                          (a) => a.address === asset1?.token,
-                        )?.amount,
-                        asset1?.decimals,
-                      ) || "",
-                    )} ${asset1?.symbol || ""}
-                      ${formatNumber(
-                        amountToValue(
-                          simulationResult?.estimatedAmount?.find(
-                            (a) => a.address === asset2?.token,
-                          )?.amount,
-                          asset1?.decimals,
-                        ) || "",
-                      )} ${asset2?.symbol || ""}`,
-                  },
-                  {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
@@ -282,16 +250,6 @@ function UnlockPage() {
                         </a>
                       </span>
                     ),
-                  },
-                  {
-                    key: "asset1Address",
-                    label: `${asset1?.name || ""} Address`,
-                    value: ellipsisCenter(asset1?.token || "", 6),
-                  },
-                  {
-                    key: "asset2Address",
-                    label: `${asset2?.name || ""} Address`,
-                    value: ellipsisCenter(asset2?.token || "", 6),
                   },
                 ]}
               />
