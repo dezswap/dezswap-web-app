@@ -211,6 +211,22 @@ function StakePage() {
     eventAddress,
   ]);
 
+  useEffect(() => {
+    if (Number(duration) > (lockdropEventInfo?.max_lock_duration || 52)) {
+      form.setValue(
+        FormKey.duration,
+        `${lockdropEventInfo?.max_lock_duration || 52}`,
+      );
+    }
+
+    if (Number(duration) < (lockdropEventInfo?.min_lock_duration || 4)) {
+      form.setValue(
+        FormKey.duration,
+        `${lockdropEventInfo?.min_lock_duration || 4}`,
+      );
+    }
+  }, [duration, form, lockdropEventInfo]);
+
   return (
     <Modal
       id="stake-modal"
