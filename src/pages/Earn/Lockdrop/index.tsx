@@ -72,7 +72,7 @@ function LockdropPage() {
     refetch: refetchLockdropEvents,
   } = useLockdropEvents();
   const api = useAPI();
-  const { findPair } = usePairs();
+  const { findPair, findPairByLpAddress } = usePairs();
 
   const lockdropEvents = useMemo(() => {
     return originalLockdropEvents.map((lockdropEvent, index) => ({
@@ -113,16 +113,38 @@ function LockdropPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const { bookmarks } = useLockdropBookmark();
 
-  const selectedPair = useMemo(() => {
-    const address1 = addresses?.[0] || "";
-    const address2 = addresses?.[1] || "";
-    return findPair([address1, address2]);
-  }, [addresses, findPair]);
+  const pairs = useMemo(() => {
+    return lockdropEvents.map((lockdropEvent) => {
+      return findPairByLpAddress(lockdropEvent.lp_token_addr);
+    });
+  }, [findPairByLpAddress, lockdropEvents]);
+
+  const filteredPairs = useMemo(
+    () =>
+      pairs.filter((pair) => {
+        if (addresses?.[0] && addresses?.[1]) {
+          return (
+            pair?.asset_addresses.includes(addresses?.[0] || "") &&
+            pair?.asset_addresses.includes(addresses?.[1] || "")
+          );
+        }
+        return (
+          pair?.asset_addresses.includes(addresses?.[0] || "") ||
+          pair?.asset_addresses.includes(addresses?.[1] || "")
+        );
+      }),
+    [addresses, pairs],
+  );
 
   const filteredLockdropEvents = lockdropEvents.filter(
     (lockdropEvent, index) => {
-      if (selectedPair) {
-        return lockdropEvent.lp_token_addr === selectedPair.liquidity_token;
+      if (
+        (addresses?.[0] || addresses?.[1]) &&
+        !filteredPairs.find(
+          (pair) => pair?.liquidity_token === lockdropEvent.lp_token_addr,
+        )
+      ) {
+        return false;
       }
       if (selectedTab === "all") {
         if (

@@ -71,7 +71,13 @@ function PoolPage() {
 
   const [addresses, setAddresses] =
     useState<[string | undefined, string | undefined]>();
-  const [selectedPair, setSelectedPair] = useState<PairExtended>();
+  const selectedPair = useMemo(
+    () =>
+      addresses?.[0] && addresses?.[1]
+        ? findPair([addresses[0], addresses[1]])
+        : undefined,
+    [addresses, findPair],
+  );
   const api = useAPI();
 
   const balances = useQueries({
@@ -94,32 +100,46 @@ function PoolPage() {
       })) || [],
   }).map((item) => item.data);
 
-  const poolList = useMemo(() => {
+  const { pairs } = usePairs();
+
+  const filteredPairs = useMemo(
+    () =>
+      pairs?.filter((pair) => {
+        if (addresses?.[0] && addresses?.[1]) {
+          return (
+            pair?.asset_addresses.includes(addresses?.[0] || "") &&
+            pair?.asset_addresses.includes(addresses?.[1] || "")
+          );
+        }
+        return (
+          pair?.asset_addresses.includes(addresses?.[0] || "") ||
+          pair?.asset_addresses.includes(addresses?.[1] || "")
+        );
+      }),
+    [addresses, pairs],
+  );
+
+  const filteredPools = useMemo(() => {
     return pools?.filter((item, index) => {
-      const isSelectedPair =
-        !selectedPair || item.address === selectedPair.contract_addr;
+      if (
+        (addresses?.[0] || addresses?.[1]) &&
+        !filteredPairs?.find((pair) => pair?.contract_addr === item.address)
+      ) {
+        return false;
+      }
       switch (selectedTabIndex) {
         case 0:
-          return isSelectedPair;
+          return true;
         case 1:
-          return isSelectedPair && Numeric.parse(balances[index] || 0).gt(0);
+          return Numeric.parse(balances[index] || 0).gt(0);
         case 2:
-          return isSelectedPair && !!bookmarks?.includes(item.address);
+          return !!bookmarks?.includes(item.address);
         default:
         // do nothing
       }
       return false;
     });
-  }, [pools, selectedPair, selectedTabIndex, balances, bookmarks]);
-
-  useEffect(() => {
-    const [address1, address2] = addresses || [];
-    if (address1 && address2) {
-      setSelectedPair(() => findPair([address1, address2]));
-    } else {
-      setSelectedPair(undefined);
-    }
-  }, [addresses, findPair]);
+  }, [pools, addresses, filteredPairs, selectedTabIndex, balances, bookmarks]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -295,7 +315,7 @@ function PoolPage() {
               )}
               <PoolList
                 pools={
-                  poolList?.slice(
+                  filteredPools?.slice(
                     (currentPage - 1) * LIMIT,
                     currentPage * LIMIT,
                   ) || []
@@ -311,10 +331,10 @@ function PoolPage() {
             </div>
           </div>
 
-          {!!poolList?.length && (
+          {!!filteredPools?.length && (
             <Pagination
               current={currentPage}
-              total={Math.floor((poolList.length - 1) / LIMIT) + 1}
+              total={Math.floor((filteredPools.length - 1) / LIMIT) + 1}
               onChange={(value) => {
                 setCurrentPage(value);
               }}
