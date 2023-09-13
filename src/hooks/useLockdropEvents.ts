@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
+import { LockdropEvent } from "types/lockdrop";
 import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
 
@@ -13,8 +14,38 @@ const useLockdropEvents = () => {
   } = useQuery({
     queryKey: ["lockdropEvents", network?.chainID],
     queryFn: async () => {
-      const res = await api.getLockdropEvents();
-      return res?.events || [];
+      const fetchAll = async (
+        prevData: LockdropEvent[] = [],
+        startAfter = 0,
+      ): Promise<LockdropEvent[]> => {
+        try {
+          const res = await api.getLockdropEvents(startAfter);
+          if (
+            !res?.events?.length ||
+            !!prevData.find(
+              ({ addr }) => addr === res?.events.slice(-1)[0].addr,
+            )
+          ) {
+            return prevData;
+          }
+          return fetchAll(
+            [...prevData, ...res.events].filter(({ addr }, index, array) => {
+              return (
+                index ===
+                array.findIndex((item) => {
+                  return addr === item.addr;
+                })
+              );
+            }),
+            res.events.slice(-1)[0].start_at + 1,
+          );
+        } catch (error) {
+          console.log(error);
+          return prevData;
+        }
+      };
+      const res = await fetchAll();
+      return res || [];
     },
   });
 
