@@ -23,6 +23,7 @@ import iconSortDesc from "assets/icons/icon-sort-desc.svg";
 import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import useSearchParamState from "hooks/useSearchParamState";
+import useNetwork from "hooks/useNetwork";
 import AssetSelector from "../AssetSelector";
 import LockdropEventList from "./LockdropEventList";
 import Select from "../Pools/Select";
@@ -61,6 +62,7 @@ const TableHeader = styled(Box)`
 const LIMIT = 10;
 
 function LockdropPage() {
+  const network = useNetwork();
   const location = useLocation();
 
   const screenClass = useScreenClass();
@@ -83,7 +85,7 @@ function LockdropPage() {
 
   const lockdropUserInfoResults = useQueries({
     queries: lockdropEvents.map((lockdropEvent) => ({
-      queryKey: ["lockdropUserInfo", lockdropEvent.addr],
+      queryKey: ["lockdropUserInfo", lockdropEvent.addr, network.chainID],
       queryFn: async () => {
         const res = await api.getLockdropUserInfo(lockdropEvent.addr);
         if (!res) {
@@ -138,6 +140,9 @@ function LockdropPage() {
 
   const filteredLockdropEvents = lockdropEvents.filter(
     (lockdropEvent, index) => {
+      if (lockdropEvent.canceled) {
+        return false;
+      }
       if (
         (addresses?.[0] || addresses?.[1]) &&
         !filteredPairs.find(
@@ -177,9 +182,9 @@ function LockdropPage() {
     },
   );
 
-  const [sortBy, setSortBy] = useState<keyof LockdropEvent | "bookmarkedAt">(
-    "end_at",
-  );
+  const [sortBy, setSortBy] = useState<
+    keyof Omit<LockdropEvent, "canceled"> | "bookmarkedAt"
+  >("end_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {

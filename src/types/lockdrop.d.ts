@@ -8,6 +8,7 @@ export type LockdropEvent = {
   start_at: number;
   end_at: number;
   cancelable_until: number;
+  canceled: boolean;
 };
 
 export interface LockdropEvents {
