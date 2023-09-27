@@ -30,6 +30,10 @@ const Wrapper = styled.div<{ hasBanner?: boolean }>`
     padding-bottom: unset;
     min-height: unset;
   }
+
+  body:has(#disclaimer-modal) & {
+    display: none;
+  }
 `;
 
 const NavBarWrapper = styled.div`
