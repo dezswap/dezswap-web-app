@@ -131,14 +131,6 @@ const Label = styled(Typography)`
   }
 `;
 
-const LinkButton = styled(Button.withComponent(Link), {
-  shouldForwardProp: (prop) => prop !== "block",
-})`
-  text-decoration: none;
-  white-space: nowrap;
-  text-align: center;
-`;
-
 Label.defaultProps = {
   size: 14,
   weight: 900,
@@ -241,6 +233,10 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
         .toNumber() || 0
     );
   }, [lpBalance, pool]);
+
+  const hasLiquidity = useMemo(() => {
+    return Numeric.parse(lpBalance || "0").gt(0);
+  }, [lpBalance]);
 
   const bookmarkButton = useMemo(
     () => (
@@ -538,25 +534,22 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 event.stopPropagation();
               }}
             >
-              <LinkButton
-                to={`add-liquidity/${pool.address}`}
-                relative="route"
-                variant="primary"
-                block
-                css={css`
-                  margin-bottom: 10px;
-                `}
-              >
-                Add liquidity
-              </LinkButton>
-              <LinkButton
-                to={`withdraw/${pool.address}`}
-                relative="route"
-                variant="secondary"
-                block
-              >
-                Remove liquidity
-              </LinkButton>
+              <Link to={`add-liquidity/${pool.address}`} relative="route">
+                <Button
+                  variant="primary"
+                  block
+                  css={css`
+                    margin-bottom: 10px;
+                  `}
+                >
+                  Add liquidity
+                </Button>
+              </Link>
+              <Link to={`withdraw/${pool.address}`} relative="route">
+                <Button variant="secondary" block disabled={!hasLiquidity}>
+                  Remove liquidity
+                </Button>
+              </Link>
             </BodyContentButtons>
           </BodyContent>
         </div>

@@ -68,6 +68,7 @@ const Button = styled.button<ButtonProps>`
             background-color: ${theme.colors.selected};
           }
           &:disabled {
+            background-color: ${theme.colors.text.background};
             opacity: 0.5;
           }
         `;
