@@ -3,6 +3,7 @@ import useModal from "hooks/useModal";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDropdownDisabled from "assets/icons/icon-dropdown-arrow-disabled.svg";
 import { css } from "@emotion/react";
+import { useEffect, useRef } from "react";
 
 type SelectValue = string | number;
 
@@ -164,11 +165,29 @@ function Select({
   onChange: handleChange,
   ...wrapperProps
 }: SelectProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const selectedOption = options?.find((option) => option.value === value);
   const modal = useModal();
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        modal.close();
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [modal]);
+
   return (
-    <Wrapper {...wrapperProps}>
+    <Wrapper ref={wrapperRef} {...wrapperProps}>
       <Button
         {...wrapperProps}
         isOpen={modal.isOpen}
