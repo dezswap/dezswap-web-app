@@ -9,6 +9,7 @@ import iconReload from "assets/icons/icon-reload.svg";
 import iconReloadHover from "assets/icons/icon-reload-hover.svg";
 import { NavLink as navLink, Outlet } from "react-router-dom";
 import styled from "@emotion/styled";
+import Tooltip from "components/Tooltip";
 
 const NavBar = styled.div`
   width: 100%;
@@ -31,6 +32,10 @@ const NavLink = styled(navLink)`
     opacity: 1;
     border-bottom-color: ${({ theme }) => theme.colors.primary};
   }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 
   .${MOBILE_SCREEN_CLASS} & {
     padding: 10px 0 10px 0;
@@ -52,15 +57,19 @@ function EarnPage() {
               Pools
             </Typography>
           </NavLink>
-          <NavLink to="lockdrop">
-            <Typography
-              size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
-              color="primary"
-              weight={900}
-            >
-              LP Lock&Drop
-            </Typography>
-          </NavLink>
+          <Tooltip content="Coming soon" offset={[0, -12]}>
+            <div>
+              <NavLink className="disabled" to="lockdrop">
+                <Typography
+                  size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
+                  color="primary"
+                  weight={900}
+                >
+                  LP Lock&Drop
+                </Typography>
+              </NavLink>
+            </div>
+          </Tooltip>
           <IconButton
             css={css`
               margin-left: auto;

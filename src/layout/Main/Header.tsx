@@ -144,6 +144,27 @@ const NavBarWrapper = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+const SubLink = styled(Link)`
+  display: block;
+  padding: 10px 0px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.text.background};
+  }
+
+  &:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+`;
+
 const navLinks = [
   {
     path: "/",
@@ -165,6 +186,7 @@ const navLinks = [
       {
         path: "/earn/lockdrop",
         label: "LP Lock&Drop",
+        disabled: true,
       },
     ],
   },
@@ -353,39 +375,30 @@ function Header() {
                                 `}
                               >
                                 {item.children.map((child) => (
-                                  <Link
-                                    key={child.path}
-                                    to={child.path}
-                                    css={css`
-                                      display: block;
-                                      padding: 10px 0px;
-                                      text-align: center;
-                                      text-decoration: none;
-
-                                      &:hover {
-                                        background-color: ${theme.colors.text
-                                          .background};
-                                      }
-
-                                      &:first-child {
-                                        border-top-left-radius: 12px;
-                                        border-top-right-radius: 12px;
-                                      }
-
-                                      &:last-child {
-                                        border-bottom-left-radius: 12px;
-                                        border-bottom-right-radius: 12px;
-                                      }
-                                    `}
+                                  <Tooltip
+                                    disabled={!child.disabled}
+                                    content="Coming soon"
                                   >
-                                    <Typography
-                                      size={16}
-                                      weight={900}
-                                      color="primary"
+                                    <SubLink
+                                      key={child.path}
+                                      to={!child.disabled ? child.path : "#"}
+                                      css={
+                                        child.disabled
+                                          ? css`
+                                              cursor: default;
+                                            `
+                                          : undefined
+                                      }
                                     >
-                                      {child.label}
-                                    </Typography>
-                                  </Link>
+                                      <Typography
+                                        size={16}
+                                        weight={900}
+                                        color="primary"
+                                      >
+                                        {child.label}
+                                      </Typography>
+                                    </SubLink>
+                                  </Tooltip>
                                 ))}
                               </Panel>
                             </div>
