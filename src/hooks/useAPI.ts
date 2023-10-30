@@ -13,6 +13,13 @@ import useNetwork from "hooks/useNetwork";
 import useLCDClient from "hooks/useLCDClient";
 import { LatestBlock } from "types/common";
 import api, { ApiVersion } from "api";
+import {
+  LockdropEstimatedReward,
+  LockdropEventInfo,
+  LockdropEvents,
+  LockdropUserInfo,
+} from "types/lockdrop";
+import { CreateTxOptions } from "@xpla/xpla.js";
 
 interface TokenBalance {
   balance: string;
@@ -136,6 +143,99 @@ const useAPI = (version: ApiVersion = "v1") => {
     [network.name, lcd],
   );
 
+  const getLockdropEvents = useCallback(
+    async (startAfter = 0) => {
+      const contractAddress = contractAddresses[network.name]?.lockdrop;
+      if (!contractAddress) {
+        return undefined;
+      }
+
+      const res = await lcd.wasm.contractQuery<LockdropEvents>(
+        contractAddress,
+        {
+          events_by_end: { start_after: startAfter },
+        },
+      );
+      return res;
+    },
+    [lcd, network.name],
+  );
+
+  const getLockdropEventInfo = useCallback(
+    async (lockdropEventAddress: string) => {
+      const res = await lcd.wasm.contractQuery<LockdropEventInfo>(
+        lockdropEventAddress,
+        {
+          event_info: {},
+        },
+      );
+      return res;
+    },
+    [lcd],
+  );
+
+  const getLockdropUserInfo = useCallback(
+    async (lockdropEventAddress: string) => {
+      if (!walletAddress || !lockdropEventAddress) {
+        return undefined;
+      }
+      const res = await lcd.wasm.contractQuery<LockdropUserInfo>(
+        lockdropEventAddress,
+        {
+          user_info: {
+            addr: walletAddress,
+          },
+        },
+      );
+      return res;
+    },
+    [lcd.wasm, walletAddress],
+  );
+
+  const getEstimatedLockdropReward = useCallback(
+    async (
+      lockdropEventAddress: string,
+      amount: number | string,
+      duration: number,
+    ) => {
+      if (!walletAddress || !lockdropEventAddress) {
+        return undefined;
+      }
+      const res = await lcd.wasm.contractQuery<LockdropEstimatedReward>(
+        lockdropEventAddress,
+        {
+          estimate: {
+            amount: `${amount}`,
+            duration,
+          },
+        },
+      );
+      return res;
+    },
+    [lcd.wasm, walletAddress],
+  );
+
+  const estimateFee = useCallback(
+    async (txOptions: CreateTxOptions) => {
+      if (!connectedWallet) {
+        return undefined;
+      }
+      const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
+      const res = await lcd.tx.estimateFee(
+        [
+          {
+            sequenceNumber: account.getSequenceNumber(),
+            publicKey: account.getPublicKey(),
+          },
+        ],
+        txOptions,
+      );
+
+      return res;
+    },
+    [connectedWallet, lcd],
+  );
+
   return useMemo(
     () => ({
       ...apiClient,
@@ -147,6 +247,11 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
       getDecimal,
+      getLockdropEvents,
+      getLockdropEventInfo,
+      getLockdropUserInfo,
+      getEstimatedLockdropReward,
+      estimateFee,
     }),
     [
       apiClient,
@@ -158,6 +263,11 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
       getDecimal,
+      getLockdropEvents,
+      getLockdropEventInfo,
+      getLockdropUserInfo,
+      getEstimatedLockdropReward,
+      estimateFee,
     ],
   );
 };

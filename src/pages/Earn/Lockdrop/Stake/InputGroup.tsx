@@ -4,17 +4,17 @@ import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
 import Copy from "components/Copy";
-import { NumberInput } from "components/Input";
+import { NumberInput, NumberInputProps } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
-import { DISPLAY_DECIMAL } from "constants/layout";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Token } from "types/api";
 
-interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
+interface InputGroupProps extends NumberInputProps {
   lpToken?: string;
   assets?: (Partial<Token> | undefined)[];
   onBalanceClick?(
@@ -40,11 +40,25 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
 
     return (
       <Box style={style}>
-        <Row justify="between" align="center" style={{ gap: 3 }}>
+        <Row
+          justify="between"
+          align="center"
+          gutterWidth={0}
+          style={{ gap: 3 }}
+          css={css`
+            margin-bottom: 5px;
+            & > div:last-of-type {
+              margin-left: auto !important;
+            }
+          `}
+        >
           <Col xs={12} sm="content">
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
-              <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>
-                <AssetButton block={screenClass === "xs"}>
+              <Col
+                xs="content"
+                style={screenClass === MOBILE_SCREEN_CLASS ? { flex: 1 } : {}}
+              >
+                <AssetButton block={screenClass === MOBILE_SCREEN_CLASS}>
                   <img
                     src={assets?.[0]?.icon || iconDefaultToken}
                     width={24}
@@ -117,6 +131,17 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               size="large"
               placeholder="0"
               align="right"
+              suffix={
+                <Typography
+                  size={14}
+                  weight={700}
+                  css={css`
+                    padding-top: 4px;
+                  `}
+                >
+                  LP
+                </Typography>
+              }
               {...inputProps}
             />
           </Col>

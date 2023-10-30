@@ -9,7 +9,7 @@ const useLCDClient = () => {
       new LCDClient({
         URL: network.lcd,
         chainID: network.chainID,
-        gasAdjustment: 1.1,
+        gasAdjustment: 1.2,
       }),
     [network],
   );

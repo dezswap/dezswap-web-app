@@ -4,23 +4,26 @@ import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
 import Copy from "components/Copy";
-import { NumberInput } from "components/Input";
+import { NumberInput, NumberInputProps } from "components/Input";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { Token } from "types/api";
+import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
+import { DISPLAY_DECIMAL } from "constants/layout";
+import { Token } from "types/api";
 
-interface InputGroupProps extends React.HTMLAttributes<HTMLInputElement> {
-  asset?: Partial<Token>;
+interface InputGroupProps extends NumberInputProps {
+  lpToken?: string;
+  assets?: (Partial<Token> | undefined)[];
   onBalanceClick?(
     value: string,
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ): void;
 }
 
-const AssetButton = styled(Button)<{ iconSrc?: string }>`
+const AssetButton = styled(Button)`
   pointer-events: none;
   border-radius: 30px;
   height: 38px;
@@ -28,37 +31,50 @@ const AssetButton = styled(Button)<{ iconSrc?: string }>`
   justify-content: flex-start;
   font-size: 16px;
   font-weight: 700;
-  &::before {
-    content: "";
-    width: 24px;
-    height: 24px;
-    background-color: ${({ theme }) => theme.colors.white};
-    border-radius: 50%;
-    background-image: ${({ iconSrc }) => `url(${iconSrc || iconDefaultToken})`};
-    background-size: cover;
-    background-position: 50% 50%;
-    border-radius: 50%;
-    margin-right: 4px;
-  }
 `;
 const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
-  ({ asset, onBalanceClick, style, ...inputProps }, ref) => {
+  ({ lpToken, assets, onBalanceClick, style, ...inputProps }, ref) => {
     const screenClass = useScreenClass();
+    const balance = useBalance(lpToken || "");
     const theme = useTheme();
-    const balance = useBalance(asset?.token);
 
     return (
       <Box style={style}>
-        <Row justify="between" align="center" style={{ gap: 3 }}>
+        <Row
+          justify="between"
+          align="center"
+          style={{ gap: 3, marginBottom: 5 }}
+        >
           <Col xs={12} sm="content">
             <Row gutterWidth={4} justify="start" align="center" wrap="nowrap">
               <Col xs="content" style={screenClass === "xs" ? { flex: 1 } : {}}>
-                <AssetButton block={screenClass === "xs"} iconSrc={asset?.icon}>
-                  {asset?.symbol}
+                <AssetButton block={screenClass === "xs"}>
+                  <img
+                    src={assets?.[0]?.icon || iconDefaultToken}
+                    width={24}
+                    alt={assets?.[0]?.symbol}
+                    css={css`
+                      margin-right: 4px;
+                      background-color: ${theme.colors.white};
+                      border-radius: 50%;
+                    `}
+                  />
+                  {assets?.[0]?.symbol}&nbsp;-&nbsp;
+                  <img
+                    src={assets?.[1]?.icon || iconDefaultToken}
+                    width={24}
+                    alt={assets?.[1]?.symbol}
+                    css={css`
+                      margin-right: 4px;
+                      background-color: ${theme.colors.white};
+                      border-radius: 50%;
+                    `}
+                  />
+                  {assets?.[1]?.symbol}
                 </AssetButton>
               </Col>
               <Col xs="content" className="cm-hidden">
-                <Copy size={38} value={asset?.token} />
+                <Copy size={38} value={lpToken} />
               </Col>
             </Row>
           </Col>
@@ -73,13 +89,13 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               onClick={(event) => {
                 if (onBalanceClick) {
                   onBalanceClick(
-                    amountToValue(balance, asset?.decimals) || "",
+                    amountToValue(balance, LP_DECIMALS) || "",
                     event,
                   );
                 }
               }}
             >
-              Balance:&nbsp;
+              LP Balance:&nbsp;
               <span
                 css={css`
                   color: ${theme.colors.primary};
@@ -89,8 +105,8 @@ const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
               >
                 {formatNumber(
                   formatDecimals(
-                    amountToValue(balance, asset?.decimals) || 0,
-                    3,
+                    amountToValue(balance, LP_DECIMALS) || 0,
+                    DISPLAY_DECIMAL,
                   ),
                 )}
               </span>

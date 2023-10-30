@@ -18,13 +18,13 @@ const useHashModal = (customId?: string) => {
     (flag = true) => {
       if (flag) {
         if (!isOpen) {
-          navigate({ hash: hookId });
+          navigate({ ...location, hash: hookId });
         }
         return;
       }
-      navigate({ hash: undefined });
+      navigate({ ...location, hash: undefined });
     },
-    [hookId, isOpen, navigate],
+    [hookId, isOpen, location, navigate],
   );
 
   const close = useCallback(() => open(false), [open]);

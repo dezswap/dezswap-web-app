@@ -75,7 +75,6 @@ function InfoTable({ items }: SummaryProps) {
               {label}
               {tooltip && (
                 <TooltipWithIcon
-                  arrow
                   size={22}
                   content={tooltip}
                   placement={

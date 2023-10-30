@@ -144,6 +144,27 @@ const NavBarWrapper = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+const SubLink = styled(Link)`
+  display: block;
+  padding: 10px 0px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.text.background};
+  }
+
+  &:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+`;
+
 const navLinks = [
   {
     path: "/",
@@ -155,8 +176,19 @@ const navLinks = [
     label: "Trade",
   },
   {
-    path: "/pool",
-    label: "Pool",
+    path: "/earn",
+    label: "Earn",
+    children: [
+      {
+        path: "/earn/pools",
+        label: "Pools",
+      },
+      {
+        path: "/earn/lockdrop",
+        label: "LP Lock&Drop",
+        disabled: true,
+      },
+    ],
   },
 ];
 
@@ -304,8 +336,18 @@ function Header() {
                       key: item.path,
                       to: item.path,
                       disabled: item.disabled,
+                      css: css`
+                        .sub-menu {
+                          display: none;
+                        }
+                        &:hover {
+                          .sub-menu {
+                            display: block;
+                          }
+                        }
+                      `,
                       children: item.disabled ? (
-                        <Tooltip arrow content="Coming soon">
+                        <Tooltip content="Coming soon">
                           <Typography size={18} weight={900} color="primary">
                             {item.label}
                           </Typography>
@@ -313,6 +355,54 @@ function Header() {
                       ) : (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
+                          {item.children && (
+                            <div
+                              className="sub-menu"
+                              css={css`
+                                position: absolute;
+                                padding-top: 3px;
+                                left: 50%;
+                                z-index: 6000;
+                                transform: translateX(-50%);
+                                top: 100%;
+                              `}
+                            >
+                              <Panel
+                                border
+                                noPadding
+                                css={css`
+                                  min-width: 138px;
+                                `}
+                              >
+                                {item.children.map((child) => (
+                                  <Tooltip
+                                    disabled={!child.disabled}
+                                    content="Coming soon"
+                                  >
+                                    <SubLink
+                                      key={child.path}
+                                      to={!child.disabled ? child.path : "#"}
+                                      css={
+                                        child.disabled
+                                          ? css`
+                                              cursor: default;
+                                            `
+                                          : undefined
+                                      }
+                                    >
+                                      <Typography
+                                        size={16}
+                                        weight={900}
+                                        color="primary"
+                                      >
+                                        {child.label}
+                                      </Typography>
+                                    </SubLink>
+                                  </Tooltip>
+                                ))}
+                              </Panel>
+                            </div>
+                          )}
                         </Typography>
                       ),
                     }))}

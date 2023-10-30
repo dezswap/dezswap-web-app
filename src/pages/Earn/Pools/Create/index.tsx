@@ -36,7 +36,7 @@ import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import InputGroup from "pages/Pool/Provide/InputGroup";
+import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
@@ -47,9 +47,10 @@ import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
-import Box from "components/Box";
+import box from "components/Box";
 import ProgressBar from "components/ProgressBar";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import styled from "@emotion/styled";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -60,6 +61,16 @@ const DISPLAY_DECIMAL = 3;
 
 const MOBILE_DISPLAY_NUMBER_CNT = 20;
 const BROWSER_DISPLAY_NUMBER_CNT = 31;
+
+const Box = styled(box)`
+  & > * {
+    margin-bottom: 5px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+`;
 
 function CreatePage() {
   const connectedWallet = useConnectedWallet();
@@ -91,7 +102,7 @@ function CreatePage() {
   const { register } = form;
 
   const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
+    navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
 
   const handleTxSuccess = useCallback(() => {

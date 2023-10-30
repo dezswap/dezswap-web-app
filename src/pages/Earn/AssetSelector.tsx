@@ -1,6 +1,5 @@
 import { useMemo, useCallback } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
-import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useTheme, css } from "@emotion/react";
 import Modal from "components/Modal";
@@ -10,12 +9,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePairs";
-import {
-  formatNumber,
-  formatDecimals,
-  amountToValue,
-  convertIbcTokenAddressForPath,
-} from "utils";
+import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconPlus from "assets/icons/icon-plus.svg";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -26,8 +20,16 @@ import { useAtom } from "jotai";
 import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
 import useBalance from "hooks/useBalance";
-import PoolButton from "./PoolButton";
 import ImportAssetModal from "./ImportAssetModal";
+import AssetFormButton from "./AssetFormButton";
+
+type AssetFormAddress = string | undefined;
+
+interface AssetFormProps {
+  addresses?: [AssetFormAddress, AssetFormAddress];
+  onChange?: (addresses: [AssetFormAddress, AssetFormAddress]) => void;
+  extra?: React.ReactNode;
+}
 
 const Wrapper = styled.div`
   width: 100%;
@@ -47,14 +49,11 @@ const Wrapper = styled.div`
   }
 `;
 
-type PoolFormAddress = string | undefined;
-
-interface PoolFormProps {
-  addresses?: [PoolFormAddress, PoolFormAddress];
-  onChange?: (addresses: [PoolFormAddress, PoolFormAddress]) => void;
-}
-
-function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
+function AssetSelector({
+  addresses,
+  onChange: handleChange,
+  extra,
+}: AssetFormProps) {
   const theme = useTheme();
   const screenClass = useScreenClass();
 
@@ -124,7 +123,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
             },
           ].map(({ key, asset, modal, balance }) => (
             <Col xs={12} sm={6} key={key}>
-              <PoolButton variant="default" onClick={() => modal.open()}>
+              <AssetFormButton variant="default" onClick={() => modal.open()}>
                 <Row
                   css={css`
                     width: 100%;
@@ -225,7 +224,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
                     />
                   </Col>
                 </Row>
-              </PoolButton>
+              </AssetFormButton>
             </Col>
           ))}
         </Row>
@@ -239,35 +238,7 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
           }
         `}
       >
-        {!selectedAddress1 || !selectedAddress2 ? (
-          <PoolButton variant="primary" disabled>
-            Select tokens first
-          </PoolButton>
-        ) : undefined}
-        {selectedAddress1 && selectedAddress2 && pair ? (
-          <Link
-            to={`/pool/add-liquidity/${pair.contract_addr}`}
-            css={css`
-              text-decoration: none;
-            `}
-          >
-            <PoolButton as="div" variant="primary">
-              Add liquidity
-            </PoolButton>
-          </Link>
-        ) : undefined}
-        {selectedAddress1 && selectedAddress2 && !pair ? (
-          <Link
-            to={`/pool/create/${addresses
-              ?.map((a) => convertIbcTokenAddressForPath(a))
-              .join("/")}`}
-            css={css`
-              text-decoration: none;
-            `}
-          >
-            <PoolButton variant="gradient">Create a new pool</PoolButton>
-          </Link>
-        ) : undefined}
+        {extra}
       </div>
 
       <Modal
@@ -335,4 +306,4 @@ function PoolForm({ addresses, onChange: handleChange }: PoolFormProps) {
   );
 }
 
-export default PoolForm;
+export default AssetSelector;

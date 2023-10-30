@@ -4,6 +4,7 @@ import iconCaution from "assets/icons/icon-caution.svg";
 
 type MessageProps = React.PropsWithChildren<{
   variant?: "guide" | "error" | "warning"; // TODO: "default" | "success" | "error" | "warning";
+  showIcon?: boolean;
 }>;
 
 const Wrapper = styled.div<Pick<MessageProps, "variant">>`
@@ -77,11 +78,15 @@ const getIconSrc = (variant: MessageProps["variant"]) => {
   }
 };
 
-function Message({ variant = "error", children }: MessageProps) {
+function Message({
+  variant = "error",
+  showIcon = true,
+  children,
+}: MessageProps) {
   const iconSrc = getIconSrc(variant);
   return (
     <Wrapper variant={variant}>
-      {iconSrc && <Icon src={iconSrc} />}
+      {showIcon && iconSrc && <Icon src={iconSrc} />}
       <Content>{children}</Content>
     </Wrapper>
   );

@@ -76,9 +76,9 @@ const navLinks = [
     label: "Trade",
   },
   {
-    path: "/pool",
+    path: "/earn",
     icon: iconPool,
-    label: "Pool",
+    label: "Earn",
   },
 ];
 
@@ -97,9 +97,7 @@ const navBar = (
         to: navLink.path,
         disabled: navLink.disabled,
         children: navLink.disabled ? (
-          <Tooltip arrow content="Coming soon">
-            {children}
-          </Tooltip>
+          <Tooltip content="Coming soon">{children}</Tooltip>
         ) : (
           children
         ),

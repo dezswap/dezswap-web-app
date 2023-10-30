@@ -113,7 +113,6 @@ function Footer() {
       <Container>
         <Content>
           <Tooltip
-            arrow
             placement="top"
             content="The most recent block number on this network. Prices update on every block."
             css={css`

@@ -1,11 +1,11 @@
-import { css, PropsOf } from "@emotion/react";
+import { PropsOf, css } from "@emotion/react";
 import Button from "components/Button";
 import Panel from "components/Panel";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 
-type PoolButtonProps = Omit<PropsOf<typeof Button>, "size" | "block">;
+type AssetFormButtonProps = Omit<PropsOf<typeof Button>, "size" | "block">;
 
-function PoolButton(props: PoolButtonProps) {
+function AssetFormButton(props: AssetFormButtonProps) {
   return (
     <Panel
       shadow
@@ -27,4 +27,5 @@ function PoolButton(props: PoolButtonProps) {
     </Panel>
   );
 }
-export default PoolButton;
+
+export default AssetFormButton;

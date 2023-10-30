@@ -16,7 +16,7 @@ import iconProvide from "assets/icons/icon-provide.svg";
 import Expand from "components/Expanded";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
-import useSimulate from "pages/Pool/Provide/useSimulate";
+import useSimulate from "pages/Earn/Pools/Provide/useSimulate";
 import {
   amountToValue,
   cutDecimal,
@@ -37,7 +37,7 @@ import { generateAddLiquidityMsg } from "utils/dezswap";
 import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import InputGroup from "pages/Pool/Provide/InputGroup";
+import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import useRequestPost from "hooks/useRequestPost";
@@ -82,7 +82,7 @@ function ProvidePage() {
   const { value: slippageTolerance } = useSlippageTolerance();
 
   const handleModalClose = useCallback(() => {
-    navigate("/pool", { replace: true });
+    navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
   const { requestPost } = useRequestPost(handleModalClose, true);
   const errorMessageModal = useInvalidPathModal({
