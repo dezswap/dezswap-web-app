@@ -67,8 +67,7 @@ const navLinks = [
   {
     path: "/",
     icon: iconOverview,
-    label: "Overview",
-    disabled: true,
+    label: "Analytics",
   },
   {
     path: "/trade",
@@ -95,12 +94,7 @@ const navBar = (
       );
       return {
         to: navLink.path,
-        disabled: navLink.disabled,
-        children: navLink.disabled ? (
-          <Tooltip content="Coming soon">{children}</Tooltip>
-        ) : (
-          children
-        ),
+        children,
       };
     })}
   />

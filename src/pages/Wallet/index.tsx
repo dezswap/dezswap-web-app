@@ -1,0 +1,152 @@
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
+import Button from "components/Button";
+import Copy from "components/Copy";
+import Hr from "components/Hr";
+import IconButton from "components/IconButton";
+import Panel from "components/Panel";
+import Typography from "components/Typography";
+import { Col, Container, Row, useScreenClass } from "react-grid-system";
+import iconOutlink from "assets/icons/icon-link-28.svg";
+import { ellipsisCenter, getAddressLink } from "utils";
+import useNetwork from "hooks/useNetwork";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import Assets from "./Assets";
+import Pools from "./Pools";
+
+const Wrapper = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+`;
+
+function WalletPage() {
+  const wallet = useWallet();
+  const network = useNetwork();
+  const connectedWallet = useConnectedWallet();
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
+
+  return (
+    <Wrapper>
+      <Container>
+        <Typography
+          color="primary"
+          size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
+          weight={900}
+          css={css`
+            padding: 19px 0;
+          `}
+        >
+          My Wallet
+        </Typography>
+        <Hr
+          css={css`
+            margin-bottom: 20px;
+          `}
+        />
+        <Panel
+          shadow
+          css={css`
+            margin-bottom: 14px;
+          `}
+        >
+          <Row
+            justify="between"
+            align="center"
+            gutterWidth={0}
+            css={css`
+              row-gap: 28px;
+            `}
+          >
+            <Col xs={12} sm="content">
+              <Row
+                justify={
+                  screenClass === MOBILE_SCREEN_CLASS ? "between" : "start"
+                }
+                align="center"
+                gutterWidth={10}
+              >
+                <Col xs="content">
+                  <Typography
+                    color="primary"
+                    size={screenClass === MOBILE_SCREEN_CLASS ? 16 : 26}
+                    weight={900}
+                  >
+                    {isSmallScreen
+                      ? ellipsisCenter(connectedWallet?.walletAddress, 8)
+                      : connectedWallet?.walletAddress}
+                  </Typography>
+                </Col>
+                <Col xs="content">
+                  <Row justify="start" align="center" gutterWidth={10}>
+                    <Col xs="content">
+                      <Copy size={38} value={connectedWallet?.walletAddress} />
+                    </Col>
+                    <Col xs="content">
+                      <a
+                        href={getAddressLink(
+                          connectedWallet?.walletAddress,
+                          network.name,
+                        )}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <IconButton
+                          size={28}
+                          icons={{ default: iconOutlink }}
+                        />
+                      </a>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={12} sm="content">
+              <Button
+                variant="secondary"
+                block
+                css={css`
+                  min-width: 150px;
+                `}
+                onClick={() => wallet.disconnect()}
+              >
+                Disconnect
+              </Button>
+            </Col>
+          </Row>
+        </Panel>
+        <div
+          css={css`
+            margin-bottom: 50px;
+          `}
+        >
+          <Assets />
+        </div>
+        <Typography
+          color="primary"
+          size={32}
+          weight={900}
+          css={css`
+            padding: 19px 0;
+          `}
+        >
+          Pools
+        </Typography>
+        <Hr
+          css={css`
+            margin-bottom: 20px;
+          `}
+        />
+        <div>
+          <Pools />
+        </div>
+      </Container>
+    </Wrapper>
+  );
+}
+
+export default WalletPage;

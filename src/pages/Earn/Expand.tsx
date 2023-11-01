@@ -26,7 +26,7 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const Header = styled(Box)`
+const Header = styled(Box)<{ hasChildren?: boolean }>`
   position: relative;
   padding: 0;
   padding-right: 20px;
@@ -36,12 +36,17 @@ const Header = styled(Box)`
     position: unset;
     padding-right: 0;
   }
-  .${SMALL_BROWSER_SCREEN_CLASS} &,
-  .${LARGE_BROWSER_SCREEN_CLASS} & {
-    &:hover {
-      background-color: ${({ theme }) => theme.colors.selected};
-    }
-  }
+
+  ${({ hasChildren, theme }) =>
+    hasChildren &&
+    css`
+      .${SMALL_BROWSER_SCREEN_CLASS} &,
+      .${LARGE_BROWSER_SCREEN_CLASS} & {
+        &:hover {
+          background-color: ${theme.colors.selected};
+        }
+      }
+    `}
 `;
 
 const Extra = styled.div`
@@ -82,6 +87,7 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
   return (
     <Wrapper>
       <Header
+        hasChildren={!!children}
         onClick={() => setIsOpen((current) => !current)}
         role="button"
         css={
@@ -102,20 +108,22 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
           >
             {extra}
           </div>
-          <div>
-            <div
-              css={css`
-                width: 18px;
-                height: 18px;
-                background-image: url(${iconExpand});
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: 50% 50%;
-                transform: rotate(${isOpen ? 180 : 0}deg);
-                margin-left: 2px;
-              `}
-            />
-          </div>
+          {children && (
+            <div>
+              <div
+                css={css`
+                  width: 18px;
+                  height: 18px;
+                  background-image: url(${iconExpand});
+                  background-size: contain;
+                  background-repeat: no-repeat;
+                  background-position: 50% 50%;
+                  transform: rotate(${isOpen ? 180 : 0}deg);
+                  margin-left: 2px;
+                `}
+              />
+            </div>
+          )}
         </Extra>
       </Header>
       {isOpen && (

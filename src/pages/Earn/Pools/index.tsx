@@ -20,6 +20,7 @@ import { convertIbcTokenAddressForPath } from "utils";
 import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
 import styled from "@emotion/styled";
 import Box from "components/Box";
+import useNetwork from "hooks/useNetwork";
 import PoolList from "./PoolList";
 import Select from "./Select";
 import AssetSelector from "../AssetSelector";
@@ -58,6 +59,7 @@ const TableHeader = styled(Box)`
 `;
 
 function PoolPage() {
+  const network = useNetwork();
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -83,7 +85,7 @@ function PoolPage() {
   const balances = useQueries({
     queries:
       pools?.map((pool) => ({
-        queryKey: ["pool", pool.address],
+        queryKey: ["balance", pool.address, network.name],
         queryFn: async () => {
           const lpAddress = getPair(pool.address)?.liquidity_token;
           if (lpAddress) {

@@ -168,8 +168,7 @@ const SubLink = styled(Link)`
 const navLinks = [
   {
     path: "/",
-    label: "Overview",
-    disabled: true,
+    label: "Analytics",
   },
   {
     path: "/trade",
@@ -242,16 +241,18 @@ function WalletInfo({
             padding: 16px;
           `}
         >
-          <Typography
-            color={theme.colors.primary}
-            weight={900}
-            css={css`
-              text-align: center;
-              padding-bottom: 9px;
-            `}
-          >
-            My Wallet
-          </Typography>
+          <Link to="wallet" onClick={onGoBack}>
+            <Typography
+              color={theme.colors.primary}
+              weight={900}
+              css={css`
+                text-align: center;
+                margin-bottom: 9px;
+              `}
+            >
+              My Wallet
+            </Typography>
+          </Link>
           {children}
         </Panel>
       }
@@ -335,7 +336,6 @@ function Header() {
                     items={navLinks.map((item) => ({
                       key: item.path,
                       to: item.path,
-                      disabled: item.disabled,
                       css: css`
                         .sub-menu {
                           display: none;
@@ -346,13 +346,7 @@ function Header() {
                           }
                         }
                       `,
-                      children: item.disabled ? (
-                        <Tooltip content="Coming soon">
-                          <Typography size={18} weight={900} color="primary">
-                            {item.label}
-                          </Typography>
-                        </Tooltip>
-                      ) : (
+                      children: (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
                           {item.children && (
