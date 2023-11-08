@@ -198,14 +198,13 @@ function WalletInfo({
   children,
   connectButton,
 }: {
-  title: string;
+  title: React.ReactNode;
   isOpen: boolean;
   onGoBack?(): void;
   children: JSX.Element;
   connectButton: JSX.Element;
 }) {
   const screenClass = useScreenClass();
-  const theme = useTheme();
 
   return screenClass === MOBILE_SCREEN_CLASS ? (
     <>
@@ -243,14 +242,14 @@ function WalletInfo({
         >
           <Link to="wallet" onClick={onGoBack}>
             <Typography
-              color={theme.colors.primary}
+              color="primary"
               weight={900}
               css={css`
                 text-align: center;
                 margin-bottom: 9px;
               `}
             >
-              My Wallet
+              My wallet
             </Typography>
           </Link>
           {children}
@@ -420,7 +419,20 @@ function Header() {
                   <Col width="auto">
                     {connectedWallet ? (
                       <WalletInfo
-                        title="My wallet"
+                        title={
+                          <Link to="/wallet">
+                            <Typography
+                              size={20}
+                              weight={900}
+                              color="primary"
+                              css={css`
+                                text-align: center;
+                              `}
+                            >
+                              My wallet
+                            </Typography>
+                          </Link>
+                        }
                         isOpen={walletPopover.isOpen}
                         onGoBack={() => walletPopover.close()}
                         connectButton={
@@ -468,10 +480,7 @@ function Header() {
                                     : "0px",
                               }}
                             >
-                              <Typography
-                                color={theme.colors.primary}
-                                weight={900}
-                              >
+                              <Typography color="primary" weight={900}>
                                 Your address
                               </Typography>
                             </Col>
@@ -486,7 +495,7 @@ function Header() {
                                 <Col style={{ paddingLeft: "4px" }}>
                                   <Typography
                                     size={16}
-                                    color={theme.colors.primary}
+                                    color="primary"
                                     weight="bold"
                                   >
                                     {connectedWallet.connection.name}
@@ -552,10 +561,7 @@ function Header() {
                               </Box>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
-                              <Typography
-                                color={theme.colors.primary}
-                                weight={900}
-                              >
+                              <Typography color="primary" weight={900}>
                                 Balance
                               </Typography>
                             </Col>
@@ -570,7 +576,7 @@ function Header() {
                                 <Col style={{ paddingLeft: "4px" }}>
                                   <Typography
                                     size={16}
-                                    color={theme.colors.primary}
+                                    color="primary"
                                     weight="bold"
                                   >
                                     {XPLA_SYMBOL}
@@ -589,13 +595,13 @@ function Header() {
                               >
                                 <Typography
                                   size={16}
-                                  color={theme.colors.text.primary}
+                                  color="text.primary"
                                   weight="bold"
                                 >
                                   {formatNumber(amountToValue(balance) || 0)}
                                 </Typography>
                                 <Typography
-                                  color={theme.colors.text.secondary}
+                                  color="text.secondary"
                                   weight="normal"
                                 >
                                   -

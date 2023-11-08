@@ -10,6 +10,8 @@ import usePairs from "hooks/usePairs";
 import usePools from "hooks/usePools";
 import { Pool } from "types/api";
 import Pagination from "components/Pagination";
+import { Col, Row, useScreenClass } from "react-grid-system";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import PoolItem from "./PoolItem";
 
 type PoolWithBalance = Pool & {
@@ -30,6 +32,10 @@ const tabs = [
 const LIMIT = 5;
 
 function Pools() {
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const [selectedTabIndex, setSelectedIndex] = useState(0);
   const { getPair } = usePairs();
   const { pools } = usePools();
@@ -81,26 +87,30 @@ function Pools() {
 
   return (
     <Panel shadow>
-      <div
-        css={css`
-          width: 211px;
-          margin-bottom: 25px;
-        `}
-      >
-        <TabButton
-          size="large"
-          selectedIndex={selectedTabIndex}
-          items={tabs}
-          onChange={(idx) => setSelectedIndex(idx)}
-        />
-      </div>
+      <Row justify={screenClass === "xs" ? "center" : "start"}>
+        <Col xs="content">
+          <div
+            css={css`
+              width: 214px;
+              margin-bottom: 25px;
+            `}
+          >
+            <TabButton
+              size="large"
+              selectedIndex={selectedTabIndex}
+              items={tabs}
+              onChange={(idx) => setSelectedIndex(idx)}
+            />
+          </div>
+        </Col>
+      </Row>
       <div
         css={css`
           margin-bottom: 25px;
         `}
       >
         <Table
-          minWidth={1110}
+          minWidth={!isSmallScreen ? 1110 : undefined}
           columns={[{ key: "none", label: "Pool", hasSort: true }]}
           data={poolsToDisplay}
           renderRow={(row) => (

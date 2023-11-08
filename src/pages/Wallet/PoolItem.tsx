@@ -1,6 +1,6 @@
 import { Numeric } from "@xpla/xpla.js";
 import Box from "components/Box";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import { Pool } from "types/api";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -26,6 +26,8 @@ import Typography from "components/Typography";
 import useBalance from "hooks/useBalance";
 import { LP_DECIMALS } from "constants/dezswap";
 import SimplePieChart from "components/SimplePieChart";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import Expand from "pages/Earn/Expand";
 
 interface PoolItemProps {
   pool: Pool;
@@ -42,6 +44,17 @@ const Content = styled.div`
   align-items: start;
 
   column-gap: 50px;
+
+  .${MOBILE_SCREEN_CLASS} &,
+  .${TABLET_SCREEN_CLASS} & {
+    flex-direction: column;
+    row-gap: 16px;
+    flex: 1;
+
+    & > div {
+      width: 100%;
+    }
+  }
 `;
 
 const InnerBox = styled(Box)`
@@ -56,14 +69,48 @@ const InnerBox = styled(Box)`
 
   & > div {
     padding: 16px 0;
+    .${MOBILE_SCREEN_CLASS} &,
+    .${TABLET_SCREEN_CLASS} & {
+      width: 100%;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      flex-direction: column;
+      row-gap: 16px;
+
+      & > div {
+        width: 100%;
+      }
+    }
   }
 `;
+
+const Label = styled(Typography)`
+  margin-bottom: 6px;
+`;
+Label.defaultProps = {
+  color: "primary",
+  size: 14,
+  weight: 900,
+};
+
+const Value = styled(Typography)``;
+Value.defaultProps = {
+  color: "primary",
+  size: 16,
+  weight: 500,
+};
 
 function PoolItem({
   pool,
   isBookmarked,
   onBookmarkClick: handleBookmarkClick,
 }: PoolItemProps) {
+  const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const network = useNetwork();
   const { getAsset } = useAssets();
   const { getPair } = usePairs();
@@ -83,31 +130,28 @@ function PoolItem({
     );
   }, [lpBalance, pool]);
 
-  return (
-    <Box>
-      <Row
-        justify="start"
-        align="center"
-        gutterWidth={10}
-        css={css`
-          margin-bottom: 19px;
-        `}
-      >
-        <Col xs="content">
-          <IconButton
-            size={32}
-            style={{ alignItems: "center" }}
-            icons={{
-              default: isBookmarked ? iconBookmarkSelected : iconBookmark,
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (handleBookmarkClick) {
-                handleBookmarkClick(pool);
-              }
-            }}
-          />
-        </Col>
+  const bookmarkButton = useMemo(
+    () => (
+      <IconButton
+        size={32}
+        style={{ alignItems: "center" }}
+        icons={{
+          default: isBookmarked ? iconBookmarkSelected : iconBookmark,
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (handleBookmarkClick) {
+            handleBookmarkClick(pool);
+          }
+        }}
+      />
+    ),
+    [handleBookmarkClick, isBookmarked, pool],
+  );
+
+  const assetIconAndName = useMemo(
+    () => (
+      <Row justify="start" align="center" gutterWidth={10} wrap="nowrap">
         <Col
           xs="content"
           css={css`
@@ -125,11 +169,234 @@ function PoolItem({
             </div>
           ))}
         </Col>
-        <Col xs="content">
-          <Typography size={16} weight={500} color="primary">
+        <Col
+          css={css`
+            min-width: 0;
+          `}
+        >
+          <Typography
+            size={16}
+            weight={500}
+            color="primary"
+            css={css`
+              max-width: 100%;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            `}
+          >
             {asset1?.symbol}-{asset2?.symbol}
           </Typography>
         </Col>
+      </Row>
+    ),
+    [asset1, asset2],
+  );
+
+  const pairInfoOutlink = useMemo(
+    () => (
+      <Outlink
+        href={
+          pair?.contract_addr
+            ? getAddressLink(pair?.contract_addr, network.name)
+            : "#"
+        }
+      >
+        Pair info
+      </Outlink>
+    ),
+    [network.name, pair?.contract_addr],
+  );
+
+  const userLiquidity = useMemo(
+    () => (
+      <>
+        <Typography
+          color="primary"
+          weight={500}
+          size={16}
+          css={css`
+            margin-bottom: 4px;
+          `}
+        >
+          $TBD
+        </Typography>
+        <Typography color="text.secondary" weight={500} size={14}>
+          =&nbsp;
+          {formatNumber(
+            formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 2),
+          )}
+          &nbsp;LP
+        </Typography>
+      </>
+    ),
+    [lpBalance],
+  );
+
+  const assetPooled = useMemo(
+    () => (
+      <>
+        <Typography
+          color="primary"
+          size={16}
+          weight={500}
+          css={css`
+            white-space: nowrap;
+            margin-bottom: 4px;
+          `}
+        >
+          {formatNumber(
+            formatDecimals(
+              amountToValue(
+                Numeric.parse(pool.assets[0].amount)
+                  .times(userShare)
+                  .toFixed(0),
+                asset1?.decimals,
+              ) || "0",
+              3,
+            ),
+          )}
+          &nbsp;
+          {asset1?.symbol}
+        </Typography>
+        <Typography
+          color="primary"
+          size={16}
+          weight={500}
+          css={css`
+            white-space: nowrap;
+          `}
+        >
+          {formatNumber(
+            formatDecimals(
+              amountToValue(
+                Numeric.parse(pool.assets[1].amount)
+                  .times(userShare)
+                  .toFixed(0),
+                asset2?.decimals,
+              ) || "0",
+              3,
+            ),
+          )}
+          &nbsp;
+          {asset2?.symbol}
+        </Typography>
+      </>
+    ),
+    [asset1, asset2, pool, userShare],
+  );
+
+  const pieChart = useMemo(
+    () => (
+      <Row justify="start" align="center" gutterWidth={0}>
+        <Col xs="content">
+          <div
+            css={css`
+              width: 59px;
+              margin-right: 15px;
+            `}
+          >
+            <SimplePieChart data={[userShare * 100, 0]} />
+          </div>
+        </Col>
+        <Col>
+          <Typography color="secondary" size={16} weight={900}>
+            {formatDecimals(userShare * 100, 2)}%
+          </Typography>
+        </Col>
+      </Row>
+    ),
+    [userShare],
+  );
+
+  return isSmallScreen ? (
+    <Expand
+      header={
+        <Content
+          css={css`
+            padding: 20px;
+          `}
+        >
+          <div>
+            <Label>Pool</Label>
+            <Row
+              justify="between"
+              align="center"
+              wrap="nowrap"
+              gutterWidth={10}
+            >
+              <Col
+                css={css`
+                  min-width: 0;
+                `}
+              >
+                {assetIconAndName}
+              </Col>
+              <Col xs="content">{bookmarkButton}</Col>
+            </Row>
+          </div>
+        </Content>
+      }
+    >
+      <Content>
+        {pairInfoOutlink}
+        <InnerBox>
+          <div>
+            <div>
+              <Label>Your Liquidity</Label>
+              {userLiquidity}
+            </div>
+            <div>
+              <Label>Asset Pooled</Label>
+              {assetPooled}
+            </div>
+            <div
+              css={css`
+                max-width: 186px;
+              `}
+            >
+              <Typography
+                color="primary"
+                weight={900}
+                size={14}
+                css={css`
+                  margin-bottom: 10px;
+                `}
+              >
+                Your Share
+              </Typography>
+              {pieChart}
+            </div>
+            <div
+              css={css`
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+              `}
+            >
+              <Button variant="primary" block>
+                Add liquidity
+              </Button>
+              <Button variant="secondary" block>
+                Remove Liquidity
+              </Button>
+            </div>
+          </div>
+        </InnerBox>
+      </Content>
+    </Expand>
+  ) : (
+    <Box>
+      <Row
+        justify="start"
+        align="center"
+        gutterWidth={10}
+        css={css`
+          margin-bottom: 19px;
+        `}
+      >
+        <Col xs="content">{bookmarkButton}</Col>
+        <Col xs="content">{assetIconAndName}</Col>
       </Row>
       <Hr
         css={css`
@@ -137,17 +404,7 @@ function PoolItem({
         `}
       />
       <Content>
-        <div>
-          <Outlink
-            href={
-              pair?.contract_addr
-                ? getAddressLink(pair?.contract_addr, network.name)
-                : "#"
-            }
-          >
-            Pair info
-          </Outlink>
-        </div>
+        <div>{pairInfoOutlink}</div>
         <div
           css={css`
             flex: 1;
@@ -183,26 +440,7 @@ function PoolItem({
                 >
                   Your Liquidity
                 </Typography>
-                <Typography
-                  color="primary"
-                  weight={500}
-                  size={16}
-                  css={css`
-                    margin-bottom: 4px;
-                  `}
-                >
-                  $TBD
-                </Typography>
-                <Typography color="text.secondary" weight={500} size={14}>
-                  =&nbsp;
-                  {formatNumber(
-                    formatDecimals(
-                      amountToValue(lpBalance, LP_DECIMALS) || "0",
-                      2,
-                    ),
-                  )}
-                  &nbsp;LP
-                </Typography>
+                {userLiquidity}
               </div>
               <div>
                 <Typography
@@ -215,51 +453,7 @@ function PoolItem({
                 >
                   Your Asset Pooled
                 </Typography>
-                <Typography
-                  color="primary"
-                  size={16}
-                  weight={500}
-                  css={css`
-                    white-space: nowrap;
-                    margin-bottom: 4px;
-                  `}
-                >
-                  {formatNumber(
-                    formatDecimals(
-                      amountToValue(
-                        Numeric.parse(pool.assets[0].amount)
-                          .times(userShare)
-                          .toFixed(0),
-                        asset1?.decimals,
-                      ) || "0",
-                      3,
-                    ),
-                  )}
-                  &nbsp;
-                  {asset1?.symbol}
-                </Typography>
-                <Typography
-                  color="primary"
-                  size={16}
-                  weight={500}
-                  css={css`
-                    white-space: nowrap;
-                  `}
-                >
-                  {formatNumber(
-                    formatDecimals(
-                      amountToValue(
-                        Numeric.parse(pool.assets[1].amount)
-                          .times(userShare)
-                          .toFixed(0),
-                        asset2?.decimals,
-                      ) || "0",
-                      3,
-                    ),
-                  )}
-                  &nbsp;
-                  {asset2?.symbol}
-                </Typography>
+                {assetPooled}
               </div>
               <div
                 css={css`
@@ -276,23 +470,7 @@ function PoolItem({
                 >
                   Your Share
                 </Typography>
-                <Row justify="start" align="center" gutterWidth={0}>
-                  <Col xs="content">
-                    <div
-                      css={css`
-                        width: 59px;
-                        margin-right: 15px;
-                      `}
-                    >
-                      <SimplePieChart data={[userShare * 100, 0]} />
-                    </div>
-                  </Col>
-                  <Col>
-                    <Typography color="secondary" size={16} weight={900}>
-                      {formatDecimals(userShare * 100, 2)}%
-                    </Typography>
-                  </Col>
-                </Row>
+                {pieChart}
               </div>
             </div>
             <div

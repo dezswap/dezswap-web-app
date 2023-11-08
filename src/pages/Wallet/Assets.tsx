@@ -19,12 +19,10 @@ import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
-import {
-  MOBILE_SCREEN_CLASS,
-  SMALL_BROWSER_SCREEN_CLASS,
-} from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import MobileAssetItem from "./MobileAssetItem";
 
-type TokenWithBalance = Partial<Token> & {
+export type TokenWithBalance = Partial<Token> & {
   balance?: string;
 };
 
@@ -41,10 +39,9 @@ const tabs = [
 
 function Assets() {
   const screenClass = useScreenClass();
-  const isSmallScreen = [
-    MOBILE_SCREEN_CLASS,
-    SMALL_BROWSER_SCREEN_CLASS,
-  ].includes(screenClass);
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const { availableAssetAddresses } = usePairs();
   const { getAsset } = useAssets();
 
@@ -92,118 +89,141 @@ function Assets() {
           </div>
         </Col>
       </Row>
-      <Table
-        minWidth={1110}
-        columns={[
-          {
-            key: "name",
-            label: "Token",
-            width: 284,
-            hasSort: true,
-            render: (name, row) => {
-              return (
-                <Row justify="start" align="center" gutterWidth={10}>
-                  <Col xs="content">
-                    <IconButton
-                      size={32}
-                      style={{ alignItems: "center" }}
-                      icons={{
-                        default:
-                          row.token && bookmarks?.includes(row.token)
-                            ? iconBookmarkSelected
-                            : iconBookmark,
-                      }}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        if (row.token) {
-                          toggleBookmark(row.token);
-                        }
-                      }}
-                    />
-                  </Col>
-                  <Col xs="content">
-                    <AssetIcon asset={row} />
-                  </Col>
-                  <Col width={200}>
-                    <div
-                      css={css`
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: center;
-                      `}
-                    >
+      {isSmallScreen ? (
+        <Table
+          hideHeader
+          columns={[]}
+          renderRow={(row) => {
+            const isBookmarked = !!bookmarks?.find(
+              (address) => address === row.token,
+            );
+            return (
+              <MobileAssetItem
+                asset={row}
+                isBookmarked={isBookmarked}
+                onBookmarkClick={(asset) =>
+                  asset?.token && toggleBookmark(asset?.token)
+                }
+              />
+            );
+          }}
+          data={selectedTabIndex === 0 ? userAssets : bookmarkedAssets}
+          emptyMessage="No tokens found"
+        />
+      ) : (
+        <Table
+          minWidth={1110}
+          columns={[
+            {
+              key: "name",
+              label: "Token",
+              width: 284,
+              hasSort: true,
+              render: (name, row) => {
+                return (
+                  <Row justify="start" align="center" gutterWidth={10}>
+                    <Col xs="content">
+                      <IconButton
+                        size={32}
+                        style={{ alignItems: "center" }}
+                        icons={{
+                          default:
+                            row.token && bookmarks?.includes(row.token)
+                              ? iconBookmarkSelected
+                              : iconBookmark,
+                        }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          if (row.token) {
+                            toggleBookmark(row.token);
+                          }
+                        }}
+                      />
+                    </Col>
+                    <Col xs="content">
+                      <AssetIcon asset={row} />
+                    </Col>
+                    <Col width={200}>
                       <div
                         css={css`
-                          white-space: nowrap;
-                          word-break: break-all;
-                          text-overflow: ellipsis;
-                          overflow: hidden;
+                          display: flex;
+                          justify-content: flex-start;
+                          align-items: center;
                         `}
                       >
-                        {name}&nbsp;
-                      </div>
-                      {row.symbol && (
-                        <Typography
-                          size={16}
-                          weight={500}
+                        <div
                           css={css`
-                            opacity: 0.7;
-                            display: inline-block;
+                            white-space: nowrap;
+                            word-break: break-all;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
                           `}
                         >
-                          ({row.symbol})
-                        </Typography>
-                      )}
-                    </div>
-                  </Col>
-                </Row>
-              );
+                          {name}&nbsp;
+                        </div>
+                        {row.symbol && (
+                          <Typography
+                            size={16}
+                            weight={500}
+                            css={css`
+                              opacity: 0.7;
+                              display: inline-block;
+                            `}
+                          >
+                            ({row.symbol})
+                          </Typography>
+                        )}
+                      </div>
+                    </Col>
+                  </Row>
+                );
+              },
             },
-          },
-          {
-            key: "none",
-            label: "Value",
-            width: 260,
-            hasSort: true,
-            render: () => "TBD",
-          },
-          {
-            key: "balance",
-            label: "Token Amount",
-            width: 260,
-            hasSort: true,
-            render: (_, row) =>
-              `${formatNumber(
-                formatDecimals(
-                  amountToValue(row.balance, row.decimals) || "0",
-                  2,
-                ),
-              )} ${row.symbol}`,
-          },
-          {
-            key: "none",
-            label: "",
-            flex: 1,
-            render: (_, row) => (
-              <div
-                css={css`
-                  display: flex;
-                  justify-content: flex-end;
-                  align-items: center;
-                `}
-              >
-                <Link to={`/trade/swap?${row.token}`}>
-                  <Button variant="primary" size="default">
-                    Swap
-                  </Button>
-                </Link>
-              </div>
-            ),
-          },
-        ]}
-        data={selectedTabIndex === 0 ? userAssets : bookmarkedAssets}
-        emptyMessage="No assets found"
-      />
+            {
+              key: "none",
+              label: "Value",
+              width: 260,
+              hasSort: true,
+              render: () => "TBD",
+            },
+            {
+              key: "balance",
+              label: "Token Amount",
+              width: 260,
+              hasSort: true,
+              render: (_, row) =>
+                `${formatNumber(
+                  formatDecimals(
+                    amountToValue(row.balance, row.decimals) || "0",
+                    2,
+                  ),
+                )} ${row.symbol}`,
+            },
+            {
+              key: "none",
+              label: "",
+              flex: 1,
+              render: (_, row) => (
+                <div
+                  css={css`
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                  `}
+                >
+                  <Link to={`/trade/swap?${row.token}`}>
+                    <Button variant="primary" size="default">
+                      Swap
+                    </Button>
+                  </Link>
+                </div>
+              ),
+            },
+          ]}
+          data={selectedTabIndex === 0 ? userAssets : bookmarkedAssets}
+          emptyMessage="No tokens found"
+        />
+      )}
     </Panel>
   );
 }
