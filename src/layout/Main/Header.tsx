@@ -4,10 +4,10 @@ import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
 import imgLogo from "assets/images/logo.svg";
 import imgSymbol from "assets/images/symbol.svg";
-import iconNotification from "assets/icons/icon-noti-off.svg";
-import iconNotificationHover from "assets/icons/icon-noti-off-hover.svg";
-import iconNotificationWithBadge from "assets/icons/icon-noti-on.svg";
-import iconNotificationWithBadgeHover from "assets/icons/icon-noti-on-hover.svg";
+import iconNotification from "assets/icons/icon-notification.svg";
+import iconNotificationHover from "assets/icons/icon-notification-hover.svg";
+import iconNotificationWithBadge from "assets/icons/icon-notification-with-badge.svg";
+import iconNotificationWithBadgeHover from "assets/icons/icon-notification-with-badge-hover.svg";
 import Button from "components/Button";
 import IconButton from "components/IconButton";
 import NavBar from "components/NavBar";
@@ -46,6 +46,8 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
+import useHashModal from "hooks/useHashModal";
+import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -268,6 +270,7 @@ function Header() {
   const connectedWallet = useConnectedWallet();
   const balance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
+  const notificationModal = useHashModal("notifications");
   const theme = useTheme();
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
@@ -405,17 +408,17 @@ function Header() {
               )}
               <Col xs="content">
                 <Row justify="end" align="center" gutterWidth={10}>
-                  {/* TODO: implement */}
-                  {/* <Col width="auto">
+                  <Col width="auto">
                     <IconButton
                       title="Notification"
                       size={45}
+                      onClick={() => notificationModal.open()}
                       icons={{
                         default: iconNotification,
                         hover: iconNotificationHover,
                       }}
                     />
-                  </Col> */}
+                  </Col>
                   <Col width="auto">
                     {connectedWallet ? (
                       <WalletInfo
@@ -645,6 +648,10 @@ function Header() {
           </Container>
         </div>
       </Wrapper>
+      <NotificationModal
+        isOpen={notificationModal.isOpen}
+        onRequestClose={() => notificationModal.close()}
+      />
     </>
   );
 }

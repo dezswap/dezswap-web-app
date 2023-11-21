@@ -3,7 +3,7 @@ import iconExpand from "assets/icons/icon-expand.svg";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
@@ -15,6 +15,8 @@ type ExpandProps = React.PropsWithChildren<{
   header?: React.ReactNode;
   extra?: React.ReactNode | React.ReactNode[];
   isOpen?: boolean;
+  hasDivider?: boolean;
+  onHeaderClick?: React.MouseEventHandler<HTMLDivElement>;
 }>;
 
 const Wrapper = styled(Box)`
@@ -82,13 +84,30 @@ const Content = styled.div`
   padding-top: 0;
 `;
 
-function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+function Expand({
+  header,
+  extra,
+  hasDivider = true,
+  isOpen: isOpenFromProps,
+  onHeaderClick,
+  children,
+}: ExpandProps) {
+  const [isOpen, setIsOpen] = useState(!!isOpenFromProps);
+
+  useEffect(() => {
+    setIsOpen(!!isOpenFromProps);
+  }, [isOpenFromProps]);
+
   return (
     <Wrapper>
       <Header
         hasChildren={!!children}
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={(event) => {
+          setIsOpen((current) => !current);
+          if (onHeaderClick) {
+            onHeaderClick(event);
+          }
+        }}
         role="button"
         css={
           isOpen &&
@@ -128,13 +147,15 @@ function Expand({ header, extra, isOpen: defaultOpen, children }: ExpandProps) {
       </Header>
       {isOpen && (
         <>
-          <Hr
-            css={css`
-              width: auto;
-              margin: 20px;
-              margin-top: 0px;
-            `}
-          />
+          {hasDivider && (
+            <Hr
+              css={css`
+                width: auto;
+                margin: 20px;
+                margin-top: 0px;
+              `}
+            />
+          )}
           <Content
             css={css`
               overflow-x: auto;

@@ -263,18 +263,20 @@ function Modal({
                   size={20}
                   weight={900}
                   color={error ? "danger" : "primary"}
-                  css={
-                    gradient
-                      ? css`
-                          text-align: center;
-                          background-image: ${theme.colors.gradient};
-                          background-clip: text;
-                          color: transparent;
-                        `
-                      : css`
-                          text-align: center;
-                        `
-                  }
+                  css={css`
+                    ${gradient &&
+                    css`
+                      background-image: ${theme.colors.gradient};
+                      background-clip: text;
+                      color: transparent;
+                    `}
+                    text-align: center;
+                    width: 80%;
+                    margin: 0 auto;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  `}
                 >
                   {title}
                 </Typography>

@@ -1,7 +1,7 @@
-import { css } from "@emotion/react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Tooltip from "components/Tooltip";
-import {
+import React, {
   useCallback,
   useEffect,
   useId,
@@ -11,10 +11,13 @@ import {
 } from "react";
 
 export interface LineChartProps
-  extends Omit<React.SVGProps<SVGSVGElement>, "strokeWidth"> {
+  extends Omit<React.SVGProps<SVGSVGElement>, "strokeWidth" | "height"> {
   data: number[];
+  height: Exclude<React.CSSProperties["height"], undefined>;
   strokeWidth?: number;
-  tooltipRender?: ({
+  // changed the prop name to avoid conflict with the eslint rule
+  // ref: https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/no-unstable-nested-components.md
+  renderTooltip?: ({
     value,
     index,
   }: {
@@ -40,9 +43,10 @@ const Wrapper = styled.div`
 function LineChart({
   data,
   strokeWidth = 3,
-  tooltipRender,
+  renderTooltip: tooltipRender,
   ...svgProps
 }: LineChartProps) {
+  const theme = useTheme();
   const gradientId = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -155,7 +159,7 @@ function LineChart({
       <svg
         viewBox={viewBox}
         width={width}
-        height={height}
+        // height={height}
         preserveAspectRatio="none"
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setSelectedIndex(-1)}
@@ -183,7 +187,7 @@ function LineChart({
           points={points
             .map((point) => [point[0], point[1] * heightScale].join(","))
             .join(" ")}
-          stroke="#0129bd"
+          stroke={theme.colors.primary}
           fill="none"
           strokeWidth={strokeWidth}
         />
@@ -194,15 +198,15 @@ function LineChart({
               y={0}
               height={height}
               width={1}
-              fill="#0129bd"
+              fill={theme.colors.primary}
             />
             <circle
               cx={points[selectedIndex][0]}
               cy={points[selectedIndex][1] * heightScale}
               r={7}
               strokeWidth={strokeWidth}
-              fill="#f5f5f5"
-              stroke="#0129bd"
+              fill={theme.colors.text.background}
+              stroke={theme.colors.primary}
             />
           </>
         )}
