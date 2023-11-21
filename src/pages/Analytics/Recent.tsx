@@ -109,7 +109,11 @@ function Recent() {
         {items[0]}
       </div>
       <List
-        style={{ transform: `translateY(-${(100 / count) * sliderIndex}%)` }}
+        style={
+          isSmallScreen
+            ? { transform: `translateY(-${(100 / count) * sliderIndex}%)` }
+            : undefined
+        }
       >
         {items}
       </List>
