@@ -4,7 +4,7 @@ import Hr from "components/Hr";
 import Modal from "components/Modal";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useNotifications from "hooks/useNotifications";
 import React, { useEffect, useState } from "react";
 import { useScreenClass } from "react-grid-system";
@@ -46,7 +46,15 @@ function NotificationModal(modalProps: ReactModal.Props) {
   );
 
   useEffect(() => {
-    setSelectedNotificationId(undefined);
+    const timerId = setTimeout(() => {
+      if (!modalProps.isOpen) {
+        setSelectedNotificationId(undefined);
+      }
+    }, MODAL_CLOSE_TIMEOUT_MS);
+
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [modalProps.isOpen]);
 
   return (
