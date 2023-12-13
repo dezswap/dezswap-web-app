@@ -60,7 +60,7 @@ function ClaimPage() {
   const { getAsset } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.name],
+    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -71,7 +71,7 @@ function ClaimPage() {
   });
 
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.name],
+    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
     queryFn: async () => {
       if (!eventAddress) {
         return null;

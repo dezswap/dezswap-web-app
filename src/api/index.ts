@@ -2,12 +2,30 @@ import axios from "axios";
 import { apiAddresses } from "constants/dezswap";
 import { Pair, Pairs, Pool, Token } from "types/api";
 import { NetworkName } from "types/common";
+import {
+  DashboardChartDuration,
+  DashboardChartResponse,
+  DashboardChartType,
+  DashboardPoolsResponse,
+  DashboardRecentResponse,
+  DashboardStatisticsResponse,
+  DashboardTokenChartType,
+  DashboardTokenDetailResponse,
+  DashboardTokensResponse,
+  DashboardTransactionsResponse,
+} from "types/dashboard-api";
 
 export type ApiVersion = "v1";
 
 const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
   const apiClient = axios.create({
     baseURL: `${apiAddresses[networkName]?.baseUrl || ""}/${version}`,
+  });
+
+  apiClient.interceptors.request.use((config) => {
+    const newConfig = { ...config };
+    newConfig.params = { [Date.now()]: "", ...newConfig.params };
+    return newConfig;
   });
 
   if (version === "v1") {
@@ -35,6 +53,89 @@ const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
       async getToken(address: string) {
         const res = await apiClient.get<Token>(`/tokens/${address}`);
         return res.data;
+      },
+      dashboard: {
+        async getPools(token?: string) {
+          const res = await apiClient.get<DashboardPoolsResponse>(
+            `/dashboard/pools`,
+            { params: { token } },
+          );
+          return res.data;
+        },
+        async getRecent() {
+          const res = await apiClient.get<DashboardRecentResponse>(
+            `/dashboard/recent`,
+          );
+          return res.data;
+        },
+        async getChart({
+          type,
+          duration,
+        }: {
+          duration?: DashboardChartDuration;
+          type: DashboardChartType;
+        }) {
+          const res = await apiClient.get<DashboardChartResponse>(
+            `/dashboard/chart/${type}`,
+            { params: { duration } },
+          );
+          return res.data;
+        },
+        async getTokenChart({
+          address,
+          duration,
+          type,
+        }: {
+          address: string;
+          duration?: DashboardChartDuration;
+          type: DashboardTokenChartType;
+        }) {
+          const res = await apiClient.get<DashboardChartResponse>(
+            `/dashboard/chart/tokens/${encodeURIComponent(address)}/${type}`,
+            { params: { duration } },
+          );
+          return res.data;
+        },
+        async getPoolChart({
+          address,
+          duration,
+          type,
+        }: {
+          address: string;
+          duration?: DashboardChartDuration;
+          type: DashboardChartType;
+        }) {
+          const res = await apiClient.get<DashboardChartResponse>(
+            `/dashboard/chart/pools/${encodeURIComponent(address)}/${type}`,
+            { params: { duration } },
+          );
+          return res.data;
+        },
+        async getStatistics() {
+          const res = await apiClient.get<DashboardStatisticsResponse>(
+            `/dashboard/statistics`,
+          );
+          return res.data;
+        },
+        async getTokens() {
+          const res = await apiClient.get<DashboardTokensResponse>(
+            `/dashboard/tokens`,
+          );
+          return res.data;
+        },
+        async getTokenDetail(address: string) {
+          const res = await apiClient.get<DashboardTokenDetailResponse>(
+            `/dashboard/tokens/${encodeURIComponent(address)}`,
+          );
+          return res.data;
+        },
+        async getTransactions(params?: { pool?: string; token?: string }) {
+          const res = await apiClient.get<DashboardTransactionsResponse>(
+            `/dashboard/txs`,
+            { params },
+          );
+          return res.data;
+        },
       },
     };
   }

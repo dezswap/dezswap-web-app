@@ -8,6 +8,7 @@ import {
 import { Asset, NativeAsset } from "types/pair";
 import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
+import { AssetInfo } from "types/api";
 
 export type Amount = string | number;
 
@@ -312,4 +313,16 @@ export const generateUnstakeLockdropMsg = ({
       duration: Number(duration),
     },
   });
+};
+
+export const getAddressFromAssetInfo = (assetInfo: AssetInfo) => {
+  if ("token" in assetInfo) {
+    return assetInfo.token.contract_addr;
+  }
+
+  if ("native_token" in assetInfo) {
+    return assetInfo.native_token.denom;
+  }
+
+  return undefined;
 };

@@ -372,6 +372,7 @@ function Header() {
                               >
                                 {item.children.map((child) => (
                                   <Tooltip
+                                    key={child.path}
                                     disabled={!child.disabled}
                                     content="Coming soon"
                                   >

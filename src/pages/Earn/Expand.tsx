@@ -103,6 +103,11 @@ function Expand({
       <Header
         hasChildren={!!children}
         onClick={(event) => {
+          if (["A", "BUTTON"].includes((event.target as HTMLElement).tagName)) {
+            event.stopPropagation();
+            return;
+          }
+
           setIsOpen((current) => !current);
           if (onHeaderClick) {
             onHeaderClick(event);
@@ -127,22 +132,20 @@ function Expand({
           >
             {extra}
           </div>
-          {children && (
-            <div>
-              <div
-                css={css`
-                  width: 18px;
-                  height: 18px;
-                  background-image: url(${iconExpand});
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                  background-position: 50% 50%;
-                  transform: rotate(${isOpen ? 180 : 0}deg);
-                  margin-left: 2px;
-                `}
-              />
-            </div>
-          )}
+          <div>
+            <div
+              css={css`
+                width: 18px;
+                height: 18px;
+                background-image: url(${iconExpand});
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+                transform: rotate(${isOpen ? 180 : 0}deg);
+                margin-left: 2px;
+              `}
+            />
+          </div>
         </Extra>
       </Header>
       {isOpen && (

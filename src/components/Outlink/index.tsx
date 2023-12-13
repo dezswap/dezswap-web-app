@@ -1,7 +1,12 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import iconOutlink from "assets/icons/icon-link.svg";
 
-const Outlink = styled.a`
+interface OutlinkProps {
+  iconSize?: number;
+}
+
+const Outlink = styled.a<OutlinkProps>`
   display: inline-block;
   line-height: 19px;
   font-size: 14px;
@@ -15,8 +20,7 @@ const Outlink = styled.a`
   &::after {
     content: "";
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    ${({ iconSize = 16 }) => css({ width: iconSize, height: iconSize })}
     position: relative;
     margin-left: 5px;
     background-image: url(${iconOutlink});
@@ -25,6 +29,10 @@ const Outlink = styled.a`
     background-position: 50% 50%;
     line-height: 19px;
     vertical-align: middle;
+  }
+
+  &:empty::after {
+    margin-left: 0;
   }
 `;
 

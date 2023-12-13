@@ -36,7 +36,7 @@ export interface TableProps<R extends object> {
   sort?: TableHeaderProps<R>["sort"];
   onSortChange?: TableHeaderProps<R>["onSortChange"];
   minWidth?: React.CSSProperties["minWidth"];
-  idKey?: keyof R;
+  idKey?: keyof R | (keyof R)[];
   hideHeader?: boolean;
 
   rowAnchorProps?:
@@ -91,6 +91,11 @@ const TableRowWrapper = styled.div`
   flex-wrap: nowrap;
   row-gap: 10px;
   padding-top: 10px;
+
+  & > a {
+    display: block;
+    min-width: 100%;
+  }
 
   .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
@@ -147,6 +152,9 @@ function Table<R extends object>({
             </div>
           )}
           {data.map((row, index) => {
+            const keys = Array.isArray(idKey) ? idKey : [idKey];
+            const key = keys?.map((k) => (k ? row[k] : undefined)).join("-");
+
             const res = renderRow ? (
               renderRow(row, index)
             ) : (
@@ -154,16 +162,18 @@ function Table<R extends object>({
                 row={row}
                 columns={columns}
                 index={index}
-                onClick={(event) => {
-                  if (onRowClick) {
-                    onRowClick(row, event);
-                  }
-                }}
+                onClick={
+                  onRowClick
+                    ? (event) => {
+                        onRowClick(row, event);
+                      }
+                    : undefined
+                }
               />
             );
 
             return (
-              <React.Fragment key={idKey ? `${row[idKey]}` : undefined}>
+              <React.Fragment key={key}>
                 {rowAnchorProps ? (
                   <a
                     {...(typeof rowAnchorProps === "function"

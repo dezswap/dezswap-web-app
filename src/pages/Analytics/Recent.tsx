@@ -1,10 +1,13 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import ChangeRateFormatter from "components/ChangeRateFormatter";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import useDashboard from "hooks/useDashboard";
 import { useEffect, useMemo, useState } from "react";
 import { useScreenClass } from "react-grid-system";
+import { formatDecimals, formatCurrency } from "utils";
 
 const List = styled.div`
   position: absolute;
@@ -27,17 +30,33 @@ const List = styled.div`
   }
 `;
 
-const data = [
-  { label: "Volume 24H", value: "3999", changeRate: 1.2 },
-  { label: "Fees 24H", value: "3999", changeRate: -1.2 },
-  { label: "TVL 24H", value: "3999", changeRate: 1.2 },
-];
-
 function Recent() {
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
+  const { recent } = useDashboard();
+
+  const data = useMemo(() => {
+    return [
+      {
+        label: "Volume 24H",
+        value: formatCurrency(recent?.volume || "0"),
+        changeRate: recent?.volumeChangeRate,
+      },
+      {
+        label: "Fees 24H",
+        value: formatCurrency(recent?.fee || "0"),
+        changeRate: recent?.feeChangeRate,
+      },
+      {
+        label: "TVL 24H",
+        value: formatCurrency(recent?.tvl || "0"),
+        changeRate: recent?.tvlChangeRate,
+      },
+    ];
+  }, [recent]);
+
   const count = data.length;
   const [sliderIndex, setSliderIndex] = useState(0);
 
@@ -52,9 +71,10 @@ function Recent() {
 
   const items = useMemo(() => {
     return data.map((item, index, array) => {
+      const { label, value, changeRate = 0 } = item;
       return (
         <Panel
-          key={item.label}
+          key={label}
           border={false}
           css={css`
             display: flex;
@@ -73,23 +93,18 @@ function Recent() {
           }
         >
           <Typography size={16} weight={900} color="primary">
-            {item.label}:
+            {label}:
           </Typography>
           <Typography size={16} weight={900} color="primary">
-            ${item.value}
+            {value}
           </Typography>
-          <Typography
-            size={16}
-            weight={900}
-            color={item.changeRate >= 0 ? "positive" : "negative"}
-          >
-            ({item.changeRate >= 0 ? "↑" : "↓"}
-            {item.changeRate})
+          <Typography size={16} weight={900}>
+            <ChangeRateFormatter rate={changeRate} />
           </Typography>
         </Panel>
       );
     });
-  }, [isSmallScreen]);
+  }, [data, isSmallScreen]);
 
   return (
     <Panel

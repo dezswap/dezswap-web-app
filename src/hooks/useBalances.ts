@@ -39,7 +39,7 @@ const useBalances = (addresses: string[]) => {
   const balanceQueryResults = useQueries({
     queries:
       addresses?.map((address) => ({
-        queryKey: ["balance", address, network.name],
+        queryKey: ["balance", address, network.chainID],
         queryFn: async () => {
           const balance = await fetchBalance(address);
           return { address, balance };

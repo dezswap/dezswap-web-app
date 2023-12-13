@@ -1,5 +1,6 @@
 import Box from "components/Box";
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 import { TableColumn } from ".";
 
 interface TableRowProps<R extends object> {
@@ -19,6 +20,12 @@ const Wrapper = styled(Box)`
   flex-wrap: nowrap;
   padding: 20px;
   gap: 20px;
+
+  ${({ onClick }) =>
+    onClick &&
+    css`
+      cursor: pointer;
+    `}
 
   & > div {
     position: relative;

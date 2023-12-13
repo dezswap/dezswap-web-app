@@ -10,6 +10,7 @@ import Error404 from "pages/Error404";
 import EarnPage from "pages/Earn";
 import AnalyticsPage from "pages/Analytics";
 import WalletPage from "pages/Wallet";
+import TokenDetailPage from "pages/Tokens/TokenDetail";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -37,6 +38,10 @@ const routes: RouteObject[] = [
     ? [{ path: "playground", element: <PlaygroundPage /> }]
     : []),
   { index: true, element: <AnalyticsPage /> },
+  {
+    path: "tokens/:tokenAddress",
+    element: <TokenDetailPage />,
+  },
   {
     path: "wallet",
     element: <WalletPage />,

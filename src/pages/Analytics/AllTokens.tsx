@@ -1,16 +1,21 @@
 import { css } from "@emotion/react";
-import { useQuery } from "@tanstack/react-query";
 import AssetIcon from "components/AssetIcon";
 import Input from "components/Input";
 import Pagination from "components/Pagination";
 import Panel from "components/Panel";
-import Table from "components/Table";
+import Table, { TableSortDirection } from "components/Table";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
+import useDashboard from "hooks/useDashboard";
+import useAssets from "hooks/useAssets";
+import { formatCurrency } from "utils";
+import { Link } from "react-router-dom";
+import HoverUnderline from "components/HoverUnderline";
+import ChangeRateFormatter from "components/ChangeRateFormatter";
+import { DashboardToken } from "types/dashboard-api";
+import { getBasicSortFunction } from "utils/table";
 import MobileTokenItem from "./MobileTokenItem";
 
 const LIMIT = 10;
@@ -20,32 +25,41 @@ function AllTokens() {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const network = useNetwork();
   const [page, setPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const api = useAPI();
+  const [sortBy, setSortBy] = useState<keyof DashboardToken>("tvl");
+  const [sortDirection, setSortDirection] =
+    useState<TableSortDirection>("desc");
 
-  const { data: tokens } = useQuery({
-    queryKey: ["all-tokens", network.name],
-    queryFn: api.getTokens,
-  });
+  const { tokens } = useDashboard();
+
+  const { getAsset } = useAssets();
 
   const filteredTokens = useMemo(() => {
     if (!tokens) return [];
 
     return tokens.filter((token) => {
       if (!searchKeyword) return true;
+      const asset = getAsset(token.address);
       return (
-        token.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        token.token.toLowerCase().includes(searchKeyword.toLowerCase())
+        asset?.token?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        asset?.name?.toLowerCase().includes(searchKeyword.toLowerCase())
       );
     });
-  }, [searchKeyword, tokens]);
+  }, [getAsset, searchKeyword, tokens]);
+
+  const sortedTokens = useMemo(() => {
+    if (!filteredTokens?.length) return [];
+
+    return filteredTokens.toSorted(getBasicSortFunction(sortBy, sortDirection));
+  }, [filteredTokens, sortBy, sortDirection]);
 
   const tokensToDisplay = useMemo(() => {
-    return filteredTokens.slice((page - 1) * LIMIT, page * LIMIT);
-  }, [filteredTokens, page]);
+    return sortedTokens.slice((page - 1) * LIMIT, page * LIMIT);
+  }, [sortedTokens, page]);
+
+  const totalPage = Math.ceil(sortedTokens.length / LIMIT);
 
   useEffect(() => {
     setPage(1);
@@ -57,11 +71,20 @@ function AllTokens() {
         justify="between"
         align="center"
         css={css`
-          margin-bottom: 10px;
+          margin-bottom: 25px;
+          row-gap: 20px;
+
+          .${MOBILE_SCREEN_CLASS} & {
+            margin-bottom: 20px;
+          }
         `}
       >
         <Col xs={12} sm="content">
-          <Typography size={20} weight={900} color="primary">
+          <Typography
+            size={screenClass === MOBILE_SCREEN_CLASS ? 14 : 20}
+            weight={900}
+            color="primary"
+          >
             All Tokens
           </Typography>
         </Col>
@@ -71,6 +94,9 @@ function AllTokens() {
               width: 100%;
               max-width: 440px;
               margin-left: auto;
+              .${MOBILE_SCREEN_CLASS} & {
+                max-width: unset;
+              }
             `}
           >
             <Input
@@ -105,16 +131,21 @@ function AllTokens() {
           <Table
             columns={[]}
             hideHeader
-            renderRow={(asset, index) => (
+            renderRow={(token, index) => (
               <MobileTokenItem
                 number={(page - 1) * LIMIT + index + 1}
-                asset={asset}
+                token={token}
               />
             )}
             data={tokensToDisplay}
           />
         ) : (
           <Table
+            sort={{ key: sortBy, direction: sortDirection }}
+            onSortChange={(key, direction) => {
+              setSortBy(key);
+              setSortDirection(direction);
+            }}
             columns={[
               {
                 key: "none",
@@ -122,17 +153,16 @@ function AllTokens() {
                 width: 10,
                 hasSort: false,
                 render(value, row, index) {
-                  return (
-                    <Typography>{(page - 1) * LIMIT + index + 1}</Typography>
-                  );
+                  return (page - 1) * LIMIT + index + 1;
                 },
               },
               {
-                key: "name",
+                key: "address",
                 label: "Token",
                 width: 289,
                 hasSort: false,
-                render(name, row) {
+                render(address) {
+                  const asset = getAsset(`${address}`);
                   return (
                     <Row
                       justify="start"
@@ -143,82 +173,92 @@ function AllTokens() {
                       `}
                     >
                       <Col xs="content">
-                        <AssetIcon asset={{ icon: row.icon }} />
+                        <AssetIcon asset={{ icon: asset?.icon }} />
                       </Col>
                       <Col width={190}>
-                        <div
-                          css={css`
-                            display: flex;
-                            justify-content: flex-start;
-                            align-items: center;
-                          `}
-                        >
-                          <div
-                            css={css`
-                              white-space: nowrap;
-                              word-break: break-all;
-                              text-overflow: ellipsis;
-                              overflow: hidden;
-                            `}
+                        <HoverUnderline>
+                          <Link
+                            to={`/tokens/${encodeURIComponent(`${address}`)}`}
                           >
-                            {name}&nbsp;
-                          </div>
-                          {row.symbol && (
-                            <Typography
-                              size={16}
-                              weight={500}
+                            <div
                               css={css`
-                                opacity: 0.7;
-                                display: inline-block;
+                                display: flex;
+                                justify-content: flex-start;
+                                align-items: center;
                               `}
                             >
-                              ({row.symbol})
-                            </Typography>
-                          )}
-                        </div>
+                              <div
+                                css={css`
+                                  white-space: nowrap;
+                                  word-break: break-all;
+                                  text-overflow: ellipsis;
+                                  overflow: hidden;
+                                `}
+                              >
+                                {asset?.name}&nbsp;
+                              </div>
+                              {asset?.symbol && (
+                                <Typography
+                                  size={16}
+                                  weight={500}
+                                  css={css`
+                                    opacity: 0.7;
+                                    display: inline-block;
+                                  `}
+                                >
+                                  ({asset?.symbol})
+                                </Typography>
+                              )}
+                            </div>
+                          </Link>
+                        </HoverUnderline>
                       </Col>
                     </Row>
                   );
                 },
               },
               {
-                key: "none",
+                key: "price",
                 label: "Price",
                 width: 170,
                 hasSort: true,
-                render() {
-                  return `$TBD`;
+                render(price) {
+                  return formatCurrency(`${price}`);
                 },
               },
               {
-                key: "none",
+                key: "priceChange",
                 label: "Price Change",
                 width: 170,
                 hasSort: true,
-                render() {
+                render(_priceChange) {
+                  const priceChange = Number(_priceChange);
                   return (
-                    <Typography size={16} weight={900} color="positive">
-                      ↑TBD%
+                    <Typography size={16} weight={900}>
+                      <ChangeRateFormatter
+                        rate={priceChange}
+                        hasBrackets={false}
+                      />
                     </Typography>
                   );
                 },
               },
               {
-                key: "none",
+                key: "volume24h",
                 label: "Volume 24H",
                 width: 170,
                 hasSort: true,
-                render() {
-                  return `$TBD`;
+                render(value) {
+                  return `${formatCurrency(`${value}`)}`;
                 },
               },
               {
-                key: "none",
+                key: "tvl",
                 label: "TVL",
                 width: 170,
                 hasSort: true,
-                render() {
-                  return `$TBD`;
+                render(value) {
+                  return `${formatCurrency(`${value}`)}`;
                 },
               },
             ]}
@@ -226,10 +266,10 @@ function AllTokens() {
           />
         )}
       </div>
-      {filteredTokens && filteredTokens.length > LIMIT && (
+      {totalPage > 1 && (
         <Pagination
           current={page}
-          total={Math.ceil(filteredTokens.length / LIMIT)}
+          total={totalPage}
           onChange={(newPage) => setPage(newPage)}
         />
       )}

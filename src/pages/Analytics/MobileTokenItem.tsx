@@ -5,11 +5,16 @@ import Expand from "pages/Earn/Expand";
 import { Col, Row } from "react-grid-system";
 
 import styled from "@emotion/styled";
-import { Token } from "types/api";
+import { DashboardToken } from "types/dashboard-api";
+import useAssets from "hooks/useAssets";
+import { formatCurrency } from "utils";
+import ChangeRateFormatter from "components/ChangeRateFormatter";
+import { Link } from "react-router-dom";
+import HoverUnderline from "components/HoverUnderline";
 
 interface MobileTokenItemProps {
   number: number;
-  asset: Partial<Token>;
+  token: DashboardToken;
 }
 
 const Content = styled.div`
@@ -35,7 +40,10 @@ Value.defaultProps = {
   weight: 500,
 };
 
-function MobileTokenItem({ number, asset }: MobileTokenItemProps) {
+function MobileTokenItem({ number, token }: MobileTokenItemProps) {
+  const { getAsset } = useAssets();
+  const asset = getAsset(token.address);
+
   return (
     <Expand
       hasDivider={false}
@@ -62,7 +70,7 @@ function MobileTokenItem({ number, asset }: MobileTokenItemProps) {
                   font-size: 0;
                 `}
               >
-                <AssetIcon asset={{ icon: asset.icon }} />
+                <AssetIcon asset={{ icon: asset?.icon }} />
               </Col>
               <Col
                 css={css`
@@ -77,14 +85,16 @@ function MobileTokenItem({ number, asset }: MobileTokenItemProps) {
                     text-overflow: ellipsis;
                   `}
                 >
-                  {asset.name}
+                  <HoverUnderline>
+                    <Link to={`/tokens/${token.address}`}>{asset?.name}</Link>
+                  </HoverUnderline>
                 </Value>
               </Col>
             </Row>
           </div>
           <div>
             <Label>Price</Label>
-            <Value>TBD</Value>
+            <Value>{formatCurrency(token.price)}</Value>
           </div>
         </Content>
       }
@@ -92,15 +102,17 @@ function MobileTokenItem({ number, asset }: MobileTokenItemProps) {
       <Content>
         <div>
           <Label>Price change</Label>
-          <Value>TBD</Value>
+          <Value weight={900}>
+            <ChangeRateFormatter rate={token.priceChange} hasBrackets={false} />
+          </Value>
         </div>
         <div>
           <Label>Volume 24H</Label>
-          <Value>TBD</Value>
+          <Value>{formatCurrency(token.volume24h)}</Value>
         </div>
         <div>
           <Label>TVL</Label>
-          <Value>TBD</Value>
+          <Value>{formatCurrency(token.tvl)}</Value>
         </div>
       </Content>
     </Expand>

@@ -1,30 +1,42 @@
-import { css, useTheme } from "@emotion/react";
+import { css } from "@emotion/react";
+import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
 import Box from "components/Box";
+import ChangeRateFormatter from "components/ChangeRateFormatter";
 import Marquee from "components/Marquee";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
-import usePairs from "hooks/usePairs";
+import useDashboard from "hooks/useDashboard";
 import { useMemo } from "react";
-import { Col, Row } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
 import { Link } from "react-router-dom";
+import { formatCurrency } from "utils";
 
 function TopMovers() {
-  const theme = useTheme();
-  const { availableAssetAddresses } = usePairs();
+  const screenClass = useScreenClass();
   const { getAsset } = useAssets();
+  const { tokens } = useDashboard();
+  const topMovingTokens = useMemo(
+    () =>
+      tokens
+        ?.toSorted((a, b) => {
+          return Numeric.parse(b.volume24h).minus(a.volume24h).toNumber();
+        })
+        .slice(0, 10),
+    [tokens],
+  );
   const assets = useMemo(() => {
-    return availableAssetAddresses
-      .slice(0, 10)
-      .map((address) => getAsset(address))
+    return topMovingTokens
+      ?.map((token) => getAsset(token.address))
       .filter((asset) => asset?.token);
-  }, [availableAssetAddresses, getAsset]);
+  }, [getAsset, topMovingTokens]);
 
   return (
     <Panel shadow>
       <Typography
-        size={20}
+        size={screenClass === MOBILE_SCREEN_CLASS ? 14 : 20}
         weight={900}
         color="primary"
         css={css`
@@ -40,77 +52,77 @@ function TopMovers() {
             position: relative;
           `}
         >
-          {assets.map((asset) => (
-            <Link
-              key={asset?.token}
-              to="/"
-              css={css`
-                margin: 0 10px;
-              `}
-            >
-              <Box
+          {topMovingTokens?.map((token, index) => {
+            const asset = assets?.[index];
+            return (
+              <Link
+                key={asset?.token}
+                to={`/tokens/${asset?.token}`}
                 css={css`
-                  width: 255px;
+                  margin: 0 10px;
                 `}
               >
-                <Row justify="start" align="center" gutterWidth={10}>
-                  <Col xs="content">
-                    <AssetIcon asset={{ icon: asset?.icon }} />
-                  </Col>
-                  <Col
-                    css={css`
-                      min-width: 0;
-                    `}
-                  >
-                    <div
+                <Box
+                  css={css`
+                    width: 255px;
+                  `}
+                >
+                  <Row justify="start" align="center" gutterWidth={10}>
+                    <Col xs="content">
+                      <AssetIcon asset={{ icon: asset?.icon }} />
+                    </Col>
+                    <Col
                       css={css`
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: center;
+                        min-width: 0;
                       `}
                     >
-                      <Typography
-                        size={14}
-                        weight={700}
-                        color="primary"
+                      <div
                         css={css`
-                          white-space: nowrap;
-                          word-break: break-all;
-                          text-overflow: ellipsis;
-                          overflow: hidden;
+                          display: flex;
+                          justify-content: flex-start;
+                          align-items: center;
                         `}
                       >
-                        {asset?.name}&nbsp;
-                      </Typography>
-                      {asset?.symbol && (
                         <Typography
                           size={14}
                           weight={700}
-                          color="text.primary"
+                          color="primary"
                           css={css`
-                            opacity: 0.7;
-                            display: inline-block;
+                            white-space: nowrap;
+                            word-break: break-all;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
                           `}
                         >
-                          ({asset.symbol})
+                          {asset?.name}&nbsp;
                         </Typography>
-                      )}
-                    </div>
-                    <Typography size={14} weight={700} color="primary">
-                      $TBD&nbsp;
-                      <span
-                        css={css`
-                          color: ${theme.colors.positive};
-                        `}
-                      >
-                        ↑0.01%
-                      </span>
-                    </Typography>
-                  </Col>
-                </Row>
-              </Box>
-            </Link>
-          ))}
+                        {asset?.symbol && (
+                          <Typography
+                            size={14}
+                            weight={700}
+                            color="text.primary"
+                            css={css`
+                              opacity: 0.7;
+                              display: inline-block;
+                            `}
+                          >
+                            ({asset.symbol})
+                          </Typography>
+                        )}
+                      </div>
+                      <Typography size={14} weight={700} color="primary">
+                        {formatCurrency(token.price)}&nbsp;
+                        <ChangeRateFormatter
+                          rate={token.priceChange}
+                          hasBrackets={false}
+                        />
+                      </Typography>
+                    </Col>
+                  </Row>
+                </Box>
+              </Link>
+            );
+          })}
         </div>
       </Marquee>
     </Panel>

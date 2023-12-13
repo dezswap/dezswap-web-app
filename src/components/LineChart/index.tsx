@@ -1,6 +1,8 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Numeric } from "@xpla/xpla.js";
 import Tooltip from "components/Tooltip";
+import Decimal from "decimal.js";
 import React, {
   useCallback,
   useEffect,
@@ -12,7 +14,7 @@ import React, {
 
 export interface LineChartProps
   extends Omit<React.SVGProps<SVGSVGElement>, "strokeWidth" | "height"> {
-  data: number[];
+  data: Numeric.Input[];
   height: Exclude<React.CSSProperties["height"], undefined>;
   strokeWidth?: number;
   // changed the prop name to avoid conflict with the eslint rule
@@ -21,7 +23,7 @@ export interface LineChartProps
     value,
     index,
   }: {
-    value: number;
+    value: Numeric.Input;
     index: number;
   }) => React.ReactNode;
 }
@@ -59,11 +61,18 @@ function LineChart({
     [height, width, strokeWidth],
   );
   const points = useMemo(() => {
+    if (!data?.length) {
+      return [];
+    }
     const { length } = data;
-    const max = Math.max(...data);
+    const max = Decimal.max(...data);
+
     return data.map((point, index) => [
       (width * index) / (length - 1),
-      height - (height * point) / max + strokeWidth,
+      Numeric.parse(height)
+        .minus(Numeric.parse(height).mul(point).dividedBy(max))
+        .plus(strokeWidth)
+        .toNumber(),
     ]);
   }, [data, height, strokeWidth, width]);
 

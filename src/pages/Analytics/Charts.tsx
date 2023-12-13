@@ -6,6 +6,10 @@ import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Select from "pages/Earn/Pools/Select";
 import { Row, Col, useScreenClass } from "react-grid-system";
+import { formatBigNumber, formatDate, formatCurrency } from "utils";
+import useDashboard from "hooks/useDashboard";
+import { DashboardChartDuration } from "types/dashboard-api";
+import useChartData from "./useChartData";
 
 const Label = styled(Typography)``;
 Label.defaultProps = {
@@ -41,12 +45,16 @@ function Chart({
   defaultValue,
   defaultCaption,
   size,
+  duration,
+  onDurationChange,
   ...lineChartProps
-}: Omit<LineChartProps, "height"> & {
+}: Omit<LineChartProps, "height" | "onDurationChange"> & {
   title: string;
   defaultValue: string;
   defaultCaption: string;
   size?: "small" | "large";
+  duration?: DashboardChartDuration;
+  onDurationChange?(duration: DashboardChartDuration): void;
 }) {
   const screenClass = useScreenClass();
   const isSmallScreen =
@@ -68,18 +76,25 @@ function Chart({
         {size === "large" && (
           <Col xs="content">
             <div
-              css={css`
-                width: 117px;
-              `}
+              css={
+                screenClass !== MOBILE_SCREEN_CLASS &&
+                css`
+                  width: 117px;
+                `
+              }
             >
               <Select
                 block
                 options={["Month", "Quarter", "Year", "All"].map((value) => ({
                   key: value,
                   label: value,
-                  value,
+                  value: value.toLowerCase(),
                 }))}
-                value="All"
+                value={duration}
+                onChange={(value) =>
+                  onDurationChange &&
+                  onDurationChange(value as DashboardChartDuration)
+                }
               />
             </div>
           </Col>
@@ -89,6 +104,7 @@ function Chart({
         justify="start"
         align="end"
         gutterWidth={10}
+        wrap="nowrap"
         css={css`
           margin-bottom: ${size === "large" ? "6px" : "2px"};
         `}
@@ -108,6 +124,27 @@ function Chart({
 }
 
 function Charts() {
+  const volume = useChartData("volume");
+  const tvl = useChartData("tvl");
+  // const fee = useChartData("fee");
+
+  const { statistics } = useDashboard();
+
+  const addresses = statistics?.map((item) => ({
+    t: item.timestamp,
+    v: item.addressCount,
+  }));
+
+  const transactions = statistics?.map((item) => ({
+    t: item.timestamp,
+    v: item.txCount,
+  }));
+
+  const fees = statistics?.map((item) => ({
+    t: item.timestamp,
+    v: item.fee,
+  }));
+
   return (
     <Row
       justify="between"
@@ -122,9 +159,19 @@ function Charts() {
           <Chart
             size="large"
             title="Volume"
-            defaultValue="$0"
-            defaultCaption="Jun 23, 2023 - Jun 23, 2023"
-            data={[30, 32, 23, 40, 67, 5, 15, 55]}
+            defaultValue={`${formatCurrency(
+              volume.data?.[volume.data.length - 1]?.v.toString() || "0",
+            )}`}
+            defaultCaption={
+              volume?.data?.[0]
+                ? `${formatDate(volume.data[0].t)} - ${formatDate(
+                    volume.data[volume.data.length - 1]?.t,
+                  )}`
+                : ""
+            }
+            data={volume.data?.map((item) => item.v) || []}
+            duration={volume.duration}
+            onDurationChange={(duration) => volume.setDuration(duration)}
             renderTooltip={({ value, index }) => (
               <div
                 css={css`
@@ -132,10 +179,10 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  ${value}
+                  {formatCurrency(value)}
                 </Typography>
                 <Typography size={12} weight={400}>
-                  Jun 23, 2023
+                  {volume.data?.[index] && formatDate(volume.data?.[index].t)}
                 </Typography>
               </div>
             )}
@@ -144,9 +191,19 @@ function Charts() {
           <Chart
             size="large"
             title="TVL"
-            defaultValue="$0"
-            defaultCaption="Jun 23, 2023 - Jun 23, 2023"
-            data={[32, 43, 68, 1, 66, 13, 50, 9, 19, 85]}
+            defaultValue={`${formatCurrency(
+              tvl.data?.[tvl.data.length - 1]?.v.toString() || "0",
+            )}`}
+            defaultCaption={
+              tvl?.data?.[0]
+                ? `${formatDate(tvl.data[0].t)} - ${formatDate(
+                    tvl.data[tvl.data.length - 1]?.t,
+                  )}`
+                : ""
+            }
+            data={tvl.data?.map((item) => item.v) || []}
+            duration={tvl.duration}
+            onDurationChange={(duration) => tvl.setDuration(duration)}
             renderTooltip={({ value, index }) => (
               <div
                 css={css`
@@ -154,10 +211,10 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  ${value}
+                  {formatCurrency(value)}
                 </Typography>
                 <Typography size={12} weight={400}>
-                  Jun 23, 2023
+                  {tvl.data?.[index] && formatDate(tvl.data?.[index].t)}
                 </Typography>
               </div>
             )}
@@ -169,9 +226,18 @@ function Charts() {
           <Chart
             size="small"
             title="Number of Addresses"
-            defaultValue="0"
-            defaultCaption="Jun 23, 2023"
-            data={[1, 2, 5, 7, 10, 24, 60, 80, 245, 252]}
+            defaultValue={formatBigNumber(
+              addresses?.reduce((prev, curr) => prev + curr.v, 0).toString() ||
+                0,
+            )}
+            defaultCaption={
+              addresses?.[0]
+                ? `${formatDate(addresses[0].t)} - ${formatDate(
+                    addresses[addresses.length - 1]?.t,
+                  )}`
+                : ""
+            }
+            data={addresses?.map((item) => item.v) || []}
             renderTooltip={({ value, index }) => (
               <div
                 css={css`
@@ -179,10 +245,10 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  {value}
+                  {formatBigNumber(value)}
                 </Typography>
                 <Typography size={12} weight={400}>
-                  Jun 23, 2023
+                  {addresses?.[index] && formatDate(addresses?.[index].t)}
                 </Typography>
               </div>
             )}
@@ -190,9 +256,19 @@ function Charts() {
           <Chart
             size="small"
             title="Number of Transactions"
-            defaultValue="0"
-            defaultCaption="Jun 23, 2023"
-            data={[1, 2, 5, 7, 10, 24, 60, 80, 245, 252]}
+            defaultValue={formatBigNumber(
+              transactions
+                ?.reduce((prev, curr) => prev + curr.v, 0)
+                .toString() || 0,
+            )}
+            defaultCaption={
+              transactions?.[0]
+                ? `${formatDate(transactions[0].t)} - ${formatDate(
+                    transactions[transactions.length - 1]?.t,
+                  )}`
+                : ""
+            }
+            data={transactions?.map((item) => item.v) || []}
             renderTooltip={({ value, index }) => (
               <div
                 css={css`
@@ -200,10 +276,10 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  {value}
+                  {formatBigNumber(value)}
                 </Typography>
                 <Typography size={12} weight={400}>
-                  Jun 23, 2023
+                  {transactions?.[index] && formatDate(transactions?.[index].t)}
                 </Typography>
               </div>
             )}
@@ -211,9 +287,17 @@ function Charts() {
           <Chart
             size="small"
             title="Fees"
-            defaultValue="0"
-            defaultCaption="Jun 23, 2023"
-            data={[1, 2, 5, 7, 10, 24, 60, 80, 245, 252]}
+            defaultValue={`${formatCurrency(
+              fees?.[fees.length - 1]?.v.toString() || "0",
+            )}`}
+            defaultCaption={
+              fees?.[0]
+                ? `${formatDate(fees[0].t)} - ${formatDate(
+                    fees[fees.length - 1]?.t,
+                  )}`
+                : ""
+            }
+            data={fees?.map((item) => item.v) || []}
             renderTooltip={({ value, index }) => (
               <div
                 css={css`
@@ -221,10 +305,10 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  {value}
+                  {formatCurrency(value)}
                 </Typography>
                 <Typography size={12} weight={400}>
-                  Jun 23, 2023
+                  {fees?.[index] && formatDate(fees?.[index].t)}
                 </Typography>
               </div>
             )}

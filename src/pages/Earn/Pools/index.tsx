@@ -85,7 +85,7 @@ function PoolPage() {
   const balances = useQueries({
     queries:
       pools?.map((pool) => ({
-        queryKey: ["balance", pool.address, network.name],
+        queryKey: ["balance", pool.address, network.chainID],
         queryFn: async () => {
           const lpAddress = getPair(pool.address)?.liquidity_token;
           if (lpAddress) {

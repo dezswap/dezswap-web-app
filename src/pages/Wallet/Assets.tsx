@@ -9,7 +9,12 @@ import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useBalances from "hooks/useBalances";
 import usePairs from "hooks/usePairs";
-import { formatNumber, formatDecimals, amountToValue } from "utils";
+import {
+  formatNumber,
+  formatDecimals,
+  amountToValue,
+  formatCurrency,
+} from "utils";
 import { Token } from "types/api";
 import TabButton from "components/TabButton";
 import { Link } from "react-router-dom";
@@ -20,6 +25,7 @@ import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import useDashboard from "hooks/useDashboard";
 import MobileAssetItem from "./MobileAssetItem";
 
 export type TokenWithBalance = Partial<Token> & {
@@ -44,6 +50,7 @@ function Assets() {
   );
   const { availableAssetAddresses } = usePairs();
   const { getAsset } = useAssets();
+  const { tokens: dashboardTokens } = useDashboard();
 
   const balances = useBalances(availableAssetAddresses);
   const { bookmarks, toggleBookmark } = useBookmark();
@@ -180,11 +187,20 @@ function Assets() {
               },
             },
             {
-              key: "none",
+              key: "token",
               label: "Value",
               width: 260,
               hasSort: true,
-              render: () => "TBD",
+              render: (address, row) => {
+                const dashboardToken = dashboardTokens?.find(
+                  (item) => item?.address === address,
+                );
+                return formatCurrency(
+                  Numeric.parse(dashboardToken?.price || 0).mul(
+                    amountToValue(row.balance, row.decimals) || "0",
+                  ),
+                );
+              },
             },
             {
               key: "balance",

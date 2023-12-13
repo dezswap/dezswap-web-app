@@ -7,12 +7,18 @@ import { Token } from "types/api";
 
 interface AssetIconProps {
   asset: Partial<Token>;
+  size?: number | string;
 }
-const Wrapper = styled.div`
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
+const Wrapper = styled.div<Pick<AssetIconProps, "size">>`
+  ${({ size }) => {
+    const cssSize = typeof size === "number" ? `${size}px` : size;
+    return css`
+      width: ${cssSize};
+      height: ${cssSize};
+      min-width: ${cssSize};
+      min-height: ${cssSize};
+    `;
+  }}
   position: relative;
   display: inline-block;
   padding: 0px 6px;
@@ -20,16 +26,18 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 50%;
 
-  background-size: 32px 32px;
+  background-size: contain;
   background-position: 50% 50%;
   background-repeat: no-repeat;
 `;
 
 function AssetIcon({
   asset: { icon: iconSrc, verified: isVerified, symbol },
+  size = 32,
 }: AssetIconProps) {
   return (
     <Wrapper
+      size={size}
       style={{
         backgroundImage: `url(${iconSrc || iconToken})`,
       }}
