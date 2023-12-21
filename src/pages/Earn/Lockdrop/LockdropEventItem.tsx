@@ -750,15 +750,16 @@ function LockdropEventItem({
                         data={[
                           {
                             label: "Your Staked LP",
-                            value: formatNumber(
-                              formatDecimals(
-                                amountToValue(
-                                  lockupInfo.locked_lp_token || 0,
-                                  LP_DECIMALS,
-                                ) || "",
-                                2,
-                              ),
-                            ),
+                            value:
+                              formatNumber(
+                                formatDecimals(
+                                  amountToValue(
+                                    lockupInfo.locked_lp_token || 0,
+                                    LP_DECIMALS,
+                                  ) || "",
+                                  2,
+                                ),
+                              ) || "",
                           },
                           {
                             label: "Rewards",

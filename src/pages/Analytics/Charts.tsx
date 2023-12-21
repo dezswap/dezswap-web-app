@@ -50,8 +50,8 @@ function Chart({
   ...lineChartProps
 }: Omit<LineChartProps, "height" | "onDurationChange"> & {
   title: string;
-  defaultValue: string;
-  defaultCaption: string;
+  defaultValue?: string;
+  defaultCaption?: string;
   size?: "small" | "large";
   duration?: DashboardChartDuration;
   onDurationChange?(duration: DashboardChartDuration): void;
@@ -132,17 +132,17 @@ function Charts() {
 
   const addresses = statistics?.map((item) => ({
     t: item.timestamp,
-    v: item.addressCount,
+    v: item.addressCount || 0,
   }));
 
   const transactions = statistics?.map((item) => ({
     t: item.timestamp,
-    v: item.txCount,
+    v: item.txCount || 0,
   }));
 
   const fees = statistics?.map((item) => ({
     t: item.timestamp,
-    v: item.fee,
+    v: item.fee || 0,
   }));
 
   return (

@@ -11,6 +11,7 @@ import EarnPage from "pages/Earn";
 import AnalyticsPage from "pages/Analytics";
 import WalletPage from "pages/Wallet";
 import TokenDetailPage from "pages/Tokens/TokenDetail";
+import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -55,20 +56,7 @@ const routes: RouteObject[] = [
       { path: "*", element: <Error404 /> },
     ],
   },
-  {
-    path: "pool",
-    element: <Outlet />,
-    children: [
-      { index: true, element: <ReplaceToEarn /> },
-      {
-        path: "create/:asset1Address/:asset2Address",
-        element: <ReplaceToEarn />,
-      },
-      { path: "add-liquidity/:pairAddress", element: <ReplaceToEarn /> },
-      { path: "withdraw/:pairAddress", element: <ReplaceToEarn /> },
-      { path: "*", element: <Error404 /> },
-    ],
-  },
+  { path: "earn/pools/:poolAddress", element: <PoolDetailPage /> },
   {
     path: "earn",
     element: <EarnPage />,
@@ -103,6 +91,22 @@ const routes: RouteObject[] = [
       //   ],
       // },
       { index: true, element: <Navigate replace to="pools" /> },
+    ],
+  },
+
+  // Legacy links
+  {
+    path: "pool",
+    element: <Outlet />,
+    children: [
+      { index: true, element: <ReplaceToEarn /> },
+      {
+        path: "create/:asset1Address/:asset2Address",
+        element: <ReplaceToEarn />,
+      },
+      { path: "add-liquidity/:pairAddress", element: <ReplaceToEarn /> },
+      { path: "withdraw/:pairAddress", element: <ReplaceToEarn /> },
+      { path: "*", element: <Error404 /> },
     ],
   },
   { path: "*", element: <Error404 /> },

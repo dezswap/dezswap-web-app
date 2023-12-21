@@ -19,8 +19,10 @@ import Typography from "components/Typography";
 import Outlink from "components/Outlink";
 import {
   amountToValue,
+  formatCurrency,
   formatDecimals,
   formatNumber,
+  getAddressLink,
   getIbcTokenHash,
   getTokenLink,
   isNativeTokenAddress,
@@ -30,11 +32,14 @@ import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
-import useDashboard from "hooks/useDashboard";
+import usePairBookmark from "hooks/usePairBookmark";
+import usePairs from "hooks/usePairs";
+import { LP_DECIMALS } from "constants/dezswap";
+import usePool from "hooks/usePool";
 import Chart from "./Chart";
-import TokenSummary from "./TokenSummary";
-import TokenTransactions from "./TokenTransactions";
-import TokenPools from "./TokenPools";
+import PoolSummary from "./PoolSummary";
+import PoolTransactions from "./PoolTransactions";
+import usePoolData from "./usePoolData";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -42,35 +47,48 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-function TokenDetailPage() {
+function PoolDetailPage() {
   const screenClass = useScreenClass();
   const network = useNetwork();
   const navigate = useNavigate();
-  const { tokenAddress } = useParams<{ tokenAddress: string }>();
-  const { bookmarks, toggleBookmark } = useBookmark();
+  const { poolAddress } = useParams<{ poolAddress: string }>();
+  const { bookmarks, toggleBookmark } = usePairBookmark();
   const invalidPathModal = useInvalidPathModal({
     onReturnClick() {
       navigate("..", { replace: true, relative: "route" });
     },
   });
 
-  const { tokens: dashboardTokens } = useDashboard();
-
-  const dashboardToken = useMemo(() => {
-    return dashboardTokens?.find((token) => token.address === tokenAddress);
-  }, [dashboardTokens, tokenAddress]);
+  const { getPair } = usePairs();
+  const pool = usePool(poolAddress);
+  const pair = useMemo(() => {
+    return poolAddress ? getPair(poolAddress) : undefined;
+  }, [poolAddress, getPair]);
 
   const { getAsset } = useAssets();
+  const dashboardPoolData = usePoolData(poolAddress || "");
 
-  const asset = useMemo(() => {
-    return tokenAddress ? getAsset(tokenAddress) : undefined;
-  }, [tokenAddress, getAsset]);
+  const [asset0, asset1] = useMemo(() => {
+    return pair?.asset_addresses.map((address) => getAsset(address)) || [];
+  }, [getAsset, pair]);
+
+  const poolName = useMemo(() => {
+    return [asset0?.name, asset1?.name].join("-");
+  }, [asset0, asset1]);
 
   const isBookmarked = useMemo(() => {
-    return tokenAddress ? bookmarks?.includes(tokenAddress) : false;
-  }, [bookmarks, tokenAddress]);
+    return poolAddress ? bookmarks?.includes(poolAddress) : false;
+  }, [bookmarks, poolAddress]);
 
-  const balance = useBalance(tokenAddress);
+  const lpBalance = useBalance(pair?.liquidity_token || "");
+
+  const userShare = useMemo(() => {
+    return pool
+      ? Numeric.parse(lpBalance || "0")
+          .dividedBy(pool.total_share || "1")
+          .toNumber() || 0
+      : 0;
+  }, [lpBalance, pool]);
 
   const bookmarkButton = useMemo(
     () => (
@@ -82,13 +100,13 @@ function TokenDetailPage() {
         }}
         onClick={(e) => {
           e.stopPropagation();
-          if (tokenAddress) {
-            toggleBookmark(tokenAddress);
+          if (poolAddress) {
+            toggleBookmark(poolAddress);
           }
         }}
       />
     ),
-    [isBookmarked, tokenAddress, toggleBookmark],
+    [isBookmarked, poolAddress, toggleBookmark],
   );
 
   const { verifiedIbcAssets } = useVerifiedAssets();
@@ -96,14 +114,14 @@ function TokenDetailPage() {
   useEffect(() => {
     if (
       verifiedIbcAssets &&
-      (!tokenAddress ||
-        (!AccAddress.validate(tokenAddress) &&
-          !isNativeTokenAddress(network.name, tokenAddress) &&
-          !verifiedIbcAssets?.[getIbcTokenHash(tokenAddress)]))
+      (!poolAddress ||
+        (!AccAddress.validate(poolAddress) &&
+          !isNativeTokenAddress(network.name, poolAddress) &&
+          !verifiedIbcAssets?.[getIbcTokenHash(poolAddress)]))
     ) {
       invalidPathModal.open();
     }
-  }, [invalidPathModal, network, tokenAddress, verifiedIbcAssets]);
+  }, [invalidPathModal, network, poolAddress, verifiedIbcAssets]);
 
   return (
     <Wrapper>
@@ -116,9 +134,11 @@ function TokenDetailPage() {
           <Breadcrumb
             items={[
               { label: "Home", to: "/" },
+              { label: "Earn", to: "/earn" },
+              { label: "Pools", to: "/earn/pools" },
               {
-                label: asset?.name || "",
-                to: `/tokens/${tokenAddress}`,
+                label: poolName,
+                to: `/earn/pools/${poolAddress}`,
               },
             ]}
           />
@@ -155,7 +175,20 @@ function TokenDetailPage() {
                       <Col xs="content">{bookmarkButton}</Col>
                     )}
                     <Col xs="content">
-                      <AssetIcon asset={{ icon: asset?.icon }} />
+                      {[asset0, asset1]?.map((asset, index) => (
+                        <div
+                          key={asset?.token}
+                          css={css`
+                            display: inline-block;
+                          `}
+                          style={{ marginLeft: -10 * index }}
+                        >
+                          <AssetIcon
+                            key={asset?.token}
+                            asset={{ icon: asset?.icon }}
+                          />
+                        </div>
+                      ))}
                     </Col>
                     <Col xs="content">
                       <Typography
@@ -163,13 +196,13 @@ function TokenDetailPage() {
                         weight={900}
                         color="primary"
                       >
-                        {asset?.name}
+                        {poolName}
                       </Typography>
                     </Col>
                     <Col xs="content">
                       <Outlink
                         iconSize={19}
-                        href={getTokenLink(tokenAddress, network.name)}
+                        href={getAddressLink(poolAddress, network.name)}
                       />
                     </Col>
                   </Row>
@@ -191,16 +224,16 @@ function TokenDetailPage() {
               >
                 <Row justify="between" align="center" gutterWidth={10}>
                   <Col xs={6}>
-                    <Link to={`/earn/pools/add-liquidity/${asset?.token}`}>
+                    <Link to={`/earn/pools/add-liquidity/${poolAddress}`}>
                       <Button variant="primary" block>
                         Add Liquidity
                       </Button>
                     </Link>
                   </Col>
                   <Col xs={6}>
-                    <Link to="/trade/swap">
-                      <Button variant="primary" block>
-                        Swap
+                    <Link to={`/earn/pools/withdraw/${poolAddress}`}>
+                      <Button variant="secondary" block>
+                        Remove liquidity
                       </Button>
                     </Link>
                   </Col>
@@ -208,7 +241,7 @@ function TokenDetailPage() {
               </div>
             </Col>
           </Row>
-          {Numeric.parse(balance).gt(0) && (
+          {Numeric.parse(lpBalance).gt(0) && (
             <>
               <Hr
                 css={css`
@@ -218,7 +251,7 @@ function TokenDetailPage() {
               <Row justify="between" align="start">
                 <Col xs="content">
                   <Typography size={16} weight={900} color="primary">
-                    My Balance
+                    My Liquidity
                   </Typography>
                 </Col>
                 <Col xs="content">
@@ -236,25 +269,25 @@ function TokenDetailPage() {
                       `}
                     >
                       $
+                      {dashboardPoolData?.recent.tvl &&
+                        formatNumber(
+                          formatDecimals(
+                            Numeric.parse(userShare).mul(
+                              dashboardPoolData?.recent.tvl,
+                            ),
+                            2,
+                          ),
+                        )}
+                    </Typography>
+                    <Typography size={14} weight={500} color="text.secondary">
+                      =
                       {formatNumber(
                         formatDecimals(
-                          Numeric.parse(dashboardToken?.price || 0).mul(
-                            amountToValue(balance, asset?.decimals) || 0,
-                          ),
+                          amountToValue(lpBalance, LP_DECIMALS) || 0,
                           2,
                         ),
                       )}
-                    </Typography>
-                    <Typography size={14} weight={500} color="text.secondary">
-                      =&nbsp;
-                      {formatNumber(
-                        formatDecimals(
-                          amountToValue(balance, asset?.decimals) || 0,
-                          3,
-                        ),
-                      )}
-                      &nbsp;
-                      {asset?.symbol}
+                      &nbsp;LP
                     </Typography>
                   </div>
                 </Col>
@@ -268,39 +301,16 @@ function TokenDetailPage() {
           gutterWidth={14}
           css={css`
             row-gap: 13px;
-            margin-bottom: 50px;
+            margin-bottom: 13px;
           `}
         >
           <Col xs={12} md={7}>
-            {tokenAddress && <Chart tokenAddress={tokenAddress} />}
+            {poolAddress && <Chart tokenAddress={poolAddress} />}
           </Col>
           <Col xs={12} md={5}>
-            {tokenAddress && <TokenSummary tokenAddress={tokenAddress} />}
+            {poolAddress && <PoolSummary poolAddress={poolAddress} />}
           </Col>
         </Row>
-
-        <Typography
-          color="primary"
-          size={32}
-          weight={900}
-          css={css`
-            margin-bottom: 19px;
-          `}
-        >
-          Pools
-        </Typography>
-        <Hr
-          css={css`
-            margin-bottom: 20px;
-          `}
-        />
-        <div
-          css={css`
-            margin-bottom: 50px;
-          `}
-        >
-          {tokenAddress && <TokenPools tokenAddress={tokenAddress} />}
-        </div>
 
         <Typography
           color="primary"
@@ -317,10 +327,10 @@ function TokenDetailPage() {
             margin-bottom: 20px;
           `}
         />
-        {tokenAddress && <TokenTransactions tokenAddress={tokenAddress} />}
+        {poolAddress && <PoolTransactions poolAddress={poolAddress} />}
       </Container>
     </Wrapper>
   );
 }
 
-export default TokenDetailPage;
+export default PoolDetailPage;

@@ -29,6 +29,21 @@ const Item = styled.li`
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 16px;
+  font-weight: 500;
+
+  &::after {
+    content: ">";
+    margin: 0 4px;
+  }
+
+  &:last-of-type {
+    font-weight: 900;
+    &::after {
+      content: unset;
+    }
+  }
 `;
 
 function Breadcrumb(props: BreadcrumbProps) {
@@ -36,24 +51,9 @@ function Breadcrumb(props: BreadcrumbProps) {
 
   return (
     <Wrapper aria-label="breadcrumb">
-      {items.map((item, index) => (
+      {items.map((item) => (
         <Item key={`${item.label} ${item.to}`}>
-          {index === items.length - 1 ? (
-            <Typography color="primary" weight={900} size={16}>
-              {item.label}
-            </Typography>
-          ) : (
-            <>
-              <Link to={item.to}>
-                <Typography color="primary" weight={400} size={16}>
-                  {item.label}
-                </Typography>
-              </Link>
-              <Typography color="primary" weight={400} size={16}>
-                &nbsp;&gt;&nbsp;
-              </Typography>
-            </>
-          )}
+          <Link to={item.to}>{item.label}</Link>
         </Item>
       ))}
     </Wrapper>

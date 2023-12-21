@@ -41,8 +41,13 @@ const useBalances = (addresses: string[]) => {
       addresses?.map((address) => ({
         queryKey: ["balance", address, network.chainID],
         queryFn: async () => {
-          const balance = await fetchBalance(address);
-          return { address, balance };
+          try {
+            const balance = await fetchBalance(address);
+            return { address, balance };
+          } catch (error) {
+            console.log(error);
+          }
+          return null;
         },
         enabled: !!address,
         refetchInterval: UPDATE_INTERVAL,
@@ -62,6 +67,7 @@ const useBalances = (addresses: string[]) => {
           balance: string;
         }
       | undefined
+      | null
     )[]
   >([]);
 

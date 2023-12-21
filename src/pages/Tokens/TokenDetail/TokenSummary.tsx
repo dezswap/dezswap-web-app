@@ -10,7 +10,7 @@ import useAssets from "hooks/useAssets";
 import useDashboard from "hooks/useDashboard";
 import { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
-import { formatCurrency } from "utils";
+import { formatCurrency, formatDecimals, formatNumber } from "utils";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -53,7 +53,7 @@ function PriceAndChangeRate({
   return (
     <Row justify="start" align="center" gutterWidth={6}>
       <Col xs="content">
-        <Value>{formatCurrency(price || 0)}</Value>
+        <Value>${formatNumber(formatDecimals(price || 0, 2))}</Value>
       </Col>
       <Col xs="content">
         <ChangeRate value={priceChange} />
@@ -121,7 +121,7 @@ function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
           priceChange={dashboardToken?.tvlChange}
         />
         <div />
-        <Label>Fees</Label>
+        <Label>Fees (24H)</Label>
         <PriceAndChangeRate price={dashboardToken?.fee} />
         <div />
       </Wrapper>

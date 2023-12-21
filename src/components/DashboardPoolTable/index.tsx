@@ -3,30 +3,19 @@ import HoverUnderline from "components/HoverUnderline";
 import Input from "components/Input";
 import Pagination from "components/Pagination";
 import Panel from "components/Panel";
-import TabButton from "components/TabButton";
 import Table, { TableSortDirection } from "components/Table";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
-import useNetwork from "hooks/useNetwork";
-import Select from "pages/Earn/Pools/Select";
 import { useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { DashboardPool } from "types/dashboard-api";
-import {
-  amountToValue,
-  ellipsisCenter,
-  formatCurrency,
-  formatNumber,
-  getAddressLink,
-  getFromNow,
-  getTransactionLink,
-} from "utils";
+import { formatCurrency } from "utils";
 import { Numeric } from "@xpla/xpla.js";
 import { getBasicSortFunction } from "utils/table";
-import usePools from "hooks/usePools";
 import usePairs from "hooks/usePairs";
 import AssetIcon from "components/AssetIcon";
+import { Link } from "react-router-dom";
 import MobilePoolItem from "./MobilePoolItem";
 
 interface DashboardPoolTableProps {
@@ -44,7 +33,6 @@ function DashboardPoolTable({
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const network = useNetwork();
 
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -213,19 +201,19 @@ function DashboardPoolTable({
                         min-width: 0;
                       `}
                     >
-                      <Typography
-                        size={16}
-                        weight={500}
-                        color="primary"
-                        css={css`
-                          max-width: 100%;
-                          overflow: hidden;
-                          white-space: nowrap;
-                          text-overflow: ellipsis;
-                        `}
-                      >
-                        {assets?.map((asset) => asset?.symbol).join("-")}
-                      </Typography>
+                      <HoverUnderline>
+                        <Link
+                          to={`/earn/pools/${address}`}
+                          css={css`
+                            max-width: 100%;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                          `}
+                        >
+                          {assets?.map((asset) => asset?.symbol).join("-")}
+                        </Link>
+                      </HoverUnderline>
                     </Col>
                   </Row>
                 );

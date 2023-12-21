@@ -198,6 +198,9 @@ export const formatNumber = (
   value: Numeric.Input,
   options?: Intl.NumberFormatOptions,
 ) => {
+  if (!Decimal.isDecimal(value) && Number.isNaN(Number(value))) {
+    return undefined;
+  }
   return Intl.NumberFormat("en-us", options).format(
     Numeric.parse(value).toNumber(),
   );

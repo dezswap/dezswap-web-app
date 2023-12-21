@@ -57,11 +57,11 @@ function Assets() {
 
   const userAssets = useMemo<TokenWithBalance[]>(() => {
     return balances
-      .filter((item): item is Exclude<typeof item, undefined> =>
+      .filter((item): item is Exclude<typeof item, undefined | null> =>
         Numeric.parse(item?.balance || "0").gt(0),
       )
       .map((item) => ({
-        ...getAsset(item?.address),
+        ...getAsset(item.address),
         balance: item?.balance,
       }));
   }, [balances, getAsset]);

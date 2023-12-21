@@ -457,7 +457,7 @@ function WithdrawPage() {
                           (a) => a.address === asset1?.token,
                         )?.amount,
                         asset1?.decimals,
-                      ) || "",
+                      ) || "0",
                     )} ${asset1?.symbol || ""}
                       ${formatNumber(
                         amountToValue(
@@ -465,7 +465,7 @@ function WithdrawPage() {
                             (a) => a.address === asset2?.token,
                           )?.amount,
                           asset1?.decimals,
-                        ) || "",
+                        ) || "0",
                       )} ${asset2?.symbol || ""}`,
                   },
                   {

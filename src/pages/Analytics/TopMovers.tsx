@@ -27,11 +27,6 @@ function TopMovers() {
         .slice(0, 10),
     [tokens],
   );
-  const assets = useMemo(() => {
-    return topMovingTokens
-      ?.map((token) => getAsset(token.address))
-      .filter((asset) => asset?.token);
-  }, [getAsset, topMovingTokens]);
 
   return (
     <Panel shadow>
@@ -52,12 +47,15 @@ function TopMovers() {
             position: relative;
           `}
         >
-          {topMovingTokens?.map((token, index) => {
-            const asset = assets?.[index];
+          {topMovingTokens?.map((token) => {
+            const asset = getAsset(token.address);
+            if (!asset) {
+              return null;
+            }
             return (
               <Link
-                key={asset?.token}
-                to={`/tokens/${asset?.token}`}
+                key={token.address}
+                to={`/tokens/${token.address}`}
                 css={css`
                   margin: 0 10px;
                 `}

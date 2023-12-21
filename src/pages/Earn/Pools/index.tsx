@@ -9,18 +9,15 @@ import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePairs";
-import useAPI from "hooks/useAPI";
-import { PairExtended } from "types/common";
 import usePairBookmark from "hooks/usePairBookmark";
 import { Numeric } from "@xpla/xpla.js";
 import ScrollToTop from "components/ScrollToTop";
 import usePools from "hooks/usePools";
-import { useQueries } from "@tanstack/react-query";
 import { convertIbcTokenAddressForPath } from "utils";
 import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
 import styled from "@emotion/styled";
 import Box from "components/Box";
-import useNetwork from "hooks/useNetwork";
+import useBalances from "hooks/useBalances";
 import PoolList from "./PoolList";
 import Select from "./Select";
 import AssetSelector from "../AssetSelector";
@@ -59,7 +56,6 @@ const TableHeader = styled(Box)`
 `;
 
 function PoolPage() {
-  const network = useNetwork();
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -80,27 +76,12 @@ function PoolPage() {
         : undefined,
     [addresses, findPair],
   );
-  const api = useAPI();
 
-  const balances = useQueries({
-    queries:
-      pools?.map((pool) => ({
-        queryKey: ["balance", pool.address, network.chainID],
-        queryFn: async () => {
-          const lpAddress = getPair(pool.address)?.liquidity_token;
-          if (lpAddress) {
-            const balance = await api.getTokenBalance(lpAddress);
-            return balance;
-          }
-          return "0";
-        },
-        enabled: !!pool.address,
-        refetchInterval: 30000,
-        refetchOnMount: false,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-      })) || [],
-  }).map((item) => item.data);
+  const balances = useBalances(
+    pools?.map((pool) => {
+      return getPair(pool.address)?.liquidity_token || "";
+    }) || [],
+  ).map((item) => item?.balance);
 
   const { pairs } = usePairs();
 

@@ -1,8 +1,8 @@
 import DashboardTransactionTable from "components/DashboardTransactionTable";
-import useTransactions from "./useTransactions";
+import useDashboardTransactions from "./useDashboardTransactions";
 
 function TokenTransactions({ tokenAddress }: { tokenAddress: string }) {
-  const transactions = useTransactions(tokenAddress);
+  const transactions = useDashboardTransactions(tokenAddress);
   return <DashboardTransactionTable data={transactions || []} />;
 }
 

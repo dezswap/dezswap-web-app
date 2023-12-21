@@ -6,6 +6,7 @@ import {
   DashboardChartDuration,
   DashboardChartResponse,
   DashboardChartType,
+  DashboardPoolDetailResponse,
   DashboardPoolsResponse,
   DashboardRecentResponse,
   DashboardStatisticsResponse,
@@ -59,6 +60,12 @@ const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
           const res = await apiClient.get<DashboardPoolsResponse>(
             `/dashboard/pools`,
             { params: { token } },
+          );
+          return res.data;
+        },
+        async getPoolDetail(address: string) {
+          const res = await apiClient.get<DashboardPoolDetailResponse>(
+            `dashboard/pools/${address}`,
           );
           return res.data;
         },

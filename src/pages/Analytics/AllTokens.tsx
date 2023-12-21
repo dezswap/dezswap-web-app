@@ -129,6 +129,7 @@ function AllTokens() {
       >
         {isSmallScreen ? (
           <Table
+            idKey="address"
             columns={[]}
             hideHeader
             renderRow={(token, index) => (
@@ -141,6 +142,7 @@ function AllTokens() {
           />
         ) : (
           <Table
+            idKey="address"
             sort={{ key: sortBy, direction: sortDirection }}
             onSortChange={(key, direction) => {
               setSortBy(key);
