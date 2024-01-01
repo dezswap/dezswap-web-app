@@ -1,5 +1,5 @@
 import DashboardTransactionTable from "components/DashboardTransactionTable";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 
 function Transactions() {
   const { transactions } = useDashboard();

@@ -17,7 +17,6 @@ import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
-  TABLET_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
@@ -25,6 +24,7 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
+  formatDecimals,
   formatNumber,
   getAddressLink,
 } from "utils";
@@ -47,6 +47,9 @@ import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
 import useHashModal from "hooks/useHashModal";
+import useDashboard from "hooks/dashboard/useDashboard";
+import { Numeric } from "@xpla/xpla.js";
+import useNotifications from "hooks/useNotifications";
 import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
@@ -268,13 +271,23 @@ function Header() {
   const screenClass = useScreenClass();
   const wallet = useWallet();
   const connectedWallet = useConnectedWallet();
-  const balance = useBalance(XPLA_ADDRESS);
+  const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const notificationModal = useHashModal("notifications");
+  const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
+
+  const { tokens: dashboardTokens } = useDashboard();
+
+  const xplaPrice = useMemo(() => {
+    const dashboardToken = dashboardTokens?.find(
+      (item) => item.address === XPLA_ADDRESS,
+    );
+    return dashboardToken?.price;
+  }, [dashboardTokens]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -414,10 +427,17 @@ function Header() {
                       title="Notification"
                       size={45}
                       onClick={() => notificationModal.open()}
-                      icons={{
-                        default: iconNotification,
-                        hover: iconNotificationHover,
-                      }}
+                      icons={
+                        hasUnreadNotifications
+                          ? {
+                              default: iconNotificationWithBadge,
+                              hover: iconNotificationWithBadgeHover,
+                            }
+                          : {
+                              default: iconNotification,
+                              hover: iconNotificationHover,
+                            }
+                      }
                     />
                   </Col>
                   <Col width="auto">
@@ -447,7 +467,7 @@ function Header() {
                                   connectedWallet.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
-                                    amountToValue(balance) || 0,
+                                    amountToValue(xplaBalance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
                                 )} ${XPLA_SYMBOL}`}
@@ -602,13 +622,24 @@ function Header() {
                                   color="text.primary"
                                   weight="bold"
                                 >
-                                  {formatNumber(amountToValue(balance) || 0)}
+                                  {formatNumber(
+                                    amountToValue(xplaBalance) || 0,
+                                  )}
                                 </Typography>
                                 <Typography
                                   color="text.secondary"
                                   weight="normal"
                                 >
-                                  -
+                                  =&nbsp;
+                                  {xplaPrice &&
+                                    `$${formatNumber(
+                                      formatDecimals(
+                                        Numeric.parse(xplaPrice).mul(
+                                          amountToValue(xplaBalance) || 0,
+                                        ),
+                                        2,
+                                      ),
+                                    )}`}
                                 </Typography>
                               </Box>
                             </Col>

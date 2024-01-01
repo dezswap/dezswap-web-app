@@ -7,7 +7,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Select from "pages/Earn/Pools/Select";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import { formatBigNumber, formatDate, formatCurrency } from "utils";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 import { DashboardChartDuration } from "types/dashboard-api";
 import useChartData from "./useChartData";
 

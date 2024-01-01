@@ -30,7 +30,7 @@ import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
@@ -191,18 +191,36 @@ function TokenDetailPage() {
               >
                 <Row justify="between" align="center" gutterWidth={10}>
                   <Col xs={6}>
-                    <Link to={`/earn/pools/add-liquidity/${asset?.token}`}>
-                      <Button variant="primary" block>
-                        Add Liquidity
-                      </Button>
-                    </Link>
+                    {asset?.token && (
+                      <Link
+                        to={{
+                          pathname: "/earn/pools",
+                          search: new URLSearchParams({
+                            q: asset.token,
+                          }).toString(),
+                        }}
+                      >
+                        <Button variant="primary" block>
+                          Add liquidity
+                        </Button>
+                      </Link>
+                    )}
                   </Col>
                   <Col xs={6}>
-                    <Link to="/trade/swap">
-                      <Button variant="primary" block>
-                        Swap
-                      </Button>
-                    </Link>
+                    {tokenAddress && (
+                      <Link
+                        to={{
+                          pathname: "/trade/swap",
+                          search: new URLSearchParams({
+                            q: tokenAddress,
+                          }).toString(),
+                        }}
+                      >
+                        <Button variant="primary" block>
+                          Swap
+                        </Button>
+                      </Link>
+                    )}
                   </Col>
                 </Row>
               </div>

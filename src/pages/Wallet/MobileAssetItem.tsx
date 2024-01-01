@@ -8,14 +8,20 @@ import { Col, Row } from "react-grid-system";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import styled from "@emotion/styled";
-import { amountToValue, formatDecimals, formatNumber } from "utils";
+import {
+  amountToValue,
+  formatCurrency,
+  formatDecimals,
+  formatNumber,
+} from "utils";
 import Button from "components/Button";
-import { TokenWithBalance } from "./Assets";
+import useDashboard from "hooks/dashboard/useDashboard";
+import { TokenWithBalanceAndValue } from "./Assets";
 
 interface MobileAssetItemProps {
-  asset: Partial<TokenWithBalance>;
+  asset: Partial<TokenWithBalanceAndValue>;
   isBookmarked?: boolean;
-  onBookmarkClick?(asset: Partial<TokenWithBalance>): void;
+  onBookmarkClick?(asset: Partial<TokenWithBalanceAndValue>): void;
 }
 
 const Content = styled.div`
@@ -46,6 +52,12 @@ function MobileAssetItem({
   isBookmarked,
   onBookmarkClick,
 }: MobileAssetItemProps) {
+  const { tokens: dashboardTokens } = useDashboard();
+
+  const dashboardToken = dashboardTokens?.find(
+    (item) => item?.address && asset?.token && item?.address === asset?.token,
+  );
+
   return (
     <Expand
       header={
@@ -104,7 +116,7 @@ function MobileAssetItem({
           </div>
           <div>
             <Label>Value</Label>
-            <Value>TBD</Value>
+            <Value>{formatCurrency(asset.value || 0)}</Value>
           </div>
         </Content>
       }

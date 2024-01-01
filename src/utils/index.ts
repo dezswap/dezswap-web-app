@@ -198,12 +198,13 @@ export const formatNumber = (
   value: Numeric.Input,
   options?: Intl.NumberFormatOptions,
 ) => {
-  if (!Decimal.isDecimal(value) && Number.isNaN(Number(value))) {
+  try {
+    return Intl.NumberFormat("en-us", options).format(
+      Numeric.parse(value).toNumber(),
+    );
+  } catch (error) {
     return undefined;
   }
-  return Intl.NumberFormat("en-us", options).format(
-    Numeric.parse(value).toNumber(),
-  );
 };
 
 export const formatBigNumber = (value: Numeric.Input) => {

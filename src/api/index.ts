@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiAddresses } from "constants/dezswap";
+import { Notification } from "stores/notifications";
 import { Pair, Pairs, Pool, Token } from "types/api";
 import { NetworkName } from "types/common";
 import {
@@ -53,6 +54,15 @@ const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
       },
       async getToken(address: string) {
         const res = await apiClient.get<Token>(`/tokens/${address}`);
+        return res.data;
+      },
+      async getNotices(params?: {
+        chain?: string;
+        after?: number;
+        limit?: number;
+        asc?: boolean;
+      }) {
+        const res = await apiClient.get<Notification[]>(`/notices`, { params });
         return res.data;
       },
       dashboard: {

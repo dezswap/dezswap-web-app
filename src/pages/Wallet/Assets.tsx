@@ -4,7 +4,7 @@ import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
 import Button from "components/Button";
 import Panel from "components/Panel";
-import Table from "components/Table";
+import Table, { TableSortDirection } from "components/Table";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useBalances from "hooks/useBalances";
@@ -25,11 +25,13 @@ import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
+import { getBasicSortFunction } from "utils/table";
 import MobileAssetItem from "./MobileAssetItem";
 
-export type TokenWithBalance = Partial<Token> & {
+export type TokenWithBalanceAndValue = Partial<Token> & {
   balance?: string;
+  value?: string;
 };
 
 const tabs = [
@@ -55,27 +57,50 @@ function Assets() {
   const balances = useBalances(availableAssetAddresses);
   const { bookmarks, toggleBookmark } = useBookmark();
 
-  const userAssets = useMemo<TokenWithBalance[]>(() => {
-    return balances
-      .filter((item): item is Exclude<typeof item, undefined | null> =>
-        Numeric.parse(item?.balance || "0").gt(0),
-      )
-      .map((item) => ({
-        ...getAsset(item.address),
-        balance: item?.balance,
-      }));
-  }, [balances, getAsset]);
+  const [sortBy, setSortBy] = useState<keyof TokenWithBalanceAndValue>("value");
+  const [sortDirection, setSortDirection] =
+    useState<TableSortDirection>("desc");
 
-  const bookmarkedAssets = useMemo<TokenWithBalance[]>(() => {
-    return (
-      bookmarks?.map((address) => ({
-        ...getAsset(address),
-        balance: balances.find((item) => item?.address === address)?.balance,
-      })) || []
+  const assets = useMemo<TokenWithBalanceAndValue[]>(() => {
+    return balances
+      .filter(
+        (item): item is Exclude<typeof item, undefined | null> =>
+          !!item?.address,
+      )
+      .map((balance) => {
+        const asset = getAsset(balance.address);
+        const dashboardToken = dashboardTokens?.find(
+          (item) => item?.address === balance.address,
+        );
+        return {
+          ...asset,
+          balance: balance?.balance,
+          value: Numeric.parse(dashboardToken?.price || 0)
+            .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
+            .toString(),
+        };
+      });
+  }, [balances, dashboardTokens, getAsset]);
+
+  const userAssets = useMemo(() => {
+    return assets.filter(
+      (asset) => asset.balance && Numeric.parse(asset.balance).gt(0),
     );
-  }, [balances, bookmarks, getAsset]);
+  }, [assets]);
+
+  const bookmarkedAssets = useMemo(() => {
+    return assets.filter(
+      (asset) => asset.token && bookmarks?.includes(asset.token),
+    );
+  }, [assets, bookmarks]);
 
   const [selectedTabIndex, setSelectedIndex] = useState(0);
+
+  const assetsToDisplay = useMemo(() => {
+    return (selectedTabIndex === 0 ? userAssets : bookmarkedAssets).toSorted(
+      getBasicSortFunction(sortBy, sortDirection),
+    );
+  }, [selectedTabIndex, userAssets, bookmarkedAssets, sortBy, sortDirection]);
 
   return (
     <Panel shadow>
@@ -114,7 +139,8 @@ function Assets() {
               />
             );
           }}
-          data={selectedTabIndex === 0 ? userAssets : bookmarkedAssets}
+          data={assetsToDisplay}
+          idKey="token"
           emptyMessage="No tokens found"
         />
       ) : (
@@ -187,19 +213,12 @@ function Assets() {
               },
             },
             {
-              key: "token",
+              key: "value",
               label: "Value",
               width: 260,
               hasSort: true,
-              render: (address, row) => {
-                const dashboardToken = dashboardTokens?.find(
-                  (item) => item?.address === address,
-                );
-                return formatCurrency(
-                  Numeric.parse(dashboardToken?.price || 0).mul(
-                    amountToValue(row.balance, row.decimals) || "0",
-                  ),
-                );
+              render: (value) => {
+                return formatCurrency(value ? `${value}` : 0);
               },
             },
             {
@@ -227,16 +246,34 @@ function Assets() {
                     align-items: center;
                   `}
                 >
-                  <Link to={`/trade/swap?${row.token}`}>
-                    <Button variant="primary" size="default">
-                      Swap
-                    </Button>
-                  </Link>
+                  {typeof row.token === "string" && (
+                    <Link
+                      to={{
+                        pathname: "/trade/swap",
+                        search: new URLSearchParams({
+                          q: row.token,
+                        }).toString(),
+                      }}
+                    >
+                      <Button variant="primary" size="default">
+                        Swap
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               ),
             },
           ]}
-          data={selectedTabIndex === 0 ? userAssets : bookmarkedAssets}
+          data={assetsToDisplay}
+          sort={{
+            key: sortBy,
+            direction: sortDirection,
+          }}
+          onSortChange={(key, direction) => {
+            setSortBy(key);
+            setSortDirection(direction);
+          }}
+          idKey="token"
           emptyMessage="No tokens found"
         />
       )}

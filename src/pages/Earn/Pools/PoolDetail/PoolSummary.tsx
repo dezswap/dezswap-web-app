@@ -11,7 +11,9 @@ import { Row, Col } from "react-grid-system";
 import { amountToValue, formatDecimals, formatNumber } from "utils";
 import usePool from "hooks/usePool";
 import { getAddressFromAssetInfo } from "utils/dezswap";
-import usePoolData from "./usePoolData";
+import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
+import { Link } from "react-router-dom";
+import HoverUnderline from "components/HoverUnderline";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -66,7 +68,7 @@ function PriceAndChangeRate({
 function PoolSummary({ poolAddress }: { poolAddress: string }) {
   const { getAsset } = useAssets();
 
-  const dashboardPoolData = usePoolData(poolAddress);
+  const dashboardPoolData = useDashboardPoolDetail(poolAddress);
   const pool = usePool(poolAddress);
 
   return (
@@ -101,9 +103,17 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
                       <AssetIcon asset={{ icon: asset?.icon }} size={24} />
                     </Col>
                     <Col xs="content">
-                      <Typography size={16} weight={500} color="primary">
-                        {asset?.name}
-                      </Typography>
+                      {asset?.token && (
+                        <Link
+                          to={`/tokens/${encodeURIComponent(asset?.token)}`}
+                        >
+                          <HoverUnderline>
+                            <Typography size={16} weight={500} color="primary">
+                              {asset?.name}
+                            </Typography>
+                          </HoverUnderline>
+                        </Link>
+                      )}
                     </Col>
                   </Row>
                 </Col>
@@ -129,14 +139,17 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
           priceChange={dashboardPoolData?.recent.volumeChangeRate}
         />
         <div />
-        <Label>TVL</Label>
-        <PriceAndChangeRate
-          price={dashboardPoolData?.recent.tvl}
-          priceChange={dashboardPoolData?.recent.tvlChangeRate}
-        />
-        <div />
         <Label>Fees (24H)</Label>
         <PriceAndChangeRate price={dashboardPoolData?.recent.fee} />
+        <div />
+        <Label>APR (7D)</Label>
+        <Value>
+          {!Number.isNaN(Number(dashboardPoolData?.recent.apr)) &&
+            `${Numeric.parse(dashboardPoolData?.recent.apr || 0)
+              .mul(100)
+              .toDecimalPlaces(2)
+              .toString()}%`}
+        </Value>
       </Wrapper>
     </Panel>
   );

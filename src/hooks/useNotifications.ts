@@ -1,57 +1,41 @@
+import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import {
-  Notification,
   notificationFirstSeenDateAtom,
   readNotificationsAtom,
 } from "stores/notifications";
-
-const notifications: Notification[] = [
-  {
-    id: "1",
-    title:
-      "First notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notificationFirst notification",
-    description: `This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification
-    This is the first notification`,
-    date: new Date(),
-  },
-  {
-    id: "2",
-    title: "Second notification",
-    description: "This is the second notification",
-    date: new Date(),
-  },
-  {
-    id: "3",
-    title: "Third notification",
-    description: "This is the third notification",
-    date: new Date(),
-  },
-];
+import useNetwork from "./useNetwork";
+import useAPI from "./useAPI";
 
 const useNotifications = () => {
+  const network = useNetwork();
+  const api = useAPI();
+  const { data: notices } = useQuery({
+    queryKey: ["notices", network.chainID],
+    queryFn: () => api.getNotices(),
+  });
+
   const [notificationFirstSeenDate, setNotificationFirstSeenDate] = useAtom(
     notificationFirstSeenDateAtom,
   );
   const [readNotifications, setReadNotifications] = useAtom(
     readNotificationsAtom,
   );
+
+  const notifications = useMemo(() => {
+    return (
+      notices?.map((notice) => {
+        const isRead =
+          readNotifications.includes(notice.id) ||
+          new Date(notice.date) < notificationFirstSeenDate;
+        return {
+          ...notice,
+          isRead,
+        };
+      }) || []
+    );
+  }, [notices, notificationFirstSeenDate, readNotifications]);
 
   useEffect(() => {
     if (!notificationFirstSeenDate) {
@@ -61,15 +45,8 @@ const useNotifications = () => {
 
   return useMemo(
     () => ({
-      notifications: notifications.map((notification) => {
-        const isRead =
-          readNotifications.includes(notification.id) ||
-          new Date(notification.date) < notificationFirstSeenDate;
-        return {
-          ...notification,
-          isRead,
-        };
-      }),
+      notifications,
+      hasUnread: notifications.some((notice) => !notice.isRead),
       markAsRead: (id: string) => {
         setReadNotifications((current) =>
           [...current, id].filter(
@@ -78,7 +55,7 @@ const useNotifications = () => {
         );
       },
     }),
-    [notificationFirstSeenDate, readNotifications, setReadNotifications],
+    [notifications, setReadNotifications],
   );
 };
 

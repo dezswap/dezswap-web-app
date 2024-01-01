@@ -28,6 +28,8 @@ import { LP_DECIMALS } from "constants/dezswap";
 import SimplePieChart from "components/SimplePieChart";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "pages/Earn/Expand";
+import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
+import { Link } from "react-router-dom";
 
 interface PoolItemProps {
   pool: Pool;
@@ -116,6 +118,7 @@ function PoolItem({
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
   const lpBalance = useBalance(pair?.liquidity_token);
+  const dashboardPoolDetail = useDashboardPoolDetail(pool.address);
 
   const [asset1, asset2] = useMemo(
     () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
@@ -219,18 +222,25 @@ function PoolItem({
             margin-bottom: 4px;
           `}
         >
-          $TBD
+          $
+          {dashboardPoolDetail?.recent.tvl &&
+            formatNumber(
+              formatDecimals(
+                Numeric.parse(userShare).mul(dashboardPoolDetail?.recent.tvl),
+                2,
+              ),
+            )}
         </Typography>
         <Typography color="text.secondary" weight={500} size={14}>
           =&nbsp;
           {formatNumber(
-            formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 2),
+            formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 3),
           )}
           &nbsp;LP
         </Typography>
       </>
     ),
-    [lpBalance],
+    [dashboardPoolDetail, lpBalance, userShare],
   );
 
   const assetPooled = useMemo(
@@ -309,6 +319,27 @@ function PoolItem({
     [userShare],
   );
 
+  const actionButtons = useMemo(
+    () => (
+      <>
+        <Link
+          to={`/earn/pools/add-liquidity/${encodeURIComponent(pool.address)}`}
+        >
+          <Button variant="primary" block>
+            Add liquidity
+          </Button>
+        </Link>
+
+        <Link to={`/earn/pools/withdraw/${encodeURIComponent(pool.address)}`}>
+          <Button variant="secondary" block>
+            Remove liquidity
+          </Button>
+        </Link>
+      </>
+    ),
+    [pool],
+  );
+
   return isSmallScreen ? (
     <Expand
       header={
@@ -374,12 +405,7 @@ function PoolItem({
                 gap: 10px;
               `}
             >
-              <Button variant="primary" block>
-                Add liquidity
-              </Button>
-              <Button variant="secondary" block>
-                Remove Liquidity
-              </Button>
+              {actionButtons}
             </div>
           </div>
         </InnerBox>
@@ -481,12 +507,7 @@ function PoolItem({
                 gap: 10px;
               `}
             >
-              <Button variant="primary" block>
-                Add liquidity
-              </Button>
-              <Button variant="secondary" block>
-                Remove Liquidity
-              </Button>
+              {actionButtons}
             </div>
           </InnerBox>
         </div>

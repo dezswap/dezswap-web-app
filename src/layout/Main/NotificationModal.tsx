@@ -6,7 +6,7 @@ import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useNotifications from "hooks/useNotifications";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import { Notification } from "stores/notifications";
@@ -91,7 +91,29 @@ function NotificationModal(modalProps: ReactModal.Props) {
       >
         <Hr />
       </Panel>
+      {!selectedNotificationId && !notifications?.length && (
+        <div
+          css={css`
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+          `}
+        >
+          <Typography
+            css={css`
+              text-align: center;
+              opacity: 0.3;
+            `}
+            size={20}
+            weight={900}
+          >
+            No data
+          </Typography>
+        </div>
+      )}
       {!selectedNotificationId &&
+        !!notifications?.length &&
         notifications.map((notification) => (
           <NotificationItem
             key={notification.id}

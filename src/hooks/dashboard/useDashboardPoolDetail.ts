@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAPI from "hooks/useAPI";
 import useNetwork from "hooks/useNetwork";
 
-const usePoolData = (poolAddress: string) => {
+const useDashboardPoolDetail = (poolAddress: string) => {
   const network = useNetwork();
   const api = useAPI();
   const { data } = useQuery({
@@ -13,4 +13,4 @@ const usePoolData = (poolAddress: string) => {
   return data;
 };
 
-export default usePoolData;
+export default useDashboardPoolDetail;

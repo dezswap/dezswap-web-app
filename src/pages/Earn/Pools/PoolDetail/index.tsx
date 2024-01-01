@@ -7,7 +7,6 @@ import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
-import useBookmark from "hooks/useBookmark";
 import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -19,12 +18,10 @@ import Typography from "components/Typography";
 import Outlink from "components/Outlink";
 import {
   amountToValue,
-  formatCurrency,
   formatDecimals,
   formatNumber,
   getAddressLink,
   getIbcTokenHash,
-  getTokenLink,
   isNativeTokenAddress,
 } from "utils";
 import useNetwork from "hooks/useNetwork";
@@ -36,10 +33,11 @@ import usePairBookmark from "hooks/usePairBookmark";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
 import usePool from "hooks/usePool";
+import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import Chart from "./Chart";
 import PoolSummary from "./PoolSummary";
 import PoolTransactions from "./PoolTransactions";
-import usePoolData from "./usePoolData";
+import PoolValueButton from "./PoolValueButton";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -66,7 +64,7 @@ function PoolDetailPage() {
   }, [poolAddress, getPair]);
 
   const { getAsset } = useAssets();
-  const dashboardPoolData = usePoolData(poolAddress || "");
+  const dashboardPoolData = useDashboardPoolDetail(poolAddress || "");
 
   const [asset0, asset1] = useMemo(() => {
     return pair?.asset_addresses.map((address) => getAsset(address)) || [];
@@ -107,6 +105,11 @@ function PoolDetailPage() {
       />
     ),
     [isBookmarked, poolAddress, toggleBookmark],
+  );
+
+  const poolValueButton = useMemo(
+    () => (poolAddress ? <PoolValueButton poolAddress={poolAddress} /> : null),
+    [poolAddress],
   );
 
   const { verifiedIbcAssets } = useVerifiedAssets();
@@ -160,7 +163,7 @@ function PoolDetailPage() {
             justify="between"
             align="center"
             css={css`
-              row-gap: 20px;
+              row-gap: 10px;
             `}
           >
             <Col xs={12} sm="content">
@@ -205,6 +208,17 @@ function PoolDetailPage() {
                         href={getAddressLink(poolAddress, network.name)}
                       />
                     </Col>
+                    {screenClass !== MOBILE_SCREEN_CLASS && (
+                      <Col xs="content">
+                        <div
+                          css={css`
+                            padding-left: 10px;
+                          `}
+                        >
+                          {poolValueButton}
+                        </div>
+                      </Col>
+                    )}
                   </Row>
                 </Col>
                 {screenClass === MOBILE_SCREEN_CLASS && (
@@ -212,7 +226,17 @@ function PoolDetailPage() {
                 )}
               </Row>
             </Col>
-            <Col xs={12} sm={6}>
+            {screenClass === MOBILE_SCREEN_CLASS && (
+              <Col
+                xs={12}
+                css={css`
+                  margin-bottom: 10px;
+                `}
+              >
+                {poolValueButton}
+              </Col>
+            )}
+            <Col xs={12} sm={4}>
               <div
                 css={
                   screenClass !== MOBILE_SCREEN_CLASS &&
@@ -226,14 +250,18 @@ function PoolDetailPage() {
                   <Col xs={6}>
                     <Link to={`/earn/pools/add-liquidity/${poolAddress}`}>
                       <Button variant="primary" block>
-                        Add Liquidity
+                        {screenClass === MOBILE_SCREEN_CLASS
+                          ? "Add"
+                          : "Add liquidity"}
                       </Button>
                     </Link>
                   </Col>
                   <Col xs={6}>
                     <Link to={`/earn/pools/withdraw/${poolAddress}`}>
                       <Button variant="secondary" block>
-                        Remove liquidity
+                        {screenClass === MOBILE_SCREEN_CLASS
+                          ? "Remove"
+                          : "Remove liquidity"}
                       </Button>
                     </Link>
                   </Col>

@@ -18,6 +18,8 @@ export type DashboardRecent = {
   feeChangeRate: number;
   tvl: string;
   tvlChangeRate: number;
+  apr: number;
+  aprChangeRate: number;
 };
 
 export type DashboardTransaction = {

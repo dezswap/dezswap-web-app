@@ -1,8 +1,8 @@
 import DashboardTransactionTable from "components/DashboardTransactionTable";
-import usePoolData from "./usePoolData";
+import useDashboardPoolDetail from "../../../../hooks/dashboard/useDashboardPoolDetail";
 
 function PoolTransactions({ poolAddress }: { poolAddress: string }) {
-  const data = usePoolData(poolAddress);
+  const data = useDashboardPoolDetail(poolAddress);
   return <DashboardTransactionTable data={data?.txs || []} />;
 }
 

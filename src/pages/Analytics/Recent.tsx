@@ -4,10 +4,10 @@ import ChangeRateFormatter from "components/ChangeRateFormatter";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 import { useEffect, useMemo, useState } from "react";
 import { useScreenClass } from "react-grid-system";
-import { formatDecimals, formatCurrency } from "utils";
+import { formatCurrency } from "utils";
 
 const List = styled.div`
   position: absolute;

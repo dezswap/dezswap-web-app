@@ -3,7 +3,7 @@ import useDashboardPools from "./useDashboardPools";
 
 function TokenPools({ tokenAddress }: { tokenAddress: string }) {
   const pools = useDashboardPools(tokenAddress);
-  return pools ? <DashboardPoolTable title="Pools" data={pools} /> : null;
+  return <DashboardPoolTable title="Pools" data={pools || []} />;
 }
 
 export default TokenPools;

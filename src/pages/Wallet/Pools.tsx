@@ -112,6 +112,7 @@ function Pools() {
         <Table
           minWidth={!isSmallScreen ? 1110 : undefined}
           columns={[{ key: "none", label: "Pool", hasSort: true }]}
+          hideHeader={isSmallScreen}
           data={poolsToDisplay}
           renderRow={(row) => (
             <PoolItem

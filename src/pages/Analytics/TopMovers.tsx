@@ -8,7 +8,7 @@ import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { Link } from "react-router-dom";
@@ -55,7 +55,7 @@ function TopMovers() {
             return (
               <Link
                 key={token.address}
-                to={`/tokens/${token.address}`}
+                to={`/tokens/${encodeURIComponent(token.address)}`}
                 css={css`
                   margin: 0 10px;
                 `}

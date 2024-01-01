@@ -14,6 +14,7 @@ import {
   amountToValue,
   cutDecimal,
   filterNumberFormat,
+  formatDecimals,
   formatNumber,
   valueToAmount,
 } from "utils";
@@ -55,6 +56,8 @@ import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
 import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
+import useSearchParamState from "hooks/useSearchParamState";
+import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -175,6 +178,9 @@ function SwapPage() {
     () => getAsset(asset2Address),
     [asset2Address, getAsset],
   );
+
+  const dashboardToken1 = useDashboardTokenDetail(asset1Address);
+  const dashboardToken2 = useDashboardTokenDetail(asset2Address);
 
   const simulationResult = useSimulate({
     fromAddress: asset1Address,
@@ -304,9 +310,6 @@ function SwapPage() {
     selectedPair,
     asset1,
     asset1Value,
-    isReversed,
-    asset2Value,
-    asset2,
     slippageTolerance,
     beliefPrice,
     txDeadlineMinutes,
@@ -414,6 +417,18 @@ function SwapPage() {
     }
   }, [form, fee, asset1Address, asset2Address]);
 
+  const [preselectedAsset2Address, setPreselectedAsset2Address] =
+    useSearchParamState("q", undefined, { replace: true });
+
+  useEffect(() => {
+    if (preselectedAsset2Address) {
+      form.setValue(FormKey.asset2Address, preselectedAsset2Address, {
+        shouldValidate: true,
+      });
+      setPreselectedAsset2Address(undefined);
+    }
+  }, [form, preselectedAsset2Address, setPreselectedAsset2Address]);
+
   return (
     <>
       <SelectAssetDrawer
@@ -508,7 +523,7 @@ function SwapPage() {
                             <Typography
                               size={16}
                               weight="bold"
-                              color={theme.colors.primary}
+                              color="primary"
                               style={{
                                 paddingTop: "1px",
                                 paddingLeft: asset1 ? "0px" : "5px",
@@ -619,7 +634,7 @@ function SwapPage() {
               {formState?.errors?.asset1Value?.message && (
                 <Typography
                   size={12}
-                  color={theme.colors.danger}
+                  color="danger"
                   css={css`
                     line-height: 18px;
                   `}
@@ -633,8 +648,17 @@ function SwapPage() {
                 text-align: right;
               `}
             >
-              <Typography color={theme.colors.text.secondary} size={14}>
-                -
+              <Typography color="text.secondary" size={14}>
+                {dashboardToken1?.price && asset1Value
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(dashboardToken1?.price || 0).mul(
+                          asset1Value || 0,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>
@@ -725,7 +749,7 @@ function SwapPage() {
                             <Typography
                               size={16}
                               weight="bold"
-                              color={theme.colors.primary}
+                              color="primary"
                               style={{
                                 paddingTop: "1px",
                                 paddingLeft: asset2 ? "0px" : "5px",
@@ -823,7 +847,7 @@ function SwapPage() {
               {formState?.errors?.asset2Value?.message && (
                 <Typography
                   size={12}
-                  color={theme.colors.danger}
+                  color="danger"
                   css={css`
                     line-height: 18px;
                   `}
@@ -837,8 +861,17 @@ function SwapPage() {
                 text-align: right;
               `}
             >
-              <Typography color={theme.colors.text.secondary} size={14}>
-                -
+              <Typography color="text.secondary" size={14}>
+                {dashboardToken2?.price && asset2Value
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(dashboardToken2?.price || 0).mul(
+                          asset2Value || 0,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>

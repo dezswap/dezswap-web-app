@@ -1,10 +1,10 @@
 import DashboardPoolTable from "components/DashboardPoolTable";
-import useDashboard from "hooks/useDashboard";
+import useDashboard from "hooks/dashboard/useDashboard";
 
 function Pools() {
   const { pools } = useDashboard();
 
-  return pools ? <DashboardPoolTable data={pools} /> : null;
+  return <DashboardPoolTable data={pools || []} />;
 }
 
 export default Pools;

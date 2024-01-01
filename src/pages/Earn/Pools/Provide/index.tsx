@@ -21,7 +21,6 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
   formatNumber,
   formatRatio,
   getTokenLink,
@@ -54,15 +53,12 @@ import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 
-enum FormKey {
+export enum FormKey {
   asset1Value = "asset1Value",
   asset2Value = "asset2Value",
 }
 
 const DISPLAY_DECIMAL = 3;
-
-const MOBILE_DISPLAY_NUMBER_CNT = 20;
-const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
@@ -121,7 +117,6 @@ function ProvidePage() {
     mode: "all",
   });
   const formData = form.watch();
-  const { register, formState } = form;
 
   const pool = usePool(pairAddress);
   const isPoolEmpty = useMemo(
@@ -356,10 +351,13 @@ function ProvidePage() {
     >
       <form onSubmit={handleSubmit}>
         <InputGroup
-          {...register(FormKey.asset1Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset1?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset1Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset1}
           onClick={() => {
             setIsReversed(false);
@@ -373,17 +371,6 @@ function ProvidePage() {
               shouldDirty: true,
               shouldTouch: true,
             });
-          }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset1Value;
-            }
           }}
         />
         <div
@@ -401,17 +388,20 @@ function ProvidePage() {
           `}
         />
         <InputGroup
-          {...register(FormKey.asset2Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset2?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset2Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset2}
           onClick={() => {
-            setIsReversed(true);
+            setIsReversed(false);
             setBalanceApplied(false);
           }}
           onBalanceClick={(value) => {
-            setIsReversed(true);
+            setIsReversed(false);
             setBalanceApplied(true);
             form.setValue(FormKey.asset2Value, value, {
               shouldValidate: true,
@@ -419,18 +409,6 @@ function ProvidePage() {
               shouldTouch: true,
             });
           }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset2Value;
-            }
-          }}
-          style={{ marginBottom: 10 }}
         />
         {isPoolEmpty && (
           <Box

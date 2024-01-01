@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
@@ -12,6 +13,8 @@ import iconOutlink from "assets/icons/icon-link-28.svg";
 import { ellipsisCenter, getAddressLink } from "utils";
 import useNetwork from "hooks/useNetwork";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import { useNavigate } from "react-router-dom";
+import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Assets from "./Assets";
 import Pools from "./Pools";
 
@@ -22,6 +25,7 @@ const Wrapper = styled.div`
 `;
 
 function WalletPage() {
+  const navigate = useNavigate();
   const wallet = useWallet();
   const network = useNetwork();
   const connectedWallet = useConnectedWallet();
@@ -29,6 +33,37 @@ function WalletPage() {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
+  const connectWalletModal = useConnectWalletModal();
+  const isModalOpened = useRef(false);
+
+  const handleDisconnectClick = () => {
+    wallet.disconnect();
+    navigate("/", { replace: true });
+  };
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      connectWalletModal.open(!connectedWallet?.walletAddress);
+      if (!connectedWallet?.walletAddress) {
+        isModalOpened.current = true;
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [connectWalletModal, connectedWallet]);
+
+  useEffect(() => {
+    if (
+      !connectWalletModal.isOpen &&
+      !connectedWallet?.walletAddress &&
+      isModalOpened.current
+    ) {
+      navigate("/", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectWalletModal]);
 
   return (
     <Wrapper>
@@ -112,7 +147,7 @@ function WalletPage() {
                 css={css`
                   min-width: 150px;
                 `}
-                onClick={() => wallet.disconnect()}
+                onClick={handleDisconnectClick}
               >
                 Disconnect
               </Button>
