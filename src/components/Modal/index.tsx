@@ -25,7 +25,10 @@ interface ModalProps extends Omit<ReactModal.Props, "style"> {
   overlay?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
-  style?: ReactModal.Props["style"] & { panel?: React.CSSProperties };
+  style?: ReactModal.Props["style"] & {
+    panel?: React.CSSProperties;
+    header?: React.CSSProperties;
+  };
   headerExtra?: React.ReactNode;
 }
 
@@ -54,12 +57,15 @@ const ModalHeader = styled(Panel)`
   position: sticky;
   left: 0;
   top: 0;
-  padding-bottom: 0 !important;
   margin-bottom: 20px;
 
   z-index: 100;
   &:has(div:empty) {
     padding: 0;
+  }
+  .${MOBILE_SCREEN_CLASS} &,
+  & {
+    padding-bottom: 0;
   }
   & > div {
     width: 100%;
@@ -256,7 +262,7 @@ function Modal({
             ...style?.panel,
           }}
         >
-          <ModalHeader>
+          <ModalHeader style={style?.header}>
             <div>
               {typeof title === "string" ? (
                 <Typography

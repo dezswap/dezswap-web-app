@@ -9,6 +9,11 @@ import { Row, Col, useScreenClass } from "react-grid-system";
 import { formatBigNumber, formatDate, formatCurrency } from "utils";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { DashboardChartDuration } from "types/dashboard-api";
+import IconButton from "components/IconButton";
+import iconFullscreen from "assets/icons/icon-fullscreen.svg";
+import useHashModal from "hooks/useHashModal";
+import { useId, useMemo } from "react";
+import Modal from "components/Modal";
 import useChartData from "./useChartData";
 
 const Label = styled(Typography)``;
@@ -56,50 +61,44 @@ function Chart({
   duration?: DashboardChartDuration;
   onDurationChange?(duration: DashboardChartDuration): void;
 }) {
+  const chartModal = useHashModal(useId());
   const screenClass = useScreenClass();
   const isSmallScreen =
     screenClass === MOBILE_SCREEN_CLASS || screenClass === TABLET_SCREEN_CLASS;
 
-  return (
-    <Panel shadow>
-      <Row
-        justify="between"
-        align="center"
-        gutterWidth={10}
-        css={css`
-          margin-bottom: ${size === "large" ? "12.5px" : "2px"};
-        `}
+  const label = useMemo(() => {
+    return <Label>{title}</Label>;
+  }, [title]);
+
+  const select = useMemo(() => {
+    return (
+      <div
+        css={
+          screenClass !== MOBILE_SCREEN_CLASS &&
+          css`
+            width: 117px;
+          `
+        }
       >
-        <Col xs="content">
-          <Label>{title}</Label>
-        </Col>
-        {size === "large" && (
-          <Col xs="content">
-            <div
-              css={
-                screenClass !== MOBILE_SCREEN_CLASS &&
-                css`
-                  width: 117px;
-                `
-              }
-            >
-              <Select
-                block
-                options={["Month", "Quarter", "Year", "All"].map((value) => ({
-                  key: value,
-                  label: value,
-                  value: value.toLowerCase(),
-                }))}
-                value={duration}
-                onChange={(value) =>
-                  onDurationChange &&
-                  onDurationChange(value as DashboardChartDuration)
-                }
-              />
-            </div>
-          </Col>
-        )}
-      </Row>
+        <Select
+          block
+          options={["Month", "Quarter", "Year", "All"].map((value) => ({
+            key: value,
+            label: value,
+            value: value.toLowerCase(),
+          }))}
+          value={duration}
+          onChange={(value) =>
+            onDurationChange &&
+            onDurationChange(value as DashboardChartDuration)
+          }
+        />
+      </div>
+    );
+  }, [duration, onDurationChange, screenClass]);
+
+  const content = useMemo(() => {
+    return (
       <Row
         justify="start"
         align="end"
@@ -116,9 +115,64 @@ function Chart({
           <Caption>{defaultCaption}</Caption>
         </Col>
       </Row>
+    );
+  }, [defaultCaption, defaultValue, size]);
+
+  return (
+    <Panel shadow>
+      <Row
+        justify="between"
+        align="center"
+        gutterWidth={10}
+        css={css`
+          margin-bottom: ${size === "large" ? "12.5px" : "2px"};
+        `}
+      >
+        <Col xs="content">{label}</Col>
+        {size === "large" && (
+          <Col xs="content">
+            <Row justify="end" align="center" gutterWidth={14}>
+              <Col xs="content">{select}</Col>
+              {isSmallScreen && (
+                <Col>
+                  <IconButton
+                    icons={{ default: iconFullscreen }}
+                    size={24}
+                    onClick={() => chartModal.open()}
+                  />
+                </Col>
+              )}
+            </Row>
+          </Col>
+        )}
+      </Row>
+      {content}
       {!(isSmallScreen && size === "small") && (
         <LineChart height={size === "large" ? 200 : 102} {...lineChartProps} />
       )}
+
+      <Modal
+        isOpen={chartModal.isOpen}
+        drawer
+        hasCloseButton
+        onRequestClose={() => chartModal.close()}
+        style={{ header: { marginBottom: 4 } }}
+        title={
+          <Row
+            justify="between"
+            align="center"
+            css={css`
+              padding-right: 38px;
+            `}
+          >
+            <Col xs="content">{label}</Col>
+            <Col xs="content">{select}</Col>
+          </Row>
+        }
+      >
+        {content}
+        <LineChart height="62vh" {...lineChartProps} />
+      </Modal>
     </Panel>
   );
 }
