@@ -15,6 +15,7 @@ import useNetwork from "hooks/useNetwork";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useNavigate } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import ScrollToTop from "components/ScrollToTop";
 import Assets from "./Assets";
 import Pools from "./Pools";
 
@@ -67,6 +68,7 @@ function WalletPage() {
 
   return (
     <Wrapper>
+      <ScrollToTop />
       <Container>
         <Typography
           color="primary"

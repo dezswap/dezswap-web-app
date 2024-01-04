@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
+import HoverUnderline from "components/HoverUnderline";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
@@ -9,6 +10,7 @@ import usePairs from "hooks/usePairs";
 import Expand from "pages/Earn/Expand";
 import React, { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
+import { Link } from "react-router-dom";
 import { DashboardPool } from "types/dashboard-api";
 import { formatCurrency } from "utils";
 
@@ -101,19 +103,31 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
                     min-width: 0;
                   `}
                 >
-                  <Typography
-                    size={16}
-                    weight={500}
-                    color="primary"
-                    css={css`
-                      max-width: 100%;
-                      overflow: hidden;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                    `}
-                  >
-                    {assets?.map((asset) => asset?.symbol).join("-")}
-                  </Typography>
+                  <HoverUnderline>
+                    <Link
+                      to={`/earn/pools/${pool.address}`}
+                      css={css`
+                        max-width: 100%;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                      `}
+                    >
+                      <Typography
+                        size={16}
+                        weight={500}
+                        color="primary"
+                        css={css`
+                          max-width: 100%;
+                          overflow: hidden;
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                        `}
+                      >
+                        {assets?.map((asset) => asset?.symbol).join("-")}
+                      </Typography>{" "}
+                    </Link>
+                  </HoverUnderline>
                 </Col>
               </Row>
             </Value>

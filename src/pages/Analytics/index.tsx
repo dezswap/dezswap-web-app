@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import Typography from "components/Typography";
 import { Container } from "react-grid-system";
+import ScrollToTop from "components/ScrollToTop";
 import Charts from "./Charts";
 import TopMovers from "./TopMovers";
 import AllTokens from "./AllTokens";
@@ -12,6 +13,7 @@ import Pools from "./Pools";
 function AnalyticsPage() {
   return (
     <Container>
+      <ScrollToTop />
       <Typography
         color="primary"
         size={32}

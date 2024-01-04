@@ -31,6 +31,7 @@ import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import useDashboard from "hooks/dashboard/useDashboard";
+import ScrollToTop from "components/ScrollToTop";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
@@ -107,6 +108,7 @@ function TokenDetailPage() {
 
   return (
     <Wrapper>
+      <ScrollToTop />
       <Container>
         <div
           css={css`

@@ -26,7 +26,7 @@ import {
 } from "utils";
 import useNetwork from "hooks/useNetwork";
 import Button from "components/Button";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import usePairBookmark from "hooks/usePairBookmark";
@@ -34,6 +34,7 @@ import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
 import usePool from "hooks/usePool";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
+import ScrollToTop from "components/ScrollToTop";
 import Chart from "./Chart";
 import PoolSummary from "./PoolSummary";
 import PoolTransactions from "./PoolTransactions";
@@ -47,6 +48,9 @@ const Wrapper = styled.div`
 
 function PoolDetailPage() {
   const screenClass = useScreenClass();
+  const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
+    screenClass,
+  );
   const network = useNetwork();
   const navigate = useNavigate();
   const { poolAddress } = useParams<{ poolAddress: string }>();
@@ -128,6 +132,7 @@ function PoolDetailPage() {
 
   return (
     <Wrapper>
+      <ScrollToTop />
       <Container>
         <div
           css={css`
@@ -166,17 +171,15 @@ function PoolDetailPage() {
               row-gap: 10px;
             `}
           >
-            <Col xs={12} sm="content">
+            <Col xs={12} md="content">
               <Row justify="between" align="center">
                 <Col>
                   <Row
                     justify="start"
                     align="center"
-                    gutterWidth={screenClass === MOBILE_SCREEN_CLASS ? 6 : 10}
+                    gutterWidth={isSmallScreen ? 6 : 10}
                   >
-                    {screenClass !== MOBILE_SCREEN_CLASS && (
-                      <Col xs="content">{bookmarkButton}</Col>
-                    )}
+                    {!isSmallScreen && <Col xs="content">{bookmarkButton}</Col>}
                     <Col xs="content">
                       {[asset0, asset1]?.map((asset, index) => (
                         <div
@@ -195,7 +198,7 @@ function PoolDetailPage() {
                     </Col>
                     <Col xs="content">
                       <Typography
-                        size={screenClass === MOBILE_SCREEN_CLASS ? 16 : 26}
+                        size={isSmallScreen ? 16 : 26}
                         weight={900}
                         color="primary"
                       >
@@ -208,7 +211,7 @@ function PoolDetailPage() {
                         href={getAddressLink(poolAddress, network.name)}
                       />
                     </Col>
-                    {screenClass !== MOBILE_SCREEN_CLASS && (
+                    {!isSmallScreen && (
                       <Col xs="content">
                         <div
                           css={css`
@@ -221,12 +224,10 @@ function PoolDetailPage() {
                     )}
                   </Row>
                 </Col>
-                {screenClass === MOBILE_SCREEN_CLASS && (
-                  <Col xs="content">{bookmarkButton}</Col>
-                )}
+                {isSmallScreen && <Col xs="content">{bookmarkButton}</Col>}
               </Row>
             </Col>
-            {screenClass === MOBILE_SCREEN_CLASS && (
+            {isSmallScreen && (
               <Col
                 xs={12}
                 css={css`
@@ -236,10 +237,10 @@ function PoolDetailPage() {
                 {poolValueButton}
               </Col>
             )}
-            <Col xs={12} sm={4}>
+            <Col xs={12} md={4}>
               <div
                 css={
-                  screenClass !== MOBILE_SCREEN_CLASS &&
+                  !isSmallScreen &&
                   css`
                     max-width: 310px;
                     margin-left: auto;
@@ -250,18 +251,14 @@ function PoolDetailPage() {
                   <Col xs={6}>
                     <Link to={`/earn/pools/add-liquidity/${poolAddress}`}>
                       <Button variant="primary" block>
-                        {screenClass === MOBILE_SCREEN_CLASS
-                          ? "Add"
-                          : "Add liquidity"}
+                        {isSmallScreen ? "Add" : "Add liquidity"}
                       </Button>
                     </Link>
                   </Col>
                   <Col xs={6}>
                     <Link to={`/earn/pools/withdraw/${poolAddress}`}>
                       <Button variant="secondary" block>
-                        {screenClass === MOBILE_SCREEN_CLASS
-                          ? "Remove"
-                          : "Remove liquidity"}
+                        {isSmallScreen ? "Remove" : "Remove liquidity"}
                       </Button>
                     </Link>
                   </Col>
