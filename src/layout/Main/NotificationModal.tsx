@@ -142,7 +142,7 @@ function NotificationModal(modalProps: ReactModal.Props) {
               {notification.description}
             </Typography>
             <Typography size={12} weight={500} color="primary">
-              {formatDateTime(notification.date)}
+              {formatDateTime(notification.timestamp)}
             </Typography>
           </NotificationItem>
         ))}
@@ -167,8 +167,8 @@ function NotificationModal(modalProps: ReactModal.Props) {
               margin-bottom: 16px;
             `}
           >
-            {selectedNotification?.date &&
-              formatDateTime(selectedNotification.date)}
+            {selectedNotification?.timestamp &&
+              formatDateTime(selectedNotification.timestamp)}
           </Typography>
           <Typography size={14} weight={700} color="primary">
             {selectedNotification?.description.split("\n").map((item) => (

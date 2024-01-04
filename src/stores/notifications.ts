@@ -5,7 +5,7 @@ export type Notification = {
   id: string;
   title: string;
   description: string;
-  date: number | string | Date;
+  timestamp: number | string | Date;
 };
 
 export const notificationsAtom = atom<Notification[]>([]);

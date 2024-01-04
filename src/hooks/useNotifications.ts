@@ -28,7 +28,7 @@ const useNotifications = () => {
       notices?.map((notice) => {
         const isRead =
           readNotifications.includes(notice.id) ||
-          new Date(notice.date) < notificationFirstSeenDate;
+          new Date(notice.timestamp) < notificationFirstSeenDate;
         return {
           ...notice,
           isRead,
