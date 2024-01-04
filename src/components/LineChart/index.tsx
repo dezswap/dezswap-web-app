@@ -37,7 +37,7 @@ const Wrapper = styled.div`
   & svg {
     overflow: visible;
     & rect {
-      transition: all 0.2s ease-in-out;
+      transition: all 0.5s cubic-bezier(0, 1, 0, 1);
     }
   }
 `;
@@ -121,7 +121,7 @@ function LineChart({
             top: 0;
             width: 2px;
             height: 100%;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.5s cubic-bezier(0, 1, 0, 1);
             pointer-events: none;
           `}
           style={{
