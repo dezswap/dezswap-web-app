@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import {
   notificationFirstSeenDateAtom,
-  readNotificationsAtom,
+  readNotificationIdsAtom,
 } from "stores/notifications";
 import useNetwork from "./useNetwork";
 import useAPI from "./useAPI";
@@ -19,23 +19,24 @@ const useNotifications = () => {
   const [notificationFirstSeenDate, setNotificationFirstSeenDate] = useAtom(
     notificationFirstSeenDateAtom,
   );
-  const [readNotifications, setReadNotifications] = useAtom(
-    readNotificationsAtom,
+  const [readNotificationIds, setReadNotificationIds] = useAtom(
+    readNotificationIdsAtom,
   );
 
   const notifications = useMemo(() => {
     return (
       notices?.map((notice) => {
         const isRead =
-          readNotifications.includes(notice.id) ||
-          new Date(notice.timestamp) < notificationFirstSeenDate;
+          readNotificationIds.includes(notice.id) ||
+          (notificationFirstSeenDate &&
+            new Date(notice.timestamp) < notificationFirstSeenDate);
         return {
           ...notice,
           isRead,
         };
       }) || []
     );
-  }, [notices, notificationFirstSeenDate, readNotifications]);
+  }, [notices, notificationFirstSeenDate, readNotificationIds]);
 
   useEffect(() => {
     if (!notificationFirstSeenDate) {
@@ -48,14 +49,14 @@ const useNotifications = () => {
       notifications,
       hasUnread: notifications.some((notice) => !notice.isRead),
       markAsRead: (id: string) => {
-        setReadNotifications((current) =>
+        setReadNotificationIds((current) =>
           [...current, id].filter(
             (item, index, array) => array.indexOf(item) === index,
           ),
         );
       },
     }),
-    [notifications, setReadNotifications],
+    [notifications, setReadNotificationIds],
   );
 };
 

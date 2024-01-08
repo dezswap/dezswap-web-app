@@ -19,9 +19,13 @@ import {
 
 export type ApiVersion = "v1";
 
+const getBaseUrl = (networkName: NetworkName, version: ApiVersion = "v1") => {
+  return `${apiAddresses[networkName]?.baseUrl || ""}/${version}`;
+};
+
 const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
   const apiClient = axios.create({
-    baseURL: `${apiAddresses[networkName]?.baseUrl || ""}/${version}`,
+    baseURL: getBaseUrl(networkName, version),
   });
 
   apiClient.interceptors.request.use((config) => {
@@ -62,7 +66,10 @@ const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
         limit?: number;
         asc?: boolean;
       }) {
-        const res = await apiClient.get<Notification[]>(`/notices`, { params });
+        const res = await apiClient.get<Notification[]>(`/notices`, {
+          params,
+          baseURL: getBaseUrl("mainnet", version),
+        });
         return res.data;
       },
       dashboard: {
