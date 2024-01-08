@@ -6,8 +6,15 @@ const useDashboardPoolDetail = (poolAddress: string) => {
   const network = useNetwork();
   const api = useAPI();
   const { data } = useQuery({
-    queryKey: ["pool-detail", poolAddress, network.chainID],
-    queryFn: () => api.dashboard.getPoolDetail(poolAddress),
+    queryKey: ["dashboard", "pool-detail", poolAddress, network.chainID],
+    queryFn: async () => {
+      try {
+        const res = await api.dashboard.getPoolDetail(poolAddress);
+        return res;
+      } catch (error) {
+        return null;
+      }
+    },
   });
 
   return data;

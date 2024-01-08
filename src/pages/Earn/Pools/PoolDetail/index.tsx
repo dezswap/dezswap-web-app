@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Breadcrumb from "components/Breadcrumb";
 import Hr from "components/Hr";
 import IconButton from "components/IconButton";
@@ -21,14 +21,11 @@ import {
   formatDecimals,
   formatNumber,
   getAddressLink,
-  getIbcTokenHash,
-  isNativeTokenAddress,
 } from "utils";
 import useNetwork from "hooks/useNetwork";
 import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
-import useVerifiedAssets from "hooks/useVerifiedAssets";
 import usePairBookmark from "hooks/usePairBookmark";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -116,19 +113,16 @@ function PoolDetailPage() {
     [poolAddress],
   );
 
-  const { verifiedIbcAssets } = useVerifiedAssets();
-
   useEffect(() => {
-    if (
-      verifiedIbcAssets &&
-      (!poolAddress ||
-        (!AccAddress.validate(poolAddress) &&
-          !isNativeTokenAddress(network.name, poolAddress) &&
-          !verifiedIbcAssets?.[getIbcTokenHash(poolAddress)]))
-    ) {
-      invalidPathModal.open();
-    }
-  }, [invalidPathModal, network, poolAddress, verifiedIbcAssets]);
+    const timerId = setTimeout(() => {
+      if (dashboardPoolData === null) {
+        invalidPathModal.open();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [dashboardPoolData, invalidPathModal, network]);
 
   return (
     <Wrapper>
@@ -237,11 +231,12 @@ function PoolDetailPage() {
                 {poolValueButton}
               </Col>
             )}
-            <Col xs={12} md={4}>
+            <Col xs={12} md="content">
               <div
                 css={
                   !isSmallScreen &&
                   css`
+                    width: 50vw;
                     max-width: 310px;
                     margin-left: auto;
                   `

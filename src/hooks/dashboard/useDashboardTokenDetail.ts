@@ -8,7 +8,14 @@ const useDashboardTokenDetail = (tokenAddress: string) => {
 
   const { data } = useQuery({
     queryKey: ["dashboard", "token", tokenAddress, network.chainID],
-    queryFn: () => api.dashboard.getTokenDetail(tokenAddress),
+    queryFn: async () => {
+      try {
+        const res = await api.dashboard.getTokenDetail(tokenAddress);
+        return res;
+      } catch (error) {
+        return null;
+      }
+    },
   });
 
   return data;

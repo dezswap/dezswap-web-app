@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Breadcrumb from "components/Breadcrumb";
 import Hr from "components/Hr";
 import IconButton from "components/IconButton";
@@ -21,17 +21,14 @@ import {
   amountToValue,
   formatDecimals,
   formatNumber,
-  getIbcTokenHash,
   getTokenLink,
-  isNativeTokenAddress,
 } from "utils";
 import useNetwork from "hooks/useNetwork";
 import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
-import useVerifiedAssets from "hooks/useVerifiedAssets";
-import useDashboard from "hooks/dashboard/useDashboard";
 import ScrollToTop from "components/ScrollToTop";
+import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
@@ -55,11 +52,7 @@ function TokenDetailPage() {
     },
   });
 
-  const { tokens: dashboardTokens } = useDashboard();
-
-  const dashboardToken = useMemo(() => {
-    return dashboardTokens?.find((token) => token.address === tokenAddress);
-  }, [dashboardTokens, tokenAddress]);
+  const dashboardToken = useDashboardTokenDetail(tokenAddress || "");
 
   const { getAsset } = useAssets();
 
@@ -92,19 +85,16 @@ function TokenDetailPage() {
     [isBookmarked, tokenAddress, toggleBookmark],
   );
 
-  const { verifiedIbcAssets } = useVerifiedAssets();
-
   useEffect(() => {
-    if (
-      verifiedIbcAssets &&
-      (!tokenAddress ||
-        (!AccAddress.validate(tokenAddress) &&
-          !isNativeTokenAddress(network.name, tokenAddress) &&
-          !verifiedIbcAssets?.[getIbcTokenHash(tokenAddress)]))
-    ) {
-      invalidPathModal.open();
-    }
-  }, [invalidPathModal, network, tokenAddress, verifiedIbcAssets]);
+    const timerId = setTimeout(() => {
+      if (dashboardToken === null) {
+        invalidPathModal.open();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [dashboardToken, invalidPathModal, network]);
 
   return (
     <Wrapper>
