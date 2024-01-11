@@ -121,7 +121,6 @@ function LineChart({
             top: 0;
             width: 2px;
             height: 100%;
-            transition: all 0.5s cubic-bezier(0, 1, 0, 1);
             pointer-events: none;
           `}
           style={{
@@ -171,6 +170,7 @@ function LineChart({
         // height={height}
         preserveAspectRatio="none"
         onMouseMove={handleMouseMove}
+        onMouseDown={handleMouseMove}
         onMouseLeave={() => setSelectedIndex(-1)}
         {...svgProps}
       >
