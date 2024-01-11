@@ -110,6 +110,7 @@ function Pools() {
         `}
       >
         <Table
+          idKey="address"
           minWidth={!isSmallScreen ? 1110 : undefined}
           columns={[{ key: "none", label: "Pool", hasSort: true }]}
           hideHeader={isSmallScreen}
