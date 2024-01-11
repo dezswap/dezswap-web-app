@@ -1,5 +1,26 @@
 import { NetworkName } from "types/common";
 
+export type SupportedChain = "dimension" | "cube";
+
+export const supportedChains: {
+  [K in SupportedChain]: {
+    network: string;
+    name: string;
+    isMainnet: boolean;
+  };
+} = {
+  dimension: {
+    network: "xpla",
+    name: "Mainnet",
+    isMainnet: true,
+  },
+  cube: {
+    network: "xpla",
+    name: "Testnet",
+    isMainnet: false,
+  },
+};
+
 export const contractAddresses: {
   [K in NetworkName]?: {
     factory: string;
@@ -15,7 +36,7 @@ export const contractAddresses: {
   testnet: {
     factory: "xpla1j4kgjl6h4rt96uddtzdxdu39h0mhn4vrtydufdrk4uxxnrpsnw2qug2yx2",
     router: "xpla1pr40depxf8w50y58swdyhc0s2yjptd2xtqgnyfvkz6k40ng53gqqnyftkm",
-    lockdrop: "xpla1qyp2krkwsrereghsxpz50lc7tuqquxfy36zl2k7ewk8pqa65wvvqhenwfj",
+    lockdrop: "xpla1009jkfkfs6x484a9s34zq030dk4sa0ygk8z7hw6hegcupkadjpfs39e5du",
   },
 };
 

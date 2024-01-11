@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import {
@@ -11,9 +11,21 @@ import useAPI from "./useAPI";
 const useNotifications = () => {
   const network = useNetwork();
   const api = useAPI();
-  const { data: notices } = useQuery({
+
+  const { fetchNextPage, data, hasNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["notices", network.chainID],
-    queryFn: () => api.getNotices(),
+    queryFn: async ({ pageParam }) => {
+      const res = await api.getNotices({
+        asc: false,
+        limit: 9999, // TODO: Pagination
+        after: pageParam,
+      });
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      const lastItem = lastPage[lastPage.length - 1];
+      return lastItem?.id;
+    },
   });
 
   const [notificationFirstSeenDate, setNotificationFirstSeenDate] = useAtom(
@@ -24,6 +36,7 @@ const useNotifications = () => {
   );
 
   const notifications = useMemo(() => {
+    const notices = data?.pages.flat();
     return (
       notices?.map((notice) => {
         const isRead =
@@ -36,7 +49,7 @@ const useNotifications = () => {
         };
       }) || []
     );
-  }, [notices, notificationFirstSeenDate, readNotificationIds]);
+  }, [data, notificationFirstSeenDate, readNotificationIds]);
 
   useEffect(() => {
     if (!notificationFirstSeenDate) {
@@ -55,8 +68,17 @@ const useNotifications = () => {
           ),
         );
       },
+      fetchMore: () => fetchNextPage(),
+      hasNextPage,
+      isLoading,
     }),
-    [notifications, setReadNotificationIds],
+    [
+      fetchNextPage,
+      hasNextPage,
+      isLoading,
+      notifications,
+      setReadNotificationIds,
+    ],
   );
 };
 

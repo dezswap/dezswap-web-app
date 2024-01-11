@@ -4,9 +4,10 @@ import Hr from "components/Hr";
 import Modal from "components/Modal";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
+import { SupportedChain, supportedChains } from "constants/dezswap";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useNotifications from "hooks/useNotifications";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import { Notification } from "stores/notifications";
@@ -37,7 +38,9 @@ const NotificationItem = styled.button`
 
 function NotificationModal(modalProps: ReactModal.Props) {
   const screenClass = useScreenClass();
-  const { notifications, markAsRead } = useNotifications();
+  const bottomDivRef = useRef<HTMLDivElement>(null);
+  const { notifications, markAsRead, fetchMore, hasNextPage } =
+    useNotifications();
   const [selectedNotificationId, setSelectedNotificationId] =
     useState<Notification["id"]>();
 
@@ -56,6 +59,32 @@ function NotificationModal(modalProps: ReactModal.Props) {
       clearTimeout(timerId);
     };
   }, [modalProps.isOpen]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchMore();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.5,
+      },
+    );
+
+    const timerId = setTimeout(() => {
+      if (bottomDivRef.current && hasNextPage && modalProps.isOpen) {
+        observer.observe(bottomDivRef.current);
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(timerId);
+      observer.disconnect();
+    };
+  }, [fetchMore, hasNextPage, modalProps]);
 
   return (
     <Modal
@@ -112,40 +141,66 @@ function NotificationModal(modalProps: ReactModal.Props) {
           </Typography>
         </div>
       )}
-      {!selectedNotificationId &&
-        !!notifications?.length &&
-        notifications.map((notification) => (
-          <NotificationItem
-            key={notification.id}
-            onClick={() => {
-              markAsRead(notification.id);
-              setSelectedNotificationId(notification.id);
-            }}
-            css={css`
-              & > * {
-                width: 100%;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-              }
+      {!selectedNotificationId && (
+        <>
+          {!!notifications?.length &&
+            notifications.map((notification) => {
+              const chain =
+                supportedChains[notification.chain as SupportedChain];
+              return (
+                <NotificationItem
+                  key={notification.id}
+                  onClick={() => {
+                    markAsRead(notification.id);
+                    setSelectedNotificationId(notification.id);
+                  }}
+                  css={css`
+                    & > * {
+                      width: 100%;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
+                    }
 
-              ${notification.isRead &&
-              css`
-                opacity: 0.5;
-              `}
+                    ${notification.isRead &&
+                    css`
+                      opacity: 0.5;
+                    `}
+                  `}
+                >
+                  <Typography size={16} weight={900} color="primary">
+                    {chain && !chain?.isMainnet ? (
+                      <span
+                        css={css`
+                          color: #ff8255;
+                        `}
+                      >
+                        [{chain.name}
+                        ]&nbsp;
+                      </span>
+                    ) : null}
+                    {notification.title}
+                  </Typography>
+                  <Typography size={14} weight={700} color="primary">
+                    {notification.description}
+                  </Typography>
+                  <Typography size={12} weight={500} color="primary">
+                    {formatDateTime(notification.timestamp)}
+                  </Typography>
+                </NotificationItem>
+              );
+            })}
+          <div
+            ref={bottomDivRef}
+            css={css`
+              opacity: 0;
             `}
+            style={{ display: hasNextPage ? "block" : "none" }}
           >
-            <Typography size={16} weight={900} color="primary">
-              {notification.title}
-            </Typography>
-            <Typography size={14} weight={700} color="primary">
-              {notification.description}
-            </Typography>
-            <Typography size={12} weight={500} color="primary">
-              {formatDateTime(notification.timestamp)}
-            </Typography>
-          </NotificationItem>
-        ))}
+            bottom
+          </div>
+        </>
+      )}
 
       {selectedNotificationId && (
         <Panel border={false}>
