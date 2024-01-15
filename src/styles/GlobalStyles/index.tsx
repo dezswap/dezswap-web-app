@@ -44,7 +44,9 @@ function GlobalStyles() {
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)),
+          .ReactModal__Body--open:has(.ReactModal__Overlay):not(
+              :has(.ReactModal__Overlay.inner-modal)
+            ),
           .ReactModal__Body--open:has(
               .ReactModal__Overlay .ReactModal__Overlay.inner-modal
             ) {

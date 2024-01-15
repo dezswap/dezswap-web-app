@@ -78,6 +78,12 @@ ModalHeader.defaultProps = {
   border: false,
 };
 
+const removeClassName = () => {
+  if (!document.querySelector(".ReactModal__Content")) {
+    document.body.classList.remove("ReactModal__Body--open");
+  }
+};
+
 function Modal({
   isOpen,
   children,
@@ -94,6 +100,7 @@ function Modal({
   headerExtra,
   className: _className,
   overlayClassName: _overlayClassName,
+  onAfterClose,
   ...modalProps
 }: ModalProps) {
   const theme = useTheme();
@@ -153,31 +160,20 @@ function Modal({
   }, [resizeTrigger]);
 
   useEffect(() => {
-    const removeClassName = () => {
-      if (!document.querySelector(".ReactModal__Content")) {
-        document.body.classList.remove("ReactModal__Body--open");
-      }
-    };
-    return () => {
-      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 10);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     const handleModalPop = () => {
       const simpleBar = SimpleBar.instances.get(document.body);
       if (simpleBar?.onWindowResize) {
         simpleBar.onWindowResize();
         setTimeout(() => {
           simpleBar.onWindowResize();
-        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+        }, MODAL_CLOSE_TIMEOUT_MS + 100);
       }
 
       if (simpleBar?.recalculate) {
         simpleBar.recalculate();
         setTimeout(() => {
           simpleBar.recalculate();
-        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+        }, MODAL_CLOSE_TIMEOUT_MS + 100);
       }
     };
 
@@ -194,6 +190,12 @@ function Modal({
       overlayClassName={overlayClassName}
       closeTimeoutMS={MODAL_CLOSE_TIMEOUT_MS}
       onRequestClose={onGoBack}
+      onAfterClose={() => {
+        removeClassName();
+        if (onAfterClose) {
+          onAfterClose();
+        }
+      }}
       style={{
         overlay: {
           ...defaultOverlayStyle,
