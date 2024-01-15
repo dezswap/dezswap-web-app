@@ -1,4 +1,10 @@
-import { Navigate, Outlet, RouteProps, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  createBrowserRouter,
+  redirect,
+  useLocation,
+} from "react-router-dom";
 import PlaygroundPage from "pages/Playground";
 import SwapPage from "pages/Trade/Swap";
 import ProvidePage from "pages/Earn/Pools/Provide";
@@ -12,16 +18,13 @@ import AnalyticsPage from "pages/Analytics";
 import WalletPage from "pages/Wallet";
 import TokenDetailPage from "pages/Tokens/TokenDetail";
 import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
+import MainLayout from "layout/Main";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
 // import ClaimPage from "pages/Earn/Lockdrop/Claim";
 // import UnlockPage from "pages/Earn/Lockdrop/Unlock";
 // import CancelPage from "pages/Earn/Lockdrop/Cancel";
-
-export interface RouteObject extends Omit<RouteProps, "children"> {
-  children?: RouteObject[];
-}
 
 // For legacy links
 function ReplaceToEarn() {
@@ -34,82 +37,92 @@ function ReplaceToEarn() {
   );
 }
 
-const routes: RouteObject[] = [
-  ...(import.meta.env?.DEV
-    ? [{ path: "playground", element: <PlaygroundPage /> }]
-    : []),
-  { index: true, element: <AnalyticsPage /> },
+const routes = createBrowserRouter([
   {
-    path: "tokens/:tokenAddress",
-    element: <TokenDetailPage />,
-  },
-  {
-    path: "wallet",
-    element: <WalletPage />,
-  },
-  {
-    path: "trade",
-    element: <TradePage />,
+    path: "/",
+    element: (
+      <MainLayout>
+        <Outlet />
+      </MainLayout>
+    ),
     children: [
-      { path: "swap", element: <SwapPage /> },
-      { index: true, element: <Navigate replace to="swap" /> },
-      { path: "*", element: <Error404 /> },
-    ],
-  },
-  { path: "earn/pools/:poolAddress", element: <PoolDetailPage /> },
-  {
-    path: "earn",
-    element: <EarnPage />,
-    children: [
+      ...(import.meta.env?.DEV
+        ? [{ path: "playground", element: <PlaygroundPage /> }]
+        : []),
+      { index: true, element: <AnalyticsPage /> },
       {
-        path: "pools",
-        element: <PoolPage />,
+        path: "tokens/:tokenAddress",
+        element: <TokenDetailPage />,
+      },
+      {
+        path: "wallet",
+        element: <WalletPage />,
+      },
+      {
+        path: "trade",
+        element: <TradePage />,
         children: [
-          {
-            path: "create/:asset1Address/:asset2Address",
-            element: <CreatePage />,
-          },
-          { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
-          { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
+          { path: "swap", element: <SwapPage /> },
+          { index: true, loader: () => redirect("swap") },
           { path: "*", element: <Error404 /> },
         ],
       },
-      // TODO: uncomment when lockdrop is ready
-      // {
-      //   path: "lockdrop",
-      //   element: <LockdropPage />,
-      //   children: [
-      //     {
-      //       path: ":eventAddress",
-      //       children: [
-      //         { index: true, element: <StakePage /> },
-      //         { path: "claim", element: <ClaimPage /> },
-      //         { path: "unlock", element: <UnlockPage /> },
-      //         { path: "cancel", element: <CancelPage /> },
-      //       ],
-      //     },
-      //   ],
-      // },
-      { index: true, element: <Navigate replace to="pools" /> },
-    ],
-  },
-
-  // Legacy links
-  {
-    path: "pool",
-    element: <Outlet />,
-    children: [
-      { index: true, element: <ReplaceToEarn /> },
+      { path: "earn/pools/:poolAddress", element: <PoolDetailPage /> },
       {
-        path: "create/:asset1Address/:asset2Address",
-        element: <ReplaceToEarn />,
+        path: "earn",
+        element: <EarnPage />,
+        children: [
+          {
+            path: "pools",
+            element: <PoolPage />,
+            children: [
+              {
+                path: "create/:asset1Address/:asset2Address",
+                element: <CreatePage />,
+              },
+              { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
+              { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
+              { path: "*", element: <Error404 /> },
+            ],
+          },
+          // TODO: uncomment when lockdrop is ready
+          // {
+          //   path: "lockdrop",
+          //   element: <LockdropPage />,
+          //   children: [
+          //     {
+          //       path: ":eventAddress",
+          //       children: [
+          //         { index: true, element: <StakePage /> },
+          //         { path: "claim", element: <ClaimPage /> },
+          //         { path: "unlock", element: <UnlockPage /> },
+          //         { path: "cancel", element: <CancelPage /> },
+          //       ],
+          //     },
+          //   ],
+          // },
+          { index: true, loader: () => redirect("pools") },
+        ],
       },
-      { path: "add-liquidity/:pairAddress", element: <ReplaceToEarn /> },
-      { path: "withdraw/:pairAddress", element: <ReplaceToEarn /> },
+
+      // Legacy links
+      {
+        path: "pool",
+        element: <Outlet />,
+        children: [
+          { index: true, element: <ReplaceToEarn /> },
+          {
+            path: "create/:asset1Address/:asset2Address",
+            element: <ReplaceToEarn />,
+          },
+          { path: "add-liquidity/:pairAddress", element: <ReplaceToEarn /> },
+          { path: "withdraw/:pairAddress", element: <ReplaceToEarn /> },
+          { path: "*", element: <Error404 /> },
+        ],
+      },
       { path: "*", element: <Error404 /> },
     ],
   },
-  { path: "*", element: <Error404 /> },
-];
+]);
 
 export default routes;

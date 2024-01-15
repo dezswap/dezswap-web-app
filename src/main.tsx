@@ -2,7 +2,6 @@ import { ThemeProvider } from "@emotion/react";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import App from "App";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 import theme from "styles/theme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "simplebar";
@@ -19,9 +18,7 @@ getChainOptions().then((chainOptions) => {
     <WalletProvider {...chainOptions}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <App />
         </ThemeProvider>
       </QueryClientProvider>
     </WalletProvider>,

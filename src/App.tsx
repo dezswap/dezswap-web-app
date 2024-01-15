@@ -1,30 +1,18 @@
-import { Route, Routes } from "react-router-dom";
-import routes, { RouteObject } from "routes";
-import { Fragment, useCallback, useEffect, useMemo } from "react";
+import { RouterProvider } from "react-router-dom";
+import routes from "routes";
+import { useEffect } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 import {
+  ScreenClassProvider,
   setConfiguration as setGridConfiguration,
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
-import { useAtomValue } from "jotai";
-import MainLayout from "layout/Main";
-import disclaimerLastSeenAtom from "stores/disclaimer";
-import DisclaimerModal from "components/Modal/DisclaimerModal";
-import globalElementsAtom from "stores/globalElements";
 
 setGridConfiguration(gridConfiguration);
 
 function App() {
-  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
-  const globalElements = useAtomValue(globalElementsAtom);
   const screenClass = useScreenClass();
-  const isDisclaimerAgreed = useMemo(() => {
-    if (!disclaimerLastSeen) return false;
-    const date = new Date();
-    date.setDate(date.getDate() - 3);
-    return disclaimerLastSeen > date;
-  }, [disclaimerLastSeen]);
 
   useEffect(() => {
     SCREEN_CLASSES.forEach((item) => {
@@ -43,33 +31,11 @@ function App() {
     });
   }, []);
 
-  const renderRoute = useCallback(
-    ({ children, element, index, ...props }: RouteObject) => {
-      return (
-        <Route
-          {...(index
-            ? { index: true }
-            : { children: children?.map(renderRoute) })}
-          key={`${props.path}`}
-          element={element}
-          {...props}
-        />
-      );
-    },
-    [],
-  );
-
   return (
-    <>
+    <ScreenClassProvider>
       <GlobalStyles />
-      <MainLayout>
-        <DisclaimerModal isOpen={!isDisclaimerAgreed} />
-        {isDisclaimerAgreed && <Routes>{routes.map(renderRoute)}</Routes>}
-      </MainLayout>
-      {globalElements.map(({ element, id }) => (
-        <Fragment key={id}>{element}</Fragment>
-      ))}
-    </>
+      <RouterProvider router={routes} />
+    </ScreenClassProvider>
   );
 }
 

@@ -1,8 +1,11 @@
-import { PropsWithChildren } from "react";
+import { Fragment, PropsWithChildren, useMemo } from "react";
 import styled from "@emotion/styled";
+import { useAtomValue } from "jotai";
+import disclaimerLastSeenAtom from "stores/disclaimer";
+import DisclaimerModal from "components/Modal/DisclaimerModal";
+import globalElementsAtom from "stores/globalElements";
 import Header, {
   DEFAULT_HEADER_HEIGHT,
-  MOBILE_HEADER_HEIGHT,
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
@@ -14,7 +17,6 @@ import iconPool from "assets/icons/icon-pool.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
-import Tooltip from "components/Tooltip";
 import Footer from "./Footer";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
@@ -103,11 +105,20 @@ const navBar = (
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
   const network = useNetwork();
+
+  const globalElements = useAtomValue(globalElementsAtom);
+  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
+  const isDisclaimerAgreed = useMemo(() => {
+    if (!disclaimerLastSeen) return false;
+    const date = new Date();
+    date.setDate(date.getDate() - 3);
+    return disclaimerLastSeen > date;
+  }, [disclaimerLastSeen]);
   return (
     <>
       <Header />
       <Wrapper hasBanner={network.name !== "mainnet"}>
-        {children}
+        {isDisclaimerAgreed && children}
         <FooterWrapper>
           <Footer />
         </FooterWrapper>
@@ -119,6 +130,11 @@ function MainLayout({ children }: PropsWithChildren) {
           <NavBarWrapper>{navBar}</NavBarWrapper>
         </>
       )}
+
+      <DisclaimerModal isOpen={!isDisclaimerAgreed} />
+      {globalElements.map(({ element, id }) => (
+        <Fragment key={id}>{element}</Fragment>
+      ))}
     </>
   );
 }
