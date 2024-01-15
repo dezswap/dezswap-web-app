@@ -10,7 +10,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useNetwork from "hooks/useNetwork";
 import Select from "pages/Earn/Pools/Select";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { DashboardTransaction } from "types/dashboard-api";
 import {
@@ -28,8 +28,6 @@ import MobileTransactionItem from "./MobileTransactionItem";
 interface DashboardTransactionTableProps {
   data: DashboardTransaction[];
 }
-
-const LIMIT = 10;
 
 const filterTabs = [
   {
@@ -55,6 +53,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
+  const limit = useMemo(() => (isSmallScreen ? 5 : 10), [isSmallScreen]);
   const network = useNetwork();
 
   const [selectedFilterTabIndex, setSelectedFilterTabIndex] = useState(0);
@@ -105,8 +104,12 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
     return filteredData.toSorted(getBasicSortFunction(sortBy, sortDirection));
   }, [filteredData, sortBy, sortDirection]);
 
-  const totalPage = Math.ceil(sortedData.length / LIMIT);
-  const dataToDisplay = sortedData.slice((page - 1) * LIMIT, page * LIMIT);
+  const totalPage = Math.ceil(sortedData.length / limit);
+  const dataToDisplay = sortedData.slice((page - 1) * limit, page * limit);
+
+  useEffect(() => {
+    setPage(1);
+  }, [limit]);
 
   return (
     <Panel shadow>

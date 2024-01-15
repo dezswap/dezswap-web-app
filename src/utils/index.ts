@@ -225,3 +225,20 @@ export const formatCurrency = (value: Numeric.Input) => {
     currency: "USD",
   });
 };
+
+export const formatPercentage = (value: Numeric.Input) => {
+  const numericValue = Numeric.parse(value);
+  if (numericValue.lt(0)) {
+    throw new Error("Percentage value cannot be negative");
+  }
+  if (numericValue.eq(0)) {
+    return "0%";
+  }
+  if (numericValue.lt(0.01)) {
+    return "<0.01%";
+  }
+  return formatNumber(numericValue.dividedBy(100), {
+    style: "percent",
+    maximumFractionDigits: 2,
+  });
+};

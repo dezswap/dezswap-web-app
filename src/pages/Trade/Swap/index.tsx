@@ -16,6 +16,7 @@ import {
   filterNumberFormat,
   formatDecimals,
   formatNumber,
+  formatPercentage,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -957,7 +958,7 @@ function SwapPage() {
                         weight="bold"
                         color={spread.color as keyof Colors}
                       >
-                        {formatNumber(spread.rate)}%
+                        {formatPercentage(spread.rate)}
                       </Typography>
                     ),
                   },
@@ -1048,7 +1049,7 @@ function SwapPage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(spread.rate)}%
+                    {formatPercentage(spread.rate)}
                   </Col>
                 </Row>
               </Message>

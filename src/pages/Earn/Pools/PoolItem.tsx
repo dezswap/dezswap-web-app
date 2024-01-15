@@ -14,6 +14,7 @@ import {
   amountToValue,
   getAddressLink,
   formatCurrency,
+  formatPercentage,
 } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -338,10 +339,9 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
             {isSmallScreen && <Label>APR</Label>}
             <div>
               {!Number.isNaN(Number(dashboardPool?.apr)) &&
-                `${Numeric.parse(dashboardPool?.apr || 0)
-                  .mul(100)
-                  .toDecimalPlaces(2)
-                  .toString()}%`}
+                formatPercentage(
+                  Numeric.parse(dashboardPool?.apr || 0).mul(100),
+                )}
             </div>
           </div>
         </TableRow>
@@ -533,7 +533,7 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                       </Col>
                       <Col>
                         <Typography color="secondary" size={16} weight={900}>
-                          {formatDecimals(userShare * 100, 2)}%
+                          {formatPercentage(userShare * 100)}
                         </Typography>
                       </Col>
                     </Row>

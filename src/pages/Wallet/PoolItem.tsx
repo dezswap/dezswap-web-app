@@ -17,6 +17,7 @@ import {
   amountToValue,
   formatDecimals,
   formatNumber,
+  formatPercentage,
   getAddressLink,
 } from "utils";
 import useNetwork from "hooks/useNetwork";
@@ -311,7 +312,7 @@ function PoolItem({
         </Col>
         <Col>
           <Typography color="secondary" size={16} weight={900}>
-            {formatDecimals(userShare * 100, 2)}%
+            {formatPercentage(userShare * 100)}
           </Typography>
         </Col>
       </Row>

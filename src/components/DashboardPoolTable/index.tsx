@@ -7,10 +7,10 @@ import Table, { TableSortDirection } from "components/Table";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { DashboardPool } from "types/dashboard-api";
-import { formatCurrency } from "utils";
+import { formatCurrency, formatPercentage } from "utils";
 import { Numeric } from "@xpla/xpla.js";
 import { getBasicSortFunction } from "utils/table";
 import usePairs from "hooks/usePairs";
@@ -23,8 +23,6 @@ interface DashboardPoolTableProps {
   title?: string;
 }
 
-const LIMIT = 10;
-
 function DashboardPoolTable({
   data: dashboardPools,
   title = "All Pools",
@@ -33,6 +31,8 @@ function DashboardPoolTable({
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
+
+  const limit = useMemo(() => (isSmallScreen ? 5 : 10), [isSmallScreen]);
 
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -77,8 +77,12 @@ function DashboardPoolTable({
     return filteredData.toSorted(getBasicSortFunction(sortBy, sortDirection));
   }, [filteredData, sortBy, sortDirection]);
 
-  const totalPage = Math.ceil(sortedData.length / LIMIT);
-  const dataToDisplay = sortedData.slice((page - 1) * LIMIT, page * LIMIT);
+  const totalPage = Math.ceil(sortedData.length / limit);
+  const dataToDisplay = sortedData.slice((page - 1) * limit, page * limit);
+
+  useEffect(() => {
+    setPage(1);
+  }, [limit]);
 
   return (
     <Panel shadow>
@@ -156,7 +160,7 @@ function DashboardPoolTable({
               width: 10,
               hasSort: false,
               render(value, row, index) {
-                return (page - 1) * LIMIT + index + 1;
+                return (page - 1) * limit + index + 1;
               },
             },
             {
@@ -255,10 +259,7 @@ function DashboardPoolTable({
                 return (
                   value &&
                   !Number.isNaN(Number(value)) &&
-                  `${Numeric.parse(value)
-                    .mul(100)
-                    .toDecimalPlaces(2)
-                    .toString()}%`
+                  formatPercentage(Numeric.parse(value).mul(100))
                 );
               },
             },
@@ -274,7 +275,7 @@ function DashboardPoolTable({
           hideHeader
           renderRow={(transaction, index) => (
             <MobilePoolItem
-              number={(page - 1) * LIMIT + index + 1}
+              number={(page - 1) * limit + index + 1}
               pool={transaction}
             />
           )}

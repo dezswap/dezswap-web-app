@@ -75,18 +75,57 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
               <Col
                 css={css`
                   min-width: 0;
+                  flex: 1;
                 `}
               >
                 <Value
                   css={css`
+                    width: 100%;
                     max-width: 100%;
                     overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
+                    line-height: 1;
+                    & > div {
+                      width: 100%;
+                      max-width: 100%;
+                      overflow: hidden;
+                    }
                   `}
                 >
                   <HoverUnderline>
-                    <Link to={`/tokens/${token.address}`}>{asset?.name}</Link>
+                    <Link
+                      to={`/tokens/${encodeURIComponent(`${asset?.token}`)}`}
+                    >
+                      <div
+                        css={css`
+                          display: flex;
+                          justify-content: flex-start;
+                          align-items: center;
+                        `}
+                      >
+                        <div
+                          css={css`
+                            white-space: nowrap;
+                            word-break: break-all;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                          `}
+                        >
+                          {asset?.name}&nbsp;
+                        </div>
+                        {asset?.symbol && (
+                          <Typography
+                            size={16}
+                            weight={500}
+                            css={css`
+                              opacity: 0.7;
+                              display: inline-block;
+                            `}
+                          >
+                            ({asset?.symbol})
+                          </Typography>
+                        )}
+                      </div>
+                    </Link>
                   </HoverUnderline>
                 </Value>
               </Col>

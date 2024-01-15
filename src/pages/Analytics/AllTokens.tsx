@@ -18,13 +18,13 @@ import { DashboardToken } from "types/dashboard-api";
 import { getBasicSortFunction } from "utils/table";
 import MobileTokenItem from "./MobileTokenItem";
 
-const LIMIT = 10;
-
 function AllTokens() {
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
+  const limit = useMemo(() => (isSmallScreen ? 5 : 10), [isSmallScreen]);
+
   const [page, setPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -56,14 +56,14 @@ function AllTokens() {
   }, [filteredTokens, sortBy, sortDirection]);
 
   const tokensToDisplay = useMemo(() => {
-    return sortedTokens.slice((page - 1) * LIMIT, page * LIMIT);
-  }, [sortedTokens, page]);
+    return sortedTokens.slice((page - 1) * limit, page * limit);
+  }, [sortedTokens, page, limit]);
 
-  const totalPage = Math.ceil(sortedTokens.length / LIMIT);
+  const totalPage = Math.ceil(sortedTokens.length / limit);
 
   useEffect(() => {
     setPage(1);
-  }, [filteredTokens]);
+  }, [filteredTokens, limit]);
 
   return (
     <Panel shadow>
@@ -134,7 +134,7 @@ function AllTokens() {
             hideHeader
             renderRow={(token, index) => (
               <MobileTokenItem
-                number={(page - 1) * LIMIT + index + 1}
+                number={(page - 1) * limit + index + 1}
                 token={token}
               />
             )}
@@ -155,7 +155,7 @@ function AllTokens() {
                 width: 10,
                 hasSort: false,
                 render(value, row, index) {
-                  return (page - 1) * LIMIT + index + 1;
+                  return (page - 1) * limit + index + 1;
                 },
               },
               {
@@ -177,7 +177,14 @@ function AllTokens() {
                       <Col xs="content">
                         <AssetIcon asset={{ icon: asset?.icon }} />
                       </Col>
-                      <Col width={190}>
+                      <Col
+                        width={246}
+                        css={css`
+                          & > div {
+                            max-width: 100%;
+                          }
+                        `}
+                      >
                         <HoverUnderline>
                           <Link
                             to={`/tokens/${encodeURIComponent(`${address}`)}`}

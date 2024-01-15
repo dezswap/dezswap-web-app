@@ -9,7 +9,7 @@ import {
   DashboardChartDuration,
   DashboardChartType,
 } from "types/dashboard-api";
-import { formatCurrency, formatDate } from "utils";
+import { formatCurrency, formatDate, formatPercentage } from "utils";
 import Select from "pages/Earn/Pools/Select";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Numeric } from "@xpla/xpla.js";
@@ -59,7 +59,7 @@ const chartValueFormatter = (
   chartType: DashboardChartType,
 ) => {
   return chartType === "apr"
-    ? `${Numeric.parse(value).mul(100).toDecimalPlaces(2).toString()}%`
+    ? formatPercentage(Numeric.parse(value).mul(100))
     : formatCurrency(value);
 };
 

@@ -8,7 +8,12 @@ import Panel from "components/Panel";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import { Row, Col } from "react-grid-system";
-import { amountToValue, formatDecimals, formatNumber } from "utils";
+import {
+  amountToValue,
+  formatDecimals,
+  formatNumber,
+  formatPercentage,
+} from "utils";
 import usePool from "hooks/usePool";
 import { getAddressFromAssetInfo } from "utils/dezswap";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
@@ -75,15 +80,16 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
     <Panel shadow>
       <Wrapper>
         <Label>Pool Liquidity</Label>
-        <Value
+        <div
           css={css`
             margin-bottom: 8px;
           `}
         >
-          $
-          {dashboardPoolData?.recent.tvl &&
-            formatNumber(formatDecimals(dashboardPoolData?.recent.tvl, 2))}
-        </Value>
+          <PriceAndChangeRate
+            price={dashboardPoolData?.recent.tvl}
+            priceChange={dashboardPoolData?.recent.tvlChangeRate}
+          />
+        </div>
         <div
           css={css`
             display: flex;
@@ -145,10 +151,9 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
         <Label>APR (7D)</Label>
         <Value>
           {!Number.isNaN(Number(dashboardPoolData?.recent.apr)) &&
-            `${Numeric.parse(dashboardPoolData?.recent.apr || 0)
-              .mul(100)
-              .toDecimalPlaces(2)
-              .toString()}%`}
+            formatPercentage(
+              Numeric.parse(dashboardPoolData?.recent.apr || 0).mul(100),
+            )}
         </Value>
       </Wrapper>
     </Panel>

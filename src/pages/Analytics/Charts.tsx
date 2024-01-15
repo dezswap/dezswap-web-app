@@ -103,10 +103,11 @@ function Chart({
         justify="start"
         align="end"
         gutterWidth={10}
-        wrap="nowrap"
+        wrap="wrap"
         css={css`
           margin-bottom: ${size === "large" ? "6px" : "2px"};
         `}
+        style={!isSmallScreen ? { maxHeight: 44 } : undefined}
       >
         <Col xs="content">
           <Value>{defaultValue}</Value>
@@ -116,7 +117,7 @@ function Chart({
         </Col>
       </Row>
     );
-  }, [defaultCaption, defaultValue, size]);
+  }, [defaultCaption, defaultValue, isSmallScreen, size]);
 
   return (
     <Panel shadow>

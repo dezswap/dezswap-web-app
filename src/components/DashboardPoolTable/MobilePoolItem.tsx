@@ -12,7 +12,7 @@ import React, { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
 import { Link } from "react-router-dom";
 import { DashboardPool } from "types/dashboard-api";
-import { formatCurrency } from "utils";
+import { formatCurrency, formatPercentage } from "utils";
 
 interface MobilePoolItemProps {
   pool: DashboardPool;
@@ -154,10 +154,7 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
           <Label>APR 7D</Label>
           <Value>
             {!Number.isNaN(Number(pool.apr)) &&
-              `${Numeric.parse(pool.apr)
-                .mul(100)
-                .toDecimalPlaces(2)
-                .toString()}%`}
+              formatPercentage(Numeric.parse(pool.apr).mul(100))}
           </Value>
         </div>
       </Content>

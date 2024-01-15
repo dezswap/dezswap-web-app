@@ -1,7 +1,7 @@
 import { css, useTheme } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
 import { useMemo } from "react";
-import { formatDecimals } from "utils";
+import { formatPercentage } from "utils";
 
 interface ChangeRateFormatterProps {
   rate?: Numeric.Input;
@@ -34,7 +34,8 @@ function ChangeRateFormatter({
     >
       {hasBrackets && "("}
       {arrow}
-      {formatDecimals(numericRate.abs(), 2)}%{hasBrackets && ")"}
+      {formatPercentage(numericRate.abs())}
+      {hasBrackets && ")"}
     </span>
   ) : null;
 }
