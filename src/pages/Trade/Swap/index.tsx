@@ -414,6 +414,12 @@ function SwapPage() {
     }
   }, [form, fee, asset1Address, asset2Address]);
 
+  useEffect(() => {
+    if (!firstProvideModal.isOpen) {
+      form.reset();
+    }
+  }, [firstProvideModal.isOpen]);
+
   return (
     <>
       <SelectAssetDrawer
@@ -435,6 +441,8 @@ function SwapPage() {
             const oppositeTarget = selectAsset1Modal.isOpen
               ? FormKey.asset2Address
               : FormKey.asset1Address;
+
+            form.setValue(target, address);
             if (formData[oppositeTarget] === address) {
               form.setValue(oppositeTarget, "");
             } else if (
@@ -443,7 +451,7 @@ function SwapPage() {
             ) {
               firstProvideModal.open();
             }
-            form.setValue(target, address);
+
             selectAsset1Modal.close();
             selectAsset2Modal.close();
           }}

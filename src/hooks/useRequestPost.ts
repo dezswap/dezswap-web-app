@@ -9,9 +9,11 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
+import useCosmostationWallet from "./useCosmostationWallet";
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
+  const cosmostationWallet = useCosmostationWallet();
   const [txOptions, setTxOptions] = useState<CreateTxOptions>();
 
   const [txResult, setTxResult] = useState<TxResult>();
@@ -45,8 +47,29 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
           }
         }
       }
+
+      // Cosmostation
+      if (
+        connectedWallet?.xplaAddress &&
+        !connectedWallet?.availablePost &&
+        createTxOptions.fee
+      ) {
+        try {
+          txBroadcastModal.open();
+          const result = await cosmostationWallet.post(
+            createTxOptions,
+            createTxOptions.fee,
+          );
+          setTxResult(result);
+        } catch (error) {
+          console.log(error);
+          if (error instanceof Error) {
+            setTxError(error);
+          }
+        }
+      }
     },
-    [connectedWallet, txBroadcastModal],
+    [connectedWallet, cosmostationWallet, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {
