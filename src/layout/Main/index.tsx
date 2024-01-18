@@ -14,6 +14,7 @@ import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
 import iconPool from "assets/icons/icon-pool.svg";
+import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
@@ -80,6 +81,11 @@ const navLinks = [
     path: "/earn",
     icon: iconPool,
     label: "Earn",
+  },
+  {
+    path: "/wallet",
+    icon: iconWallet,
+    label: "My Wallet",
   },
 ];
 
