@@ -9,7 +9,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
 import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -135,7 +135,7 @@ function PoolDetailPage() {
         >
           <Breadcrumb
             items={[
-              { label: "Home", to: "/" },
+              { label: "Analytics", to: "/" },
               { label: "Earn", to: "/earn" },
               { label: "Pools", to: "/earn/pools" },
               {
@@ -244,14 +244,14 @@ function PoolDetailPage() {
               >
                 <Row justify="between" align="center" gutterWidth={10}>
                   <Col xs={6}>
-                    <Link to={`/earn/pools/add-liquidity/${poolAddress}`}>
+                    <Link to="add">
                       <Button variant="primary" block>
                         {isSmallScreen ? "Add" : "Add liquidity"}
                       </Button>
                     </Link>
                   </Col>
                   <Col xs={6}>
-                    <Link to={`/earn/pools/withdraw/${poolAddress}`}>
+                    <Link to="remove">
                       <Button variant="secondary" block>
                         {isSmallScreen ? "Remove" : "Remove liquidity"}
                       </Button>
@@ -349,6 +349,7 @@ function PoolDetailPage() {
         />
         {poolAddress && <PoolTransactions poolAddress={poolAddress} />}
       </Container>
+      <Outlet />
     </Wrapper>
   );
 }

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
+import HoverUnderline from "components/HoverUnderline";
 import Typography from "components/Typography";
-import React from "react";
 import { Link, LinkProps } from "react-router-dom";
 
 interface BreadcrumbItem {
@@ -22,7 +22,7 @@ const Wrapper = styled.nav`
   justify-content: flex-start;
 `;
 
-const Item = styled.li`
+const Item = styled(Typography)`
   list-style: none;
   margin: 0;
   padding: 0;
@@ -40,6 +40,7 @@ const Item = styled.li`
 
   &:last-of-type {
     font-weight: 900;
+    pointer-events: none;
     &::after {
       content: unset;
     }
@@ -53,7 +54,9 @@ function Breadcrumb(props: BreadcrumbProps) {
     <Wrapper aria-label="breadcrumb">
       {items.map((item) => (
         <Item key={`${item.label} ${item.to}`}>
-          <Link to={item.to}>{item.label}</Link>
+          <Link to={item.to}>
+            <HoverUnderline>{item.label}</HoverUnderline>
+          </Link>
         </Item>
       ))}
     </Wrapper>

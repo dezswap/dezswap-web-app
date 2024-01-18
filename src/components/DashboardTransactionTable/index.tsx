@@ -109,7 +109,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
 
   useEffect(() => {
     setPage(1);
-  }, [limit]);
+  }, [limit, selectedFilterTabIndex, searchKeyword]);
 
   return (
     <Panel shadow>
@@ -210,44 +210,37 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               key: "actionDisplay",
               label: "Transaction",
               width: 230,
+              cellStyle: {
+                padding: "8.5px 0",
+              },
               render(actionDisplay, row) {
                 return (
-                  <HoverUnderline>
-                    <a
-                      href={getTransactionLink(row.hash, network.name)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      css={css`
-                        white-space: nowrap;
-                      `}
-                    >
-                      {actionDisplay}
-                    </a>
-                  </HoverUnderline>
+                  <a
+                    href={getTransactionLink(row.hash, network.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    css={css`
+                      white-space: nowrap;
+                    `}
+                  >
+                    <HoverUnderline>{actionDisplay}</HoverUnderline>
+                  </a>
                 );
               },
             },
             {
               key: "totalValue",
               label: "Total Value",
-              width: 160,
+              width: 185,
               hasSort: true,
               render(value) {
-                return (
-                  <div
-                    css={css`
-                      padding: 8.5px 0;
-                    `}
-                  >
-                    {formatCurrency(`${value}`)}
-                  </div>
-                );
+                return formatCurrency(`${value}`);
               },
             },
             {
               key: "asset0amount",
               label: "Token Amount",
-              width: 160,
+              width: 185,
               hasSort: true,
               render(amount, row) {
                 const asset = getAsset(row.asset0);
@@ -259,7 +252,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
             {
               key: "asset1amount",
               label: "Token Amount",
-              width: 160,
+              width: 185,
               hasSort: true,
               render(amount, row) {
                 const asset = getAsset(row.asset1);
@@ -271,7 +264,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
             {
               key: "account",
               label: "Account",
-              width: 160,
+              width: 185,
               hasSort: true,
               render(address) {
                 return (

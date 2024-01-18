@@ -57,6 +57,10 @@ const routes = createBrowserRouter([
       {
         path: "wallet",
         element: <WalletPage />,
+        children: [
+          { path: ":poolAddress/add", element: <ProvidePage /> },
+          { path: ":poolAddress/remove", element: <WithdrawPage /> },
+        ],
       },
       {
         path: "trade",
@@ -67,7 +71,14 @@ const routes = createBrowserRouter([
           { path: "*", element: <Error404 /> },
         ],
       },
-      { path: "earn/pools/:poolAddress", element: <PoolDetailPage /> },
+      {
+        path: "earn/pools/:poolAddress",
+        element: <PoolDetailPage />,
+        children: [
+          { path: "add", element: <ProvidePage /> },
+          { path: "remove", element: <WithdrawPage /> },
+        ],
+      },
       {
         path: "earn",
         element: <EarnPage />,
@@ -80,8 +91,8 @@ const routes = createBrowserRouter([
                 path: "create/:asset1Address/:asset2Address",
                 element: <CreatePage />,
               },
-              { path: "add-liquidity/:pairAddress", element: <ProvidePage /> },
-              { path: "withdraw/:pairAddress", element: <WithdrawPage /> },
+              { path: "add-liquidity/:poolAddress", element: <ProvidePage /> },
+              { path: "withdraw/:poolAddress", element: <WithdrawPage /> },
               { path: "*", element: <Error404 /> },
             ],
           },

@@ -161,7 +161,7 @@ function AllTokens() {
               {
                 key: "address",
                 label: "Token",
-                width: 289,
+                width: 300,
                 hasSort: false,
                 render(address) {
                   const asset = getAsset(`${address}`);
@@ -182,6 +182,8 @@ function AllTokens() {
                         css={css`
                           & > div {
                             max-width: 100%;
+                            width: auto;
+                            display: inline-block;
                           }
                         `}
                       >
@@ -229,7 +231,7 @@ function AllTokens() {
               {
                 key: "price",
                 label: "Price",
-                width: 170,
+                width: 190,
                 hasSort: true,
                 render(price) {
                   return formatCurrency(`${price}`);
@@ -238,7 +240,7 @@ function AllTokens() {
               {
                 key: "priceChange",
                 label: "Price Change",
-                width: 170,
+                width: 190,
                 hasSort: true,
                 render(_priceChange) {
                   const priceChange = Number(_priceChange);
@@ -255,7 +257,7 @@ function AllTokens() {
               {
                 key: "volume24h",
                 label: "Volume 24H",
-                width: 170,
+                width: 190,
                 hasSort: true,
                 render(value) {
                   return `${formatCurrency(`${value}`)}`;
@@ -264,7 +266,7 @@ function AllTokens() {
               {
                 key: "tvl",
                 label: "TVL",
-                width: 170,
+                width: 190,
                 hasSort: true,
                 render(value) {
                   return `${formatCurrency(`${value}`)}`;

@@ -36,6 +36,12 @@ const Wrapper = styled(Box)`
   }
 `;
 
+const DefaultTableCell = styled.div`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
 function TableRow<R extends object>({
   row,
   columns,
@@ -53,9 +59,12 @@ function TableRow<R extends object>({
         const flex = column.flex ?? `0 0 ${width}`;
 
         return (
-          <div key={key} style={{ width, flex }}>
+          <DefaultTableCell
+            key={key}
+            style={{ width, flex, ...column.cellStyle }}
+          >
             {column.render ? column.render(value, row, index) : String(value)}
-          </div>
+          </DefaultTableCell>
         );
       })}
     </Wrapper>

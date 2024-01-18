@@ -4,7 +4,7 @@ const Wrapper = styled.div`
   width: auto;
   height: auto;
   position: relative;
-  display: inline-block;
+  display: inherit;
 
   &:hover::after {
     content: "";
@@ -20,13 +20,19 @@ const Wrapper = styled.div`
 
 type HoverUnderlineProps = React.PropsWithChildren<{
   color?: React.CSSProperties["borderBottomColor"];
-}>;
+}> &
+  React.ComponentProps<typeof Wrapper>;
 
 function HoverUnderline({
   children,
   color: borderBottomColor,
+  ...wrapperProps
 }: HoverUnderlineProps) {
-  return <Wrapper css={{ borderBottomColor }}>{children}</Wrapper>;
+  return (
+    <Wrapper css={{ borderBottomColor }} {...wrapperProps}>
+      {children}
+    </Wrapper>
+  );
 }
 
 export default HoverUnderline;

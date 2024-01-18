@@ -97,7 +97,7 @@ function TokenDetailPage() {
   }, [dashboardToken, invalidPathModal, network]);
 
   return (
-    <Wrapper>
+    <Wrapper key={tokenAddress}>
       <ScrollToTop />
       <Container>
         <div
@@ -107,7 +107,7 @@ function TokenDetailPage() {
         >
           <Breadcrumb
             items={[
-              { label: "Home", to: "/" },
+              { label: "Analytics", to: "/" },
               {
                 label: asset?.name || "",
                 to: `/tokens/${tokenAddress}`,

@@ -889,8 +889,20 @@ function SwapPage() {
                     align-items: center;
                   `}
                 >
-                  {shiftAssets
-                    ? `1 ${asset2.symbol} = ${
+                  {/* // TODO: Refactor */}
+                  {shiftAssets ? (
+                    <>
+                      {`1 ${asset2.symbol}`}
+                      <IconButton
+                        icons={{ default: iconShift }}
+                        size={24}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShiftAssets((current) => !current);
+                        }}
+                      />
+                      {`${
                         asset1Value && asset2Value
                           ? cutDecimal(
                               Numeric.parse(asset1Value || 0).div(
@@ -899,9 +911,22 @@ function SwapPage() {
                               DISPLAY_DECIMAL,
                             )
                           : "-"
-                      } ${asset1?.symbol}`
-                    : `1 ${asset1.symbol} = ${
-                        asset1Value && asset2Value
+                      } ${asset1?.symbol}`}
+                    </>
+                  ) : (
+                    <>
+                      {`1 ${asset1.symbol}`}
+                      <IconButton
+                        icons={{ default: iconShift }}
+                        size={24}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShiftAssets((current) => !current);
+                        }}
+                      />
+                      {`${
+                        asset2Value && asset1Value
                           ? cutDecimal(
                               Numeric.parse(asset2Value || 0).div(
                                 asset1Value || 1,
@@ -910,15 +935,8 @@ function SwapPage() {
                             )
                           : "-"
                       } ${asset2?.symbol}`}
-                  <IconButton
-                    icons={{ default: iconShift }}
-                    size={24}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShiftAssets((current) => !current);
-                    }}
-                  />
+                    </>
+                  )}
                 </Typography>
               }
               isExpanded={false}

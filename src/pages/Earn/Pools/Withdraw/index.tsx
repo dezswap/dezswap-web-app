@@ -73,11 +73,11 @@ function WithdrawPage() {
     onReturnClick: handleModalClose,
   });
 
-  const { pairAddress } = useParams<{ pairAddress: string }>();
+  const { poolAddress } = useParams<{ poolAddress: string }>();
   const { getPair } = usePairs();
   const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
+    () => (poolAddress ? getPair(poolAddress) : undefined),
+    [getPair, poolAddress],
   );
   const { getAsset } = useAssets();
   const [asset1, asset2] = useMemo(
@@ -100,13 +100,13 @@ function WithdrawPage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (pairAddress && !AccAddress.validate(pairAddress)) {
+    if (poolAddress && !AccAddress.validate(poolAddress)) {
       errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
+  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -117,7 +117,7 @@ function WithdrawPage() {
   const { lpValue } = form.watch();
 
   const simulationResult = useSimulate(
-    pairAddress || "",
+    poolAddress || "",
     pair?.liquidity_token || "",
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
@@ -156,7 +156,7 @@ function WithdrawPage() {
               generateWithdrawLiquidityMsg(
                 connectedWallet?.network.name as NetworkName,
                 connectedWallet?.walletAddress || "",
-                pairAddress || "",
+                poolAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
                 [asset1?.token, asset2?.token].map((address) => ({

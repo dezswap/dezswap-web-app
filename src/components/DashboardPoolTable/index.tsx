@@ -23,6 +23,8 @@ interface DashboardPoolTableProps {
   title?: string;
 }
 
+const emptyMessage = "The pool doesn't exist. Create a new pool.";
+
 function DashboardPoolTable({
   data: dashboardPools,
   title = "All Pools",
@@ -153,12 +155,16 @@ function DashboardPoolTable({
             setSortBy(key);
             setSortDirection(direction);
           }}
+          emptyMessage={emptyMessage}
           columns={[
             {
               key: "none",
               label: "#",
               width: 10,
               hasSort: false,
+              cellStyle: {
+                overflow: "visible",
+              },
               render(value, row, index) {
                 return (page - 1) * limit + index + 1;
               },
@@ -166,7 +172,7 @@ function DashboardPoolTable({
             {
               key: "address",
               label: "Pools",
-              width: 292,
+              width: 300,
               render(address) {
                 const pair = getPair(`${address}`);
                 const assets = pair?.asset_addresses.map((assetAddress) =>
@@ -205,19 +211,19 @@ function DashboardPoolTable({
                         min-width: 0;
                       `}
                     >
-                      <HoverUnderline>
-                        <Link
-                          to={`/earn/pools/${address}`}
-                          css={css`
-                            max-width: 100%;
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                          `}
-                        >
+                      <Link
+                        to={`/earn/pools/${address}`}
+                        css={css`
+                          max-width: 100%;
+                          overflow: hidden;
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                        `}
+                      >
+                        <HoverUnderline>
                           {assets?.map((asset) => asset?.symbol).join("-")}
-                        </Link>
-                      </HoverUnderline>
+                        </HoverUnderline>
+                      </Link>
                     </Col>
                   </Row>
                 );
@@ -226,7 +232,7 @@ function DashboardPoolTable({
             {
               key: "tvl",
               label: "TVL",
-              width: 200,
+              width: 220,
               hasSort: true,
               render(value) {
                 return value && formatCurrency(value);
@@ -235,7 +241,7 @@ function DashboardPoolTable({
             {
               key: "volume",
               label: "Volume 24H",
-              width: 200,
+              width: 220,
               hasSort: true,
               render(value) {
                 return value && formatCurrency(value);
@@ -244,7 +250,7 @@ function DashboardPoolTable({
             {
               key: "fee",
               label: "Fee 24H",
-              width: 200,
+              width: 220,
               hasSort: true,
               render(value) {
                 return value && formatCurrency(value);
@@ -273,6 +279,7 @@ function DashboardPoolTable({
           columns={[]}
           data={dataToDisplay}
           hideHeader
+          emptyMessage={emptyMessage}
           renderRow={(transaction, index) => (
             <MobilePoolItem
               number={(page - 1) * limit + index + 1}

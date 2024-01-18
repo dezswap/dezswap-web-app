@@ -29,17 +29,24 @@ function TopMovers() {
   );
 
   return (
-    <Panel shadow>
-      <Typography
-        size={screenClass === MOBILE_SCREEN_CLASS ? 14 : 20}
-        weight={900}
-        color="primary"
+    <Panel shadow noPadding>
+      <Panel
+        border={false}
         css={css`
-          margin-bottom: 10px;
+          padding-bottom: 0;
         `}
       >
-        Top Movers
-      </Typography>
+        <Typography
+          size={screenClass === MOBILE_SCREEN_CLASS ? 14 : 20}
+          weight={900}
+          color="primary"
+          css={css`
+            margin-bottom: 10px;
+          `}
+        >
+          Top Movers
+        </Typography>
+      </Panel>
       <Marquee duration="60s">
         <div
           css={css`
@@ -123,6 +130,12 @@ function TopMovers() {
           })}
         </div>
       </Marquee>
+      <Panel
+        border={false}
+        css={css`
+          padding-top: 0;
+        `}
+      />
     </Panel>
   );
 }

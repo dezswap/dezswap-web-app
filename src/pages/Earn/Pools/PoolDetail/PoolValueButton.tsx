@@ -32,25 +32,24 @@ const Wrapper = styled.button`
   gap: 4px;
 
   &:hover {
-    background-color: ${({ theme }) => `${theme.colors.text.background}b2`};
+    background-color: #e0e0e0;
   }
 
   .${MOBILE_SCREEN_CLASS} & {
     font-size: 14px;
     padding: 8.5px 12px;
   }
+`;
 
-  &::after {
-    content: "";
-    width: 24px;
-    height: 24px;
-    position: relative;
-    display: inline-block;
-    background-image: url(${iconShift});
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: 50% 50%;
-  }
+const IconShift = styled.div`
+  width: 24px;
+  height: 24px;
+  position: relative;
+  display: inline-block;
+  background-image: url(${iconShift});
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 50% 50%;
 `;
 
 function PoolValueButton({ poolAddress }: PoolValueButtonProps) {
@@ -84,8 +83,10 @@ function PoolValueButton({ poolAddress }: PoolValueButtonProps) {
 
   return (
     <Wrapper onClick={() => setIsOpposite((current) => !current)}>
+      <span>1 {assets[0]?.symbol}</span>
+      <IconShift />
       <span>
-        1 {assets[0]?.symbol} = {formatDecimals(ratio, 3)} {assets[1]?.symbol}
+        {formatDecimals(ratio, 3)} {assets[1]?.symbol}
       </span>
     </Wrapper>
   );

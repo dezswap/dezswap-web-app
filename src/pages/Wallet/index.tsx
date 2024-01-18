@@ -13,7 +13,7 @@ import iconOutlink from "assets/icons/icon-link-28.svg";
 import { ellipsisCenter, getAddressLink } from "utils";
 import useNetwork from "hooks/useNetwork";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import ScrollToTop from "components/ScrollToTop";
 import Assets from "./Assets";
@@ -182,6 +182,7 @@ function WalletPage() {
           <Pools />
         </div>
       </Container>
+      <Outlet />
     </Wrapper>
   );
 }

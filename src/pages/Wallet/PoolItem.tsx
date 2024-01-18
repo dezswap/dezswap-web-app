@@ -31,6 +31,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "pages/Earn/Expand";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import { Link } from "react-router-dom";
+import HoverUnderline from "components/HoverUnderline";
 
 interface PoolItemProps {
   pool: Pool;
@@ -178,19 +179,23 @@ function PoolItem({
             min-width: 0;
           `}
         >
-          <Typography
-            size={16}
-            weight={500}
-            color="primary"
-            css={css`
-              max-width: 100%;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            `}
-          >
-            {asset1?.symbol}-{asset2?.symbol}
-          </Typography>
+          <Link to={`/earn/pools/${pool.address}`}>
+            <HoverUnderline>
+              <Typography
+                size={16}
+                weight={500}
+                color="primary"
+                css={css`
+                  max-width: 100%;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                `}
+              >
+                {asset1?.symbol}-{asset2?.symbol}
+              </Typography>
+            </HoverUnderline>
+          </Link>
         </Col>
       </Row>
     ),
@@ -323,15 +328,13 @@ function PoolItem({
   const actionButtons = useMemo(
     () => (
       <>
-        <Link
-          to={`/earn/pools/add-liquidity/${encodeURIComponent(pool.address)}`}
-        >
+        <Link to={`${encodeURIComponent(pool.address)}/add`}>
           <Button variant="primary" block>
             Add liquidity
           </Button>
         </Link>
 
-        <Link to={`/earn/pools/withdraw/${encodeURIComponent(pool.address)}`}>
+        <Link to={`${encodeURIComponent(pool.address)}/remove`}>
           <Button variant="secondary" block>
             Remove liquidity
           </Button>

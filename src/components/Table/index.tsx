@@ -11,6 +11,7 @@ export type TableColumn<R extends object, K extends keyof R = keyof R> = {
   label: React.ReactNode;
   width?: React.CSSProperties["width"];
   flex?: React.CSSProperties["flex"];
+  cellStyle?: React.CSSProperties;
   render?: (
     value: R[K] | null | undefined,
     row: R,
@@ -82,7 +83,7 @@ const TableRowWrapper = styled.div`
   min-width: 100%;
   height: auto;
   position: relative;
-  min-height: 157px;
+  min-height: 182px;
 
   display: flex;
   flex-direction: column;

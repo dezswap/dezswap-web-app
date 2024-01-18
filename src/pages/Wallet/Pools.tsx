@@ -112,7 +112,7 @@ function Pools() {
         <Table
           idKey="address"
           minWidth={!isSmallScreen ? 1110 : undefined}
-          columns={[{ key: "none", label: "Pool", hasSort: true }]}
+          columns={[{ key: "none", label: "Pool", hasSort: false }]} // TODO: add sort
           hideHeader={isSmallScreen}
           data={poolsToDisplay}
           renderRow={(row) => (

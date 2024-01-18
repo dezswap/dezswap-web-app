@@ -182,7 +182,7 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
       </div>
       {content}
 
-      <LineChart height={291} {...lineChartProps} />
+      <LineChart key={selectedTabIndex} height={291} {...lineChartProps} />
 
       <Modal
         isOpen={chartModal.isOpen}

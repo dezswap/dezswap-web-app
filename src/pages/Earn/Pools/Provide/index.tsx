@@ -67,7 +67,7 @@ function ProvidePage() {
     items: ["slippageTolerance", "txDeadline"],
   });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
-  const { pairAddress } = useParams<{ pairAddress: string }>();
+  const { poolAddress } = useParams<{ poolAddress: string }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair, pairs } = usePairs();
@@ -86,8 +86,8 @@ function ProvidePage() {
   });
 
   const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
+    () => (poolAddress ? getPair(poolAddress) : undefined),
+    [getPair, poolAddress],
   );
 
   const [asset1, asset2] = useMemo(
@@ -104,13 +104,13 @@ function ProvidePage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (pairAddress && !AccAddress.validate(pairAddress)) {
+    if (poolAddress && !AccAddress.validate(poolAddress)) {
       errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
+  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -118,7 +118,7 @@ function ProvidePage() {
   });
   const formData = form.watch();
 
-  const pool = usePool(pairAddress);
+  const pool = usePool(poolAddress);
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&
@@ -129,7 +129,7 @@ function ProvidePage() {
   const simulationResult = useSimulate(
     isPoolEmpty
       ? {
-          pairAddress: pairAddress || "",
+          pairAddress: poolAddress || "",
           asset1Address: asset1?.token || "",
           asset1Amount:
             valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
@@ -138,7 +138,7 @@ function ProvidePage() {
             valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
         }
       : {
-          pairAddress: pairAddress || "",
+          pairAddress: poolAddress || "",
           asset1Address: isReversed ? asset2?.token || "" : asset1?.token || "",
           asset1Amount: isReversed
             ? valueToAmount(formData.asset2Value, asset2?.decimals) || "0"
@@ -161,7 +161,7 @@ function ProvidePage() {
             msgs: generateAddLiquidityMsg(
               connectedWallet?.network.name as NetworkName,
               connectedWallet.walletAddress,
-              pairAddress || "",
+              poolAddress || "",
               [
                 {
                   address: asset1?.token || "",
