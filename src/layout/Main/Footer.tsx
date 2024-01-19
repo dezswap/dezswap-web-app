@@ -106,9 +106,10 @@ const socialMediaLinks = [
   },
 ];
 
-const text1 = "Dezswap does not take any financial profit from the protocol.";
-
-const text2 = "Trading fee goes to liquidity providers.";
+const infoMessages = [
+  "Dezswap does not take any financial profit from the protocol.",
+  "Trading fee goes to liquidity providers.",
+];
 
 function Footer() {
   const network = useNetwork();
@@ -168,9 +169,10 @@ function Footer() {
                 transform: translate(-50%, -50%);
                 width: 100%;
                 text-align: center;
+                pointer-events: none;
               `}
             >
-              {text1} {text2}
+              {infoMessages.join(" ")}
             </Typography>
           </Visible>
           <div>
@@ -197,9 +199,9 @@ function Footer() {
                 text-align: center;
               `}
             >
-              {text1}
-              <br />
-              {text2}
+              {infoMessages.map((message) => (
+                <div key={message}>{message}</div>
+              ))}
             </Typography>
           </Visible>
         </Content>
