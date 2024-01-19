@@ -71,6 +71,11 @@ function TxBroadcastingModal({
     setTimeAfterQueued(0);
   }, [txHash, lcd]);
 
+  const hasError = useMemo(
+    () => !!(txError || txInfo?.code),
+    [txError, txInfo],
+  );
+
   const modalTitle = useMemo(() => {
     if (!txHash && !txError) {
       return "Check your wallet";
@@ -81,11 +86,11 @@ function TxBroadcastingModal({
     if (txInfo && txHash && !txInfo?.code) {
       return "Complete";
     }
-    if (txError || txInfo?.code) {
+    if (hasError) {
       return "Something wrong";
     }
     return undefined;
-  }, [txError, txHash, txInfo]);
+  }, [hasError, txError, txHash, txInfo]);
 
   const [waitingFrom, setWaitingFrom] = useState(new Date());
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -111,12 +116,14 @@ function TxBroadcastingModal({
 
   return (
     <Modal
+      id="tx-broadcasting-modal"
+      className={hasError ? "has-error" : undefined}
       shouldCloseOnEsc={false}
       shouldCloseOnOverlayClick={false}
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       isOpen={isOpen}
       title={modalTitle}
-      error={!!(txError || txInfo?.code)}
+      error={hasError}
       {...(!(!txHash && !txError) ? modalProps : {})}
     >
       {!txHash && !txError && (
@@ -340,7 +347,7 @@ function TxBroadcastingModal({
           </div>
         )}
 
-      {(!!txError || !!txInfo?.code) && (
+      {hasError && (
         <div
           css={css`
             text-align: center;

@@ -16,6 +16,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
 import Tooltip from "components/Tooltip";
 import Footer from "./Footer";
+import BrowserDelegateButton from "./BrowserDelegateButton";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -28,6 +29,10 @@ const Wrapper = styled.div<{ hasBanner?: boolean }>`
   .${MOBILE_SCREEN_CLASS} & {
     padding-bottom: unset;
     min-height: unset;
+  }
+
+  body:has(#disclaimer-modal) & {
+    display: none;
   }
 `;
 
@@ -113,6 +118,7 @@ function MainLayout({ children }: PropsWithChildren) {
     <>
       <Header />
       <Wrapper hasBanner={network.name !== "mainnet"}>
+        <BrowserDelegateButton />
         {children}
         <FooterWrapper>
           <Footer />
