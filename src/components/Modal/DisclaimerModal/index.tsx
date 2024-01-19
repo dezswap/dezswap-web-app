@@ -42,6 +42,7 @@ function DisclaimerModal({ isOpen }: ReactModal.Props) {
 
   return (
     <Modal
+      id="disclaimer-modal"
       isOpen={isOpen}
       title="Disclaimer"
       hasCloseButton={false}

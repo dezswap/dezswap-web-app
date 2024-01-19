@@ -451,6 +451,8 @@ function SwapPage() {
             const oppositeTarget = selectAsset1Modal.isOpen
               ? FormKey.asset2Address
               : FormKey.asset1Address;
+
+            form.setValue(target, address);
             if (formData[oppositeTarget] === address) {
               form.setValue(oppositeTarget, "");
             } else if (
@@ -458,8 +460,9 @@ function SwapPage() {
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
               firstProvideModal.open();
+              form.reset();
             }
-            form.setValue(target, address);
+
             selectAsset1Modal.close();
             selectAsset2Modal.close();
           }}
