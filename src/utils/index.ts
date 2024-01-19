@@ -1,6 +1,7 @@
 import { Numeric } from "@xpla/xpla.js";
 import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
+import { DashboardChartItem } from "types/dashboard-api";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
@@ -241,4 +242,17 @@ export const formatPercentage = (value: Numeric.Input) => {
     style: "percent",
     maximumFractionDigits: 2,
   });
+};
+
+export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
+  const initialValue = "0";
+  try {
+    return data
+      .reduce((prev, current) => {
+        return prev.add(current.v);
+      }, Numeric.parse(initialValue))
+      .toString();
+  } catch (error) {
+    return initialValue;
+  }
 };

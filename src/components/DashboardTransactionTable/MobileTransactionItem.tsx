@@ -70,15 +70,13 @@ function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
           <div>
             <Label>Transaction</Label>
             <Value>
-              <HoverUnderline>
-                <a
-                  href={getTransactionLink(transaction.hash, network.name)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {transaction.actionDisplay}
-                </a>
-              </HoverUnderline>
+              <a
+                href={getTransactionLink(transaction.hash, network.name)}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <HoverUnderline>{transaction.actionDisplay}</HoverUnderline>
+              </a>
             </Value>
           </div>
           {expand.isOpen && (

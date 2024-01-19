@@ -107,6 +107,14 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
   const totalPage = Math.ceil(sortedData.length / limit);
   const dataToDisplay = sortedData.slice((page - 1) * limit, page * limit);
 
+  const emptyMessage = useMemo(
+    () =>
+      `No ${
+        ["", "swapped", "added", "removed"][selectedFilterTabIndex]
+      } TX found`,
+    [selectedFilterTabIndex],
+  );
+
   useEffect(() => {
     setPage(1);
   }, [limit, selectedFilterTabIndex, searchKeyword]);
@@ -205,6 +213,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
             setSortBy(key);
             setSortDirection(direction);
           }}
+          emptyMessage={emptyMessage}
           columns={[
             {
               key: "actionDisplay",
@@ -312,6 +321,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
           columns={[]}
           data={dataToDisplay}
           hideHeader
+          emptyMessage={emptyMessage}
           renderRow={(transaction) => (
             <MobileTransactionItem transaction={transaction} />
           )}

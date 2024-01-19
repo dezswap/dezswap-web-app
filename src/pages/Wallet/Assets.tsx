@@ -141,7 +141,9 @@ function Assets() {
           }}
           data={assetsToDisplay}
           idKey="token"
-          emptyMessage="No tokens found"
+          emptyMessage={
+            ["No token found", "No bookmark found"][selectedTabIndex]
+          }
         />
       ) : (
         <Table

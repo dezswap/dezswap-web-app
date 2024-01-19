@@ -15,7 +15,8 @@ import {
   formatNumber,
 } from "utils";
 import Button from "components/Button";
-import useDashboard from "hooks/dashboard/useDashboard";
+import { Link } from "react-router-dom";
+import HoverUnderline from "components/HoverUnderline";
 import { TokenWithBalanceAndValue } from "./Assets";
 
 interface MobileAssetItemProps {
@@ -52,12 +53,6 @@ function MobileAssetItem({
   isBookmarked,
   onBookmarkClick,
 }: MobileAssetItemProps) {
-  const { tokens: dashboardTokens } = useDashboard();
-
-  const dashboardToken = dashboardTokens?.find(
-    (item) => item?.address && asset?.token && item?.address === asset?.token,
-  );
-
   return (
     <Expand
       header={
@@ -95,7 +90,9 @@ function MobileAssetItem({
                     text-overflow: ellipsis;
                   `}
                 >
-                  {asset.name}
+                  <Link to={`/tokens/${asset.token}`}>
+                    <HoverUnderline>{asset.name}</HoverUnderline>
+                  </Link>
                 </Value>
               </Col>
               <Col xs="content">
@@ -120,6 +117,7 @@ function MobileAssetItem({
           </div>
         </Content>
       }
+      hasDivider={false}
     >
       <Content>
         <div>
@@ -131,11 +129,22 @@ function MobileAssetItem({
             &nbsp;{asset.symbol}
           </Value>
         </div>
-        <div>
-          <Button block variant="primary">
-            Swap
-          </Button>
-        </div>
+        {asset.token && (
+          <div>
+            <Link
+              to={{
+                pathname: "/trade/swap",
+                search: new URLSearchParams({
+                  q: asset.token,
+                }).toString(),
+              }}
+            >
+              <Button block variant="primary">
+                Swap
+              </Button>
+            </Link>
+          </div>
+        )}
       </Content>
     </Expand>
   );

@@ -9,7 +9,14 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
 import useBookmark from "hooks/useBookmark";
 import { useEffect, useMemo } from "react";
-import { Col, Container, Row, useScreenClass } from "react-grid-system";
+import {
+  Col,
+  Container,
+  Hidden,
+  Row,
+  Visible,
+  useScreenClass,
+} from "react-grid-system";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -64,7 +71,7 @@ function TokenDetailPage() {
     return tokenAddress ? bookmarks?.includes(tokenAddress) : false;
   }, [bookmarks, tokenAddress]);
 
-  const balance = useBalance(tokenAddress);
+  const balance = 1;
 
   const bookmarkButton = useMemo(
     () => (
@@ -95,6 +102,46 @@ function TokenDetailPage() {
       clearTimeout(timerId);
     };
   }, [dashboardToken, invalidPathModal, network]);
+
+  const actionButtons = useMemo(
+    () => (
+      <Row justify="between" align="center" gutterWidth={10}>
+        <Col xs={6}>
+          {asset?.token && (
+            <Link
+              to={{
+                pathname: "/earn/pools",
+                search: new URLSearchParams({
+                  q: asset.token,
+                }).toString(),
+              }}
+            >
+              <Button variant="primary" block>
+                Add liquidity
+              </Button>
+            </Link>
+          )}
+        </Col>
+        <Col xs={6}>
+          {tokenAddress && (
+            <Link
+              to={{
+                pathname: "/trade/swap",
+                search: new URLSearchParams({
+                  q: tokenAddress,
+                }).toString(),
+              }}
+            >
+              <Button variant="primary" block>
+                Swap
+              </Button>
+            </Link>
+          )}
+        </Col>
+      </Row>
+    ),
+    [asset, tokenAddress],
+  );
 
   return (
     <Wrapper key={tokenAddress}>
@@ -143,9 +190,9 @@ function TokenDetailPage() {
                     align="center"
                     gutterWidth={screenClass === MOBILE_SCREEN_CLASS ? 6 : 10}
                   >
-                    {screenClass !== MOBILE_SCREEN_CLASS && (
+                    <Hidden xs>
                       <Col xs="content">{bookmarkButton}</Col>
-                    )}
+                    </Hidden>
                     <Col xs="content">
                       <AssetIcon asset={{ icon: asset?.icon }} />
                     </Col>
@@ -166,111 +213,93 @@ function TokenDetailPage() {
                     </Col>
                   </Row>
                 </Col>
-                {screenClass === MOBILE_SCREEN_CLASS && (
+                <Visible xs>
                   <Col xs="content">{bookmarkButton}</Col>
-                )}
+                </Visible>
               </Row>
             </Col>
-            <Col xs={12} sm={6}>
-              <div
-                css={
-                  screenClass !== MOBILE_SCREEN_CLASS &&
-                  css`
+            <Hidden xs>
+              <Col xs={12} sm={6}>
+                <div
+                  css={css`
                     max-width: 310px;
                     margin-left: auto;
-                  `
-                }
-              >
-                <Row justify="between" align="center" gutterWidth={10}>
-                  <Col xs={6}>
-                    {asset?.token && (
-                      <Link
-                        to={{
-                          pathname: "/earn/pools",
-                          search: new URLSearchParams({
-                            q: asset.token,
-                          }).toString(),
-                        }}
-                      >
-                        <Button variant="primary" block>
-                          Add liquidity
-                        </Button>
-                      </Link>
-                    )}
-                  </Col>
-                  <Col xs={6}>
-                    {tokenAddress && (
-                      <Link
-                        to={{
-                          pathname: "/trade/swap",
-                          search: new URLSearchParams({
-                            q: tokenAddress,
-                          }).toString(),
-                        }}
-                      >
-                        <Button variant="primary" block>
-                          Swap
-                        </Button>
-                      </Link>
-                    )}
-                  </Col>
-                </Row>
-              </div>
-            </Col>
-          </Row>
-          {Numeric.parse(balance).gt(0) && (
-            <>
-              <Hr
-                css={css`
-                  margin: 20px 0;
-                `}
-              />
-              <Row justify="between" align="start">
-                <Col xs="content">
-                  <Typography size={16} weight={900} color="primary">
-                    My Balance
-                  </Typography>
-                </Col>
-                <Col xs="content">
-                  <div
-                    css={css`
-                      text-align: right;
-                    `}
-                  >
+                  `}
+                >
+                  {actionButtons}
+                </div>
+              </Col>
+            </Hidden>
+            {Numeric.parse(balance).gt(0) && (
+              <Col xs={12}>
+                <Hr
+                  css={css`
+                    margin-bottom: 20px;
+                  `}
+                />
+                <Row
+                  justify="between"
+                  align="start"
+                  css={css`
+                    row-gap: 10px;
+                  `}
+                >
+                  <Col xs={12} sm="content">
                     <Typography
-                      size={22}
+                      size={screenClass === MOBILE_SCREEN_CLASS ? 14 : 16}
                       weight={900}
                       color="primary"
+                    >
+                      My Balance
+                    </Typography>
+                  </Col>
+                  <Col xs={12} sm="content">
+                    <div
                       css={css`
-                        margin-bottom: 2px;
+                        text-align: right;
+                        .${MOBILE_SCREEN_CLASS} & {
+                          text-align: left;
+                        }
                       `}
                     >
-                      $
-                      {formatNumber(
-                        formatDecimals(
-                          Numeric.parse(dashboardToken?.price || 0).mul(
-                            amountToValue(balance, asset?.decimals) || 0,
+                      <Typography
+                        size={22}
+                        weight={900}
+                        color="primary"
+                        css={css`
+                          margin-bottom: 2px;
+                        `}
+                      >
+                        $
+                        {formatNumber(
+                          formatDecimals(
+                            Numeric.parse(dashboardToken?.price || 0).mul(
+                              amountToValue(balance, asset?.decimals) || 0,
+                            ),
+                            2,
                           ),
-                          2,
-                        ),
-                      )}
-                    </Typography>
-                    <Typography size={14} weight={500} color="text.secondary">
-                      =&nbsp;
-                      {formatNumber(
-                        formatDecimals(
-                          amountToValue(balance, asset?.decimals) || 0,
-                          3,
-                        ),
-                      )}
-                      &nbsp;
-                      {asset?.symbol}
-                    </Typography>
-                  </div>
-                </Col>
-              </Row>
-            </>
-          )}
+                        )}
+                      </Typography>
+                      <Typography size={14} weight={500} color="text.secondary">
+                        =&nbsp;
+                        {formatNumber(
+                          formatDecimals(
+                            amountToValue(balance, asset?.decimals) || 0,
+                            3,
+                          ),
+                        )}
+                        &nbsp;
+                        {asset?.symbol}
+                      </Typography>
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+            )}
+            <Visible xs>
+              <Col xs={12}>{actionButtons}</Col>
+            </Visible>
+          </Row>
         </Panel>
         <Row
           justify="between"

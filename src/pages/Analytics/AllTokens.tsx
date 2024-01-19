@@ -154,6 +154,9 @@ function AllTokens() {
                 label: "#",
                 width: 10,
                 hasSort: false,
+                cellStyle: {
+                  overflow: "visible",
+                },
                 render(value, row, index) {
                   return (page - 1) * limit + index + 1;
                 },

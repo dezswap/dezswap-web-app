@@ -115,6 +115,9 @@ function Pools() {
           columns={[{ key: "none", label: "Pool", hasSort: false }]} // TODO: add sort
           hideHeader={isSmallScreen}
           data={poolsToDisplay}
+          emptyMessage={
+            ["No pool found", "No bookmark found"][selectedTabIndex]
+          }
           renderRow={(row) => (
             <PoolItem
               pool={row}

@@ -321,7 +321,7 @@ function PoolDetailPage() {
           gutterWidth={14}
           css={css`
             row-gap: 13px;
-            margin-bottom: 13px;
+            margin-bottom: 30px;
           `}
         >
           <Col xs={12} md={7}>

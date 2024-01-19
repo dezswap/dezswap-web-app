@@ -6,9 +6,17 @@ import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Select from "pages/Earn/Pools/Select";
 import { Row, Col, useScreenClass } from "react-grid-system";
-import { formatBigNumber, formatDate, formatCurrency } from "utils";
+import {
+  formatBigNumber,
+  formatDate,
+  formatCurrency,
+  getSumOfDashboardChartData,
+} from "utils";
 import useDashboard from "hooks/dashboard/useDashboard";
-import { DashboardChartDuration } from "types/dashboard-api";
+import {
+  DashboardChartDuration,
+  DashboardChartItem,
+} from "types/dashboard-api";
 import IconButton from "components/IconButton";
 import iconFullscreen from "assets/icons/icon-fullscreen.svg";
 import useHashModal from "hooks/useHashModal";
@@ -185,20 +193,24 @@ function Charts() {
 
   const { statistics } = useDashboard();
 
-  const addresses = statistics?.map((item) => ({
-    t: item.timestamp,
-    v: item.addressCount || 0,
-  }));
+  // TODO: Refactor
+  const addresses: DashboardChartItem[] =
+    statistics?.map((item) => ({
+      t: item.timestamp,
+      v: `${item.addressCount || 0}`,
+    })) || [];
 
-  const transactions = statistics?.map((item) => ({
-    t: item.timestamp,
-    v: item.txCount || 0,
-  }));
+  const transactions: DashboardChartItem[] =
+    statistics?.map((item) => ({
+      t: item.timestamp,
+      v: `${item.txCount || 0}`,
+    })) || [];
 
-  const fees = statistics?.map((item) => ({
-    t: item.timestamp,
-    v: item.fee || 0,
-  }));
+  const fees: DashboardChartItem[] =
+    statistics?.map((item) => ({
+      t: item.timestamp,
+      v: `${item.fee || 0}`,
+    })) || [];
 
   return (
     <Row
@@ -214,9 +226,10 @@ function Charts() {
           <Chart
             size="large"
             title="Volume"
-            defaultValue={`${formatCurrency(
-              volume.data?.[volume.data.length - 1]?.v.toString() || "0",
-            )}`}
+            defaultValue={
+              volume?.data &&
+              `${formatCurrency(getSumOfDashboardChartData(volume.data))}`
+            }
             defaultCaption={
               volume?.data?.[0]
                 ? `${formatDate(volume.data[0].t)} - ${formatDate(
@@ -227,20 +240,31 @@ function Charts() {
             data={volume.data?.map((item) => item.v) || []}
             duration={volume.duration}
             onDurationChange={(duration) => volume.setDuration(duration)}
-            renderTooltip={({ value, index }) => (
-              <div
-                css={css`
-                  white-space: nowrap;
-                `}
-              >
-                <Typography size={20} weight={900} color="primary">
-                  {formatCurrency(value)}
-                </Typography>
-                <Typography size={12} weight={400}>
-                  {volume.data?.[index] && formatDate(volume.data?.[index].t)}
-                </Typography>
-              </div>
-            )}
+            renderTooltip={({ value, index }) => {
+              const [prevDate, currentDate] = [index - 1, index].map(
+                (i) => volume.data?.[i] && formatDate(volume.data?.[i]?.t),
+              );
+
+              const formattedDate =
+                prevDate === currentDate
+                  ? prevDate
+                  : [prevDate, currentDate].join(" - ");
+
+              return (
+                <div
+                  css={css`
+                    white-space: nowrap;
+                  `}
+                >
+                  <Typography size={20} weight={900} color="primary">
+                    {formatCurrency(value)}
+                  </Typography>
+                  <Typography size={12} weight={400}>
+                    {volume.duration === "month" ? currentDate : formattedDate}
+                  </Typography>
+                </div>
+              );
+            }}
           />
 
           <Chart
@@ -250,11 +274,7 @@ function Charts() {
               tvl.data?.[tvl.data.length - 1]?.v.toString() || "0",
             )}`}
             defaultCaption={
-              tvl?.data?.[0]
-                ? `${formatDate(tvl.data[0].t)} - ${formatDate(
-                    tvl.data[tvl.data.length - 1]?.t,
-                  )}`
-                : ""
+              tvl?.data?.[0] ? formatDate(tvl.data[tvl.data.length - 1]?.t) : ""
             }
             data={tvl.data?.map((item) => item.v) || []}
             duration={tvl.duration}
@@ -282,8 +302,7 @@ function Charts() {
             size="small"
             title="Number of Addresses"
             defaultValue={formatBigNumber(
-              addresses?.reduce((prev, curr) => prev + curr.v, 0).toString() ||
-                0,
+              getSumOfDashboardChartData(addresses),
             )}
             defaultCaption={
               addresses?.[0]
@@ -312,9 +331,7 @@ function Charts() {
             size="small"
             title="Number of Transactions"
             defaultValue={formatBigNumber(
-              transactions
-                ?.reduce((prev, curr) => prev + curr.v, 0)
-                .toString() || 0,
+              getSumOfDashboardChartData(transactions),
             )}
             defaultCaption={
               transactions?.[0]
@@ -342,9 +359,7 @@ function Charts() {
           <Chart
             size="small"
             title="Fees"
-            defaultValue={`${formatCurrency(
-              fees?.[fees.length - 1]?.v.toString() || "0",
-            )}`}
+            defaultValue={`${formatCurrency(getSumOfDashboardChartData(fees))}`}
             defaultCaption={
               fees?.[0]
                 ? `${formatDate(fees[0].t)} - ${formatDate(

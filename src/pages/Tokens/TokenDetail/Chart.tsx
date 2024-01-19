@@ -120,9 +120,7 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
             `}
           >
             {chartData?.[0]
-              ? `${formatDate(chartData[0].t)} - ${formatDate(
-                  chartData[chartData.length - 1].t,
-                )}`
+              ? formatDate(chartData[chartData.length - 1].t)
               : ""}
           </Typography>
         </Col>

@@ -451,10 +451,14 @@ function Header() {
                     />
                   </Col>
                   <Col width="auto">
+                    {/* // TODO: Refactor */}
                     {connectedWallet ? (
                       <WalletInfo
                         title={
-                          <Link to="/wallet">
+                          <Link
+                            to="/wallet"
+                            onClick={() => walletPopover.close()}
+                          >
                             <Typography
                               size={20}
                               weight={900}
