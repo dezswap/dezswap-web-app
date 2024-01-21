@@ -71,7 +71,7 @@ function TokenDetailPage() {
     return tokenAddress ? bookmarks?.includes(tokenAddress) : false;
   }, [bookmarks, tokenAddress]);
 
-  const balance = 1;
+  const balance = useBalance(tokenAddress || "");
 
   const bookmarkButton = useMemo(
     () => (
