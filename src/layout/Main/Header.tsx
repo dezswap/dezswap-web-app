@@ -8,6 +8,7 @@ import iconNotification from "assets/icons/icon-notification.svg";
 import iconNotificationHover from "assets/icons/icon-notification-hover.svg";
 import iconNotificationWithBadge from "assets/icons/icon-notification-with-badge.svg";
 import iconNotificationWithBadgeHover from "assets/icons/icon-notification-with-badge-hover.svg";
+import iconArrowRight from "assets/icons/icon-arrow-right.svg";
 import Button from "components/Button";
 import IconButton from "components/IconButton";
 import NavBar from "components/NavBar";
@@ -249,18 +250,33 @@ function WalletInfo({
             padding: 16px;
           `}
         >
-          <Link to="wallet" onClick={onGoBack}>
-            <Typography
-              color="primary"
-              weight={900}
-              css={css`
-                text-align: center;
-                margin-bottom: 9px;
-              `}
-            >
-              My wallet
-            </Typography>
-          </Link>
+          <div
+            css={css`
+              margin-bottom: 9px;
+            `}
+          >
+            <Link to="wallet" onClick={onGoBack}>
+              <Row justify="between" align="center" gutterWidth={0}>
+                <Col
+                  xs="content"
+                  css={css`
+                    opacity: 0;
+                    pointer-events: none;
+                  `}
+                >
+                  <IconButton size={24} icons={{ default: iconArrowRight }} />
+                </Col>
+                <Col xs="content">
+                  <Typography color="primary" weight={900}>
+                    My wallet
+                  </Typography>
+                </Col>
+                <Col xs="content">
+                  <IconButton size={24} icons={{ default: iconArrowRight }} />
+                </Col>
+              </Row>
+            </Link>
+          </div>
           {children}
         </Panel>
       }
@@ -455,21 +471,34 @@ function Header() {
                     {connectedWallet ? (
                       <WalletInfo
                         title={
-                          <Link
-                            to="/wallet"
-                            onClick={() => walletPopover.close()}
-                          >
-                            <Typography
-                              size={20}
-                              weight={900}
-                              color="primary"
-                              css={css`
-                                text-align: center;
-                              `}
+                          <Row justify="center">
+                            <Link
+                              to="/wallet"
+                              onClick={() => walletPopover.close()}
                             >
-                              My wallet
-                            </Typography>
-                          </Link>
+                              <Row
+                                justify="center"
+                                align="center"
+                                gutterWidth={12}
+                              >
+                                <Col xs="content">
+                                  <Typography
+                                    size={20}
+                                    weight={900}
+                                    color="primary"
+                                  >
+                                    My wallet
+                                  </Typography>
+                                </Col>
+                                <Col xs="content">
+                                  <IconButton
+                                    size={28}
+                                    icons={{ default: iconArrowRight }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Link>
+                          </Row>
                         }
                         isOpen={walletPopover.isOpen}
                         onGoBack={() => walletPopover.close()}
