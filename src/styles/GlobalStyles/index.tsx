@@ -2,6 +2,7 @@ import { css, Global, useTheme } from "@emotion/react";
 import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import reset from "emotion-reset";
 import "tippy.js/dist/tippy.css";
+import "tippy.js/dist/svg-arrow.css";
 
 function GlobalStyles() {
   const theme = useTheme();
@@ -32,12 +33,20 @@ function GlobalStyles() {
             font-family: "Nunito", sans-serif;
             outline: none;
           }
+
+          a,
+          a:active {
+            text-decoration: none;
+            color: inherit;
+          }
         `}
       />
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open:not(:has(.ReactModal__Overlay.inner-modal)),
+          .ReactModal__Body--open:has(.ReactModal__Overlay):not(
+              :has(.ReactModal__Overlay.inner-modal)
+            ),
           .ReactModal__Body--open:has(
               .ReactModal__Overlay .ReactModal__Overlay.inner-modal
             ) {
@@ -118,7 +127,6 @@ function GlobalStyles() {
       />
       {/* Tippy.js */}
       <Global
-        /* // TODO: arrow style  */
         styles={css`
           .tippy-box[data-theme~="light-border"] {
             background-color: ${theme.colors.white};
@@ -157,16 +165,13 @@ function GlobalStyles() {
             }
             &[data-placement^="top"] > .tippy-arrow:after {
               border-top-color: ${theme.colors.primary};
-              border-width: 6px 6px 0;
+              border-width: 7px 7px 0;
               top: 18px;
-              left: 2.5px;
+              left: 1px;
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="top"] > .tippy-svg-arrow > svg {
-              top: 16px;
-            }
-            &[data-placement^="top"] > .tippy-svg-arrow:after {
-              top: 17px;
+              top: 24px;
             }
             &[data-placement^="bottom"] > .tippy-arrow:before {
               border-bottom-color: ${theme.colors.white};
@@ -174,16 +179,13 @@ function GlobalStyles() {
             }
             &[data-placement^="bottom"] > .tippy-arrow:after {
               border-bottom-color: ${theme.colors.primary};
-              border-width: 0 6px 6px;
-              bottom: 19px;
-              left: 2.5px;
+              border-width: 0 7px 7px;
+              bottom: 18px;
+              left: 1px;
               transform: scale(1.5) translateY(0px);
             }
             &[data-placement^="bottom"] > .tippy-svg-arrow > svg {
-              bottom: 16px;
-            }
-            &[data-placement^="bottom"] > .tippy-svg-arrow:after {
-              bottom: 17px;
+              bottom: 24px;
             }
             &[data-placement^="left"] > .tippy-arrow:before {
               border-left-color: ${theme.colors.white};
@@ -196,10 +198,7 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(1px);
             }
             &[data-placement^="left"] > .tippy-svg-arrow > svg {
-              left: 11px;
-            }
-            &[data-placement^="left"] > .tippy-svg-arrow:after {
-              left: 12px;
+              left: 17.5px;
             }
             &[data-placement^="right"] > .tippy-arrow:before {
               border-right-color: ${theme.colors.white};
@@ -213,19 +212,27 @@ function GlobalStyles() {
               transform: scale(1.5) translateX(-1px);
             }
             &[data-placement^="right"] > .tippy-svg-arrow > svg {
-              right: 11px;
-            }
-            &[data-placement^="right"] > .tippy-svg-arrow:after {
-              right: 12px;
+              right: 17.5px;
             }
             & > .tippy-svg-arrow {
-              fill: ${theme.colors.white};
-            }
-            & > .tippy-svg-arrow:after {
-              background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCA2czEuNzk2LS4wMTMgNC42Ny0zLjYxNUM1Ljg1MS45IDYuOTMuMDA2IDggMGMxLjA3LS4wMDYgMi4xNDguODg3IDMuMzQzIDIuMzg1QzE0LjIzMyA2LjAwNSAxNiA2IDE2IDZIMHoiIGZpbGw9InJnYmEoMCwgOCwgMTYsIDAuMikiLz48L3N2Zz4=);
-              background-size: 16px 6px;
-              width: 16px;
-              height: 6px;
+              width: 28px;
+              height: 28px;
+              & > svg {
+                width: 28px;
+                height: 12px;
+              }
+              &::after {
+                content: "";
+                width: 30px;
+                height: 28px;
+                background-color: #ffffff;
+                z-index: 1;
+                position: absolute;
+                left: -1px;
+                top: 0;
+                right: unset;
+                bottom: unset;
+              }
             }
           }
         `}

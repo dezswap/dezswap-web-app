@@ -2,15 +2,17 @@ import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
-import { useLCDClient } from "hooks/useLCDClient";
+import useLCDClient from "hooks/useLCDClient";
+import useAPI from "./useAPI";
 
-export const useFee = (txOptions?: CreateTxOptions) => {
+const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
   const lcd = useLCDClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const api = useAPI();
 
   const deferredCreateTxOptions = useDeferredValue(txOptions);
 
@@ -38,18 +40,8 @@ export const useFee = (txOptions?: CreateTxOptions) => {
           return;
         }
 
-        const account = await lcd.auth.accountInfo(
-          connectedWallet.walletAddress,
-        );
-        const res = await lcd.tx.estimateFee(
-          [
-            {
-              sequenceNumber: account.getSequenceNumber(),
-              publicKey: account.getPublicKey(),
-            },
-          ],
-          deferredCreateTxOptions,
-        );
+        const res = await api.estimateFee(deferredCreateTxOptions);
+
         if (res && !isAborted) {
           setFee(res);
           setErrMsg("");
@@ -106,3 +98,5 @@ export const useFee = (txOptions?: CreateTxOptions) => {
 
   return { fee, isLoading, isFailed, errMsg };
 };
+
+export default useFee;

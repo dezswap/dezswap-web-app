@@ -11,6 +11,23 @@ interface TypographyProps {
   weight?: CSSProperties["fontWeight"];
 }
 
+interface RecursiveKeyValue {
+  [key: string]: string | RecursiveKeyValue;
+}
+const getTypographyColorRecursive = (
+  from: RecursiveKeyValue | undefined,
+  color: string | undefined,
+): string | undefined => {
+  if (!color || !from) return undefined;
+  if (typeof from[color as Color] === "string") {
+    return `${from[color as Color]}`;
+  }
+  return getTypographyColorRecursive(
+    from[color.split(".")[0]] as RecursiveKeyValue,
+    color.split(".").slice(1).join("."),
+  );
+};
+
 const Typography = styled.div<TypographyProps>`
   font-size: 14px;
   font-stretch: normal;
@@ -23,7 +40,7 @@ const Typography = styled.div<TypographyProps>`
   `}
 
   ${({ color = colors.text.primary, theme }) => css`
-    color: ${theme.colors[color as Color] ?? color};
+    color: ${getTypographyColorRecursive(theme.colors, color) ?? color};
   `}
 
   

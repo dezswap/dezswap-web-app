@@ -179,11 +179,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
 export default Input;
 
-interface NumberInput extends InputProps {
+export interface NumberInputProps extends InputProps {
   decimals?: number;
 }
 
-export const NumberInput = forwardRef<HTMLInputElement, NumberInput>(
+export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   ({ decimals = 18, ...InputProps }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);

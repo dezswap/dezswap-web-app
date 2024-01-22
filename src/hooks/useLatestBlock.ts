@@ -1,26 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAPI } from "hooks/useAPI";
+import useAPI from "hooks/useAPI";
+import { useQuery } from "@tanstack/react-query";
+import useNetwork from "./useNetwork";
 
 const UPDATE_INTERVAL = 3000;
 
 export const useLatestBlock = () => {
-  const [height, setHeight] = useState<string>();
   const api = useAPI();
+  const network = useNetwork();
 
-  useEffect(() => {
-    const fetchHeight = () => {
-      api
-        .getLatestBlockHeight()
-        .then((value) => typeof value !== "undefined" && setHeight(`${value}`));
-    };
+  const { data: height } = useQuery({
+    queryKey: ["latestBlockHeight", network.name],
+    queryFn: api.getLatestBlockHeight,
+    refetchInterval: UPDATE_INTERVAL,
+    refetchIntervalInBackground: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
 
-    const intervalId = setInterval(() => fetchHeight(), UPDATE_INTERVAL);
-    fetchHeight();
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [api]);
-
-  return useMemo(() => height, [height]);
+  return height;
 };

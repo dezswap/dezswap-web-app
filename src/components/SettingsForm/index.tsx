@@ -10,7 +10,7 @@ import { slippagePresets } from "stores/settings";
 
 import iconQuestion from "assets/icons/icon-question.svg";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
-import ToggleButton from "components/ToggleButton";
+import Switch from "components/Switch";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import React, { useCallback } from "react";
 
@@ -68,10 +68,7 @@ function SettingsForm({
                 <Col xs="content">
                   <Row justify="start" align="center" gutterWidth={2}>
                     <Label>Slippage Tolerance</Label>
-                    <Tooltip
-                      arrow
-                      content="By slippage tolerance setting, it prevents the ratio of the spread to the amount expected to receive from becoming larger than the set value. High slippage tolerance helps transaction success, but you may get an unexpected price. "
-                    >
+                    <Tooltip content="By slippage tolerance setting, it prevents the ratio of the spread to the amount expected to receive from becoming larger than the set value. High slippage tolerance helps transaction success, but you may get an unexpected price. ">
                       <IconButton size={22} icons={{ default: iconQuestion }} />
                     </Tooltip>
                   </Row>
@@ -175,10 +172,7 @@ function SettingsForm({
               <Col xs="content">
                 <Row justify="start" align="center" gutterWidth={2}>
                   <Label>Transaction Deadline</Label>
-                  <Tooltip
-                    arrow
-                    content="Transaction will not be executed if it takes longer than the time."
-                  >
+                  <Tooltip content="Transaction will not be executed if it takes longer than the time.">
                     <IconButton size={22} icons={{ default: iconQuestion }} />
                   </Tooltip>
                 </Row>
@@ -220,7 +214,6 @@ function SettingsForm({
                 <Row justify="start" align="center" gutterWidth={2}>
                   <Label color="disabled">Auto Router</Label>
                   <Tooltip
-                    arrow
                     content={
                       <>
                         Optimize the best route
@@ -234,9 +227,9 @@ function SettingsForm({
                 </Row>
               </Col>
               <Col xs="content">
-                <Tooltip arrow content="Coming soon" placement="right">
+                <Tooltip content="Coming soon" placement="right">
                   <div>
-                    <ToggleButton disabled />
+                    <Switch disabled />
                   </div>
                 </Tooltip>
               </Col>

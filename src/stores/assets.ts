@@ -1,23 +1,15 @@
 import { atomWithStorage } from "jotai/utils";
-import { Asset, NetworkName } from "types/common";
-import { atom } from "jotai";
-import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
+import { NetworkName } from "types/common";
+import { Token } from "types/api";
 
-const assetsAtom = atomWithStorage<{
-  [K in NetworkName]?: Asset[];
-}>("assets", { mainnet: [], testnet: [] });
+interface CustomToken extends Token {
+  updatedAt?: Date;
+}
 
 export const customAssetsAtom = atomWithStorage<{
-  [K in NetworkName]?: Asset[];
+  [K in NetworkName]?: CustomToken[];
 }>("customAssets", { mainnet: [], testnet: [] });
-
-export const verifiedAssetsAtom = atom<VerifiedAssets | undefined>(undefined);
-export const verifiedIbcAssetsAtom = atom<VerifiedIbcAssets | undefined>(
-  undefined,
-);
 
 export const bookmarksAtom = atomWithStorage<{
   [K in NetworkName]?: string[];
 }>("bookmarks", { mainnet: [], testnet: [] });
-
-export default assetsAtom;

@@ -9,16 +9,17 @@ import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { ellipsisCenter, getTransactionLink } from "utils";
 import { TxInfo } from "@xpla/xpla.js";
 import { TxError } from "types/common";
-import { useLCDClient } from "hooks/useLCDClient";
+import useLCDClient from "hooks/useLCDClient";
 import Panel from "components/Panel";
 import Modal from "components/Modal";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import IconButton from "components/IconButton";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
+import LoadingIndicator from "components/LoadingIndicator";
 
 interface TxBroadcastingModalProps {
   txHash?: string;
@@ -70,6 +71,11 @@ function TxBroadcastingModal({
     setTimeAfterQueued(0);
   }, [txHash, lcd]);
 
+  const hasError = useMemo(
+    () => !!(txError || txInfo?.code),
+    [txError, txInfo],
+  );
+
   const modalTitle = useMemo(() => {
     if (!txHash && !txError) {
       return "Check your wallet";
@@ -80,20 +86,44 @@ function TxBroadcastingModal({
     if (txInfo && txHash && !txInfo?.code) {
       return "Complete";
     }
-    if (txError || txInfo?.code) {
+    if (hasError) {
       return "Something wrong";
     }
     return undefined;
-  }, [txError, txHash, txInfo]);
+  }, [hasError, txError, txHash, txInfo]);
+
+  const [waitingFrom, setWaitingFrom] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const waitingSecond = useMemo(() => {
+    return (currentTime.getTime() - waitingFrom.getTime()) / 1000;
+  }, [currentTime, waitingFrom]);
+
+  useEffect(() => {
+    setWaitingFrom(new Date());
+    const intervalId =
+      !txInfo && isOpen
+        ? setInterval(() => {
+            setCurrentTime(new Date());
+          }, 10)
+        : undefined;
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isOpen, txHash, txError, txInfo]);
 
   return (
     <Modal
+      id="tx-broadcasting-modal"
+      className={hasError ? "has-error" : undefined}
       shouldCloseOnEsc={false}
       shouldCloseOnOverlayClick={false}
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       isOpen={isOpen}
       title={modalTitle}
-      error={!!(txError || txInfo?.code)}
+      error={hasError}
       {...(!(!txHash && !txError) ? modalProps : {})}
     >
       {!txHash && !txError && (
@@ -114,6 +144,7 @@ function TxBroadcastingModal({
             css={css`
               padding: 16px;
               background-color: ${theme.colors.text.background};
+              margin-bottom: 20px;
             `}
           >
             <Typography
@@ -133,9 +164,24 @@ function TxBroadcastingModal({
             />
             <Typography size={16} color="primary" weight={400}>
               Go to the connected wallet and sign-in to proceed with the
-              transaction
+              transaction. If there is no response, please reload your browser
+              and try again.
             </Typography>
           </Panel>
+          <Button
+            block
+            size="large"
+            variant="primary"
+            disabled={waitingSecond <= 7}
+            onClick={() => {
+              document.location.reload();
+            }}
+          >
+            Reload&nbsp;
+            {waitingSecond <= 7 && (
+              <LoadingIndicator value={7 - waitingSecond} min={0} max={7} />
+            )}
+          </Button>
         </div>
       )}
 
@@ -176,7 +222,7 @@ function TxBroadcastingModal({
               style={{ justifyContent: "space-between" }}
             >
               <Col width="auto" style={{ flexShrink: "0" }}>
-                <Typography>Tx Hash</Typography>
+                <Typography>TX Hash</Typography>
               </Col>
               <Col>
                 <a
@@ -245,7 +291,7 @@ function TxBroadcastingModal({
             >
               <Row wrap="nowrap" style={{ justifyContent: "space-between" }}>
                 <Col width="auto" style={{ flexShrink: "0" }}>
-                  <Typography>Tx Hash</Typography>
+                  <Typography>TX Hash</Typography>
                 </Col>
                 <Col width="auto">
                   <a
@@ -301,7 +347,7 @@ function TxBroadcastingModal({
           </div>
         )}
 
-      {(!!txError || !!txInfo?.code) && (
+      {hasError && (
         <div
           css={css`
             text-align: center;

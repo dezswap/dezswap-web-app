@@ -1,7 +1,7 @@
 import ConnectWalletModal from "components/Modal/ConnectWalletModal";
 import { useMemo } from "react";
 import useGlobalElement from "../useGlobalElement";
-import { useModal } from "../useModal";
+import useModal from "../useModal";
 
 const useConnectWalletModal = () => {
   const modal = useModal();

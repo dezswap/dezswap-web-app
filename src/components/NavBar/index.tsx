@@ -1,11 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { NavLink, NavLinkProps } from "react-router-dom";
-
-interface NavBarProps {
-  items: (NavLinkProps & { key?: React.Key; disabled?: boolean })[];
-  flex?: boolean;
-}
+import { NavLink } from "react-router-dom";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -28,13 +23,14 @@ const NavItem = styled(NavLink, {
   opacity: 0.5;
   text-align: center;
   padding: 7px 0;
+  position: relative;
   ${({ flex }) =>
     flex &&
     css`
       flex: 1;
     `}
 
-  &.active:not(.disabled) {
+  &.active:not(.disabled), &:hover:not(.disabled) {
     opacity: 1;
   }
 
@@ -42,6 +38,14 @@ const NavItem = styled(NavLink, {
     cursor: default;
   }
 `;
+
+interface NavBarProps {
+  items: (React.ComponentProps<typeof NavItem> & {
+    key?: React.Key;
+    disabled?: boolean;
+  })[];
+  flex?: boolean;
+}
 
 function NavBar({ items, flex = true }: NavBarProps) {
   return (

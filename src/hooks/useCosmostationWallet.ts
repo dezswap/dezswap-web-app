@@ -17,7 +17,7 @@ import {
 } from "utils/cosmostation-helpers";
 import { useAtom } from "jotai";
 import { cosmostationAtom } from "stores/cosmostation";
-import { useLCDClient } from "./useLCDClient";
+import useLCDClient from "./useLCDClient";
 
 // TODO: support testnet
 const CHAIN_ID = networks.dimension.chainId;
@@ -80,20 +80,14 @@ const useCosmostationWallet = () => {
             cosmostationWallet.account.address,
           )) as BaseAccount;
 
-        const signRes = await cosmostationWallet.provider.signAmino(
-          CHAIN_ID,
-          {
-            chain_id: CHAIN_ID,
-            fee: fee.toAmino(),
-            memo: "",
-            msgs: txOptions.msgs.map((msg) => msg.toAmino(false)),
-            sequence: `${sequence}`,
-            account_number: `${accountNumber}`,
-          },
-          // {
-          //   fee: true,
-          // },
-        );
+        const signRes = await cosmostationWallet.provider.signAmino(CHAIN_ID, {
+          chain_id: CHAIN_ID,
+          fee: fee.toAmino(),
+          memo: "",
+          msgs: txOptions.msgs.map((msg) => msg.toAmino(false)),
+          sequence: `${sequence}`,
+          account_number: `${accountNumber}`,
+        });
 
         const authInfoBytes = getAuthInfoBytes(
           signRes.signed_doc,

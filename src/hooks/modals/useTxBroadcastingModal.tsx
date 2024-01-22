@@ -1,6 +1,6 @@
 import TxBroadcastingModal from "components/Modal/TxBroadcastingModal";
 import useGlobalElement from "hooks/useGlobalElement";
-import { useModal } from "hooks/useModal";
+import useModal from "hooks/useModal";
 import { useMemo } from "react";
 import { TxError } from "types/common";
 

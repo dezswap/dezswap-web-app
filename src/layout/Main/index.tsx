@@ -1,8 +1,11 @@
-import { PropsWithChildren } from "react";
+import { Fragment, PropsWithChildren, useMemo } from "react";
 import styled from "@emotion/styled";
+import { useAtomValue } from "jotai";
+import disclaimerLastSeenAtom from "stores/disclaimer";
+import DisclaimerModal from "components/Modal/DisclaimerModal";
+import globalElementsAtom from "stores/globalElements";
 import Header, {
   DEFAULT_HEADER_HEIGHT,
-  MOBILE_HEADER_HEIGHT,
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
@@ -11,11 +14,12 @@ import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
 import iconPool from "assets/icons/icon-pool.svg";
+import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useNetwork } from "hooks/useNetwork";
-import Tooltip from "components/Tooltip";
+import useNetwork from "hooks/useNetwork";
 import Footer from "./Footer";
+import BrowserDelegateButton from "./BrowserDelegateButton";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -28,6 +32,10 @@ const Wrapper = styled.div<{ hasBanner?: boolean }>`
   .${MOBILE_SCREEN_CLASS} & {
     padding-bottom: unset;
     min-height: unset;
+  }
+
+  body:has(#disclaimer-modal) & {
+    display: none;
   }
 `;
 
@@ -67,8 +75,7 @@ const navLinks = [
   {
     path: "/",
     icon: iconOverview,
-    label: "Overview",
-    disabled: true,
+    label: "Analytics",
   },
   {
     path: "/trade",
@@ -76,9 +83,14 @@ const navLinks = [
     label: "Trade",
   },
   {
-    path: "/pool",
+    path: "/earn",
     icon: iconPool,
-    label: "Pool",
+    label: "Earn",
+  },
+  {
+    path: "/wallet",
+    icon: iconWallet,
+    label: "My Wallet",
   },
 ];
 
@@ -95,14 +107,7 @@ const navBar = (
       );
       return {
         to: navLink.path,
-        disabled: navLink.disabled,
-        children: navLink.disabled ? (
-          <Tooltip arrow content="Coming soon">
-            {children}
-          </Tooltip>
-        ) : (
-          children
-        ),
+        children,
       };
     })}
   />
@@ -111,11 +116,21 @@ const navBar = (
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
   const network = useNetwork();
+
+  const globalElements = useAtomValue(globalElementsAtom);
+  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
+  const isDisclaimerAgreed = useMemo(() => {
+    if (!disclaimerLastSeen) return false;
+    const date = new Date();
+    date.setDate(date.getDate() - 3);
+    return disclaimerLastSeen > date;
+  }, [disclaimerLastSeen]);
   return (
     <>
       <Header />
       <Wrapper hasBanner={network.name !== "mainnet"}>
-        {children}
+        {isDisclaimerAgreed && children}
+        <BrowserDelegateButton />
         <FooterWrapper>
           <Footer />
         </FooterWrapper>
@@ -127,6 +142,11 @@ function MainLayout({ children }: PropsWithChildren) {
           <NavBarWrapper>{navBar}</NavBarWrapper>
         </>
       )}
+
+      <DisclaimerModal isOpen={!isDisclaimerAgreed} />
+      {globalElements.map(({ element, id }) => (
+        <Fragment key={id}>{element}</Fragment>
+      ))}
     </>
   );
 }

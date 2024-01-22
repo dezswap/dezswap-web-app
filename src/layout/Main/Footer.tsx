@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import Button from "components/Button";
-import { Container } from "react-grid-system";
+import { Container, Visible } from "react-grid-system";
 import IconButton from "components/IconButton";
 
 import iconMedium from "assets/icons/icon-medium.svg";
@@ -18,15 +18,16 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
 import { useLatestBlock } from "hooks/useLatestBlock";
 import { getBlockLink } from "utils";
-import { useNetwork } from "hooks/useNetwork";
+import useNetwork from "hooks/useNetwork";
 import Tooltip from "components/Tooltip";
+import Typography from "components/Typography";
+import MobileDelegateBanner from "./MobileDelegateBanner";
 
 const Wrapper = styled.footer`
   width: 100%;
   height: auto;
   position: relative;
   padding: 30px 0;
-  .${MOBILE_SCREEN_CLASS} &,
   .${TABLET_SCREEN_CLASS} & {
     padding: 22px 0;
   }
@@ -105,15 +106,22 @@ const socialMediaLinks = [
   },
 ];
 
+const infoMessages = [
+  "Dezswap does not take any financial profit from the protocol.",
+  "Trading fee goes to liquidity providers.",
+];
+
 function Footer() {
   const network = useNetwork();
   const latestBlock = useLatestBlock();
   return (
     <Wrapper>
+      <Visible xs>
+        <MobileDelegateBanner />
+      </Visible>
       <Container>
         <Content>
           <Tooltip
-            arrow
             placement="top"
             content="The most recent block number on this network. Prices update on every block."
             css={css`
@@ -149,6 +157,24 @@ function Footer() {
               </Button>
             </a>
           </Tooltip>
+          <Visible lg md>
+            <Typography
+              size={14}
+              weight={500}
+              color="primary"
+              css={css`
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                text-align: center;
+                pointer-events: none;
+              `}
+            >
+              {infoMessages.join(" ")}
+            </Typography>
+          </Visible>
           <div>
             <SocialMediaLinks>
               {socialMediaLinks.map((item) => (
@@ -163,6 +189,21 @@ function Footer() {
               ))}
             </SocialMediaLinks>
           </div>
+          <Visible sm>
+            <Typography
+              size={14}
+              weight={500}
+              color="primary"
+              css={css`
+                width: 100%;
+                text-align: center;
+              `}
+            >
+              {infoMessages.map((message) => (
+                <div key={message}>{message}</div>
+              ))}
+            </Typography>
+          </Visible>
         </Content>
       </Container>
     </Wrapper>

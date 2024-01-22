@@ -94,7 +94,6 @@ function Copy({ value, size, children, disabled }: CopyProps) {
       <textarea ref={inputRef} value={value} readOnly />
       {children || (
         <Tooltip
-          arrow
           content="Copied!"
           trigger="click"
           onShow={(instance) => {

@@ -111,11 +111,17 @@ function Expand({
   }, [isExpandedFromProps]);
   return (
     <Wrapper className={isExpanded ? "expanded" : ""}>
-      <Label onClick={() => setIsExpanded((current) => !current)}>
-        {label}
-      </Label>
-      {preview && <PreviewContent>{preview}</PreviewContent>}
-      <Content>{children}</Content>
+      {label && (
+        <Label onClick={() => setIsExpanded((current) => !current)}>
+          {label}
+        </Label>
+      )}
+      {preview && (
+        <PreviewContent style={!label ? { paddingTop: 12 } : {}}>
+          {preview}
+        </PreviewContent>
+      )}
+      {children && <Content>{children}</Content>}
     </Wrapper>
   );
 }
