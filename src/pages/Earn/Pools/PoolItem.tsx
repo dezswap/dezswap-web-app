@@ -13,6 +13,8 @@ import {
   formatDecimals,
   amountToValue,
   getAddressLink,
+  formatCurrency,
+  formatPercentage,
 } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
@@ -28,35 +30,16 @@ import {
   TABLET_SCREEN_CLASS,
 } from "constants/layout";
 import Tooltip from "components/Tooltip";
-import { Pool } from "types/api";
 import usePairs from "hooks/usePairs";
 import Outlink from "components/Outlink";
+import SimplePieChart from "components/SimplePieChart";
+import HoverUnderline from "components/HoverUnderline";
+import usePool from "hooks/usePool";
+import useDashboard from "hooks/dashboard/useDashboard";
 import Expand from "../Expand";
 
-const SimplePieChart = styled.div<{ data: number[] }>`
-  width: 100%;
-  height: 0;
-  position: relative;
-  padding-bottom: 100%;
-
-  &::after {
-    content: "";
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-image: ${({ data, theme }) => {
-      const pieColors = [theme.colors.secondary, theme.colors.selected];
-      return `conic-gradient(${data
-        .map((d, i) => `${pieColors[i]} ${d}%`)
-        .join(", ")})`;
-    }};
-    border-radius: 50%;
-  }
-`;
-
 const TableRow = styled(Box)`
+  min-width: 100%;
   display: inline-flex;
   justify-content: flex-start;
   align-items: center;
@@ -67,7 +50,8 @@ const TableRow = styled(Box)`
 
   & > div {
     position: relative;
-    width: 190px;
+    width: 200px;
+    min-width: 200px;
     color: ${({ theme }) => theme.colors.primary};
     font-size: 16px;
     font-weight: 500;
@@ -205,12 +189,18 @@ const BodyContentButtons = styled(Box)`
 `;
 
 interface PoolItemProps {
-  pool: Pool;
+  poolAddress: string;
   bookmarked?: boolean;
   onBookmarkClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
+function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
+  const pool = usePool(poolAddress);
+  const { pools: dashboardPools } = useDashboard();
+  const dashboardPool = useMemo(
+    () => dashboardPools?.find((item) => item.address === poolAddress),
+    [dashboardPools, poolAddress],
+  );
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -218,7 +208,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
   const { getAsset } = useAssets();
   const network = useNetwork();
   const { getPair } = usePairs();
-  const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
+  const pair = useMemo(() => getPair(poolAddress), [getPair, poolAddress]);
   const lpBalance = useBalance(pair?.liquidity_token);
 
   const [asset1, asset2] = useMemo(
@@ -229,7 +219,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
   const userShare = useMemo(() => {
     return (
       Numeric.parse(lpBalance || "0")
-        .dividedBy(pool.total_share || "1")
+        .dividedBy(pool?.total_share || "1")
         .toNumber() || 0
     );
   }, [lpBalance, pool]);
@@ -280,9 +270,11 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
       header={
         <TableRow>
           <Hidden xs sm>
-            <div style={{ width: 32, marginRight: -10 }}>{bookmarkButton}</div>
+            <div style={{ width: 32, minWidth: 32, marginRight: -10 }}>
+              {bookmarkButton}
+            </div>
           </Hidden>
-          <div style={{ width: !isSmallScreen ? 244 : "100%" }}>
+          <div style={{ minWidth: !isSmallScreen ? 244 : "100%" }}>
             {isSmallScreen && <Label>Pool</Label>}
             <Row justify="start" align="center" gutterWidth={6} wrap="nowrap">
               <Col
@@ -312,9 +304,14 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    padding: 2px 0;
                   `}
                 >
-                  {asset1?.symbol}-{asset2?.symbol}
+                  <Link to={`/earn/pools/${encodeURIComponent(poolAddress)}`}>
+                    <HoverUnderline>
+                      {asset1?.symbol}-{asset2?.symbol}
+                    </HoverUnderline>
+                  </Link>
                 </Col>
               </Tooltip>
               {isSmallScreen && (
@@ -327,26 +324,25 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
           <div>
             {isSmallScreen && <Label>Total liquidity</Label>}
             <div>
-              {formatNumber(
-                formatDecimals(
-                  amountToValue(pool.total_share, LP_DECIMALS) || "",
-                  2,
-                ),
-              )}
-              &nbsp;LP
+              ${formatNumber(formatDecimals(dashboardPool?.tvl || "0", 2))}
             </div>
           </div>
           <div>
             {isSmallScreen && <Label>Volume(24h)</Label>}
-            <div>-</div>
+            <div>{formatCurrency(dashboardPool?.volume || "0")}</div>
           </div>
           <div>
             {isSmallScreen && <Label>Fees(24h)</Label>}
-            <div>-</div>
+            <div>{formatCurrency(dashboardPool?.fee || "0")}</div>
           </div>
-          <div>
+          <div style={{ minWidth: !isSmallScreen ? 80 : "100%" }}>
             {isSmallScreen && <Label>APR</Label>}
-            <div>-</div>
+            <div>
+              {!Number.isNaN(Number(dashboardPool?.apr)) &&
+                formatPercentage(
+                  Numeric.parse(dashboardPool?.apr || 0).mul(100),
+                )}
+            </div>
           </div>
         </TableRow>
       }
@@ -422,7 +418,24 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                     `}
                   >
                     <Label>Your Liquidity</Label>
-                    <Typography color="primary" size={16} weight={500}>
+                    <Typography
+                      color="primary"
+                      size={16}
+                      weight={500}
+                      css={css`
+                        margin-bottom: 4px;
+                      `}
+                    >
+                      $
+                      {formatNumber(
+                        formatDecimals(
+                          Numeric.parse(userShare).mul(dashboardPool?.tvl || 0),
+                          2,
+                        ),
+                      )}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      =&nbsp;
                       {formatNumber(
                         formatDecimals(
                           amountToValue(lpBalance, LP_DECIMALS) || "0",
@@ -443,7 +456,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                       }
                     `}
                   >
-                    <Label>Asset Pooled</Label>
+                    <Label>Your Asset Pooled</Label>
                     <Typography
                       color="primary"
                       size={16}
@@ -456,7 +469,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                       {formatNumber(
                         formatDecimals(
                           amountToValue(
-                            Numeric.parse(pool.assets[0].amount)
+                            Numeric.parse(pool?.assets[0].amount || 0)
                               .times(userShare)
                               .toFixed(0),
                             asset1?.decimals,
@@ -478,7 +491,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                       {formatNumber(
                         formatDecimals(
                           amountToValue(
-                            Numeric.parse(pool.assets[1].amount)
+                            Numeric.parse(pool?.assets[1].amount || 0)
                               .times(userShare)
                               .toFixed(0),
                             asset2?.decimals,
@@ -520,7 +533,7 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                       </Col>
                       <Col>
                         <Typography color="secondary" size={16} weight={900}>
-                          {formatDecimals(userShare * 100, 2)}%
+                          {formatPercentage(userShare * 100)}
                         </Typography>
                       </Col>
                     </Row>
@@ -534,7 +547,10 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                 event.stopPropagation();
               }}
             >
-              <Link to={`add-liquidity/${pool.address}`} relative="route">
+              <Link
+                to={`add-liquidity/${encodeURIComponent(poolAddress)}`}
+                relative="route"
+              >
                 <Button
                   variant="primary"
                   block
@@ -545,7 +561,10 @@ function PoolItem({ pool, bookmarked, onBookmarkClick }: PoolItemProps) {
                   Add liquidity
                 </Button>
               </Link>
-              <Link to={`withdraw/${pool.address}`} relative="route">
+              <Link
+                to={`withdraw/${encodeURIComponent(poolAddress)}`}
+                relative="route"
+              >
                 <Button variant="secondary" block disabled={!hasLiquidity}>
                   Remove liquidity
                 </Button>

@@ -14,7 +14,9 @@ import {
   amountToValue,
   cutDecimal,
   filterNumberFormat,
+  formatDecimals,
   formatNumber,
+  formatPercentage,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -55,6 +57,8 @@ import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
 import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
+import useSearchParamState from "hooks/useSearchParamState";
+import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -175,6 +179,9 @@ function SwapPage() {
     () => getAsset(asset2Address),
     [asset2Address, getAsset],
   );
+
+  const dashboardToken1 = useDashboardTokenDetail(asset1Address);
+  const dashboardToken2 = useDashboardTokenDetail(asset2Address);
 
   const simulationResult = useSimulate({
     fromAddress: asset1Address,
@@ -304,9 +311,6 @@ function SwapPage() {
     selectedPair,
     asset1,
     asset1Value,
-    isReversed,
-    asset2Value,
-    asset2,
     slippageTolerance,
     beliefPrice,
     txDeadlineMinutes,
@@ -414,11 +418,17 @@ function SwapPage() {
     }
   }, [form, fee, asset1Address, asset2Address]);
 
+  const [preselectedAsset2Address, setPreselectedAsset2Address] =
+    useSearchParamState("q", undefined, { replace: true });
+
   useEffect(() => {
-    if (!firstProvideModal.isOpen) {
-      form.reset();
+    if (preselectedAsset2Address) {
+      form.setValue(FormKey.asset2Address, preselectedAsset2Address, {
+        shouldValidate: true,
+      });
+      setPreselectedAsset2Address(undefined);
     }
-  }, [firstProvideModal.isOpen]);
+  }, [form, preselectedAsset2Address, setPreselectedAsset2Address]);
 
   return (
     <>
@@ -450,6 +460,7 @@ function SwapPage() {
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
               firstProvideModal.open();
+              form.reset();
             }
 
             selectAsset1Modal.close();
@@ -516,7 +527,7 @@ function SwapPage() {
                             <Typography
                               size={16}
                               weight="bold"
-                              color={theme.colors.primary}
+                              color="primary"
                               style={{
                                 paddingTop: "1px",
                                 paddingLeft: asset1 ? "0px" : "5px",
@@ -627,7 +638,7 @@ function SwapPage() {
               {formState?.errors?.asset1Value?.message && (
                 <Typography
                   size={12}
-                  color={theme.colors.danger}
+                  color="danger"
                   css={css`
                     line-height: 18px;
                   `}
@@ -641,8 +652,17 @@ function SwapPage() {
                 text-align: right;
               `}
             >
-              <Typography color={theme.colors.text.secondary} size={14}>
-                -
+              <Typography color="text.secondary" size={14}>
+                {dashboardToken1?.price && asset1Value
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(dashboardToken1?.price || 0).mul(
+                          asset1Value || 0,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>
@@ -733,7 +753,7 @@ function SwapPage() {
                             <Typography
                               size={16}
                               weight="bold"
-                              color={theme.colors.primary}
+                              color="primary"
                               style={{
                                 paddingTop: "1px",
                                 paddingLeft: asset2 ? "0px" : "5px",
@@ -831,7 +851,7 @@ function SwapPage() {
               {formState?.errors?.asset2Value?.message && (
                 <Typography
                   size={12}
-                  color={theme.colors.danger}
+                  color="danger"
                   css={css`
                     line-height: 18px;
                   `}
@@ -845,8 +865,17 @@ function SwapPage() {
                 text-align: right;
               `}
             >
-              <Typography color={theme.colors.text.secondary} size={14}>
-                -
+              <Typography color="text.secondary" size={14}>
+                {dashboardToken2?.price && asset2Value
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(dashboardToken2?.price || 0).mul(
+                          asset2Value || 0,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>
@@ -863,8 +892,20 @@ function SwapPage() {
                     align-items: center;
                   `}
                 >
-                  {shiftAssets
-                    ? `1 ${asset2.symbol} = ${
+                  {/* // TODO: Refactor */}
+                  {shiftAssets ? (
+                    <>
+                      {`1 ${asset2.symbol}`}
+                      <IconButton
+                        icons={{ default: iconShift }}
+                        size={24}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShiftAssets((current) => !current);
+                        }}
+                      />
+                      {`${
                         asset1Value && asset2Value
                           ? cutDecimal(
                               Numeric.parse(asset1Value || 0).div(
@@ -873,9 +914,22 @@ function SwapPage() {
                               DISPLAY_DECIMAL,
                             )
                           : "-"
-                      } ${asset1?.symbol}`
-                    : `1 ${asset1.symbol} = ${
-                        asset1Value && asset2Value
+                      } ${asset1?.symbol}`}
+                    </>
+                  ) : (
+                    <>
+                      {`1 ${asset1.symbol}`}
+                      <IconButton
+                        icons={{ default: iconShift }}
+                        size={24}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShiftAssets((current) => !current);
+                        }}
+                      />
+                      {`${
+                        asset2Value && asset1Value
                           ? cutDecimal(
                               Numeric.parse(asset2Value || 0).div(
                                 asset1Value || 1,
@@ -884,15 +938,8 @@ function SwapPage() {
                             )
                           : "-"
                       } ${asset2?.symbol}`}
-                  <IconButton
-                    icons={{ default: iconShift }}
-                    size={24}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShiftAssets((current) => !current);
-                    }}
-                  />
+                    </>
+                  )}
                 </Typography>
               }
               isExpanded={false}
@@ -932,7 +979,7 @@ function SwapPage() {
                         weight="bold"
                         color={spread.color as keyof Colors}
                       >
-                        {formatNumber(spread.rate)}%
+                        {formatPercentage(spread.rate)}
                       </Typography>
                     ),
                   },
@@ -1023,7 +1070,7 @@ function SwapPage() {
                       align-items: center;
                     `}
                   >
-                    {formatNumber(spread.rate)}%
+                    {formatPercentage(spread.rate)}
                   </Col>
                 </Row>
               </Message>

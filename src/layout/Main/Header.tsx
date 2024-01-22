@@ -4,10 +4,11 @@ import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
 import imgLogo from "assets/images/logo.svg";
 import imgSymbol from "assets/images/symbol.svg";
-import iconNotification from "assets/icons/icon-noti-off.svg";
-import iconNotificationHover from "assets/icons/icon-noti-off-hover.svg";
-import iconNotificationWithBadge from "assets/icons/icon-noti-on.svg";
-import iconNotificationWithBadgeHover from "assets/icons/icon-noti-on-hover.svg";
+import iconNotification from "assets/icons/icon-notification.svg";
+import iconNotificationHover from "assets/icons/icon-notification-hover.svg";
+import iconNotificationWithBadge from "assets/icons/icon-notification-with-badge.svg";
+import iconNotificationWithBadgeHover from "assets/icons/icon-notification-with-badge-hover.svg";
+import iconArrowRight from "assets/icons/icon-arrow-right.svg";
 import Button from "components/Button";
 import IconButton from "components/IconButton";
 import NavBar from "components/NavBar";
@@ -17,7 +18,6 @@ import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
-  TABLET_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
 import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
@@ -25,6 +25,7 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
+  formatDecimals,
   formatNumber,
   getAddressLink,
 } from "utils";
@@ -47,7 +48,12 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
+import useHashModal from "hooks/useHashModal";
+import useDashboard from "hooks/dashboard/useDashboard";
+import { Numeric } from "@xpla/xpla.js";
+import useNotifications from "hooks/useNotifications";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
+import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -172,8 +178,7 @@ const SubLink = styled(Link)`
 const navLinks = [
   {
     path: "/",
-    label: "Overview",
-    disabled: true,
+    label: "Analytics",
   },
   {
     path: "/trade",
@@ -203,14 +208,13 @@ function WalletInfo({
   children,
   connectButton,
 }: {
-  title: string;
+  title: React.ReactNode;
   isOpen: boolean;
   onGoBack?(): void;
   children: JSX.Element;
   connectButton: JSX.Element;
 }) {
   const screenClass = useScreenClass();
-  const theme = useTheme();
 
   return screenClass === MOBILE_SCREEN_CLASS ? (
     <>
@@ -246,16 +250,33 @@ function WalletInfo({
             padding: 16px;
           `}
         >
-          <Typography
-            color={theme.colors.primary}
-            weight={900}
+          <div
             css={css`
-              text-align: center;
-              padding-bottom: 9px;
+              margin-bottom: 9px;
             `}
           >
-            My Wallet
-          </Typography>
+            <Link to="wallet" onClick={onGoBack}>
+              <Row justify="between" align="center" gutterWidth={0}>
+                <Col
+                  xs="content"
+                  css={css`
+                    opacity: 0;
+                    pointer-events: none;
+                  `}
+                >
+                  <IconButton size={24} icons={{ default: iconArrowRight }} />
+                </Col>
+                <Col xs="content">
+                  <Typography color="primary" weight={900}>
+                    My wallet
+                  </Typography>
+                </Col>
+                <Col xs="content">
+                  <IconButton size={24} icons={{ default: iconArrowRight }} />
+                </Col>
+              </Row>
+            </Link>
+          </div>
           {children}
         </Panel>
       }
@@ -271,12 +292,23 @@ function Header() {
   const wallet = useWallet();
   const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
-  const balance = useBalance(XPLA_ADDRESS);
+  const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
+  const notificationModal = useHashModal("notifications");
+  const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
+
+  const { tokens: dashboardTokens } = useDashboard();
+
+  const xplaPrice = useMemo(() => {
+    const dashboardToken = dashboardTokens?.find(
+      (item) => item.address === XPLA_ADDRESS,
+    );
+    return dashboardToken?.price;
+  }, [dashboardTokens]);
 
   const isCosmostationWalletConnected = useMemo(
     () => !!cosmostationWallet?.account,
@@ -345,7 +377,6 @@ function Header() {
                     items={navLinks.map((item) => ({
                       key: item.path,
                       to: item.path,
-                      disabled: item.disabled,
                       css: css`
                         .sub-menu {
                           display: none;
@@ -356,13 +387,7 @@ function Header() {
                           }
                         }
                       `,
-                      children: item.disabled ? (
-                        <Tooltip content="Coming soon">
-                          <Typography size={18} weight={900} color="primary">
-                            {item.label}
-                          </Typography>
-                        </Tooltip>
-                      ) : (
+                      children: (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
                           {item.children && (
@@ -386,6 +411,7 @@ function Header() {
                               >
                                 {item.children.map((child) => (
                                   <Tooltip
+                                    key={child.path}
                                     disabled={!child.disabled}
                                     content="Coming soon"
                                   >
@@ -422,21 +448,58 @@ function Header() {
               )}
               <Col xs="content">
                 <Row justify="end" align="center" gutterWidth={10}>
-                  {/* TODO: implement */}
-                  {/* <Col width="auto">
+                  <Col width="auto">
                     <IconButton
                       title="Notification"
                       size={45}
-                      icons={{
-                        default: iconNotification,
-                        hover: iconNotificationHover,
-                      }}
+                      onClick={() => notificationModal.open()}
+                      icons={
+                        hasUnreadNotifications
+                          ? {
+                              default: iconNotificationWithBadge,
+                              hover: iconNotificationWithBadgeHover,
+                            }
+                          : {
+                              default: iconNotification,
+                              hover: iconNotificationHover,
+                            }
+                      }
                     />
-                  </Col> */}
+                  </Col>
                   <Col width="auto">
+                    {/* // TODO: Refactor */}
                     {connectedWallet ? (
                       <WalletInfo
-                        title="My wallet"
+                        title={
+                          <Row justify="center">
+                            <Link
+                              to="/wallet"
+                              onClick={() => walletPopover.close()}
+                            >
+                              <Row
+                                justify="center"
+                                align="center"
+                                gutterWidth={12}
+                              >
+                                <Col xs="content">
+                                  <Typography
+                                    size={20}
+                                    weight={900}
+                                    color="primary"
+                                  >
+                                    My wallet
+                                  </Typography>
+                                </Col>
+                                <Col xs="content">
+                                  <IconButton
+                                    size={28}
+                                    icons={{ default: iconArrowRight }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Link>
+                          </Row>
+                        }
                         isOpen={walletPopover.isOpen}
                         onGoBack={() => walletPopover.close()}
                         connectButton={
@@ -447,7 +510,7 @@ function Header() {
                                   connectedWallet.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
-                                    amountToValue(balance) || 0,
+                                    amountToValue(xplaBalance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
                                 )} ${XPLA_SYMBOL}`}
@@ -484,10 +547,7 @@ function Header() {
                                     : "0px",
                               }}
                             >
-                              <Typography
-                                color={theme.colors.primary}
-                                weight={900}
-                              >
+                              <Typography color="primary" weight={900}>
                                 Your address
                               </Typography>
                             </Col>
@@ -506,7 +566,7 @@ function Header() {
                                 <Col style={{ paddingLeft: "4px" }}>
                                   <Typography
                                     size={16}
-                                    color={theme.colors.primary}
+                                    color="primary"
                                     weight="bold"
                                   >
                                     {isCosmostationWalletConnected
@@ -574,10 +634,7 @@ function Header() {
                               </Box>
                             </Col>
                             <Col style={{ flex: "unset", paddingTop: "20px" }}>
-                              <Typography
-                                color={theme.colors.primary}
-                                weight={900}
-                              >
+                              <Typography color="primary" weight={900}>
                                 Balance
                               </Typography>
                             </Col>
@@ -592,7 +649,7 @@ function Header() {
                                 <Col style={{ paddingLeft: "4px" }}>
                                   <Typography
                                     size={16}
-                                    color={theme.colors.primary}
+                                    color="primary"
                                     weight="bold"
                                   >
                                     {XPLA_SYMBOL}
@@ -611,16 +668,27 @@ function Header() {
                               >
                                 <Typography
                                   size={16}
-                                  color={theme.colors.text.primary}
+                                  color="text.primary"
                                   weight="bold"
                                 >
-                                  {formatNumber(amountToValue(balance) || 0)}
+                                  {formatNumber(
+                                    amountToValue(xplaBalance) || 0,
+                                  )}
                                 </Typography>
                                 <Typography
-                                  color={theme.colors.text.secondary}
+                                  color="text.secondary"
                                   weight="normal"
                                 >
-                                  -
+                                  =&nbsp;
+                                  {xplaPrice &&
+                                    `$${formatNumber(
+                                      formatDecimals(
+                                        Numeric.parse(xplaPrice).mul(
+                                          amountToValue(xplaBalance) || 0,
+                                        ),
+                                        2,
+                                      ),
+                                    )}`}
                                 </Typography>
                               </Box>
                             </Col>
@@ -662,6 +730,10 @@ function Header() {
           </Container>
         </div>
       </Wrapper>
+      <NotificationModal
+        isOpen={notificationModal.isOpen}
+        onRequestClose={() => notificationModal.close()}
+      />
     </>
   );
 }

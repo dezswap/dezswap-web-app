@@ -77,7 +77,7 @@ function StakePage() {
   const { getLockdropEventInfo } = useLockdropEvents();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.name],
+    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
     queryFn: async () => {
       if (!eventAddress) {
         return null;

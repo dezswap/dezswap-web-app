@@ -9,21 +9,21 @@ import TabButton from "components/TabButton";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePairs";
-import useAPI from "hooks/useAPI";
-import { PairExtended } from "types/common";
 import usePairBookmark from "hooks/usePairBookmark";
 import { Numeric } from "@xpla/xpla.js";
 import ScrollToTop from "components/ScrollToTop";
-import usePools from "hooks/usePools";
-import { useQueries } from "@tanstack/react-query";
 import { convertIbcTokenAddressForPath } from "utils";
-import iconSortDisabled from "assets/icons/icon-sort-disabled.svg";
-import styled from "@emotion/styled";
-import Box from "components/Box";
-import PoolList from "./PoolList";
+import useBalances from "hooks/useBalances";
+import useSearchParamState from "hooks/useSearchParamState";
+import useDashboard from "hooks/dashboard/useDashboard";
+import Table, { TableSortDirection } from "components/Table";
+import { getBasicSortFunction } from "utils/table";
+import usePools from "hooks/usePools";
+import { DashboardPool } from "types/dashboard-api";
 import Select from "./Select";
 import AssetSelector from "../AssetSelector";
 import AssetFormButton from "../AssetFormButton";
+import PoolItem from "./PoolItem";
 
 const timeBaseOptions = ["24h", "7d", "1m"];
 const tabs = [
@@ -38,25 +38,6 @@ const mobileTabs = [
 ];
 const LIMIT = 10;
 
-const TableHeader = styled(Box)`
-  display: inline-flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: nowrap;
-  padding: 14px 20px;
-  margin-bottom: 10px;
-  gap: 20px;
-  & > div {
-    width: 190px;
-    color: ${({ theme }) => theme.colors.primary};
-    font-size: 14px;
-    font-weight: 900;
-    & > img {
-      vertical-align: middle;
-    }
-  }
-`;
-
 function PoolPage() {
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
@@ -65,9 +46,40 @@ function PoolPage() {
   const [selectedTimeBase, setSelectedTimeBase] = useState(timeBaseOptions[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const { findPair, getPair } = usePairs();
-  const { bookmarks } = usePairBookmark();
+  const { bookmarks, toggleBookmark } = usePairBookmark();
+  const { pools: dashboardPools } = useDashboard();
   const { pools } = usePools();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+
+  const notListedPools = useMemo(() => {
+    return (
+      pools
+        ?.filter((pool) => {
+          return !dashboardPools?.find(
+            (dashboardPool) => dashboardPool.address === pool.address,
+          );
+        })
+        .map((pool) => {
+          const res: DashboardPool = {
+            address: pool.address,
+            volume: "0",
+            fee: "0",
+            apr: "0",
+            tvl: "0",
+          };
+          return res;
+        }) || []
+    );
+  }, [dashboardPools, pools]);
+
+  const allPools = useMemo(() => {
+    return [...(dashboardPools || []), ...notListedPools];
+  }, [dashboardPools, notListedPools]);
+
+  const [sortBy, setSortBy] =
+    useState<keyof Exclude<typeof dashboardPools, undefined>[number]>("tvl");
+  const [sortDirection, setSortDirection] =
+    useState<TableSortDirection>("desc");
 
   const [addresses, setAddresses] =
     useState<[string | undefined, string | undefined]>();
@@ -78,27 +90,12 @@ function PoolPage() {
         : undefined,
     [addresses, findPair],
   );
-  const api = useAPI();
 
-  const balances = useQueries({
-    queries:
-      pools?.map((pool) => ({
-        queryKey: ["pool", pool.address],
-        queryFn: async () => {
-          const lpAddress = getPair(pool.address)?.liquidity_token;
-          if (lpAddress) {
-            const balance = await api.getTokenBalance(lpAddress);
-            return balance;
-          }
-          return "0";
-        },
-        enabled: !!pool.address,
-        refetchInterval: 30000,
-        refetchOnMount: false,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-      })) || [],
-  }).map((item) => item.data);
+  const balances = useBalances(
+    allPools?.map((pool) => {
+      return getPair(pool.address)?.liquidity_token || "";
+    }) || [],
+  ).map((item) => item?.balance);
 
   const { pairs } = usePairs();
 
@@ -120,30 +117,62 @@ function PoolPage() {
   );
 
   const filteredPools = useMemo(() => {
-    return pools?.filter((item, index) => {
-      if (
-        (addresses?.[0] || addresses?.[1]) &&
-        !filteredPairs?.find((pair) => pair?.contract_addr === item.address)
-      ) {
+    return (
+      allPools?.filter((item, index) => {
+        if (
+          (addresses?.[0] || addresses?.[1]) &&
+          !filteredPairs?.find((pair) => pair?.contract_addr === item.address)
+        ) {
+          return false;
+        }
+        switch (selectedTabIndex) {
+          case 0:
+            return true;
+          case 1:
+            return Numeric.parse(balances[index] || 0).gt(0);
+          case 2:
+            return !!bookmarks?.includes(item.address);
+          default:
+          // do nothing
+        }
         return false;
-      }
-      switch (selectedTabIndex) {
-        case 0:
-          return true;
-        case 1:
-          return Numeric.parse(balances[index] || 0).gt(0);
-        case 2:
-          return !!bookmarks?.includes(item.address);
-        default:
-        // do nothing
-      }
-      return false;
-    });
-  }, [pools, addresses, filteredPairs, selectedTabIndex, balances, bookmarks]);
+      }) || []
+    );
+  }, [
+    allPools,
+    addresses,
+    filteredPairs,
+    selectedTabIndex,
+    balances,
+    bookmarks,
+  ]);
+
+  const sortedPools = useMemo(() => {
+    return filteredPools.toSorted(getBasicSortFunction(sortBy, sortDirection));
+  }, [filteredPools, sortBy, sortDirection]);
+
+  const poolsToDisplay = useMemo(() => {
+    return (
+      sortedPools?.slice((currentPage - 1) * LIMIT, currentPage * LIMIT) || []
+    );
+  }, [currentPage, sortedPools]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedTabIndex]);
+
+  const [preselectedAddress, setPreselectedAddress] = useSearchParamState(
+    "q",
+    undefined,
+    { replace: true },
+  );
+
+  useEffect(() => {
+    if (preselectedAddress) {
+      setAddresses([preselectedAddress, undefined]);
+      setPreselectedAddress(undefined);
+    }
+  }, [preselectedAddress, setPreselectedAddress]);
 
   return (
     <>
@@ -291,38 +320,65 @@ function PoolPage() {
                 }
               `}
             >
-              {!isSmallScreen && (
-                <TableHeader>
-                  <div style={{ width: 32, marginRight: -10 }}>&nbsp;</div>
-                  <div style={{ width: 244 }}>Pool</div>
-                  <div>
-                    Total Liquidity
-                    <img src={iconSortDisabled} width={22} alt="sort" />
-                  </div>
-                  <div>
-                    Volume(24H)
-                    <img src={iconSortDisabled} width={22} alt="sort" />
-                  </div>
-                  <div>
-                    Fees(24H)
-                    <img src={iconSortDisabled} width={22} alt="sort" />
-                  </div>
-                  <div>
-                    APR
-                    <img src={iconSortDisabled} width={22} alt="sort" />
-                  </div>
-                </TableHeader>
-              )}
-              <PoolList
-                pools={
-                  filteredPools?.slice(
-                    (currentPage - 1) * LIMIT,
-                    currentPage * LIMIT,
-                  ) || []
-                }
+              <Table
+                idKey="address"
+                hideHeader={isSmallScreen}
+                columns={[
+                  {
+                    key: "none",
+                    width: 22,
+                    label: "",
+                    hasSort: false,
+                  },
+                  {
+                    key: "address",
+                    width: 244,
+                    label: "Pool",
+                    hasSort: false,
+                  },
+                  {
+                    key: "tvl",
+                    width: 200,
+                    label: "Total Liquidity",
+                    hasSort: true,
+                  },
+                  {
+                    key: "volume",
+                    width: 200,
+                    label: "Volume(24H)",
+                    hasSort: true,
+                  },
+                  {
+                    key: "fee",
+                    width: 200,
+                    label: "Fees(24H)",
+                    hasSort: true,
+                  },
+                  {
+                    key: "apr",
+                    width: 80,
+                    label: "APR",
+                    hasSort: true,
+                  },
+                ]}
+                sort={{ key: sortBy, direction: sortDirection }}
+                onSortChange={(key, direction) => {
+                  setSortBy(key);
+                  setSortDirection(direction);
+                }}
+                data={poolsToDisplay}
+                renderRow={(dashboardPool) => (
+                  <PoolItem
+                    poolAddress={dashboardPool.address}
+                    bookmarked={bookmarks?.includes(dashboardPool.address)}
+                    onBookmarkClick={() =>
+                      toggleBookmark(dashboardPool.address)
+                    }
+                  />
+                )}
                 emptyMessage={
                   [
-                    undefined,
+                    "The pool doesn't exist. Create a new pool.",
                     selectedPair ? "No my pool found." : "No pool found.",
                     "No bookmark found.",
                   ][selectedTabIndex]

@@ -1,17 +1,12 @@
 import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
 import Typography from "components/Typography";
-import {
-  BROWSER_DISPLAY_NUMBER_CNT,
-  DISPLAY_DECIMAL,
-  MOBILE_DISPLAY_NUMBER_CNT,
-  MOBILE_SCREEN_CLASS,
-} from "constants/layout";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import InputGroup from "pages/Earn/Pools/Withdraw/InputGroup";
 import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
+  formatDecimals,
   formatNumber,
   getTokenLink,
   valueToAmount,
@@ -50,6 +45,7 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -77,11 +73,11 @@ function WithdrawPage() {
     onReturnClick: handleModalClose,
   });
 
-  const { pairAddress } = useParams<{ pairAddress: string }>();
+  const { poolAddress } = useParams<{ poolAddress: string }>();
   const { getPair } = usePairs();
   const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
+    () => (poolAddress ? getPair(poolAddress) : undefined),
+    [getPair, poolAddress],
   );
   const { getAsset } = useAssets();
   const [asset1, asset2] = useMemo(
@@ -92,6 +88,9 @@ function WithdrawPage() {
     [getAsset, pair],
   );
 
+  const dashboardToken1 = useDashboardTokenDetail(asset1?.token || "");
+  const dashboardToken2 = useDashboardTokenDetail(asset2?.token || "");
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       if (!asset1?.token || !asset2?.token) {
@@ -101,13 +100,13 @@ function WithdrawPage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (pairAddress && !AccAddress.validate(pairAddress)) {
+    if (poolAddress && !AccAddress.validate(poolAddress)) {
       errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
+  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -118,10 +117,22 @@ function WithdrawPage() {
   const { lpValue } = form.watch();
 
   const simulationResult = useSimulate(
-    pairAddress || "",
+    poolAddress || "",
     pair?.liquidity_token || "",
     valueToAmount(lpValue, LP_DECIMALS) || "0",
   );
+
+  const [simulatedValue1, simulatedValue2] = useMemo(() => {
+    return [asset1, asset2].map(
+      (asset) =>
+        amountToValue(
+          simulationResult?.estimatedAmount?.find(
+            (a) => a.address === asset?.token,
+          )?.amount,
+          asset?.decimals,
+        ) || "0",
+    );
+  }, [asset1, asset2, simulationResult]);
 
   const balance = useBalance(pair?.liquidity_token || "");
 
@@ -145,7 +156,7 @@ function WithdrawPage() {
               generateWithdrawLiquidityMsg(
                 connectedWallet?.network.name as NetworkName,
                 connectedWallet?.walletAddress || "",
-                pairAddress || "",
+                poolAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
                 [asset1?.token, asset2?.token].map((address) => ({
@@ -219,10 +230,13 @@ function WithdrawPage() {
     >
       <form onSubmit={handleSubmit}>
         <InputGroup
-          {...register(FormKey.lpValue, {
-            setValueAs: (value) => filterNumberFormat(value, LP_DECIMALS),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.lpValue,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           lpToken={pair?.liquidity_token}
           assets={
             pair?.asset_addresses.map((address) => getAsset(address)) || []
@@ -233,17 +247,6 @@ function WithdrawPage() {
               shouldDirty: true,
               shouldTouch: true,
             });
-          }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = lpValue;
-            }
           }}
         />
         <div
@@ -320,14 +323,7 @@ function WithdrawPage() {
                   cursor: pointer;
                 `}
               >
-                {formatNumber(
-                  amountToValue(
-                    simulationResult?.estimatedAmount?.find(
-                      (a) => a.address === asset1?.token,
-                    )?.amount,
-                    asset1?.decimals,
-                  ) || "0",
-                )}
+                {formatNumber(simulatedValue1)}
               </Typography>
             </Col>
           </Row>
@@ -340,7 +336,16 @@ function WithdrawPage() {
                   text-align: right;
                 `}
               >
-                -
+                {simulatedValue1 && dashboardToken1?.price
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(simulatedValue1).mul(
+                          dashboardToken1.price,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>
@@ -402,14 +407,7 @@ function WithdrawPage() {
                   cursor: pointer;
                 `}
               >
-                {formatNumber(
-                  amountToValue(
-                    simulationResult?.estimatedAmount?.find(
-                      (a) => a.address === asset2?.token,
-                    )?.amount,
-                    asset2?.decimals,
-                  ) || "0",
-                )}
+                {formatNumber(simulatedValue2)}
               </Typography>
             </Col>
           </Row>
@@ -422,7 +420,16 @@ function WithdrawPage() {
                   text-align: right;
                 `}
               >
-                -
+                {simulatedValue2 && dashboardToken2?.price
+                  ? `= $${formatNumber(
+                      formatDecimals(
+                        Numeric.parse(simulatedValue2).mul(
+                          dashboardToken2.price,
+                        ),
+                        2,
+                      ),
+                    )}`
+                  : "-"}
               </Typography>
             </Col>
           </Row>
@@ -451,22 +458,10 @@ function WithdrawPage() {
                         at the current condition.
                       </>
                     ),
-                    value: `${formatNumber(
-                      amountToValue(
-                        simulationResult?.estimatedAmount?.find(
-                          (a) => a.address === asset1?.token,
-                        )?.amount,
-                        asset1?.decimals,
-                      ) || "",
-                    )} ${asset1?.symbol || ""}
-                      ${formatNumber(
-                        amountToValue(
-                          simulationResult?.estimatedAmount?.find(
-                            (a) => a.address === asset2?.token,
-                          )?.amount,
-                          asset1?.decimals,
-                        ) || "",
-                      )} ${asset2?.symbol || ""}`,
+                    value: `${formatNumber(simulatedValue1)} ${
+                      asset1?.symbol || ""
+                    }
+                      ${formatNumber(simulatedValue2)} ${asset2?.symbol || ""}`,
                   },
                   {
                     key: "fee",

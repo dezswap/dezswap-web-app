@@ -25,7 +25,10 @@ interface ModalProps extends Omit<ReactModal.Props, "style"> {
   overlay?: boolean;
   onGoBack?: React.MouseEventHandler<HTMLButtonElement>;
   title?: React.ReactNode;
-  style?: ReactModal.Props["style"] & { panel?: React.CSSProperties };
+  style?: ReactModal.Props["style"] & {
+    panel?: React.CSSProperties;
+    header?: React.CSSProperties;
+  };
   headerExtra?: React.ReactNode;
 }
 
@@ -54,12 +57,15 @@ const ModalHeader = styled(Panel)`
   position: sticky;
   left: 0;
   top: 0;
-  padding-bottom: 0 !important;
   margin-bottom: 20px;
 
   z-index: 100;
   &:has(div:empty) {
     padding: 0;
+  }
+  .${MOBILE_SCREEN_CLASS} &,
+  & {
+    padding-bottom: 0;
   }
   & > div {
     width: 100%;
@@ -70,6 +76,12 @@ const ModalHeader = styled(Panel)`
 
 ModalHeader.defaultProps = {
   border: false,
+};
+
+const removeClassName = () => {
+  if (!document.querySelector(".ReactModal__Content")) {
+    document.body.classList.remove("ReactModal__Body--open");
+  }
 };
 
 function Modal({
@@ -89,6 +101,7 @@ function Modal({
   contentRef: _contentRef,
   className: _className,
   overlayClassName: _overlayClassName,
+  onAfterClose,
   ...modalProps
 }: ModalProps) {
   const theme = useTheme();
@@ -177,31 +190,20 @@ function Modal({
   }, [resizeTrigger]);
 
   useEffect(() => {
-    const removeClassName = () => {
-      if (!document.querySelector(".ReactModal__Content")) {
-        document.body.classList.remove("ReactModal__Body--open");
-      }
-    };
-    return () => {
-      setTimeout(removeClassName, MODAL_CLOSE_TIMEOUT_MS + 10);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     const handleModalPop = () => {
       const simpleBar = SimpleBar.instances.get(document.body);
       if (simpleBar?.onWindowResize) {
         simpleBar.onWindowResize();
         setTimeout(() => {
           simpleBar.onWindowResize();
-        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+        }, MODAL_CLOSE_TIMEOUT_MS + 100);
       }
 
       if (simpleBar?.recalculate) {
         simpleBar.recalculate();
         setTimeout(() => {
           simpleBar.recalculate();
-        }, MODAL_CLOSE_TIMEOUT_MS + 10);
+        }, MODAL_CLOSE_TIMEOUT_MS + 100);
       }
     };
 
@@ -218,6 +220,12 @@ function Modal({
       overlayClassName={overlayClassName}
       closeTimeoutMS={MODAL_CLOSE_TIMEOUT_MS}
       onRequestClose={onGoBack}
+      onAfterClose={() => {
+        removeClassName();
+        if (onAfterClose) {
+          onAfterClose();
+        }
+      }}
       style={{
         overlay: {
           ...defaultOverlayStyle,
@@ -292,25 +300,27 @@ function Modal({
             ...style?.panel,
           }}
         >
-          <ModalHeader>
+          <ModalHeader style={style?.header}>
             <div>
               {typeof title === "string" ? (
                 <Typography
                   size={20}
                   weight={900}
                   color={error ? "danger" : "primary"}
-                  css={
-                    gradient
-                      ? css`
-                          text-align: center;
-                          background-image: ${theme.colors.gradient};
-                          background-clip: text;
-                          color: transparent;
-                        `
-                      : css`
-                          text-align: center;
-                        `
-                  }
+                  css={css`
+                    ${gradient &&
+                    css`
+                      background-image: ${theme.colors.gradient};
+                      background-clip: text;
+                      color: transparent;
+                    `}
+                    text-align: center;
+                    width: 80%;
+                    margin: 0 auto;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  `}
                 >
                   {title}
                 </Typography>

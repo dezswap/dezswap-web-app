@@ -14,7 +14,7 @@ const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
         const res = Numeric.parse(amountToValue(balance) || 0).minus(
           amountToValue(feeAmount) || 0,
         );
-        setBalanceMinusFee(res.gt(0) ? valueToAmount(res) : "0");
+        setBalanceMinusFee(res.gt(0) ? valueToAmount(res) || "0" : "0");
       } else {
         setBalanceMinusFee(balance);
       }

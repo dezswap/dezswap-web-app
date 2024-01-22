@@ -1,6 +1,7 @@
 import { Numeric } from "@xpla/xpla.js";
 import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
+import { DashboardChartItem } from "types/dashboard-api";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
@@ -9,13 +10,6 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
         t.slice(t.indexOf("."), t.indexOf(".") + decimals + 1)
     : t;
 };
-
-export const formatNumber = (value: number | string) =>
-  !value
-    ? "0"
-    : Intl.NumberFormat("en-US", { maximumFractionDigits: 20 }).format(
-        Number(value),
-      );
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
@@ -131,9 +125,10 @@ export const formatRatio = (value: number) => {
   return value.toFixed(2);
 };
 
-export const formatDateTime = (input: string | number | Date) => {
-  const date = new Date(input);
+type DateConstructorInput = ConstructorParameters<DateConstructor>[0];
 
+export const formatDateTime = (input: DateConstructorInput) => {
+  const date = new Date(input);
   return Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
@@ -144,11 +139,120 @@ export const formatDateTime = (input: string | number | Date) => {
   }).format(date);
 };
 
-export const getRemainDays = (input: string | number | Date) => {
+export const formatDate = (input: DateConstructorInput) => {
+  const date = new Date(input);
+  return Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+};
+
+export const getFromNow = (input: DateConstructorInput) => {
+  const date = new Date(input);
+  const diffSecs = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(diffSecs / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+  const rtf = new Intl.RelativeTimeFormat("en-us", { numeric: "auto" });
+
+  if (years > 0) {
+    return rtf.format(-years, "year");
+  }
+  if (months > 0) {
+    return rtf.format(-months, "month");
+  }
+  if (days > 0) {
+    return rtf.format(-days, "day");
+  }
+  if (hours > 0) {
+    return rtf.format(-hours, "hour");
+  }
+  if (minutes > 0) {
+    return rtf.format(-minutes, "minute");
+  }
+  return rtf.format(-diffSecs, "second");
+};
+export const getRemainDays = (input: DateConstructorInput) => {
   const date = new Date(input);
   const now = new Date();
 
   const diff = date.getTime() - now.getTime();
   const res = Math.ceil(diff / (1000 * 3600 * 24));
   return res > 0 ? res : 0;
+};
+
+const getBigNumberFormatOptions = (
+  value: Numeric.Input,
+): Intl.NumberFormatOptions => {
+  const numericValue = Numeric.parse(value);
+  const notation = numericValue.abs().lt(1000000) ? "standard" : "compact";
+  return {
+    notation,
+    compactDisplay: "short",
+  };
+};
+
+export const formatNumber = (
+  value: Numeric.Input,
+  options?: Intl.NumberFormatOptions,
+) => {
+  try {
+    return Intl.NumberFormat("en-us", options).format(
+      Numeric.parse(value).toNumber(),
+    );
+  } catch (error) {
+    return undefined;
+  }
+};
+
+export const formatBigNumber = (value: Numeric.Input) => {
+  return formatNumber(value, getBigNumberFormatOptions(value));
+};
+
+export const formatCurrency = (value: Numeric.Input) => {
+  const bigNumberFormatOptions = getBigNumberFormatOptions(value);
+  if (Numeric.parse(value).lt(0.01)) {
+    return `$${formatNumber(value, {
+      ...bigNumberFormatOptions,
+      maximumSignificantDigits: 2,
+    })}`;
+  }
+  return formatNumber(value, {
+    ...bigNumberFormatOptions,
+    style: "currency",
+    currency: "USD",
+  });
+};
+
+export const formatPercentage = (value: Numeric.Input) => {
+  const numericValue = Numeric.parse(value);
+  if (numericValue.lt(0)) {
+    throw new Error("Percentage value cannot be negative");
+  }
+  if (numericValue.eq(0)) {
+    return "0%";
+  }
+  if (numericValue.lt(0.01)) {
+    return "<0.01%";
+  }
+  return formatNumber(numericValue.dividedBy(100), {
+    style: "percent",
+    maximumFractionDigits: 2,
+  });
+};
+
+export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
+  const initialValue = "0";
+  try {
+    return data
+      .reduce((prev, current) => {
+        return prev.add(current.v);
+      }, Numeric.parse(initialValue))
+      .toString();
+  } catch (error) {
+    return initialValue;
+  }
 };

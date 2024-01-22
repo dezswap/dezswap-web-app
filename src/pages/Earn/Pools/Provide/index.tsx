@@ -21,7 +21,6 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
   formatNumber,
   formatRatio,
   getTokenLink,
@@ -54,15 +53,12 @@ import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 
-enum FormKey {
+export enum FormKey {
   asset1Value = "asset1Value",
   asset2Value = "asset2Value",
 }
 
 const DISPLAY_DECIMAL = 3;
-
-const MOBILE_DISPLAY_NUMBER_CNT = 20;
-const BROWSER_DISPLAY_NUMBER_CNT = 31;
 
 function ProvidePage() {
   const connectedWallet = useConnectedWallet();
@@ -71,7 +67,7 @@ function ProvidePage() {
     items: ["slippageTolerance", "txDeadline"],
   });
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
-  const { pairAddress } = useParams<{ pairAddress: string }>();
+  const { poolAddress } = useParams<{ poolAddress: string }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair, pairs } = usePairs();
@@ -90,8 +86,8 @@ function ProvidePage() {
   });
 
   const pair = useMemo(
-    () => (pairAddress ? getPair(pairAddress) : undefined),
-    [getPair, pairAddress],
+    () => (poolAddress ? getPair(poolAddress) : undefined),
+    [getPair, poolAddress],
   );
 
   const [asset1, asset2] = useMemo(
@@ -108,22 +104,21 @@ function ProvidePage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (pairAddress && !AccAddress.validate(pairAddress)) {
+    if (poolAddress && !AccAddress.validate(poolAddress)) {
       errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, pairAddress]);
+  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
   });
   const formData = form.watch();
-  const { register, formState } = form;
 
-  const pool = usePool(pairAddress);
+  const pool = usePool(poolAddress);
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&
@@ -134,7 +129,7 @@ function ProvidePage() {
   const simulationResult = useSimulate(
     isPoolEmpty
       ? {
-          pairAddress: pairAddress || "",
+          pairAddress: poolAddress || "",
           asset1Address: asset1?.token || "",
           asset1Amount:
             valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
@@ -143,7 +138,7 @@ function ProvidePage() {
             valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
         }
       : {
-          pairAddress: pairAddress || "",
+          pairAddress: poolAddress || "",
           asset1Address: isReversed ? asset2?.token || "" : asset1?.token || "",
           asset1Amount: isReversed
             ? valueToAmount(formData.asset2Value, asset2?.decimals) || "0"
@@ -166,7 +161,7 @@ function ProvidePage() {
             msgs: generateAddLiquidityMsg(
               connectedWallet?.network.name as NetworkName,
               connectedWallet.walletAddress,
-              pairAddress || "",
+              poolAddress || "",
               [
                 {
                   address: asset1?.token || "",
@@ -356,10 +351,13 @@ function ProvidePage() {
     >
       <form onSubmit={handleSubmit}>
         <InputGroup
-          {...register(FormKey.asset1Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset1?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset1Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset1}
           onClick={() => {
             setIsReversed(false);
@@ -373,17 +371,6 @@ function ProvidePage() {
               shouldDirty: true,
               shouldTouch: true,
             });
-          }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset1Value;
-            }
           }}
         />
         <div
@@ -401,17 +388,20 @@ function ProvidePage() {
           `}
         />
         <InputGroup
-          {...register(FormKey.asset2Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset2?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset2Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset2}
           onClick={() => {
-            setIsReversed(true);
+            setIsReversed(false);
             setBalanceApplied(false);
           }}
           onBalanceClick={(value) => {
-            setIsReversed(true);
+            setIsReversed(false);
             setBalanceApplied(true);
             form.setValue(FormKey.asset2Value, value, {
               shouldValidate: true,
@@ -419,18 +409,6 @@ function ProvidePage() {
               shouldTouch: true,
             });
           }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset2Value;
-            }
-          }}
-          style={{ marginBottom: 10 }}
         />
         {isPoolEmpty && (
           <Box

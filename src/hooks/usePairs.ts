@@ -2,21 +2,20 @@ import { useCallback, useMemo } from "react";
 import useAPI from "hooks/useAPI";
 import useNetwork from "hooks/useNetwork";
 import { useQuery } from "@tanstack/react-query";
+import { getAddressFromAssetInfo } from "utils/dezswap";
 
 const usePairs = () => {
   const network = useNetwork();
   const api = useAPI();
 
   const { data: pairs, isLoading } = useQuery({
-    queryKey: ["pairs", network.name],
+    queryKey: ["pairs", network.chainID],
     queryFn: async () => {
       const res = await api.getPairs();
       return res?.pairs.map((pair) => ({
         ...pair,
-        asset_addresses: pair.asset_infos.map((assetInfo) =>
-          "token" in assetInfo
-            ? assetInfo.token.contract_addr
-            : assetInfo.native_token.denom,
+        asset_addresses: pair.asset_infos.map(
+          (assetInfo) => getAddressFromAssetInfo(assetInfo) || "",
         ),
       }));
     },

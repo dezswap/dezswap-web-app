@@ -19,7 +19,6 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
   formatDecimals,
   formatNumber,
   getTokenLink,
@@ -59,9 +58,6 @@ enum FormKey {
 
 const DISPLAY_DECIMAL = 3;
 
-const MOBILE_DISPLAY_NUMBER_CNT = 20;
-const BROWSER_DISPLAY_NUMBER_CNT = 31;
-
 const Box = styled(box)`
   & > * {
     margin-bottom: 5px;
@@ -99,7 +95,6 @@ function CreatePage() {
     mode: "all",
   });
   const formData = form.watch();
-  const { register } = form;
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -339,10 +334,13 @@ function CreatePage() {
     >
       <form onSubmit={handleSubmit}>
         <InputGroup
-          {...register(FormKey.asset1Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset1?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset1Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset1}
           onClick={() => {
             setBalanceApplied(false);
@@ -354,17 +352,6 @@ function CreatePage() {
               shouldDirty: true,
               shouldTouch: true,
             });
-          }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset1Value;
-            }
           }}
         />
         <div
@@ -382,10 +369,13 @@ function CreatePage() {
           `}
         />
         <InputGroup
-          {...register(FormKey.asset2Value, {
-            setValueAs: (value) => filterNumberFormat(value, asset2?.decimals),
-            required: true,
-          })}
+          controllerProps={{
+            name: FormKey.asset2Value,
+            control: form.control,
+            rules: {
+              required: true,
+            },
+          }}
           asset={asset2}
           onClick={() => {
             setBalanceApplied(false);
@@ -397,17 +387,6 @@ function CreatePage() {
               shouldDirty: true,
               shouldTouch: true,
             });
-          }}
-          onBlur={(e) => {
-            const numberCnt =
-              screenClass === MOBILE_SCREEN_CLASS
-                ? MOBILE_DISPLAY_NUMBER_CNT
-                : BROWSER_DISPLAY_NUMBER_CNT;
-            if (e.target.value.length > numberCnt) {
-              e.target.value = `${e.target.value.slice(0, numberCnt - 2)}...`;
-            } else {
-              e.target.value = formData.asset2Value;
-            }
           }}
           style={{ marginBottom: 10 }}
         />
