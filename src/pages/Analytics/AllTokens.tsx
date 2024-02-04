@@ -42,9 +42,8 @@ function AllTokens() {
     return tokens.filter((token) => {
       if (!searchKeyword) return true;
       const asset = getAsset(token.address);
-      return (
-        asset?.token?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        asset?.name?.toLowerCase().includes(searchKeyword.toLowerCase())
+      return [asset?.token, asset?.name, asset?.symbol].some((value) =>
+        value?.toLowerCase().includes(searchKeyword.toLowerCase()),
       );
     });
   }, [getAsset, searchKeyword, tokens]);
