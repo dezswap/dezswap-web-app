@@ -186,16 +186,18 @@ function Assets() {
                           align-items: center;
                         `}
                       >
-                        <div
-                          css={css`
-                            white-space: nowrap;
-                            word-break: break-all;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                          `}
-                        >
-                          {name}&nbsp;
-                        </div>
+                        <Link to={`/tokens/${encodeURIComponent(row.token)}`}>
+                          <div
+                            css={css`
+                              white-space: nowrap;
+                              word-break: break-all;
+                              text-overflow: ellipsis;
+                              overflow: hidden;
+                            `}
+                          >
+                            {name}&nbsp;
+                          </div>
+                        </Link>
                         {row.symbol && (
                           <Typography
                             size={16}
