@@ -2,23 +2,19 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import { Row, Col } from "react-grid-system";
-import {
-  amountToValue,
-  formatDecimals,
-  formatNumber,
-  formatPercentage,
-} from "utils";
+import { amountToValue, formatDecimals, formatNumber } from "utils";
 import usePool from "hooks/usePool";
 import { getAddressFromAssetInfo } from "utils/dezswap";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import { Link } from "react-router-dom";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -150,10 +146,11 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
         <div />
         <Label>APR (7D)</Label>
         <Value>
-          {!Number.isNaN(Number(dashboardPoolData?.recent.apr)) &&
-            formatPercentage(
-              Numeric.parse(dashboardPoolData?.recent.apr || 0).mul(100),
-            )}
+          {!Number.isNaN(Number(dashboardPoolData?.recent.apr)) && (
+            <PercentageFormatter
+              value={Numeric.parse(dashboardPoolData?.recent.apr || 0).mul(100)}
+            />
+          )}
         </Value>
       </Wrapper>
     </Panel>

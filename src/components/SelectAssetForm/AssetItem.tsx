@@ -8,12 +8,13 @@ import useBalance from "hooks/useBalance";
 import useIsInViewport from "hooks/useIsInViewport";
 import { useRef } from "react";
 import { Token } from "types/api";
-import { formatNumber, cutDecimal, amountToValue, ellipsisCenter } from "utils";
+import { ellipsisCenter } from "utils";
 
 import iconToken from "assets/icons/icon-default-token.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 interface WrapperProps {
   selected?: boolean;
@@ -121,9 +122,7 @@ function Balance({ asset }: { asset?: Partial<Token> }) {
         padding-left: 10px;
       `}
     >
-      {formatNumber(
-        cutDecimal(amountToValue(balance || 0, asset?.decimals) || 0, 3),
-      )}
+      <AssetValueFormatter asset={asset} amount={balance} showSymbol={false} />
     </Typography>
   );
 }

@@ -10,12 +10,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import useDashboard from "hooks/dashboard/useDashboard";
 import useAssets from "hooks/useAssets";
-import { formatCurrency } from "utils";
 import { Link } from "react-router-dom";
-import HoverUnderline from "components/HoverUnderline";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import HoverUnderline from "components/utils/HoverUnderline";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import { DashboardToken } from "types/dashboard-api";
 import { getBasicSortFunction } from "utils/table";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import MobileTokenItem from "./MobileTokenItem";
 
 function AllTokens() {
@@ -237,7 +237,7 @@ function AllTokens() {
                 width: 190,
                 hasSort: true,
                 render(price) {
-                  return formatCurrency(`${price}`);
+                  return price && <CurrencyFormatter value={price} />;
                 },
               },
               {
@@ -263,7 +263,7 @@ function AllTokens() {
                 width: 190,
                 hasSort: true,
                 render(value) {
-                  return `${formatCurrency(`${value}`)}`;
+                  return value && <CurrencyFormatter value={value} />;
                 },
               },
               {
@@ -272,7 +272,7 @@ function AllTokens() {
                 width: 190,
                 hasSort: true,
                 render(value) {
-                  return `${formatCurrency(`${value}`)}`;
+                  return value && <CurrencyFormatter value={value} />;
                 },
               },
             ]}

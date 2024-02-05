@@ -8,15 +8,11 @@ import { Col, Row } from "react-grid-system";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import styled from "@emotion/styled";
-import {
-  amountToValue,
-  formatCurrency,
-  formatDecimals,
-  formatNumber,
-} from "utils";
 import Button from "components/Button";
 import { Link } from "react-router-dom";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { TokenWithBalanceAndValue } from "./Assets";
 
 interface MobileAssetItemProps {
@@ -113,7 +109,9 @@ function MobileAssetItem({
           </div>
           <div>
             <Label>Value</Label>
-            <Value>{formatCurrency(asset.value || 0)}</Value>
+            <Value>
+              <CurrencyFormatter value={asset.value} />
+            </Value>
           </div>
         </Content>
       }
@@ -123,10 +121,7 @@ function MobileAssetItem({
         <div>
           <Label>Total Amount</Label>
           <Value>
-            {formatNumber(
-              formatDecimals(amountToValue(asset.balance) || "0", 2),
-            )}
-            &nbsp;{asset.symbol}
+            <AssetValueFormatter asset={asset} amount={asset.balance} />
           </Value>
         </div>
         {asset.token && (

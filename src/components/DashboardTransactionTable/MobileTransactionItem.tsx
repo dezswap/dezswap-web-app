@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
@@ -9,14 +9,13 @@ import Expand from "pages/Earn/Expand";
 import React, { useMemo } from "react";
 import { DashboardTransaction } from "types/dashboard-api";
 import {
-  amountToValue,
   ellipsisCenter,
-  formatCurrency,
-  formatNumber,
   getAddressLink,
   getFromNow,
   getTransactionLink,
 } from "utils";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 interface MobileTransactionItemProps {
   transaction: DashboardTransaction;
@@ -83,30 +82,26 @@ function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
             <>
               <div>
                 <Label>Total Value</Label>
-                <Value>{formatCurrency(transaction.totalValue)}</Value>
-              </div>
-              <div>
-                <Label>Token Amount</Label>
                 <Value>
-                  {formatNumber(
-                    amountToValue(
-                      `${transaction.asset0amount}`,
-                      asset0?.decimals,
-                    ) || "",
-                  )}
-                  &nbsp;{asset0?.symbol}
+                  <CurrencyFormatter value={transaction.totalValue} />
                 </Value>
               </div>
               <div>
                 <Label>Token Amount</Label>
                 <Value>
-                  {formatNumber(
-                    amountToValue(
-                      `${transaction.asset1amount}`,
-                      asset1?.decimals,
-                    ) || "",
-                  )}
-                  &nbsp;{asset1?.symbol}
+                  <AssetValueFormatter
+                    asset={asset0}
+                    amount={transaction.asset0amount}
+                  />
+                </Value>
+              </div>
+              <div>
+                <Label>Token Amount</Label>
+                <Value>
+                  <AssetValueFormatter
+                    asset={asset1}
+                    amount={transaction.asset1amount}
+                  />
                 </Value>
               </div>
               <div>

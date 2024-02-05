@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import Input from "components/Input";
 import Pagination from "components/Pagination";
 import Panel from "components/Panel";
@@ -10,12 +10,13 @@ import useAssets from "hooks/useAssets";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { DashboardPool } from "types/dashboard-api";
-import { formatCurrency, formatPercentage } from "utils";
 import { Numeric } from "@xpla/xpla.js";
 import { getBasicSortFunction } from "utils/table";
 import usePairs from "hooks/usePairs";
 import AssetIcon from "components/AssetIcon";
 import { Link } from "react-router-dom";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 import MobilePoolItem from "./MobilePoolItem";
 
 interface DashboardPoolTableProps {
@@ -235,7 +236,7 @@ function DashboardPoolTable({
               width: 220,
               hasSort: true,
               render(value) {
-                return value && formatCurrency(value);
+                return value && <CurrencyFormatter value={value} />;
               },
             },
             {
@@ -244,7 +245,7 @@ function DashboardPoolTable({
               width: 220,
               hasSort: true,
               render(value) {
-                return value && formatCurrency(value);
+                return value && <CurrencyFormatter value={value} />;
               },
             },
             {
@@ -253,7 +254,7 @@ function DashboardPoolTable({
               width: 220,
               hasSort: true,
               render(value) {
-                return value && formatCurrency(value);
+                return value && <CurrencyFormatter value={value} />;
               },
             },
             {
@@ -264,8 +265,11 @@ function DashboardPoolTable({
               render(value) {
                 return (
                   value &&
-                  !Number.isNaN(Number(value)) &&
-                  formatPercentage(Numeric.parse(value).mul(100))
+                  !Number.isNaN(Number(value)) && (
+                    <PercentageFormatter
+                      value={Numeric.parse(value).mul(100)}
+                    />
+                  )
                 );
               },
             },

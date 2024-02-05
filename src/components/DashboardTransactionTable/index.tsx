@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import Input from "components/Input";
 import Pagination from "components/Pagination";
 import Panel from "components/Panel";
@@ -14,15 +14,15 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { DashboardTransaction } from "types/dashboard-api";
 import {
-  amountToValue,
   ellipsisCenter,
-  formatCurrency,
-  formatNumber,
   getAddressLink,
   getFromNow,
   getTransactionLink,
 } from "utils";
 import { getBasicSortFunction } from "utils/table";
+import OverflowTooltip from "components/utils/OverflowTooltip";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import MobileTransactionItem from "./MobileTransactionItem";
 
 interface DashboardTransactionTableProps {
@@ -224,16 +224,18 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               },
               render(actionDisplay, row) {
                 return (
-                  <a
-                    href={getTransactionLink(row.hash, network.name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    css={css`
-                      white-space: nowrap;
-                    `}
-                  >
-                    <HoverUnderline>{actionDisplay}</HoverUnderline>
-                  </a>
+                  <OverflowTooltip content={actionDisplay}>
+                    <a
+                      href={getTransactionLink(row.hash, network.name)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      css={css`
+                        white-space: nowrap;
+                      `}
+                    >
+                      <HoverUnderline>{actionDisplay}</HoverUnderline>
+                    </a>
+                  </OverflowTooltip>
                 );
               },
             },
@@ -243,7 +245,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               width: 185,
               hasSort: true,
               render(value) {
-                return formatCurrency(`${value}`);
+                return value && <CurrencyFormatter value={value} />;
               },
             },
             {
@@ -253,9 +255,11 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               hasSort: true,
               render(amount, row) {
                 const asset = getAsset(row.asset0);
-                return `${formatNumber(
-                  amountToValue(`${amount}`, asset?.decimals) || "",
-                )} ${asset?.symbol}`;
+                return (
+                  amount && (
+                    <AssetValueFormatter asset={asset} amount={amount} />
+                  )
+                );
               },
             },
             {
@@ -265,9 +269,11 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               hasSort: true,
               render(amount, row) {
                 const asset = getAsset(row.asset1);
-                return `${formatNumber(
-                  amountToValue(`${amount}`, asset?.decimals) || "",
-                )} ${asset?.symbol}`;
+                return (
+                  amount && (
+                    <AssetValueFormatter asset={asset} amount={amount} />
+                  )
+                );
               },
             },
             {

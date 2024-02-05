@@ -9,7 +9,6 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePairs";
-import { formatNumber, formatDecimals, amountToValue } from "utils";
 import iconPlus from "assets/icons/icon-plus.svg";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDefaultAsset from "assets/icons/icon-default-token.svg";
@@ -20,6 +19,7 @@ import { useAtom } from "jotai";
 import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
 import useBalance from "hooks/useBalance";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import ImportAssetModal from "./ImportAssetModal";
 import AssetFormButton from "./AssetFormButton";
 
@@ -200,12 +200,11 @@ function AssetSelector({
                           color: ${theme.colors.primary};
                         `}
                       >
-                        {formatNumber(
-                          formatDecimals(
-                            amountToValue(balance, asset?.decimals) || 0,
-                            3,
-                          ),
-                        )}
+                        <AssetValueFormatter
+                          asset={asset}
+                          amount={balance}
+                          showSymbol={false}
+                        />
                       </span>
                     </Typography>
                   </Col>
