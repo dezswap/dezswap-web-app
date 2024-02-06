@@ -90,7 +90,7 @@ function MobileAssetItem({
                     text-overflow: ellipsis;
                   `}
                 >
-                  <Link to={`/tokens/${asset.token}`}>
+                  <Link to={`/tokens/${encodeURIComponent(`${asset.token}`)}`}>
                     <HoverUnderline>{asset.name}</HoverUnderline>
                   </Link>
                 </Value>
