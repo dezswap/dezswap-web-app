@@ -58,37 +58,16 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
   }
 };
 
-export const filterNumberFormat = (value: string, decimals = 18) => {
-  if (!value || value.length < 2) {
-    return value?.replace(/[^0-9]/g, "");
-  }
+export const sanitizeNumberInput = (value: string, decimals = 18) => {
+  // Remove all non-numeric characters except decimal point and minus sign
+  const regex = /[^0-9.]/g;
+  const isNegative = value.startsWith("-");
+  const sanitized = value.replace(regex, "");
+  const [integerPart, decimalPart] = sanitized.split(".");
 
-  let t = 0;
-  let v = 0;
-  // remove redundant zeros
-  // replace non-digit characters and preceding multiple zeros
-  const filtered = value.replaceAll(/[0\\.]/g, "").length
-    ? value
-        .replace(/[^0-9\\.]/g, "")
-        .replace(/^[0]+[\\.]/g, (match: string) => {
-          v += 1;
-          return v === 1 ? "0." : match;
-        })
-        .replace(/[\\.]/g, (match: string) => {
-          t += 1;
-          return t === 2 ? "" : match;
-        })
-    : "0";
-
-  // decimal count check
-  return filtered.includes(".") &&
-    (filtered.split(".").pop()?.length || 0) > decimals
-    ? filtered.slice(0, filtered.indexOf(".")) +
-        filtered.slice(
-          filtered.indexOf("."),
-          filtered.indexOf(".") + decimals + 1,
-        )
-    : filtered;
+  return `${isNegative ? "-" : ""}${integerPart}${
+    decimalPart !== undefined ? `.${decimalPart.slice(0, decimals)}` : ""
+  }`;
 };
 
 export const getBlockLink = (height?: string, network?: string) =>

@@ -18,7 +18,7 @@ import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  filterNumberFormat,
+  sanitizeNumberInput,
   formatDateTime,
   formatNumber,
   getTokenLink,
@@ -252,7 +252,7 @@ function StakePage() {
             form.setValue(FormKey.lpValue, value);
           }}
           {...register(FormKey.lpValue, {
-            setValueAs: (value) => filterNumberFormat(value, LP_DECIMALS),
+            setValueAs: (value) => sanitizeNumberInput(value, LP_DECIMALS),
             required: true,
           })}
         />

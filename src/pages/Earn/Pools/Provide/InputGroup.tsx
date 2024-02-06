@@ -13,6 +13,7 @@ import useBalance from "hooks/useBalance";
 import { Numeric } from "@xpla/xpla.js";
 import { UseControllerProps, useController } from "react-hook-form";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import { useMemo } from "react";
 
 interface InputGroupProps extends NumberInputProps {
   asset?: Partial<Token> | null;
@@ -57,6 +58,22 @@ function InputGroup({
   const theme = useTheme();
   const balance = useBalance(asset?.token);
   const dashboardToken = useDashboardTokenDetail(asset?.token || "");
+
+  const expectedUsdValue = useMemo(() => {
+    try {
+      if (dashboardToken?.price && field.value) {
+        return `= $${formatNumber(
+          formatDecimals(
+            Numeric.parse(dashboardToken?.price || 0).mul(field.value),
+            2,
+          ),
+        )}`;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return "-";
+  }, [dashboardToken, field.value]);
 
   return (
     <Box style={style}>
@@ -129,14 +146,7 @@ function InputGroup({
               text-align: right;
             `}
           >
-            {dashboardToken?.price && field.value
-              ? `= $${formatNumber(
-                  formatDecimals(
-                    Numeric.parse(dashboardToken?.price || 0).mul(field.value),
-                    2,
-                  ),
-                )}`
-              : "-"}
+            {expectedUsdValue}
           </Typography>
         </Col>
       </Row>

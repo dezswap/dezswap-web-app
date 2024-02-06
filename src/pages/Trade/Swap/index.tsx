@@ -13,7 +13,7 @@ import useAssets from "hooks/useAssets";
 import {
   amountToValue,
   cutDecimal,
-  filterNumberFormat,
+  sanitizeNumberInput,
   formatDecimals,
   formatNumber,
   formatPercentage,
@@ -253,13 +253,13 @@ function SwapPage() {
 
   const beliefPrice = useMemo(() => {
     if (isReversed) {
-      if (asset2Value && simulationResult.estimatedAmount) {
+      if (Number(asset2Value) && simulationResult.estimatedAmount) {
         return Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset1?.decimals) ||
             0,
         ).div(asset2Value);
       }
-    } else if (asset1Value && simulationResult.estimatedAmount) {
+    } else if (Number(asset1Value) && simulationResult.estimatedAmount) {
       return Numeric.parse(asset1Value || 0).div(
         Numeric.parse(
           amountToValue(simulationResult.estimatedAmount, asset2?.decimals) ||
@@ -287,7 +287,7 @@ function SwapPage() {
       !asset1?.token ||
       !asset1Value ||
       isPoolEmpty ||
-      Numeric.parse(asset1Value).isNaN()
+      !Number(asset1Value)
     ) {
       return undefined;
     }
@@ -330,27 +330,28 @@ function SwapPage() {
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
   const buttonMsg = useMemo(() => {
-    if (asset1 === undefined || asset2 === undefined) {
-      return "Select tokens";
-    }
-
-    if (isPoolEmpty) {
-      return "Swap";
-    }
-
-    if (asset1Value) {
-      if (
-        Numeric.parse(asset1Value).gt(
-          Numeric.parse(
-            amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
-          ),
-        )
-      ) {
-        return `Insufficient ${asset1?.symbol} balance`;
+    try {
+      if (asset1 === undefined || asset2 === undefined) {
+        return "Select tokens";
       }
-      return "Swap";
-    }
 
+      if (isPoolEmpty) {
+        return "Swap";
+      }
+
+      if (asset1Value) {
+        if (
+          Numeric.parse(asset1Value).gt(
+            amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
+          )
+        ) {
+          return `Insufficient ${asset1?.symbol} balance`;
+        }
+        return "Swap";
+      }
+    } catch (error) {
+      console.log(error);
+    }
     return "Enter an amount";
   }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
 
@@ -362,7 +363,7 @@ function SwapPage() {
       balanceApplied &&
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
-      asset1Value &&
+      Number(asset1Value) &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
           amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
@@ -608,7 +609,7 @@ function SwapPage() {
                 }}
                 {...register(FormKey.asset1Value, {
                   setValueAs: (value) =>
-                    filterNumberFormat(value, asset1?.decimals),
+                    sanitizeNumberInput(value, asset1?.decimals),
                   onChange: () => {
                     setBalanceApplied(false);
                     setIsReversed(false);
@@ -653,7 +654,7 @@ function SwapPage() {
               `}
             >
               <Typography color="text.secondary" size={14}>
-                {dashboardToken1?.price && asset1Value
+                {dashboardToken1?.price && Number(asset1Value)
                   ? `= $${formatNumber(
                       formatDecimals(
                         Numeric.parse(dashboardToken1?.price || 0).mul(
@@ -822,7 +823,7 @@ function SwapPage() {
                 }}
                 {...register(FormKey.asset2Value, {
                   setValueAs: (value) =>
-                    filterNumberFormat(value, asset2?.decimals),
+                    sanitizeNumberInput(value, asset2?.decimals),
                   onChange: () => {
                     setIsReversed(true);
                   },
