@@ -47,7 +47,8 @@ const Button = styled.button<ButtonProps>`
           &:hover {
             opacity: 0.7;
           }
-          &:disabled {
+          &:disabled,
+          form:invalid &[type="submit"] {
             background-color: ${theme.colors.disabled};
             border-color: ${theme.colors.disabled};
             color: ${theme.colors.white};
@@ -67,7 +68,8 @@ const Button = styled.button<ButtonProps>`
           &.active {
             background-color: ${theme.colors.selected};
           }
-          &:disabled {
+          &:disabled,
+          form:invalid &[type="submit"] {
             background-color: ${theme.colors.text.background};
             opacity: 0.5;
           }
@@ -90,7 +92,8 @@ const Button = styled.button<ButtonProps>`
           background-image: ${theme.colors.gradient};
           border: none;
           color: ${theme.colors.white};
-          &:disabled {
+          &:disabled,
+          form:invalid &[type="submit"] {
             background-image: unset;
             background-color: ${theme.colors.disabled};
             border: none;
@@ -104,7 +107,8 @@ const Button = styled.button<ButtonProps>`
           &:hover {
             opacity: 0.7;
           }
-          &:disabled {
+          &:disabled,
+          form:invalid &[type="submit"] {
             background-color: ${theme.colors.disabled};
             border-color: ${theme.colors.disabled};
             color: ${theme.colors.white};
@@ -132,7 +136,7 @@ const Button = styled.button<ButtonProps>`
       display: flex;
     `}
 
-  &:disabled {
+  &:disabled, form:invalid &[type="submit"] {
     cursor: default;
   }
 `;
