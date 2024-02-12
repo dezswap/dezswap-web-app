@@ -1,8 +1,6 @@
-import { Fragment, PropsWithChildren, useMemo } from "react";
+import { Fragment, PropsWithChildren } from "react";
 import styled from "@emotion/styled";
 import { useAtomValue } from "jotai";
-import disclaimerLastSeenAtom from "stores/disclaimer";
-import DisclaimerModal from "components/Modal/DisclaimerModal";
 import globalElementsAtom from "stores/globalElements";
 import Header, {
   DEFAULT_HEADER_HEIGHT,
@@ -118,18 +116,12 @@ function MainLayout({ children }: PropsWithChildren) {
   const network = useNetwork();
 
   const globalElements = useAtomValue(globalElementsAtom);
-  const disclaimerLastSeen = useAtomValue(disclaimerLastSeenAtom);
-  const isDisclaimerAgreed = useMemo(() => {
-    if (!disclaimerLastSeen) return false;
-    const date = new Date();
-    date.setDate(date.getDate() - 3);
-    return disclaimerLastSeen > date;
-  }, [disclaimerLastSeen]);
+
   return (
     <>
       <Header />
       <Wrapper hasBanner={network.name !== "mainnet"}>
-        {isDisclaimerAgreed && children}
+        {children}
         <BrowserDelegateButton />
         <FooterWrapper>
           <Footer />
@@ -142,8 +134,6 @@ function MainLayout({ children }: PropsWithChildren) {
           <NavBarWrapper>{navBar}</NavBarWrapper>
         </>
       )}
-
-      <DisclaimerModal isOpen={!isDisclaimerAgreed} />
       {globalElements.map(({ element, id }) => (
         <Fragment key={id}>{element}</Fragment>
       ))}
