@@ -23,9 +23,9 @@ function AssetValueFormatter({
     parsedValue.lt(0.001) && !parsedValue.eq(0) ? "< 0.001" : formattedValue;
   return (
     <OverflowTooltip
-      content={`${formatNumber(parsedValue, {
-        minimumSignificantDigits: 1,
-      })}${showSymbol ? ` ${asset?.symbol || ""}` : ""}`}
+      content={`${parsedValue.toFixed()}${
+        showSymbol ? ` ${asset?.symbol || ""}` : ""
+      }`}
       disabled={valueToDisplay !== formattedValue ? false : undefined}
     >
       {`${valueToDisplay}${showSymbol ? ` ${asset?.symbol || ""}` : ""}`}

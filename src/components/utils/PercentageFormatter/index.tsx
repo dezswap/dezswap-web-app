@@ -15,7 +15,7 @@ function PercentageFormatter({ value }: PercentageFormatterProps) {
 
   return (
     <OverflowTooltip
-      content={formattedValue}
+      content={`${parsedValue.toFixed()}%`}
       disabled={valueToDisplay !== formattedValue ? false : undefined}
     >
       {valueToDisplay}
