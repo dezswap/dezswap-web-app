@@ -41,7 +41,7 @@ const OverflowTooltip = forwardRef<
   return (
     <Tooltip
       ref={tooltipRef}
-      disabled={disabledFromProps !== undefined ? disabledFromProps : disabled}
+      disabled={disabledFromProps ?? disabled}
       content={content || children}
       {...props}
     >
