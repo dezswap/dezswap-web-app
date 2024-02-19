@@ -301,13 +301,14 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     padding: 2px 0;
+                    line-height: 28px;
                   `}
                 >
-                  <Link to={`/earn/pools/${encodeURIComponent(poolAddress)}`}>
-                    <HoverUnderline>
+                  <HoverUnderline>
+                    <Link to={`/earn/pools/${encodeURIComponent(poolAddress)}`}>
                       {asset1?.symbol}-{asset2?.symbol}
-                    </HoverUnderline>
-                  </Link>
+                    </Link>
+                  </HoverUnderline>
                 </Col>
               </Tooltip>
               {isSmallScreen && (

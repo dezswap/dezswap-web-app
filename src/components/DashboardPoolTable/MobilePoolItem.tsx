@@ -102,6 +102,7 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
                 <Col
                   css={css`
                     min-width: 0;
+                    line-height: 32px;
                   `}
                 >
                   <HoverUnderline>
@@ -123,10 +124,11 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
                           overflow: hidden;
                           white-space: nowrap;
                           text-overflow: ellipsis;
+                          display: inline;
                         `}
                       >
                         {assets?.map((asset) => asset?.symbol).join("-")}
-                      </Typography>{" "}
+                      </Typography>
                     </Link>
                   </HoverUnderline>
                 </Col>
