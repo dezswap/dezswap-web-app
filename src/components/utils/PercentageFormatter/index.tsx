@@ -1,6 +1,7 @@
 import Decimal from "decimal.js";
 import { formatPercentage } from "utils";
 import { Numeric } from "@xpla/xpla.js";
+import { css } from "@emotion/react";
 import OverflowTooltip from "../OverflowTooltip";
 
 interface PercentageFormatterProps {
@@ -15,7 +16,15 @@ function PercentageFormatter({ value }: PercentageFormatterProps) {
 
   return (
     <OverflowTooltip
-      content={`${parsedValue.toFixed()}%`}
+      content={
+        <div
+          css={css`
+            word-break: break-all;
+          `}
+        >
+          {parsedValue.toFixed()}%
+        </div>
+      }
       disabled={valueToDisplay !== formattedValue ? false : undefined}
     >
       {valueToDisplay}

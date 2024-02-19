@@ -1,5 +1,6 @@
 import { formatCurrency } from "utils";
 import { Numeric } from "@xpla/xpla.js";
+import { css } from "@emotion/react";
 import OverflowTooltip from "../OverflowTooltip";
 
 interface CurrencyFormatterProps {
@@ -14,7 +15,15 @@ function CurrencyFormatter({ value = 0 }: CurrencyFormatterProps) {
     isDecimalTooLong && parsedValue.lt(0.01) ? "< $0.01" : formattedValue;
   return (
     <OverflowTooltip
-      content={`$${parsedValue.toFixed()}`}
+      content={
+        <div
+          css={css`
+            word-break: break-all;
+          `}
+        >
+          ${parsedValue.toFixed()}
+        </div>
+      }
       disabled={valueToDisplay !== formattedValue ? false : undefined}
     >
       {valueToDisplay}

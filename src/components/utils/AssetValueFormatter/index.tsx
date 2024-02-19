@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { Token } from "types/api";
 import { amountToValue, formatDecimals, formatNumber } from "utils";
 import { Numeric } from "@xpla/xpla.js";
+import { css } from "@emotion/react";
 import OverflowTooltip from "../OverflowTooltip";
 
 interface AssetValueFormatterProps {
@@ -23,9 +24,16 @@ function AssetValueFormatter({
     parsedValue.lt(0.001) && !parsedValue.eq(0) ? "< 0.001" : formattedValue;
   return (
     <OverflowTooltip
-      content={`${parsedValue.toFixed()}${
-        showSymbol ? ` ${asset?.symbol || ""}` : ""
-      }`}
+      content={
+        <div
+          css={css`
+            word-break: break-all;
+          `}
+        >
+          {parsedValue.toFixed()}
+          {showSymbol && ` ${asset?.symbol || ""}`}
+        </div>
+      }
       disabled={valueToDisplay !== formattedValue ? false : undefined}
     >
       {`${valueToDisplay}${showSymbol ? ` ${asset?.symbol || ""}` : ""}`}
