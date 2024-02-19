@@ -7,19 +7,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "simplebar";
 import "simplebar/dist/simplebar.css";
 import ResizeObserver from "resize-observer-polyfill";
-import { Numeric } from "@xpla/xpla.js";
+import "utils/overloadXplaNumeric";
 
 window.ResizeObserver = ResizeObserver;
-
-const originalNumericParse = Numeric.parse;
-Numeric.parse = (value) => {
-  try {
-    return originalNumericParse(value);
-  } catch (error) {
-    console.log(error);
-  }
-  return originalNumericParse(0);
-};
 
 const queryClient = new QueryClient();
 

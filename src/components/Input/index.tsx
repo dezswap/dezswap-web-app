@@ -264,14 +264,13 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const target = event.currentTarget;
         if (target.value) {
           try {
-            Numeric.parse(target.value);
+            Numeric.parse(target.value, { throwOnError: true });
+            if (onChange) {
+              onChange(event);
+            }
           } catch (error) {
             event.preventDefault();
           }
-        }
-
-        if (onChange) {
-          onChange(event);
         }
       },
       [onChange],
