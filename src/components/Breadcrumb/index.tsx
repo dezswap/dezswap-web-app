@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import Typography from "components/Typography";
 import { Link, LinkProps } from "react-router-dom";
 

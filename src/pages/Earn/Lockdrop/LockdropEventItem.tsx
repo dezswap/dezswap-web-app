@@ -43,6 +43,7 @@ import {
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
@@ -499,30 +500,19 @@ function LockdropEventItem({
             <div>
               {isSmallScreen && <Label>Allocation</Label>}
               <div>
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(
-                      lockdropEvent.total_reward,
-                      rewardAsset?.decimals,
-                    ) || "",
-                    2,
-                  ),
-                )}
-                &nbsp;
-                {rewardAsset?.symbol}
+                <AssetValueFormatter
+                  asset={rewardAsset}
+                  amount={lockdropEvent.total_reward}
+                />
               </div>
             </div>
             <div>
               {isSmallScreen && <Label>Total Staked LP</Label>}
               <div>
-                {formatNumber(
-                  formatDecimals(
-                    amountToValue(lockdropEvent.total_locked_lp, LP_DECIMALS) ||
-                      "",
-                    2,
-                  ),
-                )}
-                &nbsp;LP
+                <AssetValueFormatter
+                  asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+                  amount={lockdropEvent.total_locked_lp}
+                />
               </div>
             </div>
             <div>

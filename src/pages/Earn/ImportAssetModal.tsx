@@ -13,18 +13,8 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import ReactModal from "react-modal";
 import { TokenInfo } from "types/token";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import {
-  amountToValue,
-  cutDecimal,
-  formatNumber,
-  getIbcTokenHash,
-  isNativeTokenAddress,
-} from "utils";
-import {
-  DISPLAY_DECIMAL,
-  MOBILE_SCREEN_CLASS,
-  MODAL_CLOSE_TIMEOUT_MS,
-} from "constants/layout";
+import { getIbcTokenHash, isNativeTokenAddress } from "utils";
+import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
 import usePairs from "hooks/usePairs";
@@ -34,6 +24,7 @@ import imgSuccess from "assets/images/success-import.svg";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import { Token } from "types/api";
 import useLCDClient from "hooks/useLCDClient";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -362,12 +353,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
               </div>
               <div>
                 <Typography size={16} weight={700}>
-                  {formatNumber(
-                    cutDecimal(
-                      amountToValue(balance || 0, tokenInfo?.decimals) || 0,
-                      DISPLAY_DECIMAL,
-                    ),
-                  )}
+                  <AssetValueFormatter asset={tokenInfo} amount={balance} />
                 </Typography>
               </div>
             </div>

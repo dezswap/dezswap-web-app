@@ -7,10 +7,10 @@ import { Col, Row } from "react-grid-system";
 import styled from "@emotion/styled";
 import { DashboardToken } from "types/dashboard-api";
 import useAssets from "hooks/useAssets";
-import { formatCurrency } from "utils";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import { Link } from "react-router-dom";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
 
 interface MobileTokenItemProps {
   number: number;
@@ -133,7 +133,9 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
           </div>
           <div>
             <Label>Price</Label>
-            <Value>{formatCurrency(token.price)}</Value>
+            <Value>
+              <CurrencyFormatter value={token.price} />
+            </Value>
           </div>
         </Content>
       }
@@ -147,11 +149,15 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
         </div>
         <div>
           <Label>Volume 24H</Label>
-          <Value>{formatCurrency(token.volume24h)}</Value>
+          <Value>
+            <CurrencyFormatter value={token.volume24h} />
+          </Value>
         </div>
         <div>
           <Label>TVL</Label>
-          <Value>{formatCurrency(token.tvl)}</Value>
+          <Value>
+            <CurrencyFormatter value={token.tvl} />
+          </Value>
         </div>
       </Content>
     </Expand>

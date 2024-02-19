@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
@@ -12,7 +12,8 @@ import React, { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
 import { Link } from "react-router-dom";
 import { DashboardPool } from "types/dashboard-api";
-import { formatCurrency, formatPercentage } from "utils";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 
 interface MobilePoolItemProps {
   pool: DashboardPool;
@@ -135,12 +136,16 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
           {expand.isOpen && (
             <div>
               <Label>TVL</Label>
-              <Value>{formatCurrency(pool.tvl)}</Value>
+              <Value>
+                <CurrencyFormatter value={pool.tvl} />
+              </Value>
             </div>
           )}
           <div>
             <Label>Volume 24H</Label>
-            <Value>{formatCurrency(pool.volume)}</Value>
+            <Value>
+              <CurrencyFormatter value={pool.volume} />
+            </Value>
           </div>
         </Content>
       }
@@ -148,13 +153,16 @@ function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
       <Content>
         <div>
           <Label>Fees 24H</Label>
-          <Value>{formatCurrency(pool.fee)}</Value>
+          <Value>
+            <CurrencyFormatter value={pool.fee} />
+          </Value>
         </div>
         <div>
           <Label>APR 7D</Label>
           <Value>
-            {!Number.isNaN(Number(pool.apr)) &&
-              formatPercentage(Numeric.parse(pool.apr).mul(100))}
+            {!Number.isNaN(Number(pool.apr)) && (
+              <PercentageFormatter value={Numeric.parse(pool.apr).mul(100)} />
+            )}
           </Value>
         </div>
       </Content>

@@ -9,13 +9,14 @@ import {
   DashboardTokenChartType,
   DashboardChartDuration,
 } from "types/dashboard-api";
-import { formatCurrency, formatDate } from "utils";
+import { formatDate, formatDateRange, getSumOfDashboardChartData } from "utils";
 import Select from "pages/Earn/Pools/Select";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import IconButton from "components/IconButton";
 import iconFullscreen from "assets/icons/icon-fullscreen.svg";
 import useHashModal from "hooks/useHashModal";
 import Modal from "components/Modal";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import useChartData from "./useChartData";
 
 const chartTypeTabs = ["Volume", "TVL", "Price"].map((label) => ({
@@ -35,11 +36,14 @@ const chartDurationOptions = ["Month", "Quarter", "Year", "All"].map(
 function Chart({ tokenAddress }: { tokenAddress: string }) {
   const screenClass = useScreenClass();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const selectedTabValue = useMemo(() => {
+    return chartTypeTabs[selectedTabIndex].value;
+  }, [selectedTabIndex]);
   const {
     data: chartData,
     duration,
     setDuration,
-  } = useChartData(tokenAddress, chartTypeTabs[selectedTabIndex].value);
+  } = useChartData(tokenAddress, selectedTabValue);
 
   const chartModal = useHashModal(useId());
 
@@ -63,7 +67,7 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
           {screenClass === MOBILE_SCREEN_CLASS && (
             <Select
               options={chartTypeTabs}
-              value={chartTypeTabs[selectedTabIndex].value}
+              value={selectedTabValue}
               onChange={(value) => {
                 setSelectedTabIndex(
                   chartTypeTabs.findIndex((item) => item.value === value),
@@ -91,7 +95,7 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
         </Col>
       </Row>
     );
-  }, [duration, screenClass, selectedTabIndex, setDuration]);
+  }, [duration, screenClass, selectedTabValue, selectedTabIndex, setDuration]);
 
   const content = useMemo(() => {
     return (
@@ -105,9 +109,16 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
       >
         <Col xs="content">
           <Typography size={32} weight={900} color="primary">
-            {`${formatCurrency(
-              chartData?.[chartData.length - 1]?.v.toString() || "0",
-            )}`}
+            {selectedTabValue === "volume" && (
+              <CurrencyFormatter
+                value={getSumOfDashboardChartData(chartData || [])}
+              />
+            )}
+            {selectedTabValue !== "volume" && (
+              <CurrencyFormatter
+                value={chartData?.[chartData.length - 1]?.v.toString() || "0"}
+              />
+            )}
           </Typography>
         </Col>
         <Col xs="content">
@@ -119,19 +130,38 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
               margin-bottom: 7px;
             `}
           >
-            {chartData?.[0]
+            {selectedTabValue === "volume" &&
+              formatDateRange(
+                chartData?.[0]?.t,
+                chartData?.[chartData.length - 1]?.t,
+              )}
+            {selectedTabValue !== "volume" && chartData?.[0]
               ? formatDate(chartData[chartData.length - 1].t)
               : ""}
           </Typography>
         </Col>
       </Row>
     );
-  }, [chartData]);
+  }, [chartData, selectedTabValue]);
 
   const lineChartProps = useMemo<Omit<LineChartProps, "height">>(() => {
     return {
       data: chartData?.map((item) => item.v) || [],
       renderTooltip({ value, index }) {
+        const [prevDate, currentDate] = [
+          chartData?.[index - 1]?.t,
+          chartData?.[index]?.t,
+        ];
+
+        if (!currentDate) {
+          return null;
+        }
+
+        const formattedDate =
+          duration !== "month" && selectedTabValue === "volume"
+            ? formatDateRange(prevDate, currentDate)
+            : formatDate(currentDate);
+
         return (
           <div
             css={css`
@@ -139,16 +169,16 @@ function Chart({ tokenAddress }: { tokenAddress: string }) {
             `}
           >
             <Typography size={20} weight={900} color="primary">
-              {formatCurrency(value)}
+              <CurrencyFormatter value={value} />
             </Typography>
             <Typography size={12} weight={400}>
-              {chartData?.[index] && formatDate(chartData?.[index].t)}
+              {formattedDate}
             </Typography>
           </div>
         );
       },
     };
-  }, [chartData]);
+  }, [chartData, duration, selectedTabValue]);
 
   return (
     <Panel shadow>
