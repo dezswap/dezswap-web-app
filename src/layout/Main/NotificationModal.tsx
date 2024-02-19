@@ -225,10 +225,15 @@ function NotificationModal(modalProps: ReactModal.Props) {
             {selectedNotification?.timestamp &&
               formatDateTime(selectedNotification.timestamp)}
           </Typography>
-          <Typography size={14} weight={700} color="primary">
-            {selectedNotification?.description.split("\n").map((item) => (
-              <div>{item}</div>
-            ))}
+          <Typography
+            size={14}
+            weight={700}
+            color="primary"
+            css={css`
+              white-space: pre-line;
+            `}
+          >
+            {selectedNotification?.description}
           </Typography>
         </Panel>
       )}
