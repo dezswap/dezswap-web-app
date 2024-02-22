@@ -99,9 +99,14 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const assetList = useMemo(() => {
     const isBookmark = tabs[tabIdx].value === "bookmark";
 
+    const addressListWithoutDuplicate = Array.from(
+      new Set(addressList?.filter((address) => address)),
+    );
     const filteredList = isBookmark
-      ? addressList?.filter((address) => bookmarks?.includes(address))
-      : addressList;
+      ? addressListWithoutDuplicate?.filter((address) =>
+          bookmarks?.includes(address),
+        )
+      : addressListWithoutDuplicate;
 
     if (isBookmark && !filteredList?.length) {
       return (
@@ -123,7 +128,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
         asset?.verified || isNativeTokenAddress(network.name, address);
       return (
         <AssetItem
-          key={asset?.token}
+          key={address}
           asset={asset}
           selected={selectedAssetAddress === address}
           hidden={
@@ -143,8 +148,10 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     });
 
     return deferredSearchKeyword &&
-      (items === undefined ||
-        items?.filter((i) => !i.props.invisible)?.length < 1) ? (
+      items.filter(
+        (i: React.ReactElement<React.ComponentProps<typeof AssetItem>>) =>
+          !i.props.hidden,
+      )?.length < 1 ? (
       <NoResult>
         <Typography
           size={22}
