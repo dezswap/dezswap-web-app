@@ -156,6 +156,8 @@ function ProvidePage() {
       formData.asset1Value &&
       asset2?.token &&
       formData.asset2Value &&
+      Number(formData.asset1Value) &&
+      Number(formData.asset2Value) &&
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
@@ -208,36 +210,41 @@ function ProvidePage() {
   const asset2BalanceMinusFee = useBalanceMinusFee(asset2?.token, feeAmount);
 
   const buttonMsg = useMemo(() => {
-    if (formData.asset1Value) {
-      if (
-        Numeric.parse(formData.asset1Value).gt(
-          Numeric.parse(
-            amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
-          ),
-        )
-      ) {
-        return `Insufficient ${asset1?.symbol} balance`;
+    try {
+      if (formData.asset1Value) {
+        if (
+          Numeric.parse(formData.asset1Value).gt(
+            Numeric.parse(
+              amountToValue(asset1BalanceMinusFee, asset1?.decimals) || 0,
+            ),
+          )
+        ) {
+          return `Insufficient ${asset1?.symbol} balance`;
+        }
+
+        if (
+          formData.asset2Value &&
+          Numeric.parse(formData.asset2Value).gt(
+            Numeric.parse(
+              amountToValue(asset2BalanceMinusFee, asset2?.decimals) || 0,
+            ),
+          )
+        ) {
+          return `Insufficient ${asset2?.symbol} balance`;
+        }
+
+        if (formData.asset1Value && !formData.asset2Value) {
+          return `Enter ${asset2?.symbol} amount`;
+        }
+        return "Add";
       }
 
-      if (
-        formData.asset2Value &&
-        Numeric.parse(formData.asset2Value).gt(
-          Numeric.parse(
-            amountToValue(asset2BalanceMinusFee, asset2?.decimals) || 0,
-          ),
-        )
-      ) {
-        return `Insufficient ${asset2?.symbol} balance`;
+      if (formData.asset2Value && !formData.asset1Value) {
+        return `Enter ${asset1?.symbol} amount`;
       }
-
-      if (formData.asset1Value && !formData.asset2Value) {
-        return `Enter ${asset2?.symbol} amount`;
-      }
-      return "Add";
-    }
-
-    if (formData.asset2Value && !formData.asset1Value) {
-      return `Enter ${asset1?.symbol} amount`;
+    } catch (error) {
+      console.log(error);
+      return "Enter an amount";
     }
 
     return "Enter an amount";
@@ -321,7 +328,7 @@ function ProvidePage() {
   }, [asset2BalanceMinusFee, formData.asset2Value, form]);
 
   useEffect(() => {
-    if (simulationResult && !simulationResult.isLoading && !isPoolEmpty) {
+    if (!simulationResult?.isLoading && !isPoolEmpty) {
       form.setValue(
         isReversed ? FormKey.asset1Value : FormKey.asset2Value,
         amountToValue(
@@ -360,7 +367,7 @@ function ProvidePage() {
             },
           }}
           asset={asset1}
-          onClick={() => {
+          onFocus={() => {
             setIsReversed(false);
             setBalanceApplied(false);
           }}
@@ -397,12 +404,12 @@ function ProvidePage() {
             },
           }}
           asset={asset2}
-          onClick={() => {
-            setIsReversed(false);
+          onFocus={() => {
+            setIsReversed(true);
             setBalanceApplied(false);
           }}
           onBalanceClick={(value) => {
-            setIsReversed(false);
+            setIsReversed(true);
             setBalanceApplied(true);
             form.setValue(FormKey.asset2Value, value, {
               shouldValidate: true,
@@ -442,7 +449,7 @@ function ProvidePage() {
             label={
               <Typography weight="bold">
                 {`1${asset1?.symbol} = ${
-                  formData.asset1Value && formData.asset2Value
+                  Number(formData.asset1Value) && Number(formData.asset2Value)
                     ? cutDecimal(
                         Numeric.parse(formData.asset2Value || 0)
                           .div(formData.asset1Value || 1)
@@ -785,7 +792,8 @@ function ProvidePage() {
               form.formState.isValidating ||
               simulationResult.isLoading ||
               isFeeLoading ||
-              isFeeFailed
+              isFeeFailed ||
+              buttonMsg !== "Add"
             }
             css={css`
               margin-bottom: 10px;

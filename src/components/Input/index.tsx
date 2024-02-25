@@ -1,8 +1,9 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { formatDecimals } from "utils";
+import { sanitizeNumberInput } from "utils";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { Numeric } from "@xpla/xpla.js";
 
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";
@@ -184,43 +185,108 @@ export interface NumberInputProps extends InputProps {
 }
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ decimals = 18, ...InputProps }, ref) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
-    useEffect(() => {
-      const elInput = inputRef.current;
-      const handleKeydown = (event: Event) => {
-        const target = event.target as HTMLInputElement;
+  ({ decimals = 18, onKeyDown, onKeyUp, onChange, ...InputProps }, ref) => {
+    const isIMEActive = useRef(false);
+    const isKeyPressing = useRef(false);
+    const lastValue = useRef<string | undefined>(undefined);
 
-        target.value = target.value.replace(/[^0-9.]/g, "");
-
-        if (target.value?.split(".").length > 2) {
-          event.preventDefault();
-          const index = target.value.lastIndexOf(".");
-          target.value =
-            target.value.substring(0, index) +
-            target.value.substring(index + 1, target.value.length);
-        }
+    const handleInput = useCallback<React.FormEventHandler<HTMLInputElement>>(
+      (event) => {
+        const target = event.currentTarget;
         if (
-          target.value.includes(".") &&
-          (target.value?.split(".").pop()?.length || 0) > decimals
+          isIMEActive.current ||
+          !isKeyPressing.current ||
+          target.value.split(".").length > 2
         ) {
+          if (lastValue.current) {
+            target.value = lastValue.current;
+          }
+        }
+        const sanitizedValue = sanitizeNumberInput(target.value, decimals);
+        if (target.value !== sanitizedValue) {
           event.preventDefault();
-          target.value = formatDecimals(target.value, decimals);
+          target.value = sanitizedValue;
         }
-      };
-      elInput?.addEventListener("keydown", handleKeydown);
-      elInput?.addEventListener("keyup", handleKeydown);
-      elInput?.addEventListener("keypress", handleKeydown);
-      return () => {
-        if (elInput) {
-          elInput.removeEventListener("keydown", handleKeydown);
-          elInput.removeEventListener("keyup", handleKeydown);
-          elInput.removeEventListener("keypress", handleKeydown);
-        }
-      };
-    }, [decimals]);
+      },
+      [decimals],
+    );
 
-    return <Input ref={inputRef} {...InputProps} />;
+    const handleKeyDown = useCallback<
+      React.KeyboardEventHandler<HTMLInputElement>
+    >(
+      (event) => {
+        const target = event.currentTarget;
+        isKeyPressing.current = true;
+        isIMEActive.current = event.key === "Process";
+        lastValue.current = target.value;
+        if (isIMEActive.current) {
+          event.preventDefault();
+        }
+        if (event.key.length === 1 && !event.ctrlKey) {
+          const regex = /[^0-9.]/g;
+          const isAllowedKey = !regex.test(event.key);
+          const selectedText = target.value?.substring(
+            target.selectionStart || 0,
+            target.selectionEnd || 0,
+          );
+          if (
+            !isAllowedKey ||
+            (event.key === "." &&
+              event.currentTarget.value?.includes(".") &&
+              !selectedText.includes("."))
+          ) {
+            event.preventDefault();
+          }
+        }
+        if (onKeyDown) {
+          onKeyDown(event);
+        }
+      },
+      [onKeyDown],
+    );
+
+    const handleKeyUp = useCallback<
+      React.KeyboardEventHandler<HTMLInputElement>
+    >(
+      (event) => {
+        isKeyPressing.current = false;
+        if (onKeyUp) {
+          onKeyUp(event);
+        }
+      },
+      [onKeyUp],
+    );
+
+    const handleChange = useCallback<
+      React.ChangeEventHandler<HTMLInputElement>
+    >(
+      (event) => {
+        const target = event.currentTarget;
+        if (target.value) {
+          try {
+            Numeric.parse(target.value, { throwOnError: true });
+            if (onChange) {
+              onChange(event);
+            }
+          } catch (error) {
+            event.preventDefault();
+          }
+        }
+      },
+      [onChange],
+    );
+
+    return (
+      <Input
+        ref={ref}
+        onInput={handleInput}
+        onKeyUp={handleKeyUp}
+        onKeyDown={handleKeyDown}
+        onChange={handleChange}
+        pattern="^[0-9]*[.]?[0-9]*$"
+        inputMode="decimal"
+        {...InputProps}
+      />
+    );
   },
 );
