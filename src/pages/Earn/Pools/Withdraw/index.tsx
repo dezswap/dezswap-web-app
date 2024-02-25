@@ -46,6 +46,7 @@ import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -473,20 +474,14 @@ function WithdrawPage() {
                         the transaction.
                       </>
                     ),
-                    value: `${
-                      fee
-                        ? formatNumber(
-                            cutDecimal(
-                              amountToValue(
-                                fee.amount
-                                  ?.get(XPLA_ADDRESS)
-                                  ?.amount.toString(),
-                              ) || 0,
-                              DISPLAY_DECIMAL,
-                            ),
-                          )
-                        : "-"
-                    } ${XPLA_SYMBOL}`,
+                    value: (
+                      <AssetValueFormatter
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={fee?.amount
+                          ?.get(XPLA_ADDRESS)
+                          ?.amount.toString()}
+                      />
+                    ),
                   },
                 ]}
               />

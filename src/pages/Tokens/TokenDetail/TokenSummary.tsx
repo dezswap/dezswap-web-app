@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
@@ -10,7 +10,7 @@ import useAssets from "hooks/useAssets";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
-import { formatCurrency, formatDecimals, formatNumber } from "utils";
+import { formatDecimals, formatNumber } from "utils";
 
 const Wrapper = styled.div`
   width: 100%;

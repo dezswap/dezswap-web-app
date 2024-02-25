@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";

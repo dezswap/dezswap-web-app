@@ -16,7 +16,6 @@ import {
   sanitizeNumberInput,
   formatDecimals,
   formatNumber,
-  formatPercentage,
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -59,6 +58,8 @@ import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
 import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -584,13 +585,11 @@ function SwapPage() {
                       );
                     }}
                   >
-                    {formatNumber(
-                      cutDecimal(
-                        amountToValue(asset1Balance || 0, asset1?.decimals) ||
-                          0,
-                        DISPLAY_DECIMAL,
-                      ),
-                    )}
+                    <AssetValueFormatter
+                      asset={asset1}
+                      amount={asset1Balance}
+                      showSymbol={false}
+                    />
                   </Typography>
                 </Col>
               </Row>
@@ -798,13 +797,11 @@ function SwapPage() {
                       text-underline-offset: 3px;
                     `}
                   >
-                    {formatNumber(
-                      cutDecimal(
-                        amountToValue(asset2Balance || 0, asset2?.decimals) ||
-                          0,
-                        DISPLAY_DECIMAL,
-                      ),
-                    )}
+                    <AssetValueFormatter
+                      asset={asset2}
+                      amount={asset2Balance}
+                      showSymbol={false}
+                    />
                   </Typography>
                 </Col>
               </Row>
@@ -959,16 +956,12 @@ function SwapPage() {
                         at the current condition.
                       </>
                     ),
-                    value: `${
-                      simulationResult?.estimatedAmount
-                        ? formatNumber(
-                            amountToValue(
-                              simulationResult?.estimatedAmount,
-                              asset2?.decimals,
-                            ) || 0,
-                          )
-                        : ""
-                    } ${asset2?.symbol}`,
+                    value: (
+                      <AssetValueFormatter
+                        asset={asset2}
+                        amount={simulationResult?.estimatedAmount}
+                      />
+                    ),
                   },
                   {
                     key: "priceImpact",
@@ -980,7 +973,7 @@ function SwapPage() {
                         weight="bold"
                         color={spread.color as keyof Colors}
                       >
-                        {formatPercentage(spread.rate)}
+                        <PercentageFormatter value={spread.rate} />
                       </Typography>
                     ),
                   },
@@ -994,11 +987,12 @@ function SwapPage() {
                         the transaction.
                       </>
                     ),
-                    value: feeAmount
-                      ? `${formatNumber(
-                          amountToValue(feeAmount) || 0,
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: (
+                      <AssetValueFormatter
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={feeAmount}
+                      />
+                    ),
                   },
                   {
                     key: "route",
@@ -1071,7 +1065,7 @@ function SwapPage() {
                       align-items: center;
                     `}
                   >
-                    {formatPercentage(spread.rate)}
+                    <PercentageFormatter value={spread.rate} />
                   </Col>
                 </Row>
               </Message>

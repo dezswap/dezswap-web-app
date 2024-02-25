@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
 import AssetIcon from "components/AssetIcon";
 import Box from "components/Box";
-import ChangeRateFormatter from "components/ChangeRateFormatter";
+import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import Marquee from "components/Marquee";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
@@ -12,7 +12,7 @@ import useDashboard from "hooks/dashboard/useDashboard";
 import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { Link } from "react-router-dom";
-import { formatCurrency } from "utils";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
 
 function TopMovers() {
   const screenClass = useScreenClass();
@@ -116,7 +116,8 @@ function TopMovers() {
                         )}
                       </div>
                       <Typography size={14} weight={700} color="primary">
-                        {formatCurrency(token.price)}&nbsp;
+                        <CurrencyFormatter value={token.price} />
+                        &nbsp;
                         <ChangeRateFormatter
                           rate={token.priceChange}
                           hasBrackets={false}

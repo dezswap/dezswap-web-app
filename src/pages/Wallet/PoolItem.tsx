@@ -13,13 +13,7 @@ import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import Outlink from "components/Outlink";
 import usePairs from "hooks/usePairs";
-import {
-  amountToValue,
-  formatDecimals,
-  formatNumber,
-  formatPercentage,
-  getAddressLink,
-} from "utils";
+import { formatDecimals, formatNumber, getAddressLink } from "utils";
 import useNetwork from "hooks/useNetwork";
 import styled from "@emotion/styled";
 import Button from "components/Button";
@@ -31,7 +25,9 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "pages/Earn/Expand";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import { Link } from "react-router-dom";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 
 interface PoolItemProps {
   pool: Pool;
@@ -239,10 +235,10 @@ function PoolItem({
         </Typography>
         <Typography color="text.secondary" weight={500} size={14}>
           =&nbsp;
-          {formatNumber(
-            formatDecimals(amountToValue(lpBalance, LP_DECIMALS) || "0", 3),
-          )}
-          &nbsp;LP
+          <AssetValueFormatter
+            asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+            amount={lpBalance}
+          />
         </Typography>
       </>
     ),
@@ -261,19 +257,12 @@ function PoolItem({
             margin-bottom: 4px;
           `}
         >
-          {formatNumber(
-            formatDecimals(
-              amountToValue(
-                Numeric.parse(pool.assets[0].amount)
-                  .times(userShare)
-                  .toFixed(0),
-                asset1?.decimals,
-              ) || "0",
-              3,
-            ),
-          )}
-          &nbsp;
-          {asset1?.symbol}
+          <AssetValueFormatter
+            asset={asset1}
+            amount={Numeric.parse(pool.assets[0].amount)
+              .times(userShare)
+              .toFixed(0)}
+          />
         </Typography>
         <Typography
           color="primary"
@@ -283,19 +272,12 @@ function PoolItem({
             white-space: nowrap;
           `}
         >
-          {formatNumber(
-            formatDecimals(
-              amountToValue(
-                Numeric.parse(pool.assets[1].amount)
-                  .times(userShare)
-                  .toFixed(0),
-                asset2?.decimals,
-              ) || "0",
-              3,
-            ),
-          )}
-          &nbsp;
-          {asset2?.symbol}
+          <AssetValueFormatter
+            asset={asset2}
+            amount={Numeric.parse(pool.assets[1].amount)
+              .times(userShare)
+              .toFixed(0)}
+          />
         </Typography>
       </>
     ),
@@ -317,7 +299,7 @@ function PoolItem({
         </Col>
         <Col>
           <Typography color="secondary" size={16} weight={900}>
-            {formatPercentage(userShare * 100)}
+            <PercentageFormatter value={userShare * 100} />
           </Typography>
         </Col>
       </Row>

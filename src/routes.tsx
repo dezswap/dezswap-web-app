@@ -19,6 +19,7 @@ import WalletPage from "pages/Wallet";
 import TokenDetailPage from "pages/Tokens/TokenDetail";
 import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 import MainLayout from "layout/Main";
+import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -37,12 +38,14 @@ function ReplaceToEarn() {
   );
 }
 
+const OutletWithDisclaimerAgreement = withDisclaimerAgreement(Outlet);
+
 const routes = createBrowserRouter([
   {
     path: "/",
     element: (
       <MainLayout>
-        <Outlet />
+        <OutletWithDisclaimerAgreement />
       </MainLayout>
     ),
     children: [

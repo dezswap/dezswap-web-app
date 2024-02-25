@@ -36,6 +36,7 @@ import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import ScrollToTop from "components/ScrollToTop";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
@@ -282,14 +283,7 @@ function TokenDetailPage() {
                       </Typography>
                       <Typography size={14} weight={500} color="text.secondary">
                         =&nbsp;
-                        {formatNumber(
-                          formatDecimals(
-                            amountToValue(balance, asset?.decimals) || 0,
-                            3,
-                          ),
-                        )}
-                        &nbsp;
-                        {asset?.symbol}
+                        <AssetValueFormatter asset={asset} amount={balance} />
                       </Typography>
                     </div>
                   </Col>

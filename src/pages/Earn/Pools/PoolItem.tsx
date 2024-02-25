@@ -8,14 +8,7 @@ import useBalance from "hooks/useBalance";
 import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Row, Col, useScreenClass, Hidden } from "react-grid-system";
-import {
-  formatNumber,
-  formatDecimals,
-  amountToValue,
-  getAddressLink,
-  formatCurrency,
-  formatPercentage,
-} from "utils";
+import { formatNumber, formatDecimals, getAddressLink } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -33,9 +26,12 @@ import Tooltip from "components/Tooltip";
 import usePairs from "hooks/usePairs";
 import Outlink from "components/Outlink";
 import SimplePieChart from "components/SimplePieChart";
-import HoverUnderline from "components/HoverUnderline";
+import HoverUnderline from "components/utils/HoverUnderline";
 import usePool from "hooks/usePool";
 import useDashboard from "hooks/dashboard/useDashboard";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 import Expand from "../Expand";
 
 const TableRow = styled(Box)`
@@ -329,19 +325,24 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
           </div>
           <div>
             {isSmallScreen && <Label>Volume(24h)</Label>}
-            <div>{formatCurrency(dashboardPool?.volume || "0")}</div>
+            <div>
+              <CurrencyFormatter value={dashboardPool?.volume} />
+            </div>
           </div>
           <div>
             {isSmallScreen && <Label>Fees(24h)</Label>}
-            <div>{formatCurrency(dashboardPool?.fee || "0")}</div>
+            <div>
+              <CurrencyFormatter value={dashboardPool?.fee} />
+            </div>
           </div>
           <div style={{ minWidth: !isSmallScreen ? 80 : "100%" }}>
             {isSmallScreen && <Label>APR</Label>}
             <div>
-              {!Number.isNaN(Number(dashboardPool?.apr)) &&
-                formatPercentage(
-                  Numeric.parse(dashboardPool?.apr || 0).mul(100),
-                )}
+              {!Number.isNaN(Number(dashboardPool?.apr)) && (
+                <PercentageFormatter
+                  value={Numeric.parse(dashboardPool?.apr || 0).mul(100)}
+                />
+              )}
             </div>
           </div>
         </TableRow>
@@ -436,13 +437,10 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                     </Typography>
                     <Typography color="text.secondary">
                       =&nbsp;
-                      {formatNumber(
-                        formatDecimals(
-                          amountToValue(lpBalance, LP_DECIMALS) || "0",
-                          3,
-                        ),
-                      )}
-                      &nbsp;LP
+                      <AssetValueFormatter
+                        asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+                        amount={lpBalance}
+                      />
                     </Typography>
                   </Col>
                   <Col
@@ -466,19 +464,12 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                         margin-bottom: 4px;
                       `}
                     >
-                      {formatNumber(
-                        formatDecimals(
-                          amountToValue(
-                            Numeric.parse(pool?.assets[0].amount || 0)
-                              .times(userShare)
-                              .toFixed(0),
-                            asset1?.decimals,
-                          ) || "0",
-                          3,
-                        ),
-                      )}
-                      &nbsp;
-                      {asset1?.symbol}
+                      <AssetValueFormatter
+                        asset={asset1}
+                        amount={Numeric.parse(pool?.assets[0].amount || 0)
+                          .times(userShare)
+                          .toFixed(0)}
+                      />
                     </Typography>
                     <Typography
                       color="primary"
@@ -488,19 +479,12 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                         white-space: nowrap;
                       `}
                     >
-                      {formatNumber(
-                        formatDecimals(
-                          amountToValue(
-                            Numeric.parse(pool?.assets[1].amount || 0)
-                              .times(userShare)
-                              .toFixed(0),
-                            asset2?.decimals,
-                          ) || "0",
-                          3,
-                        ),
-                      )}
-                      &nbsp;
-                      {asset2?.symbol}
+                      <AssetValueFormatter
+                        asset={asset2}
+                        amount={Numeric.parse(pool?.assets[1].amount || 0)
+                          .times(userShare)
+                          .toFixed(0)}
+                      />
                     </Typography>
                   </Col>
                   <Col
@@ -533,7 +517,7 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
                       </Col>
                       <Col>
                         <Typography color="secondary" size={16} weight={900}>
-                          {formatPercentage(userShare * 100)}
+                          <PercentageFormatter value={userShare * 100} />
                         </Typography>
                       </Col>
                     </Row>

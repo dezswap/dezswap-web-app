@@ -52,6 +52,7 @@ import ProgressBar from "components/ProgressBar";
 import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -469,44 +470,43 @@ function ProvidePage() {
                           label: "Total LP supply",
                           tooltip:
                             "The sum of Locked LP supply and Received LP supply.",
-                          value: `${formatNumber(
-                            cutDecimal(
-                              amountToValue(
-                                simulationResult?.share,
-                                LP_DECIMALS,
-                              ) || 0,
-                              DISPLAY_DECIMAL,
-                            ),
-                          )} LP`,
+                          value: (
+                            <AssetValueFormatter
+                              asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+                              amount={simulationResult?.share}
+                            />
+                          ),
                         },
                         {
                           key: "lockedLp",
                           label: "Locked LP supply",
                           tooltip:
                             "The amount of LP locked by contract to create a new pool.",
-                          value: `${formatNumber(
-                            cutDecimal(
-                              amountToValue(LOCKED_LP_SUPPLY, LP_DECIMALS) || 0,
-                              DISPLAY_DECIMAL,
-                            ),
-                          )} LP`,
+                          value: (
+                            <AssetValueFormatter
+                              asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+                              amount={LOCKED_LP_SUPPLY}
+                            />
+                          ),
                         },
                         {
                           key: "receivedLp",
                           label: "Received LP supply",
                           tooltip:
                             "The amount of LP you may get at the transaction.",
-                          value: `${formatNumber(
-                            cutDecimal(
-                              amountToValue(
-                                Numeric.parse(simulationResult?.share || 0)
-                                  .minus(LOCKED_LP_SUPPLY)
-                                  .toString(),
-                                LP_DECIMALS,
-                              ) || 0,
-                              DISPLAY_DECIMAL,
-                            ),
-                          )} LP`,
+                          value: (
+                            <AssetValueFormatter
+                              asset={{
+                                decimals: LP_DECIMALS,
+                                symbol: "LP",
+                              }}
+                              amount={Numeric.parse(
+                                simulationResult?.share || 0,
+                              )
+                                .minus(LOCKED_LP_SUPPLY)
+                                .toString()}
+                            />
+                          ),
                         },
                         {
                           key: "fee",
@@ -518,14 +518,14 @@ function ProvidePage() {
                               the transaction.
                             </>
                           ),
-                          value: feeAmount
-                            ? `${formatNumber(
-                                cutDecimal(
-                                  amountToValue(feeAmount) || "0",
-                                  DISPLAY_DECIMAL,
-                                ),
-                              )} ${XPLA_SYMBOL}`
-                            : "",
+                          value: feeAmount ? (
+                            <AssetValueFormatter
+                              asset={{ symbol: XPLA_SYMBOL }}
+                              amount={feeAmount}
+                            />
+                          ) : (
+                            ""
+                          ),
                         },
                       ]
                     : [
@@ -539,15 +539,15 @@ function ProvidePage() {
                               you may get at the transaction.
                             </>
                           ),
-                          value: `${formatNumber(
-                            cutDecimal(
-                              amountToValue(
-                                simulationResult?.share,
-                                LP_DECIMALS,
-                              ) || 0,
-                              DISPLAY_DECIMAL,
-                            ),
-                          )} LP`,
+                          value: (
+                            <AssetValueFormatter
+                              asset={{
+                                decimals: LP_DECIMALS,
+                                symbol: "LP",
+                              }}
+                              amount={simulationResult?.share}
+                            />
+                          ),
                         },
                         {
                           key: "poolLiquidity1",
@@ -559,22 +559,20 @@ function ProvidePage() {
                               before adding.
                             </>
                           ),
-                          value: `${
-                            formatNumber(
-                              cutDecimal(
-                                amountToValue(
-                                  pool?.assets?.find((a) =>
-                                    "token" in a.info
+                          value: (
+                            <AssetValueFormatter
+                              asset={asset1}
+                              amount={
+                                pool?.assets?.find(
+                                  (a) =>
+                                    ("token" in a.info
                                       ? a.info.token.contract_addr
-                                      : a.info.native_token.denom ===
-                                        asset1?.token,
-                                  )?.amount,
-                                  asset1?.decimals,
-                                ) || "0",
-                                DISPLAY_DECIMAL,
-                              ),
-                            ) || "-"
-                          } ${asset1?.symbol || ""}`,
+                                      : a.info.native_token.denom) ===
+                                    asset1?.token,
+                                )?.amount
+                              }
+                            />
+                          ),
                         },
                         {
                           key: "poolLiquidity2",
@@ -586,22 +584,20 @@ function ProvidePage() {
                               before adding.
                             </>
                           ),
-                          value: `${
-                            formatNumber(
-                              cutDecimal(
-                                amountToValue(
-                                  pool?.assets?.find((a) =>
-                                    "token" in a.info
+                          value: (
+                            <AssetValueFormatter
+                              asset={asset2}
+                              amount={
+                                pool?.assets?.find(
+                                  (a) =>
+                                    ("token" in a.info
                                       ? a.info.token.contract_addr
-                                      : a.info.native_token.denom ===
-                                        asset2?.token,
-                                  )?.amount,
-                                  asset2?.decimals,
-                                ) || "0",
-                                DISPLAY_DECIMAL,
-                              ),
-                            ) || "-"
-                          } ${asset2?.symbol || ""}`,
+                                      : a.info.native_token.denom) ===
+                                    asset2?.token,
+                                )?.amount
+                              }
+                            />
+                          ),
                         },
                         {
                           key: "yourShare",
@@ -626,14 +622,14 @@ function ProvidePage() {
                               the transaction.
                             </>
                           ),
-                          value: feeAmount
-                            ? `${formatNumber(
-                                cutDecimal(
-                                  amountToValue(feeAmount) || "0",
-                                  DISPLAY_DECIMAL,
-                                ),
-                              )} ${XPLA_SYMBOL}`
-                            : "",
+                          value: feeAmount ? (
+                            <AssetValueFormatter
+                              asset={{ symbol: XPLA_SYMBOL }}
+                              amount={feeAmount}
+                            />
+                          ) : (
+                            ""
+                          ),
                         },
                       ]
                 }

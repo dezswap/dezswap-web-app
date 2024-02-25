@@ -9,12 +9,7 @@ import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useBalances from "hooks/useBalances";
 import usePairs from "hooks/usePairs";
-import {
-  formatNumber,
-  formatDecimals,
-  amountToValue,
-  formatCurrency,
-} from "utils";
+import { amountToValue } from "utils";
 import { Token } from "types/api";
 import TabButton from "components/TabButton";
 import { Link } from "react-router-dom";
@@ -27,6 +22,8 @@ import AssetIcon from "components/AssetIcon";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { getBasicSortFunction } from "utils/table";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import MobileAssetItem from "./MobileAssetItem";
 
 export type TokenWithBalanceAndValue = Partial<Token> & {
@@ -186,16 +183,20 @@ function Assets() {
                           align-items: center;
                         `}
                       >
-                        <div
-                          css={css`
-                            white-space: nowrap;
-                            word-break: break-all;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                          `}
+                        <Link
+                          to={`/tokens/${encodeURIComponent(`${row.token}`)}`}
                         >
-                          {name}&nbsp;
-                        </div>
+                          <div
+                            css={css`
+                              white-space: nowrap;
+                              word-break: break-all;
+                              text-overflow: ellipsis;
+                              overflow: hidden;
+                            `}
+                          >
+                            {name}&nbsp;
+                          </div>
+                        </Link>
                         {row.symbol && (
                           <Typography
                             size={16}
@@ -220,7 +221,7 @@ function Assets() {
               width: 260,
               hasSort: true,
               render: (value) => {
-                return formatCurrency(value ? `${value}` : 0);
+                return <CurrencyFormatter value={value ? `${value}` : 0} />;
               },
             },
             {
@@ -228,13 +229,9 @@ function Assets() {
               label: "Token Amount",
               width: 260,
               hasSort: true,
-              render: (_, row) =>
-                `${formatNumber(
-                  formatDecimals(
-                    amountToValue(row.balance, row.decimals) || "0",
-                    2,
-                  ),
-                )} ${row.symbol}`,
+              render: (_, row) => (
+                <AssetValueFormatter asset={row} amount={row.balance} />
+              ),
             },
             {
               key: "none",

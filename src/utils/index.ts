@@ -127,6 +127,33 @@ export const formatDate = (input: DateConstructorInput) => {
   }).format(date);
 };
 
+export const formatDateRange = (
+  start?: DateConstructorInput,
+  end?: DateConstructorInput,
+) => {
+  const startDate = start ? new Date(start) : undefined;
+  const endDate = end ? new Date(end) : undefined;
+
+  let formattedStartDate = "Unknown";
+  let formattedEndDate = "Unknown";
+
+  if (startDate) {
+    formattedStartDate =
+      startDate.getFullYear() === endDate?.getFullYear()
+        ? Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "numeric",
+          }).format(startDate)
+        : formatDate(startDate);
+  }
+
+  if (endDate) {
+    formattedEndDate = formatDate(endDate);
+  }
+
+  return `${formattedStartDate} - ${formattedEndDate}`;
+};
+
 export const getFromNow = (input: DateConstructorInput) => {
   const date = new Date(input);
   const diffSecs = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -214,13 +241,18 @@ export const formatPercentage = (value: Numeric.Input) => {
   if (numericValue.eq(0)) {
     return "0%";
   }
-  if (numericValue.lt(0.01)) {
-    return "<0.01%";
-  }
-  return formatNumber(numericValue.dividedBy(100), {
+
+  const numberFormatOptions = {
     style: "percent",
     maximumFractionDigits: 2,
-  });
+  };
+
+  if (numericValue.lt(0.01)) {
+    numberFormatOptions.maximumFractionDigits = 4;
+  } else if (numericValue.lt(0.00001)) {
+    numberFormatOptions.maximumFractionDigits = 6;
+  }
+  return formatNumber(numericValue.dividedBy(100), numberFormatOptions);
 };
 
 export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {

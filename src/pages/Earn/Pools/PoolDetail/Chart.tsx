@@ -9,7 +9,7 @@ import {
   DashboardChartDuration,
   DashboardChartType,
 } from "types/dashboard-api";
-import { formatCurrency, formatDate, formatPercentage } from "utils";
+import { formatDate, formatDateRange, getSumOfDashboardChartData } from "utils";
 import Select from "pages/Earn/Pools/Select";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Numeric } from "@xpla/xpla.js";
@@ -17,6 +17,8 @@ import IconButton from "components/IconButton";
 import iconFullscreen from "assets/icons/icon-fullscreen.svg";
 import useHashModal from "hooks/useHashModal";
 import Modal from "components/Modal";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 import useChartData from "./useChartData";
 
 const chartTypeTabs: {
@@ -58,9 +60,11 @@ const chartValueFormatter = (
   value: Numeric.Input,
   chartType: DashboardChartType,
 ) => {
-  return chartType === "apr"
-    ? formatPercentage(Numeric.parse(value).mul(100))
-    : formatCurrency(value);
+  return chartType === "apr" ? (
+    <PercentageFormatter value={Numeric.parse(value).mul(100)} />
+  ) : (
+    <CurrencyFormatter value={value} />
+  );
 };
 
 function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
@@ -136,10 +140,16 @@ function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
       >
         <Col xs="content">
           <Typography size={32} weight={900} color="primary">
-            {chartValueFormatter(
-              chartData?.[chartData.length - 1]?.v.toString() || "0",
-              selectedChartType,
+            {selectedChartType === "volume" && (
+              <CurrencyFormatter
+                value={getSumOfDashboardChartData(chartData || [])}
+              />
             )}
+            {selectedChartType !== "volume" &&
+              chartValueFormatter(
+                chartData?.[chartData.length - 1]?.v.toString() || "0",
+                selectedChartType,
+              )}
           </Typography>
         </Col>
         <Col xs="content">
@@ -151,10 +161,13 @@ function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
               margin-bottom: 7px;
             `}
           >
-            {chartData?.[0]
-              ? `${formatDate(chartData[0].t)} - ${formatDate(
-                  chartData[chartData.length - 1].t,
-                )}`
+            {selectedChartType === "volume" &&
+              formatDateRange(
+                chartData?.[0]?.t,
+                chartData?.[chartData.length - 1]?.t,
+              )}
+            {selectedChartType !== "volume" && chartData?.[0]
+              ? formatDate(chartData[chartData.length - 1].t)
               : ""}
           </Typography>
         </Col>
@@ -166,6 +179,20 @@ function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
     return {
       data: chartData?.map((item) => item.v) || [],
       renderTooltip({ value, index }) {
+        const [prevDate, currentDate] = [
+          chartData?.[index - 1]?.t,
+          chartData?.[index]?.t,
+        ];
+
+        if (!currentDate) {
+          return null;
+        }
+
+        const formattedDate =
+          duration !== "month" && selectedChartType === "volume"
+            ? formatDateRange(prevDate, currentDate)
+            : formatDate(currentDate);
+
         return (
           <div
             css={css`
@@ -176,13 +203,13 @@ function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
               {chartValueFormatter(value, selectedChartType)}
             </Typography>
             <Typography size={12} weight={400}>
-              {chartData?.[index] && formatDate(chartData?.[index].t)}
+              {formattedDate}
             </Typography>
           </div>
         );
       },
     };
-  }, [chartData, selectedChartType]);
+  }, [chartData, duration, selectedChartType]);
 
   return (
     <Panel shadow>

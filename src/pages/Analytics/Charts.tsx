@@ -11,6 +11,7 @@ import {
   formatDate,
   formatCurrency,
   getSumOfDashboardChartData,
+  formatDateRange,
 } from "utils";
 import useDashboard from "hooks/dashboard/useDashboard";
 import {
@@ -22,6 +23,7 @@ import iconFullscreen from "assets/icons/icon-fullscreen.svg";
 import useHashModal from "hooks/useHashModal";
 import { useId, useMemo } from "react";
 import Modal from "components/Modal";
+import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import useChartData from "./useChartData";
 
 const Label = styled(Typography)``;
@@ -232,23 +234,29 @@ function Charts() {
             }
             defaultCaption={
               volume?.data?.[0]
-                ? `${formatDate(volume.data[0].t)} - ${formatDate(
+                ? formatDateRange(
+                    volume.data[0].t,
                     volume.data[volume.data.length - 1]?.t,
-                  )}`
+                  )
                 : ""
             }
             data={volume.data?.map((item) => item.v) || []}
             duration={volume.duration}
             onDurationChange={(duration) => volume.setDuration(duration)}
             renderTooltip={({ value, index }) => {
-              const [prevDate, currentDate] = [index - 1, index].map(
-                (i) => volume.data?.[i] && formatDate(volume.data?.[i]?.t),
-              );
+              const [prevDate, currentDate] = [
+                volume.data?.[index - 1]?.t,
+                volume.data?.[index]?.t,
+              ];
+
+              if (!currentDate) {
+                return null;
+              }
 
               const formattedDate =
-                prevDate === currentDate
-                  ? prevDate
-                  : [prevDate, currentDate].join(" - ");
+                volume.duration === "month"
+                  ? formatDate(currentDate)
+                  : formatDateRange(prevDate, currentDate);
 
               return (
                 <div
@@ -257,10 +265,10 @@ function Charts() {
                   `}
                 >
                   <Typography size={20} weight={900} color="primary">
-                    {formatCurrency(value)}
+                    <CurrencyFormatter value={value} />
                   </Typography>
                   <Typography size={12} weight={400}>
-                    {volume.duration === "month" ? currentDate : formattedDate}
+                    {formattedDate}
                   </Typography>
                 </div>
               );
@@ -286,7 +294,7 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  {formatCurrency(value)}
+                  <CurrencyFormatter value={value} />
                 </Typography>
                 <Typography size={12} weight={400}>
                   {tvl.data?.[index] && formatDate(tvl.data?.[index].t)}
@@ -306,9 +314,10 @@ function Charts() {
             )}
             defaultCaption={
               addresses?.[0]
-                ? `${formatDate(addresses[0].t)} - ${formatDate(
+                ? formatDateRange(
+                    addresses[0].t,
                     addresses[addresses.length - 1]?.t,
-                  )}`
+                  )
                 : ""
             }
             data={addresses?.map((item) => item.v) || []}
@@ -335,9 +344,10 @@ function Charts() {
             )}
             defaultCaption={
               transactions?.[0]
-                ? `${formatDate(transactions[0].t)} - ${formatDate(
+                ? formatDateRange(
+                    transactions[0].t,
                     transactions[transactions.length - 1]?.t,
-                  )}`
+                  )
                 : ""
             }
             data={transactions?.map((item) => item.v) || []}
@@ -362,9 +372,7 @@ function Charts() {
             defaultValue={`${formatCurrency(getSumOfDashboardChartData(fees))}`}
             defaultCaption={
               fees?.[0]
-                ? `${formatDate(fees[0].t)} - ${formatDate(
-                    fees[fees.length - 1]?.t,
-                  )}`
+                ? formatDateRange(fees[0].t, fees[fees.length - 1]?.t)
                 : ""
             }
             data={fees?.map((item) => item.v) || []}
@@ -375,7 +383,7 @@ function Charts() {
                 `}
               >
                 <Typography size={20} weight={900} color="primary">
-                  {formatCurrency(value)}
+                  <CurrencyFormatter value={value} />
                 </Typography>
                 <Typography size={12} weight={400}>
                   {fees?.[index] && formatDate(fees?.[index].t)}

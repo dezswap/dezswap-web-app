@@ -14,6 +14,7 @@ import { Numeric } from "@xpla/xpla.js";
 import { UseControllerProps, useController } from "react-hook-form";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import { useMemo } from "react";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 interface InputGroupProps extends NumberInputProps {
   asset?: Partial<Token> | null;
@@ -115,8 +116,12 @@ function InputGroup({
                 text-underline-offset: 3px;
               `}
             >
-              {formatNumber(
-                formatDecimals(amountToValue(balance, asset?.decimals) || 0, 3),
+              {asset && (
+                <AssetValueFormatter
+                  asset={asset}
+                  amount={balance}
+                  showSymbol={false}
+                />
               )}
             </span>
           </Typography>

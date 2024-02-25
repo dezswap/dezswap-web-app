@@ -1,5 +1,5 @@
 import Tippy, { TippyProps } from "@tippyjs/react";
-import { useEffect } from "react";
+import { ComponentRef, forwardRef, useEffect } from "react";
 import SimpleBar from "simplebar";
 import { hideAll } from "tippy.js";
 
@@ -12,25 +12,34 @@ function handleScroll() {
   hideAll();
 }
 
-function Tooltip({ children, ...props }: TippyProps) {
-  useEffect(() => {
-    const simpleBar = SimpleBar.instances.get(document.body);
+const Tooltip = forwardRef<ComponentRef<typeof Tippy>, TippyProps>(
+  function Tooltip({ children, ...props }, ref) {
+    useEffect(() => {
+      const simpleBar = SimpleBar.instances.get(document.body);
 
-    window.addEventListener("scroll", handleScroll);
-    try {
-      simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
-    } catch (error) {
-      console.log(error);
-    }
+      window.addEventListener("scroll", handleScroll);
+      try {
+        simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
+      } catch (error) {
+        console.log(error);
+      }
 
-    // No need to remove event listener since the browser does not add duplicate event listeners
-  }, []);
+      // No need to remove event listener since the browser does not add duplicate event listeners
+    }, []);
 
-  return (
-    <Tippy maxWidth="250px" arrow {...props} theme="light-border" duration={0}>
-      {children}
-    </Tippy>
-  );
-}
+    return (
+      <Tippy
+        ref={ref}
+        maxWidth="250px"
+        arrow
+        {...props}
+        theme="light-border"
+        duration={0}
+      >
+        {children}
+      </Tippy>
+    );
+  },
+);
 
 export default Tooltip;
