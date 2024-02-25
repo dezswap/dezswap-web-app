@@ -1,5 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import Tippy, { TippyProps } from "@tippyjs/react/headless";
 import { NavLink } from "react-router-dom";
 
 const Wrapper = styled.div`
@@ -30,7 +31,7 @@ const NavItem = styled(NavLink, {
       flex: 1;
     `}
 
-  &.active:not(.disabled), &:hover:not(.disabled) {
+  &.active:not(.disabled), &:hover:not(.disabled), &[aria-expanded="true"] {
     opacity: 1;
   }
 
@@ -43,6 +44,7 @@ interface NavBarProps {
   items: (React.ComponentProps<typeof NavItem> & {
     key?: React.Key;
     disabled?: boolean;
+    tippyProps?: TippyProps;
   })[];
   flex?: boolean;
 }
@@ -50,14 +52,18 @@ interface NavBarProps {
 function NavBar({ items, flex = true }: NavBarProps) {
   return (
     <Wrapper>
-      {items.map(({ key, disabled, to, ...navLink }) => (
-        <NavItem
-          className={`${navLink.className ?? ""} ${disabled ? "disabled" : ""}`}
-          key={key ?? `${to.toString()}`}
-          to={disabled ? "#" : to}
-          {...navLink}
-          flex={flex}
-        />
+      {items.map(({ key, disabled, to, tippyProps, ...navItemProps }) => (
+        <Tippy {...tippyProps}>
+          <NavItem
+            className={`${navItemProps.className ?? ""} ${
+              disabled ? "disabled" : ""
+            }`}
+            key={key ?? `${to.toString()}`}
+            to={disabled ? "#" : to}
+            {...navItemProps}
+            flex={flex}
+          />
+        </Tippy>
       ))}
     </Wrapper>
   );

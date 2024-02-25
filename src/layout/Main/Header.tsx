@@ -164,12 +164,12 @@ const SubLink = styled(Link)`
     background-color: ${({ theme }) => theme.colors.text.background};
   }
 
-  &:first-child {
+  &:first-of-type {
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
   }
 
-  &:last-child {
+  &:last-of-type {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
   }
@@ -377,68 +377,54 @@ function Header() {
                     items={navLinks.map((item) => ({
                       key: item.path,
                       to: item.path,
-                      css: css`
-                        .sub-menu {
-                          display: none;
-                        }
-                        &:hover {
-                          .sub-menu {
-                            display: block;
-                          }
-                        }
-                      `,
+                      tippyProps: {
+                        disabled: !item.children,
+                        placement: "bottom",
+                        interactive: true,
+                        offset: [0, 3],
+                        render: (attrs) => (
+                          <div {...attrs}>
+                            <Panel
+                              border
+                              noPadding
+                              css={css`
+                                min-width: 138px;
+                              `}
+                            >
+                              {item?.children?.map((child) => (
+                                <Tooltip
+                                  key={child.path}
+                                  disabled={!child.disabled}
+                                  content="Coming soon"
+                                >
+                                  <SubLink
+                                    key={child.path}
+                                    to={!child.disabled ? child.path : "#"}
+                                    css={
+                                      child.disabled
+                                        ? css`
+                                            cursor: default;
+                                          `
+                                        : undefined
+                                    }
+                                  >
+                                    <Typography
+                                      size={16}
+                                      weight={900}
+                                      color="primary"
+                                    >
+                                      {child.label}
+                                    </Typography>
+                                  </SubLink>
+                                </Tooltip>
+                              ))}
+                            </Panel>
+                          </div>
+                        ),
+                      },
                       children: (
                         <Typography size={18} weight={900} color="primary">
                           {item.label}
-                          {item.children && (
-                            <div
-                              className="sub-menu"
-                              css={css`
-                                position: absolute;
-                                padding-top: 3px;
-                                left: 50%;
-                                z-index: 6000;
-                                transform: translateX(-50%);
-                                top: 100%;
-                              `}
-                            >
-                              <Panel
-                                border
-                                noPadding
-                                css={css`
-                                  min-width: 138px;
-                                `}
-                              >
-                                {item.children.map((child) => (
-                                  <Tooltip
-                                    key={child.path}
-                                    disabled={!child.disabled}
-                                    content="Coming soon"
-                                  >
-                                    <SubLink
-                                      key={child.path}
-                                      to={!child.disabled ? child.path : "#"}
-                                      css={
-                                        child.disabled
-                                          ? css`
-                                              cursor: default;
-                                            `
-                                          : undefined
-                                      }
-                                    >
-                                      <Typography
-                                        size={16}
-                                        weight={900}
-                                        color="primary"
-                                      >
-                                        {child.label}
-                                      </Typography>
-                                    </SubLink>
-                                  </Tooltip>
-                                ))}
-                              </Panel>
-                            </div>
-                          )}
                         </Typography>
                       ),
                     }))}
