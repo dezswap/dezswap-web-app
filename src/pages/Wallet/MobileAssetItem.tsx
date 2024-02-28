@@ -128,7 +128,7 @@ function MobileAssetItem({
           <div>
             <Link
               to={{
-                pathname: "/trade/swap",
+                pathname: "swap",
                 search: new URLSearchParams({
                   q: asset.token,
                 }).toString(),

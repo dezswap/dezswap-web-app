@@ -20,6 +20,7 @@ import TokenDetailPage from "pages/Tokens/TokenDetail";
 import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 import MainLayout from "layout/Main";
 import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
+import SwapPageAsModal from "components/Modal/SwapModal";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -56,6 +57,7 @@ const routes = createBrowserRouter([
       {
         path: "tokens/:tokenAddress",
         element: <TokenDetailPage />,
+        children: [{ path: "swap", element: <SwapPageAsModal isOpen /> }],
       },
       {
         path: "wallet",
@@ -63,6 +65,7 @@ const routes = createBrowserRouter([
         children: [
           { path: ":poolAddress/add", element: <ProvidePage /> },
           { path: ":poolAddress/remove", element: <WithdrawPage /> },
+          { path: "swap", element: <SwapPageAsModal isOpen /> },
         ],
       },
       {
