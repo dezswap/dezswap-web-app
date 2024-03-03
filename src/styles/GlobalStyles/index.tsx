@@ -11,13 +11,16 @@ function GlobalStyles() {
       <Global
         styles={css`
           ${reset}
+
           body,
           html {
             width: 100%;
-            height: 100%;
+            height: 100vh !important;
+            min-height: 100%;
             position: relative;
             font-family: "Nunito", sans-serif;
             background-color: ${theme.colors.background};
+            overflow: visible !important;
           }
 
           #root {
@@ -44,13 +47,13 @@ function GlobalStyles() {
       {/* React Modal */}
       <Global
         styles={css`
-          .ReactModal__Body--open:has(.ReactModal__Overlay):not(
-              :has(.ReactModal__Overlay.inner-modal)
-            ),
-          .ReactModal__Body--open:has(
-              .ReactModal__Overlay .ReactModal__Overlay.inner-modal
-            ) {
-            overflow: hidden;
+          html {
+            &:has(.ReactModal__Overlay):not(
+                :has(.ReactModal__Overlay.inner-modal)
+              ),
+            &:has(.ReactModal__Overlay .ReactModal__Overlay.inner-modal) {
+              overflow: hidden !important;
+            }
           }
           .ReactModal__Overlay {
             opacity: 0;
@@ -240,23 +243,54 @@ function GlobalStyles() {
       {/* Scrollbars */}
       <Global
         styles={css`
+          html:has(body[data-simplebar]) {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            &::-webkit-scrollbar {
+              display: none;
+              -webkit-appearance: none;
+              width: 0;
+              height: 0;
+            }
+          }
+
+          body {
+            & > .simplebar-wrapper {
+              position: relative;
+              & .simplebar-content-wrapper,
+              & .simplebar-offset,
+              & .simplebar-mask,
+              & {
+                overflow: visible !important;
+              }
+            }
+
+            & > .simplebar-track {
+              position: fixed !important;
+            }
+          }
+
           * {
             scrollbar-width: thin;
             scrollbar-color: ${theme.colors.secondary} transparent;
-            &::-webkit-scrollbar {
-              width: 8px;
-              height: 8px;
-            }
+            @supports (selector(::-webkit-scrollbar)) {
+              scrollbar-width: unset;
+              scrollbar-color: unset;
+              &::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+              }
 
-            [data-simplebar]::-webkit-scrollbar {
-              display: none;
-            }
-            &::-webkit-scrollbar-thumb {
-              background-color: ${theme.colors.secondary};
-              border-radius: 30px;
-            }
-            &::-webkit-scrollbar-track {
-              background-color: transparent;
+              [data-simplebar]::-webkit-scrollbar {
+                display: none;
+              }
+              &::-webkit-scrollbar-thumb {
+                background-color: ${theme.colors.secondary};
+                border-radius: 30px;
+              }
+              &::-webkit-scrollbar-track {
+                background-color: transparent;
+              }
             }
           }
 
