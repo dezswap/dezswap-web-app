@@ -248,7 +248,7 @@ function Assets() {
                   {typeof row.token === "string" && (
                     <Link
                       to={{
-                        pathname: "/trade/swap",
+                        pathname: "swap",
                         search: new URLSearchParams({
                           q: row.token,
                         }).toString(),

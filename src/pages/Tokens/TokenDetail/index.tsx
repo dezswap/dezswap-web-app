@@ -17,7 +17,7 @@ import {
   Visible,
   useScreenClass,
 } from "react-grid-system";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -124,12 +124,12 @@ function TokenDetailPage() {
           )}
         </Col>
         <Col xs={6}>
-          {tokenAddress && (
+          {asset?.token && (
             <Link
               to={{
-                pathname: "/trade/swap",
+                pathname: "swap",
                 search: new URLSearchParams({
-                  q: tokenAddress,
+                  q: asset.token,
                 }).toString(),
               }}
             >
@@ -141,7 +141,7 @@ function TokenDetailPage() {
         </Col>
       </Row>
     ),
-    [asset, tokenAddress],
+    [asset],
   );
 
   return (
@@ -352,6 +352,7 @@ function TokenDetailPage() {
         />
         {tokenAddress && <TokenTransactions tokenAddress={tokenAddress} />}
       </Container>
+      <Outlet />
     </Wrapper>
   );
 }
