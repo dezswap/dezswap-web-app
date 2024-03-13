@@ -37,18 +37,23 @@ const Wrapper = styled.div<{ hasBanner?: boolean }>`
   }
 `;
 
-const NavBarWrapper = styled.div`
+const HeaderWrapper = styled.div`
   width: 100%;
   height: auto;
   position: fixed;
   left: 0;
-  bottom: -1px;
+  top: 0;
   z-index: 4000;
+`;
+
+const NavBarWrapper = styled(HeaderWrapper)`
+  top: unset;
+  bottom: -1px;
   background-color: ${({ theme }) => theme.colors.background};
   box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.1);
 `;
 
-const NavBarOffset = styled.div`
+const Offset = styled.div`
   width: 100%;
   height: auto;
   position: relative;
@@ -119,7 +124,12 @@ function MainLayout({ children }: PropsWithChildren) {
 
   return (
     <>
-      <Header />
+      <HeaderWrapper as="header">
+        <Header />
+      </HeaderWrapper>
+      <Offset>
+        <Header />
+      </Offset>
       <Wrapper hasBanner={network.name !== "mainnet"}>
         {children}
         <BrowserDelegateButton />
@@ -130,7 +140,7 @@ function MainLayout({ children }: PropsWithChildren) {
 
       {[MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(screenClass) && (
         <>
-          <NavBarOffset>{navBar}</NavBarOffset>
+          <Offset>{navBar}</Offset>
           <NavBarWrapper>{navBar}</NavBarWrapper>
         </>
       )}

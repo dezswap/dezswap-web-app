@@ -47,7 +47,6 @@ import Banner from "components/Banner";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
 import { Link } from "react-router-dom";
-import SimpleBar from "simplebar/dist";
 import useHashModal from "hooks/useHashModal";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
@@ -67,7 +66,6 @@ interface WrapperProps {
 const Wrapper = styled.header<WrapperProps>`
   width: 100%;
   height: ${`${DEFAULT_HEADER_HEIGHT}px`};
-  position: sticky;
   left: 0;
   z-index: 5000;
   pointer-events: none;
@@ -87,9 +85,7 @@ const Wrapper = styled.header<WrapperProps>`
 
   & > div {
     pointer-events: auto;
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: relative;
     width: 100%;
     padding-top: 16px;
     padding-bottom: 24px;
@@ -316,20 +312,14 @@ function Header() {
   );
 
   useEffect(() => {
-    const handleScroll = (event?: Event) => {
+    const handleScroll = () => {
       const { current } = wrapperRef;
       if (!current) return;
-      const scrollY = event?.target
-        ? (event?.target as HTMLElement).scrollTop
-        : window.scrollY;
-      current.classList.toggle("scrolled", scrollY > 0);
+      current.classList.toggle("scrolled", window.scrollY > 0);
     };
     handleScroll();
-    const simpleBar = SimpleBar.instances.get(document.body);
-    simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
     window.addEventListener("scroll", handleScroll);
     return () => {
-      simpleBar.getScrollElement().removeEventListener("scroll", handleScroll);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -340,10 +330,6 @@ function Header() {
         <Banner
           css={css`
             padding: 0;
-            position: sticky;
-            left: 0;
-            top: 0;
-            z-index: 6000;
           `}
         >
           <span
