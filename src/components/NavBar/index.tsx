@@ -52,19 +52,29 @@ interface NavBarProps {
 function NavBar({ items, flex = true }: NavBarProps) {
   return (
     <Wrapper>
-      {items.map(({ key, disabled, to, tippyProps, ...navItemProps }) => (
-        <Tippy {...tippyProps}>
-          <NavItem
-            className={`${navItemProps.className ?? ""} ${
-              disabled ? "disabled" : ""
-            }`}
-            key={key ?? `${to.toString()}`}
-            to={disabled ? "#" : to}
-            {...navItemProps}
-            flex={flex}
-          />
-        </Tippy>
-      ))}
+      {items.map(
+        ({
+          key,
+          disabled,
+          to,
+          tippyProps = {
+            disabled: true,
+          },
+          ...navItemProps
+        }) => (
+          <Tippy {...tippyProps}>
+            <NavItem
+              className={`${navItemProps.className ?? ""} ${
+                disabled ? "disabled" : ""
+              }`}
+              key={key ?? `${to.toString()}`}
+              to={disabled ? "#" : to}
+              {...navItemProps}
+              flex={flex}
+            />
+          </Tippy>
+        ),
+      )}
     </Wrapper>
   );
 }

@@ -7,7 +7,6 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
-import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -56,6 +55,15 @@ const NavBarOffset = styled.div`
   pointer-events: none;
 `;
 
+const NavBarIcon = styled.div`
+  width: 100%;
+  height: 24px;
+  position: relative;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+`;
+
 const FooterWrapper = styled.div`
   width: 100%;
   height: auto;
@@ -97,7 +105,7 @@ const navBar = (
     items={navLinks.map((navLink) => {
       const children = (
         <div>
-          <IconButton icons={{ default: navLink.icon }} size={24} />
+          <NavBarIcon style={{ backgroundImage: `url(${navLink.icon})` }} />
           <Typography size={12} weight={900} color="primary">
             {navLink.label}
           </Typography>
