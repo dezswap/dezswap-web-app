@@ -56,15 +56,27 @@ function Marquee({ children, duration, direction = "left" }: MarqueeProps) {
   const isPointerDown = useRef(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const lastScreenX = useRef(0);
 
   useEffect(() => {
     const handlePointerUp = (event: PointerEvent) => {
       if (event.button === 0) {
         isPointerDown.current = false;
-        setIsScrolling(false);
+        setIsScrolling((isScrolled) => {
+          if (isScrolled && contentRef.current) {
+            contentRef.current.blur();
+          }
+          return false;
+        });
       }
     };
     const handlePointerMove = (event: PointerEvent) => {
+      let { movementX } = event;
+      // The movementX property is `undefined` in Safari. Fixed in Safari version 17.
+      // https://developer.apple.com/documentation/safari-release-notes/safari-17-release-notes#:~:text=Fixed%20missing%20movementX%20and%20movementY%20in%20pointermove%20events.%20(108112600
+      if (movementX === undefined) {
+        movementX = event.screenX - lastScreenX.current;
+      }
       if (isPointerDown.current) {
         const target = contentRef.current;
         if (target) {
@@ -81,12 +93,13 @@ function Marquee({ children, duration, direction = "left" }: MarqueeProps) {
               }
               // eslint-disable-next-line no-param-reassign
               animation.currentTime -=
-                (event.movementX * animationDurationMs) / targetWidth;
+                (movementX * animationDurationMs) / targetWidth;
               setIsScrolling(true);
             }
           });
         }
       }
+      lastScreenX.current = event.screenX;
     };
     const handleDragStart = (event: DragEvent) => {
       const target = event.target as HTMLElement;
@@ -119,6 +132,7 @@ function Marquee({ children, duration, direction = "left" }: MarqueeProps) {
         onPointerDown={(event) => {
           if (event.buttons === 1) {
             isPointerDown.current = true;
+            lastScreenX.current = event.screenX;
           }
         }}
       >
