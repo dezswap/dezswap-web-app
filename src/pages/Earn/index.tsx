@@ -57,19 +57,15 @@ function EarnPage() {
               Pools
             </Typography>
           </NavLink>
-          <Tooltip content="Coming soon" offset={[0, -12]}>
-            <div>
-              <NavLink className="disabled" to="lockdrop">
-                <Typography
-                  size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
-                  color="primary"
-                  weight={900}
-                >
-                  LP Lock&Drop
-                </Typography>
-              </NavLink>
-            </div>
-          </Tooltip>
+          <NavLink to="lockdrop">
+            <Typography
+              size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
+              color="primary"
+              weight={900}
+            >
+              LP Lock&Drop
+            </Typography>
+          </NavLink>
           <IconButton
             css={css`
               margin-left: auto;

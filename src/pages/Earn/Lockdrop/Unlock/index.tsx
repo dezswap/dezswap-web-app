@@ -1,5 +1,5 @@
 import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
@@ -9,13 +9,7 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatNumber,
-  getTokenLink,
-} from "utils";
+import { amountToValue, ellipsisCenter, getTokenLink } from "utils";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
@@ -31,6 +25,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import InputGroup from "../Stake/InputGroup";
 
 function UnlockPage() {
@@ -201,14 +196,14 @@ function UnlockPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                 ]}
               />
