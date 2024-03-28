@@ -1,5 +1,5 @@
 import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
@@ -11,14 +11,7 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatDecimals,
-  formatNumber,
-  getTokenLink,
-} from "utils";
+import { ellipsisCenter, getTokenLink } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateClaimLockdropMsg } from "utils/dezswap";
@@ -34,6 +27,8 @@ import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 
 const Box = styled(box)`
   & > * {
@@ -217,17 +212,15 @@ function ClaimPage() {
                 display: inline-block;
               `}
             >
-              {lockupInfo
-                ? formatNumber(
-                    formatDecimals(
-                      amountToValue(
-                        lockupInfo.claimable || 0,
-                        rewardAsset?.decimals,
-                      ) || "",
-                      2,
-                    ),
-                  )
-                : ""}
+              {lockupInfo ? (
+                <AssetValueFormatter
+                  amount={lockupInfo.claimable}
+                  asset={rewardAsset}
+                  showSymbol={false}
+                />
+              ) : (
+                ""
+              )}
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -264,27 +257,27 @@ function ClaimPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                   {
                     key: "shareOfPool",
                     label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                    value: `${cutDecimal(
-                      Numeric.parse(lockupInfo?.total_reward || "0")
-                        .dividedBy(
-                          lockdropEventInfo?.total_lockdrop_reward || "1",
-                        )
-                        .mul(100)
-                        .toString(),
-                      2,
-                    )}%`,
+                    value: (
+                      <PercentageFormatter
+                        value={Numeric.parse(lockupInfo?.total_reward || "0")
+                          .dividedBy(
+                            lockdropEventInfo?.total_lockdrop_reward || "1",
+                          )
+                          .mul(100)}
+                      />
+                    ),
                   },
                 ]}
               />

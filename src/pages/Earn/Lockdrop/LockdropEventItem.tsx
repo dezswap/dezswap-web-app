@@ -7,14 +7,7 @@ import { css } from "@emotion/react";
 import Tooltip from "components/Tooltip";
 import Typography from "components/Typography";
 import { LP_DECIMALS } from "constants/dezswap";
-import {
-  formatNumber,
-  formatDecimals,
-  amountToValue,
-  formatDateTime,
-  getRemainDays,
-  getAddressLink,
-} from "utils";
+import { formatDateTime, getRemainDays, getAddressLink } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import iconVerified from "assets/icons/icon-verified.svg";
 import iconAlarm from "assets/icons/icon-alarm.svg";
@@ -26,7 +19,7 @@ import iconBadge from "assets/icons/icon-badge.svg";
 import useAssets from "hooks/useAssets";
 import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import ProgressBar from "components/ProgressBar";
 import { Link } from "react-router-dom";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
@@ -259,7 +252,7 @@ function LockdropUserInfoTable({
 }: {
   data: {
     label: string;
-    value: string;
+    value: React.ReactNode;
     tooltip?: React.ReactNode;
   }[];
 }) {
@@ -740,54 +733,42 @@ function LockdropEventItem({
                         data={[
                           {
                             label: "Your Staked LP",
-                            value:
-                              formatNumber(
-                                formatDecimals(
-                                  amountToValue(
-                                    lockupInfo.locked_lp_token || 0,
-                                    LP_DECIMALS,
-                                  ) || "",
-                                  2,
-                                ),
-                              ) || "",
+                            value: (
+                              <AssetValueFormatter
+                                amount={lockupInfo.locked_lp_token || 0}
+                                asset={{ decimals: LP_DECIMALS, symbol: "LP" }}
+                                showSymbol={false}
+                              />
+                            ),
                           },
                           {
                             label: "Rewards",
                             tooltip:
                               "The amount for Rewards may vary due to the composition of the pool changes during the Lock&Drop event period. It will be fixed when the event is over.",
-                            value: `${formatNumber(
-                              formatDecimals(
-                                amountToValue(
-                                  lockupInfo.total_reward || 0,
-                                  rewardAsset?.decimals,
-                                ) || "",
-                                2,
-                              ),
-                            )} ${rewardAsset?.symbol}`,
+                            value: (
+                              <AssetValueFormatter
+                                amount={lockupInfo.total_reward || 0}
+                                asset={rewardAsset}
+                              />
+                            ),
                           },
                           {
                             label: "Claimable",
-                            value: `${formatNumber(
-                              formatDecimals(
-                                amountToValue(
-                                  lockupInfo.claimable || 0,
-                                  rewardAsset?.decimals,
-                                ) || "",
-                                2,
-                              ),
-                            )} ${rewardAsset?.symbol}`,
+                            value: (
+                              <AssetValueFormatter
+                                amount={lockupInfo.claimable || 0}
+                                asset={rewardAsset}
+                              />
+                            ),
                           },
                           {
                             label: "Claimed",
-                            value: `${formatNumber(
-                              formatDecimals(
-                                amountToValue(
-                                  lockupInfo.claimed || 0,
-                                  rewardAsset?.decimals,
-                                ) || "",
-                                2,
-                              ),
-                            )} ${rewardAsset?.symbol}`,
+                            value: (
+                              <AssetValueFormatter
+                                amount={lockupInfo.claimed || 0}
+                                asset={rewardAsset}
+                              />
+                            ),
                           },
                         ]}
                       />
