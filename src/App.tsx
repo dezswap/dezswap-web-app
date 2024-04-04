@@ -8,6 +8,7 @@ import {
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
+import "styles/customScrollbar";
 
 setGridConfiguration(gridConfiguration);
 
