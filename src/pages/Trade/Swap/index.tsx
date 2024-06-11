@@ -462,7 +462,6 @@ function SwapPage() {
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
               firstProvideModal.open();
-              form.reset();
             }
 
             selectAsset1Modal.close();
