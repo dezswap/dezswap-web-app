@@ -21,12 +21,11 @@ import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 import MainLayout from "layout/Main";
 import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
 import SwapPageAsModal from "components/Modal/SwapModal";
-// TODO: uncomment when lockdrop is ready
-// import LockdropPage from "pages/Earn/Lockdrop";
-// import StakePage from "pages/Earn/Lockdrop/Stake";
-// import ClaimPage from "pages/Earn/Lockdrop/Claim";
-// import UnlockPage from "pages/Earn/Lockdrop/Unlock";
-// import CancelPage from "pages/Earn/Lockdrop/Cancel";
+import LockdropPage from "pages/Earn/Lockdrop";
+import StakePage from "pages/Earn/Lockdrop/Stake";
+import ClaimPage from "pages/Earn/Lockdrop/Claim";
+import UnlockPage from "pages/Earn/Lockdrop/Unlock";
+import CancelPage from "pages/Earn/Lockdrop/Cancel";
 
 // For legacy links
 function ReplaceToEarn() {
@@ -102,22 +101,21 @@ const routes = createBrowserRouter([
               { path: "*", element: <Error404 /> },
             ],
           },
-          // TODO: uncomment when lockdrop is ready
-          // {
-          //   path: "lockdrop",
-          //   element: <LockdropPage />,
-          //   children: [
-          //     {
-          //       path: ":eventAddress",
-          //       children: [
-          //         { index: true, element: <StakePage /> },
-          //         { path: "claim", element: <ClaimPage /> },
-          //         { path: "unlock", element: <UnlockPage /> },
-          //         { path: "cancel", element: <CancelPage /> },
-          //       ],
-          //     },
-          //   ],
-          // },
+          {
+            path: "lockdrop",
+            element: <LockdropPage />,
+            children: [
+              {
+                path: ":eventAddress",
+                children: [
+                  { index: true, element: <StakePage /> },
+                  { path: "claim", element: <ClaimPage /> },
+                  { path: "unlock", element: <UnlockPage /> },
+                  { path: "cancel", element: <CancelPage /> },
+                ],
+              },
+            ],
+          },
           { index: true, loader: () => redirect("pools") },
         ],
       },

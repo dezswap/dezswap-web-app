@@ -195,7 +195,7 @@ const navLinks = [
       {
         path: "/earn/lockdrop",
         label: "LP Lock&Drop",
-        disabled: true,
+        disabled: false,
       },
     ],
   },
