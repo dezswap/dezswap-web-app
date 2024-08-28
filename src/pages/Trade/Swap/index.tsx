@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Typography from "components/Typography";
@@ -168,8 +169,15 @@ function SwapPage() {
   const { asset1Address, asset2Address, asset1Value, asset2Value } =
     form.watch();
 
+  const targetRef = useRef<FormKey>();
   const firstProvideModal = useFirstProvideModal({
     addresses: [asset1Address, asset2Address],
+    onClickCancel: () => {
+      if (targetRef.current) {
+        form.setValue(targetRef.current, "");
+        targetRef.current = undefined;
+      }
+    },
   });
 
   const asset1 = useMemo(
@@ -461,6 +469,7 @@ function SwapPage() {
               formData[oppositeTarget] &&
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
+              targetRef.current = target;
               firstProvideModal.open();
             }
 
