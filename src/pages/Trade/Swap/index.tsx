@@ -440,6 +440,16 @@ function SwapPage() {
     }
   }, [form, preselectedAsset2Address, setPreselectedAsset2Address]);
 
+  useEffect(() => {
+    if (!asset1Address) {
+      form.setValue(FormKey.asset1Value, "", { shouldValidate: true });
+    }
+
+    if (!asset2Address) {
+      form.setValue(FormKey.asset2Value, "", { shouldValidate: true });
+    }
+  }, [asset1Address, asset2Address, form]);
+
   return (
     <>
       <SelectAssetDrawer
