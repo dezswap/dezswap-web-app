@@ -1083,6 +1083,7 @@ function SwapPage() {
               simulationResult.isLoading ||
               isFeeLoading ||
               isFeeFailed ||
+              !selectedPair ||
               isPoolEmpty
             }
             css={css`
