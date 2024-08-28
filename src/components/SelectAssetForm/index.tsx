@@ -89,7 +89,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   } = props;
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
-  const deferredSearchKeyword = useDeferredValue(searchKeyword.toLowerCase());
+  const deferredSearchKeyword = useDeferredValue(searchKeyword);
   const { getAsset } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const network = useNetwork();
