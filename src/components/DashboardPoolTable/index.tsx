@@ -189,6 +189,7 @@ function DashboardPoolTable({
                     <Col
                       xs="content"
                       css={css`
+                        line-height: 1;
                         font-size: 0;
                       `}
                     >
