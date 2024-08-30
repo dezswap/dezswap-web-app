@@ -1,23 +1,34 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import FirstProvideModal from "components/Modal/FirstProvideModal";
 import useGlobalElement from "hooks/useGlobalElement";
 import useModal from "hooks/useModal";
 
 const useFirstProvideModal = ({
   addresses,
+  onClickCancel,
 }: {
   addresses: [string, string];
+  onClickCancel?: () => void;
 }) => {
   const modal = useModal();
+
+  const handleClose = useCallback(() => {
+    modal.close();
+
+    if (onClickCancel) {
+      onClickCancel();
+    }
+  }, [modal.close, onClickCancel]);
+
   const element = useMemo(
     () => (
       <FirstProvideModal
         addresses={addresses}
         isOpen={modal.isOpen}
-        onRequestClose={modal.close}
+        onRequestClose={handleClose}
       />
     ),
-    [modal.close, modal.isOpen],
+    [handleClose, modal.isOpen],
   );
   useGlobalElement(element);
   return modal;

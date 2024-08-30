@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Typography from "components/Typography";
@@ -168,8 +169,21 @@ function SwapPage() {
   const { asset1Address, asset2Address, asset1Value, asset2Value } =
     form.watch();
 
+  const targetRef = useRef<FormKey>();
+  const targetValueRef = useRef<FormKey>();
   const firstProvideModal = useFirstProvideModal({
     addresses: [asset1Address, asset2Address],
+    onClickCancel: () => {
+      if (targetRef.current) {
+        form.setValue(targetRef.current, "");
+        targetRef.current = undefined;
+      }
+
+      if (targetValueRef.current) {
+        form.setValue(targetValueRef.current, "");
+        targetValueRef.current = undefined;
+      }
+    },
   });
 
   const asset1 = useMemo(
@@ -456,11 +470,22 @@ function SwapPage() {
 
             form.setValue(target, address);
             if (formData[oppositeTarget] === address) {
+              const oppositeTargetValue = selectAsset1Modal.isOpen
+                ? FormKey.asset2Value
+                : FormKey.asset1Value;
+
               form.setValue(oppositeTarget, "");
+              form.setValue(oppositeTargetValue, "");
             } else if (
               formData[oppositeTarget] &&
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
+              const targetValue = selectAsset1Modal.isOpen
+                ? FormKey.asset1Value
+                : FormKey.asset2Value;
+
+              targetRef.current = target;
+              targetValueRef.current = targetValue;
               firstProvideModal.open();
             }
 
@@ -1083,6 +1108,7 @@ function SwapPage() {
               simulationResult.isLoading ||
               isFeeLoading ||
               isFeeFailed ||
+              !selectedPair ||
               isPoolEmpty
             }
             css={css`
