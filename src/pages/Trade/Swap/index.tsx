@@ -170,12 +170,18 @@ function SwapPage() {
     form.watch();
 
   const targetRef = useRef<FormKey>();
+  const targetValueRef = useRef<FormKey>();
   const firstProvideModal = useFirstProvideModal({
     addresses: [asset1Address, asset2Address],
     onClickCancel: () => {
       if (targetRef.current) {
         form.setValue(targetRef.current, "");
         targetRef.current = undefined;
+      }
+
+      if (targetValueRef.current) {
+        form.setValue(targetValueRef.current, "");
+        targetValueRef.current = undefined;
       }
     },
   });
@@ -440,16 +446,6 @@ function SwapPage() {
     }
   }, [form, preselectedAsset2Address, setPreselectedAsset2Address]);
 
-  useEffect(() => {
-    if (!asset1Address) {
-      form.setValue(FormKey.asset1Value, "", { shouldValidate: true });
-    }
-
-    if (!asset2Address) {
-      form.setValue(FormKey.asset2Value, "", { shouldValidate: true });
-    }
-  }, [asset1Address, asset2Address, form]);
-
   return (
     <>
       <SelectAssetDrawer
@@ -474,12 +470,22 @@ function SwapPage() {
 
             form.setValue(target, address);
             if (formData[oppositeTarget] === address) {
+              const oppositeTargetValue = selectAsset1Modal.isOpen
+                ? FormKey.asset2Value
+                : FormKey.asset1Value;
+
               form.setValue(oppositeTarget, "");
+              form.setValue(oppositeTargetValue, "");
             } else if (
               formData[oppositeTarget] &&
               !findPair([address, formData[oppositeTarget] || ""])
             ) {
+              const targetValue = selectAsset1Modal.isOpen
+                ? FormKey.asset1Value
+                : FormKey.asset2Value;
+
               targetRef.current = target;
+              targetValueRef.current = targetValue;
               firstProvideModal.open();
             }
 
