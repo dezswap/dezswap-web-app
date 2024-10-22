@@ -442,6 +442,7 @@ function ProvidePage() {
         )}
         <div
           css={css`
+            margin-top: 10px;
             margin-bottom: ${isPoolEmpty ? "10px" : "20px"};
           `}
         >
