@@ -124,7 +124,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const getLatestBlockHeight = useCallback(async () => {
     const { data } = await axios.get<LatestBlock>(
-      `${network.lcd}/blocks/latest`,
+      `${network.lcd}/cosmos/base/tendermint/v1beta1/blocks/latest`,
     );
     return data.block.header.height;
   }, [network.lcd]);
