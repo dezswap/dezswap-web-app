@@ -9,7 +9,7 @@ import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { ellipsisCenter, getTransactionLink } from "utils";
 import { TxInfo } from "@xpla/xpla.js";
 import { TxError } from "types/common";
-import useLCDClient from "hooks/useLCDClient";
+import useLCDClient from "hooks/useUpdatedLCDClient";
 import Panel from "components/Panel";
 import Modal from "components/Modal";
 import useNetwork from "hooks/useNetwork";
@@ -20,12 +20,16 @@ import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
 import LoadingIndicator from "components/LoadingIndicator";
+import { TxResponse } from "@xpla/xplajs/cosmos/base/abci/v1beta1/abci";
 
 interface TxBroadcastingModalProps {
   txHash?: string;
   txError?: TxError;
   onDoneClick?: MouseEventHandler<HTMLButtonElement>;
   onRetryClick?: MouseEventHandler<HTMLButtonElement>;
+}
+interface XplaTxResponse extends Omit<TxResponse, "tx_response"> {
+  tx_response: TxInfo;
 }
 
 function TxBroadcastingModal({
@@ -48,8 +52,12 @@ function TxBroadcastingModal({
   useEffect(() => {
     const fetchTxInfo = async () => {
       if (txHash) {
-        const res = await lcd.tx.txInfo(txHash);
-        setTxInfo(res);
+        const client = await lcd;
+        const res = (await client.cosmos.tx.v1beta1.getTx({
+          hash: txHash,
+        })) as XplaTxResponse;
+
+        setTxInfo(res.tx_response);
       }
     };
 

@@ -1,8 +1,8 @@
 import axios from "axios";
 
-import { useCallback, useMemo } from "react";
-import { ReverseSimulation, Simulation } from "types/pair";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
+import { toBase64, toUtf8 } from "@cosmjs/encoding";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
@@ -11,7 +11,7 @@ import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
 import { contractAddresses } from "constants/dezswap";
 import useNetwork from "hooks/useNetwork";
 import useLCDClient from "hooks/useLCDClient";
-import { LatestBlock } from "types/common";
+import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
 import api, { ApiVersion } from "api";
 import {
   LockdropEstimatedReward,
@@ -20,19 +20,29 @@ import {
   LockdropUserInfo,
 } from "types/lockdrop";
 import { CreateTxOptions } from "@xpla/xpla.js";
+import { ReverseSimulation, Simulation } from "types/pair";
+import { CustomLCDClient, TokenBalance } from "types/lcdClient";
 
-interface TokenBalance {
-  balance: string;
-}
-
-interface Decimal {
-  decimals: number;
-}
+const getQueryData = (query: object) => {
+  return toBase64(toUtf8(JSON.stringify(query)));
+};
 
 const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
+  const updatedLcd = useUpdatedLCDClient();
   const connectedWallet = useConnectedWallet();
+  const [client, setClient] = useState<CustomLCDClient | null>(null);
+
+  useEffect(() => {
+    const initClient = async () => {
+      const initializedClient = await updatedLcd;
+      setClient(initializedClient);
+    };
+
+    initClient();
+  }, [updatedLcd]);
+
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,
     [connectedWallet],
@@ -45,52 +55,76 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
-      const res = await lcd.wasm.contractQuery<Simulation>(
-        contractAddress,
+      if (!client) return undefined;
+
+      const queryData = getQueryData(
         generateSimulationMsg(network.name, offerAsset, amount),
       );
-      return res;
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: contractAddress,
+        queryData,
+      });
+
+      return res as unknown as Simulation;
     },
-    [lcd, network.name],
+    [network.name, updatedLcd],
   );
 
   const reverseSimulate = useCallback(
     async (contractAddress: string, askAsset: string, amount: string) => {
-      const res = await lcd.wasm.contractQuery<ReverseSimulation>(
-        contractAddress,
+      if (!client) return undefined;
+
+      const queryData = getQueryData(
         generateReverseSimulationMsg(network.name, askAsset, amount),
       );
-      return res;
+
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: contractAddress,
+        queryData,
+      });
+
+      return res as unknown as ReverseSimulation;
     },
     [lcd, network.name],
   );
 
   const getNativeTokenBalance = useCallback(
     async (denom: string) => {
-      if (!denom || !walletAddress) {
+      if (!denom || !walletAddress || !client) {
         return undefined;
       }
-      const res = await lcd.bank.balance(walletAddress, {
-        "pagination.limit": "9999",
+
+      const res = await client.cosmos.bank.v1beta1.balance({
+        address: walletAddress,
+        denom,
       });
 
-      if (res && res[0]) {
-        return res[0].get(denom) ? res[0].get(denom)?.amount.toString() : "0";
+      if (res && res.balance) {
+        return res.balance.amount;
       }
 
       return undefined;
     },
-    [lcd, walletAddress],
+    [updatedLcd, walletAddress],
   );
 
   const getTokenBalance = useCallback(
     async (contractAddress: string) => {
-      if (!contractAddress || !walletAddress) {
+      if (!contractAddress || !walletAddress || !client) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<TokenBalance>(contractAddress, {
+
+      const queryData = getQueryData({
         balance: { address: walletAddress },
       });
+
+      const { data } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: contractAddress,
+        queryData,
+      });
+
+      const res = data as unknown as TokenBalance;
+
       return res.balance;
     },
     [lcd, walletAddress],
@@ -123,73 +157,100 @@ const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getLatestBlockHeight = useCallback(async () => {
-    const { data } = await axios.get<LatestBlock>(
-      `${network.lcd}/cosmos/base/tendermint/v1beta1/blocks/latest`,
-    );
-    return data.block.header.height;
+    if (!client) return undefined;
+
+    const res = await client.cosmos.base.tendermint.v1beta1.getLatestBlock();
+
+    return res.block?.header.height as unknown as string;
   }, [network.lcd]);
 
-  const getDecimal = useCallback(
-    async (denom: string) => {
-      const contractAddress = contractAddresses[network.name]?.factory;
-      if (!contractAddress || !denom) {
-        return undefined;
-      }
-      const res = await lcd.wasm.contractQuery<Decimal>(contractAddress, {
-        native_token_decimals: { denom },
-      });
-      return res.decimals;
-    },
-    [network.name, lcd],
-  );
+  // unused func
+  // const getDecimal = useCallback(
+  //   async (denom: string) => {
+  //     const contractAddress = contractAddresses[network.name]?.factory;
+  //     if (!contractAddress || !denom) {
+  //       return undefined;
+  //     }
+
+  //     const queryData = toBase64(
+  //       toUtf8(
+  //         JSON.stringify({
+  //           native_token_decimals: { denom },
+  //         }),
+  //       ),
+  //     ) as unknown as Uint8Array; // FIXME: 실제타입과 달라요..;
+
+  //     const { data: res } = await (
+  //       client
+  //     ).cosmwasm.wasm.v1.smartContractState({
+  //       address: contractAddress,
+  //       queryData,
+  //     });
+  //     const tokenDecimals = res as unknown as Decimal; // FIXME:
+  //     return tokenDecimals.decimals;
+  //   },
+  //   [network.name, lcd],
+  // );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
       const contractAddress = contractAddresses[network.name]?.lockdrop;
-      if (!contractAddress) {
+      if (!contractAddress || !client) {
         return undefined;
       }
 
-      const res = await lcd.wasm.contractQuery<LockdropEvents>(
-        contractAddress,
-        {
-          events_by_end: { start_after: startAfter },
-        },
-      );
-      return res;
+      const queryData = getQueryData({
+        events_by_end: { start_after: startAfter },
+      });
+
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: contractAddress,
+        queryData,
+      });
+
+      return res as unknown as LockdropEvents;
     },
     [lcd, network.name],
   );
 
   const getLockdropEventInfo = useCallback(
     async (lockdropEventAddress: string) => {
-      const res = await lcd.wasm.contractQuery<LockdropEventInfo>(
-        lockdropEventAddress,
-        {
-          event_info: {},
-        },
-      );
-      return res;
+      if (!client) return undefined;
+
+      const queryData = getQueryData({
+        event_info: {},
+      });
+
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: lockdropEventAddress,
+        queryData,
+      });
+
+      return res as unknown as LockdropEventInfo;
     },
-    [lcd],
+    [client],
   );
 
   const getLockdropUserInfo = useCallback(
     async (lockdropEventAddress: string) => {
-      if (!walletAddress || !lockdropEventAddress) {
+      if (!walletAddress || !lockdropEventAddress || !client) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<LockdropUserInfo>(
-        lockdropEventAddress,
-        {
-          user_info: {
-            addr: walletAddress,
-          },
+
+      const queryData = getQueryData({
+        user_info: {
+          addr: walletAddress,
         },
-      );
-      return res;
+      });
+
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: lockdropEventAddress,
+        queryData,
+      });
+
+      return res as unknown as LockdropUserInfo;
     },
-    [lcd.wasm, walletAddress],
+    [client, walletAddress],
   );
 
   const getEstimatedLockdropReward = useCallback(
@@ -198,23 +259,28 @@ const useAPI = (version: ApiVersion = "v1") => {
       amount: number | string,
       duration: number,
     ) => {
-      if (!walletAddress || !lockdropEventAddress) {
+      if (!walletAddress || !lockdropEventAddress || !client) {
         return undefined;
       }
-      const res = await lcd.wasm.contractQuery<LockdropEstimatedReward>(
-        lockdropEventAddress,
-        {
-          estimate: {
-            amount: `${amount}`,
-            duration,
-          },
+
+      const queryData = getQueryData({
+        estimate: {
+          amount: `${amount}`,
+          duration,
         },
-      );
-      return res;
+      });
+
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: lockdropEventAddress,
+        queryData,
+      });
+
+      return res as unknown as LockdropEstimatedReward;
     },
-    [lcd.wasm, walletAddress],
+    [client, walletAddress],
   );
 
+  // TODO: Replace with XplaSigningClient
   const estimateFee = useCallback(
     async (txOptions: CreateTxOptions) => {
       if (!connectedWallet) {
@@ -246,7 +312,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      getDecimal,
+      // getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
@@ -262,7 +328,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      getDecimal,
+      // getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
