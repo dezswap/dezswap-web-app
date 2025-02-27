@@ -2,10 +2,10 @@ import axios from "axios";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import { toBase64, toUtf8 } from "@cosmjs/encoding";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
+  getQueryData,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
 import { contractAddresses } from "constants/dezswap";
@@ -22,10 +22,6 @@ import {
 import { CreateTxOptions } from "@xpla/xpla.js";
 import { ReverseSimulation, Simulation } from "types/pair";
 import { CustomLCDClient, TokenBalance } from "types/lcdClient";
-
-const getQueryData = (query: object) => {
-  return toBase64(toUtf8(JSON.stringify(query)));
-};
 
 const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
@@ -56,7 +52,6 @@ const useAPI = (version: ApiVersion = "v1") => {
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
       if (!client) return undefined;
-
       const queryData = getQueryData(
         generateSimulationMsg(network.name, offerAsset, amount),
       );
@@ -67,7 +62,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as Simulation;
     },
-    [network.name, updatedLcd],
+    [network.name, client],
   );
 
   const reverseSimulate = useCallback(
@@ -85,7 +80,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as ReverseSimulation;
     },
-    [lcd, network.name],
+    [client, network.name],
   );
 
   const getNativeTokenBalance = useCallback(
@@ -105,7 +100,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return undefined;
     },
-    [updatedLcd, walletAddress],
+    [client, walletAddress],
   );
 
   const getTokenBalance = useCallback(
@@ -127,7 +122,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res.balance;
     },
-    [lcd, walletAddress],
+    [client, walletAddress],
   );
 
   const getVerifiedTokenInfos = useCallback(
@@ -162,7 +157,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     const res = await client.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
     return res.block?.header.height as unknown as string;
-  }, [network.lcd]);
+  }, [network.lcd, client]);
 
   // unused func
   // const getDecimal = useCallback(
@@ -210,7 +205,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as LockdropEvents;
     },
-    [lcd, network.name],
+    [client, network.name],
   );
 
   const getLockdropEventInfo = useCallback(
