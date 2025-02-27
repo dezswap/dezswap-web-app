@@ -8,9 +8,10 @@ import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
-import useLCDClient from "./useLCDClient";
+import useLCDClient from "./useUpdatedLCDClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
+import { getQueryData } from "utils/dezswap";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -76,9 +77,18 @@ const useCustomAssets = () => {
                 }));
               }
             } else {
-              const token = await lcd.wasm.contractQuery<TokenInfo>(address, {
+              const queryData = getQueryData({
                 token_info: {},
               });
+              const client = await lcd;
+              const { data } = await client.cosmwasm.wasm.v1.smartContractState(
+                {
+                  address,
+                  queryData,
+                },
+              );
+              const token = data as unknown as TokenInfo;
+
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];
 

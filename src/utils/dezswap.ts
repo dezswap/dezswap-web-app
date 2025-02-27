@@ -9,6 +9,7 @@ import { Asset, NativeAsset } from "types/pair";
 import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
+import { toBase64, toUtf8 } from "@cosmjs/encoding";
 
 export type Amount = string | number;
 
@@ -26,6 +27,10 @@ export const queryMessages = {
   getPool() {
     return { pool: {} };
   },
+};
+
+export const getQueryData = (query: object) => {
+  return toBase64(toUtf8(JSON.stringify(query)));
 };
 
 const assetMsg = (
