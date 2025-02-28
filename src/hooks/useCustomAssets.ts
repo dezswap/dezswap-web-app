@@ -20,7 +20,7 @@ const useCustomAssets = () => {
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
 
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
   const network = useNetwork();
   const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
     mainnet: [],
@@ -80,13 +80,14 @@ const useCustomAssets = () => {
               const queryData = getQueryData({
                 token_info: {},
               });
-              const client = await lcd;
-              const { data } = await client.cosmwasm.wasm.v1.smartContractState(
-                {
-                  address,
-                  queryData,
-                },
-              );
+              if (!lcd) {
+                console.log("Error: LCDClient is not exist");
+                return;
+              }
+              const { data } = await lcd.cosmwasm.wasm.v1.smartContractState({
+                address,
+                queryData,
+              });
               const token = data as unknown as TokenInfo;
 
               if (verifiedAssets) {

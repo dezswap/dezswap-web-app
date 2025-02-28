@@ -41,7 +41,7 @@ function TxBroadcastingModal({
   ...modalProps
 }: ReactModal.Props & TxBroadcastingModalProps) {
   const network = useNetwork();
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
 
@@ -51,9 +51,8 @@ function TxBroadcastingModal({
 
   useEffect(() => {
     const fetchTxInfo = async () => {
-      if (txHash) {
-        const client = await lcd;
-        const res = (await client.cosmos.tx.v1beta1.getTx({
+      if (lcd && txHash) {
+        const res = (await lcd.cosmos.tx.v1beta1.getTx({
           hash: txHash,
         })) as XplaTxResponse;
 

@@ -40,7 +40,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const network = useNetwork();
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
 
   const api = useAPI();
 
@@ -109,17 +109,16 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             } as TokenInfo);
           }
         }
-      } else if (isValidAddress) {
+      } else if (isValidAddress && lcd) {
         try {
           const queryData = getQueryData({
             token_info: {},
           });
-          const client = await lcd;
-          const { data: res } =
-            await client.cosmwasm.wasm.v1.smartContractState({
-              address,
-              queryData,
-            });
+
+          const { data: res } = await lcd.cosmwasm.wasm.v1.smartContractState({
+            address,
+            queryData,
+          });
 
           if (!isAborted) {
             setTokenInfo(res as unknown as TokenInfo);

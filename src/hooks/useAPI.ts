@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import {
   generateReverseSimulationMsg,
@@ -21,24 +21,13 @@ import {
 } from "types/lockdrop";
 import { CreateTxOptions } from "@xpla/xpla.js";
 import { ReverseSimulation, Simulation } from "types/pair";
-import { CustomLCDClient, TokenBalance } from "types/lcdClient";
+import { TokenBalance } from "types/lcdClient";
 
 const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
-  const updatedLcd = useUpdatedLCDClient();
+  const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
   const connectedWallet = useConnectedWallet();
-  const [client, setClient] = useState<CustomLCDClient | null>(null);
-
-  useEffect(() => {
-    const initClient = async () => {
-      const initializedClient = await updatedLcd;
-      setClient(initializedClient);
-    };
-
-    initClient();
-  }, [updatedLcd]);
-
   const walletAddress = useMemo(
     () => connectedWallet?.walletAddress,
     [connectedWallet],
@@ -51,45 +40,47 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
-      if (!client) return undefined;
+      if (!updatedLcd) return undefined;
       const queryData = getQueryData(
         generateSimulationMsg(network.name, offerAsset, amount),
       );
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: contractAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: contractAddress,
+          queryData,
+        });
 
       return res as unknown as Simulation;
     },
-    [network.name, client],
+    [network.name, updatedLcd],
   );
 
   const reverseSimulate = useCallback(
     async (contractAddress: string, askAsset: string, amount: string) => {
-      if (!client) return undefined;
+      if (!updatedLcd) return undefined;
 
       const queryData = getQueryData(
         generateReverseSimulationMsg(network.name, askAsset, amount),
       );
 
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: contractAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: contractAddress,
+          queryData,
+        });
 
       return res as unknown as ReverseSimulation;
     },
-    [client, network.name],
+    [network.name, updatedLcd],
   );
 
   const getNativeTokenBalance = useCallback(
     async (denom: string) => {
-      if (!denom || !walletAddress || !client) {
+      if (!denom || !walletAddress || !updatedLcd) {
         return undefined;
       }
 
-      const res = await client.cosmos.bank.v1beta1.balance({
+      const res = await updatedLcd.cosmos.bank.v1beta1.balance({
         address: walletAddress,
         denom,
       });
@@ -100,12 +91,12 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return undefined;
     },
-    [client, walletAddress],
+    [updatedLcd, walletAddress],
   );
 
   const getTokenBalance = useCallback(
     async (contractAddress: string) => {
-      if (!contractAddress || !walletAddress || !client) {
+      if (!contractAddress || !walletAddress || !updatedLcd) {
         return undefined;
       }
 
@@ -113,7 +104,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         balance: { address: walletAddress },
       });
 
-      const { data } = await client.cosmwasm.wasm.v1.smartContractState({
+      const { data } = await updatedLcd.cosmwasm.wasm.v1.smartContractState({
         address: contractAddress,
         queryData,
       });
@@ -122,7 +113,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res.balance;
     },
-    [client, walletAddress],
+    [updatedLcd, walletAddress],
   );
 
   const getVerifiedTokenInfos = useCallback(
@@ -152,12 +143,13 @@ const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getLatestBlockHeight = useCallback(async () => {
-    if (!client) return undefined;
+    if (!updatedLcd) return undefined;
 
-    const res = await client.cosmos.base.tendermint.v1beta1.getLatestBlock();
+    const res =
+      await updatedLcd.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
     return res.block?.header.height as unknown as string;
-  }, [network.lcd, client]);
+  }, [updatedLcd]);
 
   // unused func
   // const getDecimal = useCallback(
@@ -173,15 +165,13 @@ const useAPI = (version: ApiVersion = "v1") => {
   //           native_token_decimals: { denom },
   //         }),
   //       ),
-  //     ) as unknown as Uint8Array; // FIXME: 실제타입과 달라요..;
+  //     )
 
-  //     const { data: res } = await (
-  //       client
-  //     ).cosmwasm.wasm.v1.smartContractState({
+  //     const { data: res } = await updatedLcd.cosmwasm.wasm.v1.smartContractState({
   //       address: contractAddress,
   //       queryData,
   //     });
-  //     const tokenDecimals = res as unknown as Decimal; // FIXME:
+  //     const tokenDecimals = res as unknown as Decimal;
   //     return tokenDecimals.decimals;
   //   },
   //   [network.name, lcd],
@@ -190,7 +180,7 @@ const useAPI = (version: ApiVersion = "v1") => {
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
       const contractAddress = contractAddresses[network.name]?.lockdrop;
-      if (!contractAddress || !client) {
+      if (!contractAddress || !updatedLcd) {
         return undefined;
       }
 
@@ -198,37 +188,39 @@ const useAPI = (version: ApiVersion = "v1") => {
         events_by_end: { start_after: startAfter },
       });
 
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: contractAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: contractAddress,
+          queryData,
+        });
 
       return res as unknown as LockdropEvents;
     },
-    [client, network.name],
+    [updatedLcd, network.name],
   );
 
   const getLockdropEventInfo = useCallback(
     async (lockdropEventAddress: string) => {
-      if (!client) return undefined;
+      if (!updatedLcd) return undefined;
 
       const queryData = getQueryData({
         event_info: {},
       });
 
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: lockdropEventAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: lockdropEventAddress,
+          queryData,
+        });
 
       return res as unknown as LockdropEventInfo;
     },
-    [client],
+    [updatedLcd],
   );
 
   const getLockdropUserInfo = useCallback(
     async (lockdropEventAddress: string) => {
-      if (!walletAddress || !lockdropEventAddress || !client) {
+      if (!walletAddress || !lockdropEventAddress || !updatedLcd) {
         return undefined;
       }
 
@@ -238,14 +230,15 @@ const useAPI = (version: ApiVersion = "v1") => {
         },
       });
 
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: lockdropEventAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: lockdropEventAddress,
+          queryData,
+        });
 
       return res as unknown as LockdropUserInfo;
     },
-    [client, walletAddress],
+    [updatedLcd, walletAddress],
   );
 
   const getEstimatedLockdropReward = useCallback(
@@ -254,7 +247,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       amount: number | string,
       duration: number,
     ) => {
-      if (!walletAddress || !lockdropEventAddress || !client) {
+      if (!walletAddress || !lockdropEventAddress || !updatedLcd) {
         return undefined;
       }
 
@@ -265,14 +258,15 @@ const useAPI = (version: ApiVersion = "v1") => {
         },
       });
 
-      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-        address: lockdropEventAddress,
-        queryData,
-      });
+      const { data: res } =
+        await updatedLcd.cosmwasm.wasm.v1.smartContractState({
+          address: lockdropEventAddress,
+          queryData,
+        });
 
       return res as unknown as LockdropEstimatedReward;
     },
-    [client, walletAddress],
+    [updatedLcd, walletAddress],
   );
 
   // TODO: Replace with XplaSigningClient
@@ -313,6 +307,8 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
+      lcdUrl,
+      isLoading,
     }),
     [
       apiClient,
@@ -329,6 +325,8 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
+      lcdUrl,
+      isLoading,
     ],
   );
 };

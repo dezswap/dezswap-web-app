@@ -26,7 +26,7 @@ const useCosmostationWallet = () => {
   // const [provider, setProvider] = useState<Cosmos>();
   // const [account, setAccount] = useState<RequestAccountResponse>();
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
   const xplaWallet = useWallet();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isInstalled = !!(window as any).cosmostation;
@@ -75,8 +75,11 @@ const useCosmostationWallet = () => {
         throw new Error("Not connected");
       }
       try {
-        const client = await lcd;
-        const { info } = await client.cosmos.auth.v1beta1.accountInfo({
+        if (!lcd) {
+          console.log("Error: LCDClient is not exist");
+          return;
+        }
+        const { info } = await lcd.cosmos.auth.v1beta1.accountInfo({
           address: cosmostationWallet.account.address,
         });
         const { account_number: accountNumber, sequence } =
