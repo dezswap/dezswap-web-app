@@ -1,4 +1,20 @@
 import axios from "axios";
+import {
+  StdFee,
+  StdSignDoc,
+  TelescopeGeneratedType,
+} from "@interchainjs/types";
+import {
+  AccountData,
+  Auth,
+  AuthOptions,
+  IGenericOfflineSignArgs,
+  IGenericOfflineSigner,
+  SIGN_MODE,
+  SignerConfig,
+} from "@interchainjs/types";
+import { createRPCQueryClient } from "@xpla/xplajs/cosmos/rpc.query.js";
+import { MsgSend } from "@xpla/xplajs/cosmos/bank/v1beta1/tx";
 
 import { useCallback, useMemo } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
@@ -12,6 +28,7 @@ import { contractAddresses } from "constants/dezswap";
 import useNetwork from "hooks/useNetwork";
 import useLCDClient from "hooks/useLCDClient";
 import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
+import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import api, { ApiVersion } from "api";
 import {
   LockdropEstimatedReward,
@@ -19,7 +36,8 @@ import {
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { CreateTxOptions, SignerInfo } from "@xpla/xpla.js";
+import useXplaSigningClient from "./useXplaSigningClient";
 import { ReverseSimulation, Simulation } from "types/pair";
 import { TokenBalance } from "types/lcdClient";
 
@@ -33,10 +51,41 @@ const useAPI = (version: ApiVersion = "v1") => {
     [connectedWallet],
   );
 
+  // const xplaSigningClient = useMemo(
+  //   async () =>
+  //     await XplaSigningClient.connectWithSigner(
+  //       "https://cube-rpc.xpla.dev",
+  //       signer,
+  //     ),
+  //   [(network.name, version)],
+  // );
+
   const apiClient = useMemo(
     () => api(network.name, version),
     [network.name, version],
   );
+  // export interface OfflineAminoSigner {
+  //   getAccounts: () => Promise<readonly AccountData[]>;
+  //   signAmino: (
+  //     signerAddress: string,
+  //     signDoc: CosmosAminoDoc
+  //   ) => Promise<AminoSignResponse>;
+  // }
+  // const offlineAminoSigner = {
+  //   getAccount: Promise.resolve("xpla124tcpkjs9jxvsu7efze38kr5uql3a6kn67vmva"),
+  //   signAmino: {
+  //     signerAddress: "xpla124tcpkjs9jxvsu7efze38kr5uql3a6kn67vmva",
+  //     // signDoc: { chain_id: 'cube_47-5';
+  //     //   account_number: string;
+  //     //   sequence: string;
+  //     //   fee: StdFee;
+  //     //   msgs: AminoMessage[];
+  //     //   memo: string;}
+  //   },
+  // };
+
+  const xplaSigningClient = useXplaSigningClient("xplatestnet");
+  console.log(xplaSigningClient);
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
@@ -276,6 +325,17 @@ const useAPI = (version: ApiVersion = "v1") => {
         return undefined;
       }
       const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
+      // get authInfo
+      // const accountd = await (
+      //   await updatedLcd
+      // ).cosmos.auth.v1beta1.accountInfo({
+      //   address: connectedWallet.walletAddress,
+      // });
+      // console.log(accountd.info);
+
+      const fee = calculateFee({}, undefined, () =>
+        Promise.resolve("cube_47-5"),
+      );
       const res = await lcd.tx.estimateFee(
         [
           {
@@ -285,7 +345,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         ],
         txOptions,
       );
-
+      console.log(res, fee);
       return res;
     },
     [connectedWallet, lcd],

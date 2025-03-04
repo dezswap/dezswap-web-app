@@ -14,6 +14,8 @@ import iconInstalled from "assets/icons/icon-installed.svg";
 import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
+import { useWalletManager } from "@interchain-kit/react";
+import { keplrWallet } from "@interchain-kit/keplr-extension";
 
 const WalletButton = styled.button`
   width: auto;
@@ -47,6 +49,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
+  const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
     ...availableConnections
@@ -152,6 +155,24 @@ function ConnectWalletModal(props: ReactModal.Props) {
           height: "100%",
         }}
       >
+        <button
+          onClick={async (e) => {
+            try {
+              const res = await wm.connect(
+                keplrWallet.info?.name as string,
+                "xplatestnet",
+              );
+
+              console.log("res:", res);
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+          type="button"
+        >
+          Click ME~
+        </button>
+
         {buttons.map((item) => (
           <Col
             xs={6}
