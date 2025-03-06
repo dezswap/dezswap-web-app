@@ -9,7 +9,7 @@ import { Asset, NativeAsset } from "types/pair";
 import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
-import { toBase64, toUtf8 } from "@cosmjs/encoding";
+import { Buffer } from "buffer";
 
 export type Amount = string | number;
 
@@ -30,7 +30,7 @@ export const queryMessages = {
 };
 
 export const getQueryData = (query: object) => {
-  return toBase64(toUtf8(JSON.stringify(query)));
+  return Buffer.from(JSON.stringify(query)).toString("base64");
 };
 
 const assetMsg = (

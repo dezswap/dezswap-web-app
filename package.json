@@ -21,7 +21,6 @@
     ]
   },
   "dependencies": {
-    "@cosmjs/encoding": "^0.33.0",
     "@cosmostation/extension-client": "^0.1.15",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
