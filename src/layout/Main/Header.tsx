@@ -55,6 +55,8 @@ import useNotifications from "hooks/useNotifications";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
 import NotificationModal from "./NotificationModal";
 import useWalletAddress from "hooks/useWalletAddress";
+import { useWalletManager } from "@interchain-kit/react";
+import { KeplrName } from "constants/dezswap";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -303,6 +305,7 @@ function Header() {
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
   const { walletAddress, isKeplr } = useWalletAddress();
   const { tokens: dashboardTokens } = useDashboard();
+  const wm = useWalletManager();
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -688,6 +691,8 @@ function Header() {
                                 onClick={() => {
                                   wallet.disconnect();
                                   cosmostationWallet.disconnect();
+
+                                  if (isKeplr) wm.disconnect(KeplrName);
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);
