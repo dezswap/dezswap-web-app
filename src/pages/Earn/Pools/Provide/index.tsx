@@ -53,6 +53,7 @@ import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import useWalletAddress from "hooks/useWalletAddress";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -77,6 +78,7 @@ function ProvidePage() {
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
+  const { walletAddress } = useWalletAddress();
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -163,7 +165,7 @@ function ProvidePage() {
         ? {
             msgs: generateAddLiquidityMsg(
               connectedWallet?.network.name as NetworkName,
-              connectedWallet.walletAddress,
+              walletAddress,
               poolAddress || "",
               [
                 {

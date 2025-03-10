@@ -60,6 +60,7 @@ import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -152,6 +153,7 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
+  const { walletAddress } = useWalletAddress();
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -296,7 +298,7 @@ function SwapPage() {
       msgs: [
         generateSwapMsg(
           connectedWallet?.network.name as NetworkName,
-          connectedWallet.walletAddress,
+          walletAddress,
           selectedPair.contract_addr,
           asset1.token,
           valueToAmount(asset1Value, asset1?.decimals) || "",

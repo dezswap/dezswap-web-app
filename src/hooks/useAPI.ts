@@ -2,36 +2,34 @@ import axios from "axios";
 
 import { useCallback, useMemo } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
+import { CreateTxOptions } from "@xpla/xpla.js";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
-import { contractAddresses } from "constants/dezswap";
-import useNetwork from "hooks/useNetwork";
-import useLCDClient from "hooks/useLCDClient";
-import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
-import api, { ApiVersion } from "api";
+import { TokenBalance } from "types/lcdClient";
 import {
   LockdropEstimatedReward,
   LockdropEventInfo,
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { contractAddresses } from "constants/dezswap";
+import useNetwork from "hooks/useNetwork";
+import useLCDClient from "hooks/useLCDClient";
+import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
+import api, { ApiVersion } from "api";
 import { ReverseSimulation, Simulation } from "types/pair";
-import { TokenBalance } from "types/lcdClient";
+import useWalletAddress from "./useWalletAddress";
 
 const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
   const connectedWallet = useConnectedWallet();
-  const walletAddress = useMemo(
-    () => connectedWallet?.walletAddress,
-    [connectedWallet],
-  );
+  const { walletAddress } = useWalletAddress();
 
   const apiClient = useMemo(
     () => api(network.name, version),
@@ -275,7 +273,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       if (!connectedWallet) {
         return undefined;
       }
-      const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
+      const account = await lcd.auth.accountInfo(walletAddress);
       const res = await lcd.tx.estimateFee(
         [
           {

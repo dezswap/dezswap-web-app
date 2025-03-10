@@ -50,6 +50,7 @@ import box from "components/Box";
 import ProgressBar from "components/ProgressBar";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
+import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -87,6 +88,7 @@ function CreatePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getAsset, validate } = useAssets();
+  const { walletAddress } = useWalletAddress();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const network = useNetwork();
 
@@ -161,7 +163,7 @@ function CreatePage() {
         ? {
             msgs: generateCreatePoolMsg(
               connectedWallet?.network.name as NetworkName,
-              connectedWallet.walletAddress,
+              walletAddress,
               [
                 {
                   address: asset1?.token || "",

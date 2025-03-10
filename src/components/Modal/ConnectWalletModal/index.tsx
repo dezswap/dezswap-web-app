@@ -14,6 +14,9 @@ import iconInstalled from "assets/icons/icon-installed.svg";
 import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
+import { useWalletManager } from "@interchain-kit/react";
+import useWalletAddress from "hooks/useWalletAddress";
+import { KeplrName } from "constants/dezswap";
 
 const WalletButton = styled.button`
   width: auto;
@@ -43,10 +46,13 @@ type WalletButtonProps = {
 
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
-  const { connect, availableConnectTypes } = useWallet();
+  const { connect } = useWallet();
+  const { fetchWalletAddress } = useWalletAddress();
+
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
+  const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
     ...availableConnections
@@ -59,6 +65,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
         isInstalled: true,
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           connect(type, identifier, false);
+          fetchWalletAddress();
           if (props.onRequestClose) {
             props.onRequestClose(event);
           }
@@ -74,6 +81,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 isInstalled: true,
                 onClick: (event) => {
                   connect(p.type, p.identifier, true);
+                  fetchWalletAddress();
                   if (props.onRequestClose) {
                     props.onRequestClose(event);
                   }
@@ -90,6 +98,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
             isInstalled: true,
             onClick: (event) => {
               cosmostationWallet.connect();
+              fetchWalletAddress();
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
@@ -152,6 +161,23 @@ function ConnectWalletModal(props: ReactModal.Props) {
           height: "100%",
         }}
       >
+        <button
+          onClick={async (e) => {
+            try {
+              await wm.connect(KeplrName);
+              fetchWalletAddress();
+              if (props.onRequestClose) {
+                props.onRequestClose(e);
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+          type="button"
+        >
+          Keplr
+        </button>
+
         {buttons.map((item) => (
           <Col
             xs={6}

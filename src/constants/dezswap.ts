@@ -1,6 +1,17 @@
+import { assetLists, chains, AssetList, Chain } from "@chain-registry/v2";
 import { NetworkName } from "types/common";
 
 export type SupportedChain = "dimension" | "cube";
+export const KeplrName = "keplr-extension";
+export const DefaultChainName = "xplatestnet";
+export const DefaultRpcEndpoint = "https://cube-rpc.xpla.io";
+
+export const DefaultChain =
+  chains.find((chain) => chain.chainName === DefaultChainName) ?? ({} as Chain);
+
+export const DefaultAssetList =
+  assetLists.find((assetList) => assetList.chainName === DefaultChainName) ??
+  ({} as AssetList);
 
 export const supportedChains: {
   [K in SupportedChain]: {
