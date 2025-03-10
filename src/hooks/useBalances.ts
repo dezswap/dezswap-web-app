@@ -44,6 +44,8 @@ const useBalances = (addresses: string[]) => {
           connectedWallet?.walletAddress,
           address,
           network.chainID,
+          api.lcdUrl,
+          api.isLoading,
         ],
         queryFn: async () => {
           try {

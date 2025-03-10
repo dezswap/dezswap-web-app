@@ -8,9 +8,10 @@ import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
-import useLCDClient from "./useLCDClient";
+import useLCDClient from "./useUpdatedLCDClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
+import { getQueryData } from "utils/dezswap";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -19,7 +20,7 @@ const useCustomAssets = () => {
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
 
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
   const network = useNetwork();
   const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
     mainnet: [],
@@ -76,9 +77,19 @@ const useCustomAssets = () => {
                 }));
               }
             } else {
-              const token = await lcd.wasm.contractQuery<TokenInfo>(address, {
+              const queryData = getQueryData({
                 token_info: {},
               });
+              if (!lcd) {
+                console.log("Error: LCDClient is not exist");
+                return;
+              }
+              const { data } = await lcd.cosmwasm.wasm.v1.smartContractState({
+                address,
+                queryData,
+              });
+              const token = data as unknown as TokenInfo;
+
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];
 

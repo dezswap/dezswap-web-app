@@ -18,5 +18,5 @@ export const useLatestBlock = () => {
     refetchOnReconnect: true,
   });
 
-  return height;
+  return height || "0";
 };

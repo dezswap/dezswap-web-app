@@ -23,8 +23,9 @@ import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import { Token } from "types/api";
-import useLCDClient from "hooks/useLCDClient";
+import useLCDClient from "hooks/useUpdatedLCDClient";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { getQueryData } from "utils/dezswap";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -39,7 +40,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const network = useNetwork();
-  const lcd = useLCDClient();
+  const { client: lcd } = useLCDClient();
 
   const api = useAPI();
 
@@ -108,13 +109,19 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             } as TokenInfo);
           }
         }
-      } else if (isValidAddress) {
+      } else if (isValidAddress && lcd) {
         try {
-          const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+          const queryData = getQueryData({
             token_info: {},
           });
+
+          const { data: res } = await lcd.cosmwasm.wasm.v1.smartContractState({
+            address,
+            queryData,
+          });
+
           if (!isAborted) {
-            setTokenInfo(res);
+            setTokenInfo(res as unknown as TokenInfo);
           }
         } catch (error) {
           console.log(error);

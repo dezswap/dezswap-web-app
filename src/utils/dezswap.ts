@@ -9,6 +9,7 @@ import { Asset, NativeAsset } from "types/pair";
 import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
+import { Buffer } from "buffer";
 
 export type Amount = string | number;
 
@@ -26,6 +27,10 @@ export const queryMessages = {
   getPool() {
     return { pool: {} };
   },
+};
+
+export const getQueryData = (query: object) => {
+  return Buffer.from(JSON.stringify(query)).toString("base64");
 };
 
 const assetMsg = (
