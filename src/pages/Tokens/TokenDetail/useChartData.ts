@@ -31,7 +31,9 @@ const getAxlUSDCChartData = (
 };
 
 const useChartData = (address: string, type: ChartAPIParameters["type"]) => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
   const [duration, setDuration] =
     useState<ChartAPIParameters["duration"]>("month");
@@ -45,7 +47,7 @@ const useChartData = (address: string, type: ChartAPIParameters["type"]) => {
   }, [getAsset, address]);
 
   const { data } = useQuery({
-    queryKey: [type, "chart", duration, network.chainID],
+    queryKey: [type, "chart", duration, chainId],
     queryFn: async () => {
       if (isAxlUSDC && type === "price") {
         return getAxlUSDCChartData(duration);

@@ -92,7 +92,9 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const deferredSearchKeyword = useDeferredValue(searchKeyword.toLowerCase());
   const { getAsset } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +127,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     const items = filteredList?.map((address) => {
       const asset = getAsset(address);
       const isVerified =
-        asset?.verified || isNativeTokenAddress(network.name, address);
+        asset?.verified || isNativeTokenAddress(chainName, address);
       return (
         <AssetItem
           key={address}
@@ -174,7 +176,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     tabIdx,
     theme,
     toggleBookmark,
-    network,
+    chainName,
   ]);
 
   useEffect(() => {

@@ -47,6 +47,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -62,8 +63,11 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
+  const { walletAddress } = useWalletAddress();
   const navigate = useNavigate();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, explorers },
+  } = useNetwork();
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -107,7 +111,7 @@ function WithdrawPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -155,8 +159,8 @@ function WithdrawPage() {
         ? {
             msgs: [
               generateWithdrawLiquidityMsg(
-                connectedWallet?.network.name as NetworkName,
-                connectedWallet?.walletAddress || "",
+                chainName,
+                walletAddress || "",
                 poolAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
@@ -519,7 +523,7 @@ function WithdrawPage() {
                     <>
                       {ellipsisCenter(asset1?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset1?.token, network.name)}
+                        href={getTokenLink(asset1?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`
@@ -545,7 +549,7 @@ function WithdrawPage() {
                     <>
                       {ellipsisCenter(asset2?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset2?.token, network.name)}
+                        href={getTokenLink(asset2?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`

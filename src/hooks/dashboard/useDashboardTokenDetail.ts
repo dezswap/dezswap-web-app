@@ -3,11 +3,13 @@ import useAPI from "hooks/useAPI";
 import useNetwork from "hooks/useNetwork";
 
 const useDashboardTokenDetail = (tokenAddress: string) => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
 
   const { data } = useQuery({
-    queryKey: ["dashboard", "token", tokenAddress, network.chainID],
+    queryKey: ["dashboard", "token", tokenAddress, chainId],
     queryFn: async () => {
       try {
         const res = await api.dashboard.getTokenDetail(tokenAddress);

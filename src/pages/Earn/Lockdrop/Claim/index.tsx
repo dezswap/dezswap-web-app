@@ -34,6 +34,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Box = styled(box)`
   & > * {
@@ -50,7 +51,9 @@ function ClaimPage() {
   const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
   const connectedWallet = useConnectedWallet();
 
   const { getLockdropEventInfo } = useLockdropEvents();
@@ -58,9 +61,10 @@ function ClaimPage() {
 
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
+  const { walletAddress } = useWalletAddress();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -71,7 +75,7 @@ function ClaimPage() {
   });
 
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -117,7 +121,7 @@ function ClaimPage() {
     return {
       msgs: [
         generateClaimLockdropMsg({
-          senderAddress: connectedWallet?.walletAddress,
+          senderAddress: walletAddress,
           contractAddress: eventAddress,
           duration,
         }),
@@ -307,7 +311,7 @@ function ClaimPage() {
                         <a
                           href={getTokenLink(
                             lockdropEventInfo?.lp_token_addr,
-                            network.name,
+                            explorers?.[0].url,
                           )}
                           target="_blank"
                           rel="noreferrer noopener"

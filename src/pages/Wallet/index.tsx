@@ -18,6 +18,7 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import ScrollToTop from "components/ScrollToTop";
 import Assets from "./Assets";
 import Pools from "./Pools";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -28,7 +29,10 @@ const Wrapper = styled.div`
 function WalletPage() {
   const navigate = useNavigate();
   const wallet = useWallet();
-  const network = useNetwork();
+  const { walletAddress } = useWalletAddress();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const connectedWallet = useConnectedWallet();
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
@@ -44,8 +48,8 @@ function WalletPage() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      connectWalletModal.open(!connectedWallet?.walletAddress);
-      if (!connectedWallet?.walletAddress) {
+      connectWalletModal.open(!walletAddress);
+      if (!walletAddress) {
         isModalOpened.current = true;
       }
     }, 1000);
@@ -56,11 +60,7 @@ function WalletPage() {
   }, [connectWalletModal, connectedWallet]);
 
   useEffect(() => {
-    if (
-      !connectWalletModal.isOpen &&
-      !connectedWallet?.walletAddress &&
-      isModalOpened.current
-    ) {
+    if (!connectWalletModal.isOpen && !walletAddress && isModalOpened.current) {
       navigate("/", { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +69,7 @@ function WalletPage() {
   return (
     <Wrapper>
       <ScrollToTop />
-      {connectedWallet?.walletAddress && (
+      {walletAddress && (
         <>
           <Container>
             <Typography
@@ -116,23 +116,20 @@ function WalletPage() {
                         weight={900}
                       >
                         {isSmallScreen
-                          ? ellipsisCenter(connectedWallet?.walletAddress, 8)
-                          : connectedWallet?.walletAddress}
+                          ? ellipsisCenter(walletAddress, 8)
+                          : walletAddress}
                       </Typography>
                     </Col>
                     <Col xs="content">
                       <Row justify="start" align="center" gutterWidth={10}>
                         <Col xs="content">
-                          <Copy
-                            size={38}
-                            value={connectedWallet?.walletAddress}
-                          />
+                          <Copy size={38} value={walletAddress} />
                         </Col>
                         <Col xs="content">
                           <a
                             href={getAddressLink(
-                              connectedWallet?.walletAddress,
-                              network.name,
+                              walletAddress,
+                              explorers?.[0].url,
                             )}
                             target="_blank"
                             rel="noreferrer noopener"

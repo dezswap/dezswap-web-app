@@ -45,6 +45,7 @@ import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Expand from "../Expand";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
   padding: 2px;
@@ -322,7 +323,10 @@ function LockdropEventItem({
   const connectedWallet = useConnectedWallet();
   const api = useAPI();
   const { getAsset } = useAssets();
-  const network = useNetwork();
+  const { walletAddress } = useWalletAddress();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const { findPairByLpAddress } = usePairs();
   const { requestPost } = useRequestPost(() => {
     document.location.reload();
@@ -410,7 +414,7 @@ function LockdropEventItem({
 
   const lockdropAction = useCallback(
     async (messageType: "cancel" | "claim" | "unstake", duration: number) => {
-      if (!connectedWallet?.walletAddress) {
+      if (!walletAddress) {
         return;
       }
       const generateMsg = {
@@ -422,7 +426,7 @@ function LockdropEventItem({
       const txOptions: CreateTxOptions = {
         msgs: [
           generateMsg[messageType]({
-            senderAddress: connectedWallet?.walletAddress,
+            senderAddress: walletAddress,
             contractAddress: lockdropEvent.addr,
             duration,
           }),
@@ -602,7 +606,7 @@ function LockdropEventItem({
           <OutlinkList>
             <Outlink>Project Site</Outlink>
             <Outlink
-              href={getAddressLink(lockdropEvent.addr, network.name)}
+              href={getAddressLink(lockdropEvent.addr, explorers?.[0].url)}
               target="_blank"
               rel="noopener noreferrer"
             >

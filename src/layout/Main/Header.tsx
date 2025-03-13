@@ -300,9 +300,11 @@ function Header() {
   const notificationModal = useHashModal("notifications");
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, explorers },
+  } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
-  const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
+  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { walletAddress, isKeplr } = useWalletAddress();
   const { tokens: dashboardTokens } = useDashboard();
   const wm = useWalletManager();
@@ -365,7 +367,7 @@ function Header() {
               text-transform: uppercase;
             `}
           >
-            {connectedWallet?.network.name}
+            {chainName}
           </span>
         </Banner>
       )}
@@ -572,7 +574,7 @@ function Header() {
                                   <a
                                     href={getAddressLink(
                                       walletAddress,
-                                      network.name,
+                                      explorers?.[0].ur,
                                     )}
                                     target="_blank"
                                     rel="noreferrer noopener"

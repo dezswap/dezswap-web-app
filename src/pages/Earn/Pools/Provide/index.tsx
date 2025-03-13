@@ -76,7 +76,9 @@ function ProvidePage() {
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, explorers },
+  } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useWalletAddress();
 
@@ -164,7 +166,7 @@ function ProvidePage() {
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
             msgs: generateAddLiquidityMsg(
-              connectedWallet?.network.name as NetworkName,
+              chainName,
               walletAddress,
               poolAddress || "",
               [
@@ -654,7 +656,7 @@ function ProvidePage() {
                         <a
                           href={getTokenLink(
                             pair?.liquidity_token,
-                            network.name,
+                            explorers?.[0].url,
                           )}
                           target="_blank"
                           rel="noreferrer noopener"
@@ -681,7 +683,7 @@ function ProvidePage() {
                       <span>
                         {ellipsisCenter(asset1?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset1?.token, network.name)}
+                          href={getTokenLink(asset1?.token, explorers?.[0].url)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`
@@ -707,7 +709,7 @@ function ProvidePage() {
                       <span>
                         {ellipsisCenter(asset2?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset2?.token, network.name)}
+                          href={getTokenLink(asset2?.token, explorers?.[0].url)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`

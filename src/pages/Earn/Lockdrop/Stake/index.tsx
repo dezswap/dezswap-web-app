@@ -42,6 +42,7 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
+import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -61,7 +62,10 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
+  const { walletAddress } = useWalletAddress();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
   const connectedWallet = useConnectedWallet();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -77,7 +81,7 @@ function StakePage() {
   const { getLockdropEventInfo } = useLockdropEvents();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -138,17 +142,13 @@ function StakePage() {
   }, [form, searchParams]);
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (
-      !connectedWallet?.walletAddress ||
-      !eventAddress ||
-      !lockdropEventInfo?.lp_token_addr
-    ) {
+    if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
     return {
       msgs: [
         generateIncreaseLockupContractMsg({
-          senderAddress: connectedWallet?.walletAddress,
+          senderAddress: walletAddress,
           contractAddress: eventAddress,
           lpTokenAddress: lockdropEventInfo?.lp_token_addr,
           amount: valueToAmount(lpValue, LP_DECIMALS),
@@ -439,7 +439,7 @@ function StakePage() {
                       <a
                         href={getTokenLink(
                           lockdropEventInfo?.lp_token_addr,
-                          network.name,
+                          explorers?.[0].url,
                         )}
                         target="_blank"
                         rel="noreferrer noopener"

@@ -5,24 +5,23 @@ import { isNativeTokenAddress, getIbcTokenHash } from "utils";
 import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
 import useVerifiedAssets from "./useVerifiedAssets";
+import useWalletAddress from "./useWalletAddress";
 
 const UPDATE_INTERVAL = 30000;
 
 const useBalances = (addresses: string[]) => {
   const connectedWallet = useConnectedWallet();
   const { verifiedIbcAssets } = useVerifiedAssets();
-  const network = useNetwork();
-
+  const {
+    selectedChain: { chainName, chainId },
+  } = useNetwork();
+  const { walletAddress } = useWalletAddress();
   const api = useAPI();
   const fetchBalance = useCallback(
     async (address: string) => {
-      if (
-        address &&
-        connectedWallet?.network.name &&
-        connectedWallet?.walletAddress
-      ) {
+      if (address && chainName && walletAddress) {
         if (
-          isNativeTokenAddress(connectedWallet?.network.name, address) ||
+          isNativeTokenAddress(chainName, address) ||
           (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)])
         ) {
           const value = await api.getNativeTokenBalance(address);
@@ -41,9 +40,9 @@ const useBalances = (addresses: string[]) => {
       addresses?.map((address) => ({
         queryKey: [
           "balance",
-          connectedWallet?.walletAddress,
+          walletAddress,
           address,
-          network.chainID,
+          chainId,
           api.lcdUrl,
           api.isLoading,
         ],

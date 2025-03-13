@@ -39,7 +39,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const { client: lcd } = useLCDClient();
 
   const api = useAPI();
@@ -48,8 +50,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
   const isNativeToken = useMemo(
-    () => isNativeTokenAddress(network.name, address),
-    [network.name, address],
+    () => isNativeTokenAddress(chainName, address),
+    [chainName, address],
   );
   const isIbcToken = useMemo(
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
@@ -93,7 +95,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens[network.name]?.find(
+        const asset = nativeTokens[chainName]?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {

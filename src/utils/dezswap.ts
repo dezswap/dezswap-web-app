@@ -33,10 +33,7 @@ export const getQueryData = (query: object) => {
   return Buffer.from(JSON.stringify(query)).toString("base64");
 };
 
-const assetMsg = (
-  networkName: NetworkName,
-  asset: { address: string; amount: string },
-) => ({
+const assetMsg = (asset: { address: string; amount: string }) => ({
   info: AccAddress.validate(asset.address)
     ? { token: { contract_addr: asset.address } }
     : { native_token: { denom: asset.address } },
@@ -53,13 +50,9 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
 
-export const generateSimulationMsg = (
-  networkName: NetworkName,
-  offerAsset: string,
-  amount: string,
-) => ({
+export const generateSimulationMsg = (offerAsset: string, amount: string) => ({
   simulation: {
-    offer_asset: assetMsg(networkName, {
+    offer_asset: assetMsg({
       address: offerAsset,
       amount,
     }),
@@ -67,12 +60,11 @@ export const generateSimulationMsg = (
 });
 
 export const generateReverseSimulationMsg = (
-  networkName: NetworkName,
   askAsset: string,
   amount: string,
 ) => ({
   reverse_simulation: {
-    ask_asset: assetMsg(networkName, {
+    ask_asset: assetMsg({
       address: askAsset,
       amount,
     }),
@@ -80,7 +72,7 @@ export const generateReverseSimulationMsg = (
 });
 
 export const generateCreatePoolMsg = (
-  networkName: NetworkName,
+  networkName: string,
   senderAddress: string,
   assets: { address: string; amount: string }[],
 ) => [
@@ -115,7 +107,7 @@ export const generateCreatePoolMsg = (
 ];
 
 export const generateAddLiquidityMsg = (
-  networkName: NetworkName,
+  networkName: string,
   senderAddress: string,
   contractAddress: string,
   assets: { address: string; amount: string }[],
@@ -158,7 +150,7 @@ export const generateAddLiquidityMsg = (
 ];
 
 export const generateWithdrawLiquidityMsg = (
-  networkName: NetworkName,
+  networkName: string,
   senderAddress: string,
   contractAddress: string,
   lpTokenAddress: string,

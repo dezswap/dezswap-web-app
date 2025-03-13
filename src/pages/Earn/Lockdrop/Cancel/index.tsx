@@ -37,6 +37,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Box = styled(box)`
   & > * {
@@ -52,14 +53,17 @@ function CancelPage() {
   const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
   const connectedWallet = useConnectedWallet();
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
+  const { walletAddress } = useWalletAddress();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -80,7 +84,7 @@ function CancelPage() {
   });
 
   const { data: lockdropUserInfo } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -129,7 +133,7 @@ function CancelPage() {
     return {
       msgs: [
         generateCancelLockdropMsg({
-          senderAddress: connectedWallet?.walletAddress,
+          senderAddress: walletAddress,
           contractAddress: eventAddress,
           duration,
         }),
@@ -341,7 +345,7 @@ function CancelPage() {
                       <a
                         href={getTokenLink(
                           lockdropEventInfo?.lp_token_addr,
-                          network.name,
+                          explorers?.[0].url,
                         )}
                         target="_blank"
                         rel="noreferrer noopener"

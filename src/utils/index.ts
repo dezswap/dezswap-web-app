@@ -70,19 +70,17 @@ export const sanitizeNumberInput = (value: string, decimals = 18) => {
   }`;
 };
 
-export const getBlockLink = (height?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/block/${height}`;
+export const getBlockLink = (height?: string, explorers?: string) =>
+  `${explorers}/block/${height}`;
 
-export const getAddressLink = (address?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/address/${address}`;
+export const getAddressLink = (address?: string, explorers?: string) =>
+  `${explorers}/address/${address}`;
 
-export const getTransactionLink = (txHash?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/tx/${txHash}`;
+export const getTransactionLink = (txHash?: string, explorers?: string) =>
+  `${explorers}/tx/${txHash}`;
 
-export const getTokenLink = (address?: string, network?: string) => {
-  return `https://explorer.xpla.io/${network}/token/${
-    address === XPLA_ADDRESS ? "xpla" : address
-  }`;
+export const getTokenLink = (address?: string, explorers?: string) => {
+  return `${explorers}/token/${address === XPLA_ADDRESS ? "xpla" : address}`;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>

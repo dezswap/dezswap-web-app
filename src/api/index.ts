@@ -19,11 +19,12 @@ import {
 
 export type ApiVersion = "v1";
 
-const getBaseUrl = (networkName: NetworkName, version: ApiVersion = "v1") => {
+const getBaseUrl = (networkName: string, version: ApiVersion = "v1") => {
+  if (!Object.keys(apiAddresses).includes(networkName)) return "";
   return `${apiAddresses[networkName]?.baseUrl || ""}/${version}`;
 };
 
-const api = (networkName: NetworkName, version: ApiVersion = "v1") => {
+const api = (networkName: string, version: ApiVersion = "v1") => {
   const apiClient = axios.create({
     baseURL: getBaseUrl(networkName, version),
   });

@@ -4,9 +4,11 @@ import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import useLCDClient from "hooks/useLCDClient";
 import useAPI from "./useAPI";
+import useWalletAddress from "./useWalletAddress";
 
 const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useWalletAddress();
   const lcd = useLCDClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +34,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
     const estimateFee = async () => {
       try {
-        if (!connectedWallet?.walletAddress || !deferredCreateTxOptions) {
+        if (!walletAddress || !deferredCreateTxOptions) {
           setFee(undefined);
           setErrMsg("");
           setIsFailed(false);

@@ -13,14 +13,16 @@ const useExpectedReward = ({
   duration?: number;
 }) => {
   const { getEstimatedLockdropReward } = useAPI();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const { data } = useQuery({
     queryKey: [
       "estimatedLockdropReward",
       lockdropEventAddress,
       amount,
       duration,
-      network.name,
+      chainName,
     ],
     queryFn: async () => {
       if (!lockdropEventAddress || !amount || !duration) {

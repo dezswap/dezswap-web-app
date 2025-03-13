@@ -111,7 +111,9 @@ function PoolItem({
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, explorers },
+  } = useNetwork();
   const { getAsset } = useAssets();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
@@ -203,14 +205,14 @@ function PoolItem({
       <Outlink
         href={
           pair?.contract_addr
-            ? getAddressLink(pair?.contract_addr, network.name)
+            ? getAddressLink(pair?.contract_addr, explorers?.[0].url)
             : "#"
         }
       >
         Pair info
       </Outlink>
     ),
-    [network.name, pair?.contract_addr],
+    [chainName, pair?.contract_addr],
   );
 
   const userLiquidity = useMemo(

@@ -90,7 +90,9 @@ function CreatePage() {
   const { getAsset, validate } = useAssets();
   const { walletAddress } = useWalletAddress();
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, explorers },
+  } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -161,24 +163,18 @@ function CreatePage() {
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
-            msgs: generateCreatePoolMsg(
-              connectedWallet?.network.name as NetworkName,
-              walletAddress,
-              [
-                {
-                  address: asset1?.token || "",
-                  amount:
-                    valueToAmount(formData.asset1Value, asset1?.decimals) ||
-                    "0",
-                },
-                {
-                  address: asset2?.token || "",
-                  amount:
-                    valueToAmount(formData.asset2Value, asset2?.decimals) ||
-                    "0",
-                },
-              ],
-            ),
+            msgs: generateCreatePoolMsg(chainName, walletAddress, [
+              {
+                address: asset1?.token || "",
+                amount:
+                  valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+              },
+              {
+                address: asset2?.token || "",
+                amount:
+                  valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
+              },
+            ]),
           }
         : undefined,
     [
@@ -505,7 +501,7 @@ function CreatePage() {
                     <>
                       {ellipsisCenter(asset?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset?.token, network.name)}
+                        href={getTokenLink(asset?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`

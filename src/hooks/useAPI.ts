@@ -25,23 +25,23 @@ import { ReverseSimulation, Simulation } from "types/pair";
 import useWalletAddress from "./useWalletAddress";
 
 const useAPI = (version: ApiVersion = "v1") => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
   const connectedWallet = useConnectedWallet();
   const { walletAddress } = useWalletAddress();
 
   const apiClient = useMemo(
-    () => api(network.name, version),
-    [network.name, version],
+    () => api(chainName, version),
+    [chainName, version],
   );
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
       if (!updatedLcd) return undefined;
-      const queryData = getQueryData(
-        generateSimulationMsg(network.name, offerAsset, amount),
-      );
+      const queryData = getQueryData(generateSimulationMsg(offerAsset, amount));
       const { data: res } =
         await updatedLcd.cosmwasm.wasm.v1.smartContractState({
           address: contractAddress,
@@ -50,7 +50,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as Simulation;
     },
-    [network.name, updatedLcd],
+    [updatedLcd],
   );
 
   const reverseSimulate = useCallback(
@@ -58,7 +58,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       if (!updatedLcd) return undefined;
 
       const queryData = getQueryData(
-        generateReverseSimulationMsg(network.name, askAsset, amount),
+        generateReverseSimulationMsg(askAsset, amount),
       );
 
       const { data: res } =
@@ -69,7 +69,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as ReverseSimulation;
     },
-    [network.name, updatedLcd],
+    [chainName, updatedLcd],
   );
 
   const getNativeTokenBalance = useCallback(
@@ -141,18 +141,18 @@ const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getLatestBlockHeight = useCallback(async () => {
-    if (!updatedLcd) return undefined;
+    if (!updatedLcd) return "0";
 
     const res =
       await updatedLcd.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
-    return res.block?.header.height as unknown as string;
+    return res.block?.header.height ?? ("0" as unknown as string);
   }, [updatedLcd]);
 
   // unused func
   // const getDecimal = useCallback(
   //   async (denom: string) => {
-  //     const contractAddress = contractAddresses[network.name]?.factory;
+  //     const contractAddress = contractAddresses[chainName]?.factory;
   //     if (!contractAddress || !denom) {
   //       return undefined;
   //     }
@@ -172,12 +172,12 @@ const useAPI = (version: ApiVersion = "v1") => {
   //     const tokenDecimals = res as unknown as Decimal;
   //     return tokenDecimals.decimals;
   //   },
-  //   [network.name, lcd],
+  //   [chainName, lcd],
   // );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
-      const contractAddress = contractAddresses[network.name]?.lockdrop;
+      const contractAddress = contractAddresses?.[chainName]?.lockdrop;
       if (!contractAddress || !updatedLcd) {
         return undefined;
       }
@@ -194,7 +194,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as LockdropEvents;
     },
-    [updatedLcd, network.name],
+    [updatedLcd, chainName],
   );
 
   const getLockdropEventInfo = useCallback(

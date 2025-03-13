@@ -14,7 +14,6 @@ import "utils/overrideXplaNumeric";
 import {
   DefaultAssetList,
   DefaultChain,
-  DefaultChainName,
   DefaultRpcEndpoint,
 } from "constants/dezswap";
 

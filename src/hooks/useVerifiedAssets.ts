@@ -4,7 +4,9 @@ import useNetwork from "./useNetwork";
 
 const useVerifiedAssets = () => {
   const api = useAPI();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const { data: verifiedAssets } = useQuery({
     queryKey: ["verifiedAssets"],
     queryFn: api.getVerifiedTokenInfos,
@@ -23,8 +25,8 @@ const useVerifiedAssets = () => {
   });
 
   return {
-    verifiedAssets: verifiedAssets?.[network.name],
-    verifiedIbcAssets: verifiedIbcAssets?.[network.name],
+    verifiedAssets: verifiedAssets?.[chainName],
+    verifiedIbcAssets: verifiedIbcAssets?.[chainName],
   };
 };
 

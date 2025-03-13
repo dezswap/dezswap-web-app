@@ -32,15 +32,18 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
+import useWalletAddress from "hooks/useWalletAddress";
 
 function UnlockPage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
   const connectedWallet = useConnectedWallet();
-
+  const { walletAddress } = useWalletAddress();
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
@@ -48,7 +51,7 @@ function UnlockPage() {
   const { getAsset } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -59,7 +62,7 @@ function UnlockPage() {
   });
 
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -100,7 +103,7 @@ function UnlockPage() {
     return {
       msgs: [
         generateUnstakeLockdropMsg({
-          senderAddress: connectedWallet?.walletAddress,
+          senderAddress: walletAddress,
           contractAddress: eventAddress,
           duration,
         }),
@@ -231,7 +234,7 @@ function UnlockPage() {
                         <a
                           href={getTokenLink(
                             lockdropEventInfo?.lp_token_addr,
-                            network.name,
+                            explorers?.[0].url,
                           )}
                           target="_blank"
                           rel="noreferrer noopener"

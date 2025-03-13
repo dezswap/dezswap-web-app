@@ -1,14 +1,13 @@
-import { assetLists, chains, AssetList, Chain } from "@chain-registry/v2";
+import { assetLists, chains } from "@chain-registry/v2";
+import type { Chain, AssetList } from "@chain-registry/v2-types";
 import { NetworkName } from "types/common";
 
 export type SupportedChain = "dimension" | "cube";
 export const KeplrName = "keplr-extension";
-export const DefaultChainName = "xplatestnet";
-export const DefaultRpcEndpoint = "https://cube-rpc.xpla.io";
-
+export const DefaultChainName = import.meta.env?.DEV ? "xplatestnet" : "xpla";
 export const DefaultChain =
   chains.find((chain) => chain.chainName === DefaultChainName) ?? ({} as Chain);
-
+export const DefaultRpcEndpoint = DefaultChain?.apis?.rpc?.[0]?.address || "";
 export const DefaultAssetList =
   assetLists.find((assetList) => assetList.chainName === DefaultChainName) ??
   ({} as AssetList);
@@ -33,18 +32,18 @@ export const supportedChains: {
 };
 
 export const contractAddresses: {
-  [K in NetworkName]?: {
+  [K in string]?: {
     factory: string;
     router: string;
     lockdrop: string;
   };
 } = {
-  mainnet: {
+  xpla: {
     factory: "xpla1j33xdql0h4kpgj2mhggy4vutw655u90z7nyj4afhxgj4v5urtadq44e3vd",
     router: "xpla1uv4dz7ngaqwymvxggrjp3rnz3gs33szwjsnrxqg0ylkykqf8r7ns9s3cg4",
     lockdrop: "",
   },
-  testnet: {
+  xplatestnet: {
     factory: "xpla1j4kgjl6h4rt96uddtzdxdu39h0mhn4vrtydufdrk4uxxnrpsnw2qug2yx2",
     router: "xpla1pr40depxf8w50y58swdyhc0s2yjptd2xtqgnyfvkz6k40ng53gqqnyftkm",
     lockdrop: "xpla1009jkfkfs6x484a9s34zq030dk4sa0ygk8z7hw6hegcupkadjpfs39e5du",
@@ -55,14 +54,14 @@ export const LP_DECIMALS = 6;
 export const LOCKED_LP_SUPPLY = 1_000;
 
 export const apiAddresses: {
-  [K in NetworkName]?: {
+  [K in string]?: {
     baseUrl: string;
   };
 } = {
-  mainnet: {
+  xpla: {
     baseUrl: "https://dimension-api.dezswap.io",
   },
-  testnet: {
+  xplatestnet: {
     baseUrl: "https://cube-api.dezswap.io",
   },
 };

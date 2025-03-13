@@ -20,6 +20,7 @@ import { useBlocker } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -124,17 +125,19 @@ const navBar = (
 
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
 
   const globalElements = useAtomValue(globalElementsAtom);
-
+  const { walletAddress } = useWalletAddress();
   const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
     if (nextLocation.pathname.startsWith("/wallet")) {
-      if (!connectedWallet?.walletAddress) {
+      if (!walletAddress) {
         return true;
       }
     }
@@ -151,7 +154,7 @@ function MainLayout({ children }: PropsWithChildren) {
   return (
     <>
       <Header />
-      <Wrapper hasBanner={network.name !== "mainnet"}>
+      <Wrapper hasBanner={chainName !== "xpla"}>
         {children}
         <BrowserDelegateButton />
         <FooterWrapper>
