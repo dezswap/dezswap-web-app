@@ -4,7 +4,6 @@ import { NetworkName } from "types/common";
 
 const useNetwork = () => {
   const wallet = useWallet();
-
   return useMemo(
     () => ({ ...wallet.network, name: wallet.network.name as NetworkName }),
     [wallet.network],

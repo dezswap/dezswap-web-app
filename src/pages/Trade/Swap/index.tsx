@@ -60,6 +60,7 @@ import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -292,6 +293,7 @@ function SwapPage() {
     ) {
       return undefined;
     }
+
     return {
       msgs: [
         generateSwapMsg(
@@ -327,8 +329,8 @@ function SwapPage() {
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
   }, [fee]);
-
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
+  const { walletAddress } = useWalletAddress();
 
   const buttonMsg = useMemo(() => {
     try {
@@ -354,13 +356,13 @@ function SwapPage() {
       console.log(error);
     }
     return "Enter an amount";
-  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+  }, [asset1, asset2, isPoolEmpty, asset1Value, asset1BalanceMinusFee]);
 
   const [shiftAssets, setShiftAssets] = useState(false);
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
@@ -379,7 +381,16 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee, asset1Value, form]);
+  }, [
+    asset1?.decimals,
+    asset1Address,
+    asset1BalanceMinusFee,
+    asset1Value,
+    balanceApplied,
+    form,
+    isReversed,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -1071,7 +1082,7 @@ function SwapPage() {
             </div>
           </Tooltip>
         )}
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

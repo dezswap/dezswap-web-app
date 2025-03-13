@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
@@ -54,6 +54,7 @@ import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
 import NotificationModal from "./NotificationModal";
+import useWalletAddress from "hooks/useWalletAddress";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -300,7 +301,7 @@ function Header() {
   const network = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
-
+  const { walletAddress, isKeplr } = useWalletAddress();
   const { tokens: dashboardTokens } = useDashboard();
 
   const xplaPrice = useMemo(() => {
@@ -314,6 +315,12 @@ function Header() {
     () => !!cosmostationWallet?.account,
     [cosmostationWallet],
   );
+
+  const walletName = useMemo(() => {
+    if (isCosmostationWalletConnected) return "Cosmostation";
+    if (isKeplr) return "Keplr Wallet"; // TODO: check pretty name
+    return connectedWallet?.connection.name;
+  }, [isCosmostationWalletConnected, isKeplr]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -454,7 +461,7 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet ? (
+                    {walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -491,9 +498,9 @@ function Header() {
                         connectButton={
                           <Button onClick={walletPopover.toggle}>
                             {screenClass === MOBILE_SCREEN_CLASS
-                              ? ellipsisCenter(connectedWallet.walletAddress)
+                              ? ellipsisCenter(walletAddress)
                               : `${ellipsisCenter(
-                                  connectedWallet.walletAddress,
+                                  walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
                                     amountToValue(xplaBalance) || 0,
@@ -555,15 +562,13 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {isCosmostationWalletConnected
-                                      ? "Cosmostation"
-                                      : connectedWallet.connection.name}
+                                    {walletName}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
                                   <a
                                     href={getAddressLink(
-                                      connectedWallet.walletAddress,
+                                      walletAddress,
                                       network.name,
                                     )}
                                     target="_blank"
@@ -600,21 +605,14 @@ function Header() {
                                     }
                                   `}
                                 >
-                                  <Col>
-                                    {ellipsisCenter(
-                                      connectedWallet?.walletAddress,
-                                      10,
-                                    )}
-                                  </Col>
+                                  <Col>{ellipsisCenter(walletAddress, 10)}</Col>
                                   <Col
                                     width="auto"
                                     css={css`
                                       font-size: 0;
                                     `}
                                   >
-                                    <Copy
-                                      value={connectedWallet?.walletAddress}
-                                    />
+                                    <Copy value={walletAddress} />
                                   </Col>
                                 </Row>
                               </Box>

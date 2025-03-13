@@ -4,6 +4,8 @@ import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import useLCDClient from "hooks/useLCDClient";
 import useAPI from "./useAPI";
+import { useWalletManager } from "@interchain-kit/react";
+import useWalletAddress from "./useWalletAddress";
 
 const useFee = (txOptions?: CreateTxOptions) => {
   const connectedWallet = useConnectedWallet();
@@ -12,8 +14,9 @@ const useFee = (txOptions?: CreateTxOptions) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const { walletAddress } = useWalletAddress();
   const api = useAPI();
-
+  const wm = useWalletManager();
   const deferredCreateTxOptions = useDeferredValue(txOptions);
 
   useEffect(() => {
@@ -23,7 +26,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!connectedWallet || !deferredCreateTxOptions) {
+    if ((!connectedWallet && !wm) || !deferredCreateTxOptions) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -32,7 +35,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
     const estimateFee = async () => {
       try {
-        if (!connectedWallet?.walletAddress || !deferredCreateTxOptions) {
+        if (!walletAddress || !deferredCreateTxOptions) {
           setFee(undefined);
           setErrMsg("");
           setIsFailed(false);

@@ -2,37 +2,38 @@ import axios from "axios";
 
 import { useCallback, useMemo } from "react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
+import { CreateTxOptions } from "@xpla/xpla.js";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
-import { contractAddresses } from "constants/dezswap";
-import useNetwork from "hooks/useNetwork";
-import useLCDClient from "hooks/useLCDClient";
-import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
-import api, { ApiVersion } from "api";
+import { TokenBalance } from "types/lcdClient";
 import {
   LockdropEstimatedReward,
   LockdropEventInfo,
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { contractAddresses } from "constants/dezswap";
+import useNetwork from "hooks/useNetwork";
+import useLCDClient from "hooks/useLCDClient";
+import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
+import api, { ApiVersion } from "api";
 import { ReverseSimulation, Simulation } from "types/pair";
-import { TokenBalance } from "types/lcdClient";
+import useXplaSigningClient from "./useXplaSigningClient";
+import useWalletAddress from "./useWalletAddress";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { toEncoders } from "@interchainjs/cosmos/utils";
 
 const useAPI = (version: ApiVersion = "v1") => {
   const network = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
   const connectedWallet = useConnectedWallet();
-  const walletAddress = useMemo(
-    () => connectedWallet?.walletAddress,
-    [connectedWallet],
-  );
-
+  const xplaSigningClient = useXplaSigningClient("xplatestnet");
+  const { walletAddress } = useWalletAddress();
   const apiClient = useMemo(
     () => api(network.name, version),
     [network.name, version],
@@ -144,7 +145,6 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const getLatestBlockHeight = useCallback(async () => {
     if (!updatedLcd) return undefined;
-
     const res =
       await updatedLcd.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
@@ -268,23 +268,47 @@ const useAPI = (version: ApiVersion = "v1") => {
     },
     [updatedLcd, walletAddress],
   );
-
   // TODO: Replace with XplaSigningClient
   const estimateFee = useCallback(
     async (txOptions: CreateTxOptions) => {
-      if (!connectedWallet) {
-        return undefined;
+      // if (!connectedWallet) {
+      //   return undefined;
+      // }
+      let res;
+      // const a = createExecuteContract(xplaSigningClient);
+
+      try {
+        xplaSigningClient?.addEncoders(toEncoders(MsgExecuteContract));
+
+        console.log(txOptions.msgs);
+        const resd = await xplaSigningClient
+          ?.simulate(
+            "xpla1flfcczfcu06xnrkrf6nzevgts2fv24hacpwdrq",
+            txOptions.msgs as any,
+            txOptions.memo,
+          )
+          .catch((e) => console.log(e));
+
+        console.log("resd", resd);
+        // const accountd = await updatedLcd.cosmos.auth.v1beta1.accountInfo({
+        //   address: connectedWallet.walletAddress,
+        // });
+        // console.log(accountd.info);
+        // const fee = calculateFee({}, undefined, () =>
+        //   Promise.resolve("cube_47-5"),
+        // );
+        // let res = await lcd.tx.estimateFee(
+        //   [
+        //     {
+        //       sequenceNumber: account.sequence,
+        //       publicKey: account.public_key,
+        //     },
+        //   ],
+        //   txOptions,
+        // );
+      } catch (e) {
+        console.log("fail:", e);
       }
-      const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
-      const res = await lcd.tx.estimateFee(
-        [
-          {
-            sequenceNumber: account.getSequenceNumber(),
-            publicKey: account.getPublicKey(),
-          },
-        ],
-        txOptions,
-      );
 
       return res;
     },

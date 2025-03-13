@@ -2,7 +2,7 @@ import {
   AccAddress,
   Coin,
   Coins,
-  MsgExecuteContract,
+  MsgExecuteContract as BeforeMsgExecuteContract,
   Numeric,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
@@ -10,6 +10,9 @@ import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
+import { toUtf8 } from "@cosmjs/encoding";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MessageComposer } from "@xpla/xpla-react/cosmwasm/wasm/v1/tx.registry";
 
 export type Amount = string | number;
 
@@ -90,7 +93,7 @@ export const generateCreatePoolMsg = (
     )
     .map(
       (a) =>
-        new MsgExecuteContract(
+        new BeforeMsgExecuteContract(
           senderAddress,
           a.address,
           {
@@ -102,7 +105,7 @@ export const generateCreatePoolMsg = (
           [],
         ),
     ),
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     contractAddresses[networkName]?.factory || "",
     {
@@ -126,7 +129,7 @@ export const generateAddLiquidityMsg = (
     .filter((a) => AccAddress.validate(a.address))
     .map(
       (a) =>
-        new MsgExecuteContract(
+        new BeforeMsgExecuteContract(
           senderAddress,
           a.address,
           {
@@ -138,7 +141,7 @@ export const generateAddLiquidityMsg = (
           [],
         ),
     ),
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     contractAddress,
     {
@@ -166,7 +169,7 @@ export const generateWithdrawLiquidityMsg = (
   minAssets?: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
 ) =>
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     lpTokenAddress,
     {
@@ -212,7 +215,7 @@ export const generateSwapMsg = (
       }),
     );
 
-    return new MsgExecuteContract(
+    return new BeforeMsgExecuteContract(
       senderAddress,
       fromAssetAddress,
       {
@@ -225,25 +228,53 @@ export const generateSwapMsg = (
       [],
     );
   }
-
-  return new MsgExecuteContract(
-    senderAddress,
-    contractAddress,
-    {
-      swap: {
-        offer_asset: assetMsg(networkName, {
-          address: fromAssetAddress,
-          amount,
-        }),
-        max_spread: `${maxSpreadFixed}`,
-        belief_price: `${beliefPrice}`,
-        deadline: Number(
-          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-        ),
+  const msg = MsgExecuteContract.fromPartial({
+    sender: "xpla1flfcczfcu06xnrkrf6nzevgts2fv24hacpwdrq",
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        swap: {
+          offer_asset: assetMsg(networkName, {
+            address: fromAssetAddress,
+            amount,
+          }),
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
+        },
+      }),
+    ),
+    funds: [
+      {
+        denom: getCoins([{ address: fromAssetAddress, amount }]).denoms()?.[0],
+        amount,
       },
-    },
-    getCoins([{ address: fromAssetAddress, amount }]),
-  );
+    ],
+  });
+  // return new BeforeMsgExecuteContract(
+  //   senderAddress,
+  //   contractAddress,
+  //   {
+  //     swap: {
+  //       offer_asset: assetMsg(networkName, {
+  //         address: fromAssetAddress,
+  //         amount,
+  //       }),
+  //       max_spread: `${maxSpreadFixed}`,
+  //       belief_price: `${beliefPrice}`,
+  //       deadline: Number(
+  //         Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+  //       ),
+  //     },
+  //   },
+  //   getCoins([{ address: fromAssetAddress, amount }]),
+  // );
+
+  const { executeContract } = MessageComposer.fromPartial;
+
+  return executeContract(msg);
 };
 
 export const generateIncreaseLockupContractMsg = ({
@@ -259,7 +290,7 @@ export const generateIncreaseLockupContractMsg = ({
   duration: number | string;
   amount?: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, lpTokenAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, lpTokenAddress, {
     send: {
       msg: window.btoa(
         JSON.stringify({
@@ -281,7 +312,7 @@ export const generateCancelLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     cancel: {
       duration: Number(duration),
     },
@@ -297,7 +328,7 @@ export const generateClaimLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     claim: {
       duration: Number(duration),
     },
@@ -313,7 +344,7 @@ export const generateUnstakeLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     unlock: {
       duration: Number(duration),
     },

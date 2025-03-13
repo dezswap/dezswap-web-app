@@ -219,7 +219,15 @@ function CreatePage() {
         },
       );
     }
-  }, [asset1Balance, formData.asset1Value, form]);
+  }, [
+    asset1Balance,
+    formData.asset1Value,
+    form,
+    connectedWallet,
+    balanceApplied,
+    asset1?.token,
+    asset1?.decimals,
+  ]);
 
   useEffect(() => {
     if (
@@ -239,7 +247,15 @@ function CreatePage() {
         },
       );
     }
-  }, [asset2Balance, formData.asset2Value, form]);
+  }, [
+    asset2Balance,
+    formData.asset2Value,
+    form,
+    connectedWallet,
+    balanceApplied,
+    asset2?.token,
+    asset2?.decimals,
+  ]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
