@@ -40,7 +40,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const {
-    selectedChain: { chainName },
+    selectedChain: { chainName, chainId },
   } = useNetwork();
   const { client: lcd } = useLCDClient();
 
@@ -145,7 +145,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    network,
+    chainName,
     lcd,
     address,
   ]);
@@ -161,7 +161,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -176,7 +176,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,

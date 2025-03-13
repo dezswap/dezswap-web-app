@@ -17,6 +17,7 @@ import useCosmostationWallet from "hooks/useCosmostationWallet";
 import { useWalletManager } from "@interchain-kit/react";
 import useWalletAddress from "hooks/useWalletAddress";
 import { KeplrName } from "constants/dezswap";
+import useNetwork from "hooks/useNetwork";
 
 const WalletButton = styled.button`
   width: auto;
@@ -52,6 +53,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
@@ -65,7 +69,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
         isInstalled: true,
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           connect(type, identifier, false);
-          fetchWalletAddress();
+          fetchWalletAddress(chainName);
           if (props.onRequestClose) {
             props.onRequestClose(event);
           }
@@ -81,7 +85,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 isInstalled: true,
                 onClick: (event) => {
                   connect(p.type, p.identifier, true);
-                  fetchWalletAddress();
+                  fetchWalletAddress(chainName);
                   if (props.onRequestClose) {
                     props.onRequestClose(event);
                   }
@@ -98,7 +102,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
             isInstalled: true,
             onClick: (event) => {
               cosmostationWallet.connect();
-              fetchWalletAddress();
+              fetchWalletAddress(chainName);
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
@@ -165,7 +169,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           onClick={async (e) => {
             try {
               await wm.connect(KeplrName);
-              fetchWalletAddress();
+              fetchWalletAddress(chainName, KeplrName);
               if (props.onRequestClose) {
                 props.onRequestClose(e);
               }

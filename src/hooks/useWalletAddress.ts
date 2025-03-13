@@ -1,5 +1,6 @@
 import { useWalletManager } from "@interchain-kit/react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
+import { KeplrName } from "constants/dezswap";
 import { useAtom } from "jotai";
 import { walletInfoAtom } from "stores/wallet";
 
@@ -8,37 +9,29 @@ const useWalletAddress = () => {
   const wm = useWalletManager();
   const connectedWallet = useConnectedWallet();
 
-  const fetchWalletAddress = async (chainId = "xplatestnet") => {
-    if (connectedWallet?.walletAddress) {
-      setWalletInfo({
-        walletAddress: connectedWallet.walletAddress,
-        isKeplr: false,
-      });
-      return;
-    }
-
-    try {
-      const { address } =
-        (await wm?.getAccount("keplr-extension", chainId)) ?? {};
-
-      setWalletInfo({
-        walletAddress: address,
-        isKeplr: true,
-      });
-    } catch (error) {
-      console.error(error);
-      setWalletInfo({
-        walletAddress: "",
-        isKeplr: false,
-      });
-    }
-  };
-
   const resetWalletAddress = () => {
     setWalletInfo({
       walletAddress: "",
       isKeplr: false,
     });
+  };
+
+  const fetchWalletAddress = async (chainName: string, walletName?: string) => {
+    try {
+      const { address } = (await wm?.getAccount(KeplrName, chainName)) ?? {};
+      const isKeplr = walletName === KeplrName;
+      const walletAddress = isKeplr
+        ? address
+        : connectedWallet?.walletAddress || "";
+
+      setWalletInfo({
+        walletAddress,
+        isKeplr,
+      });
+    } catch (error) {
+      console.error(error);
+      resetWalletAddress();
+    }
   };
 
   return {
