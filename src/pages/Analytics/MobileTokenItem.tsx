@@ -67,6 +67,7 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
               <Col
                 xs="content"
                 css={css`
+                  line-height: 1;
                   font-size: 0;
                 `}
               >
@@ -83,7 +84,7 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
                     width: 100%;
                     max-width: 100%;
                     overflow: hidden;
-                    line-height: 1;
+                    line-height: 32px;
                     & > div {
                       width: 100%;
                       max-width: 100%;
@@ -97,7 +98,7 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
                     >
                       <div
                         css={css`
-                          display: flex;
+                          display: inline-flex;
                           justify-content: flex-start;
                           align-items: center;
                         `}

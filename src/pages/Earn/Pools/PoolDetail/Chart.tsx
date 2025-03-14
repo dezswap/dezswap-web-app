@@ -241,7 +241,7 @@ function Chart({ tokenAddress: poolAddress }: { tokenAddress: string }) {
       </div>
       {content}
 
-      <LineChart height={291} {...lineChartProps} />
+      <LineChart height={286} {...lineChartProps} />
       <Modal
         isOpen={chartModal.isOpen}
         drawer
