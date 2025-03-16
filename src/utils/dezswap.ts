@@ -6,7 +6,6 @@ import {
   Numeric,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
-import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
@@ -181,7 +180,7 @@ export const generateWithdrawLiquidityMsg = (
   );
 
 export const generateSwapMsg = (
-  networkName: NetworkName,
+  networkName: string,
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,

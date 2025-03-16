@@ -1,5 +1,4 @@
 import { atomWithStorage } from "jotai/utils";
-import { NetworkName } from "types/common";
 import { Token } from "types/api";
 
 interface CustomToken extends Token {

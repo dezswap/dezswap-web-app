@@ -2,4 +2,4 @@ import { atomWithStorage } from "jotai/utils";
 
 export const lockdropBookmarksAtom = atomWithStorage<{
   [K in string]?: string[];
-}>("lockdrop-bookmarks", { mainnet: [], testnet: [] });
+}>("lockdrop-bookmarks", { xpla: [], xplatestnet: [] });

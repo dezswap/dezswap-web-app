@@ -52,7 +52,6 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
-import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
 import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
@@ -297,7 +296,7 @@ function SwapPage() {
     return {
       msgs: [
         generateSwapMsg(
-          connectedWallet?.network.name as NetworkName,
+          connectedWallet?.network.name,
           walletAddress,
           selectedPair.contract_addr,
           asset1.token,

@@ -16,8 +16,6 @@ export type TxError =
   | TxFailed
   | TxUnspecifiedError;
 
-export type NetworkName = "testnet" | "mainnet";
-
 export interface PairExtended extends Pair {
   asset_addresses: string[];
 }

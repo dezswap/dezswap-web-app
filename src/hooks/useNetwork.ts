@@ -2,12 +2,11 @@ import { assetLists, chains } from "@chain-registry/v2";
 import type { Chain, AssetList } from "@chain-registry/v2-types";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 import { useEffect, useMemo, useState } from "react";
-import { NetworkName } from "types/common";
 
 const useNetwork = () => {
   const wallet = useWallet();
   const xplaNetwork = useMemo(
-    () => ({ ...wallet.network, name: wallet.network.name as NetworkName }),
+    () => ({ ...wallet.network, name: wallet.network.name }),
     [wallet.network],
   );
   const [chainName, setChainName] = useState<string>("xpla");

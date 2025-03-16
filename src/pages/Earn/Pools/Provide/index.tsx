@@ -33,7 +33,6 @@ import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
-import { NetworkName } from "types/common";
 import { useConnectedWallet } from "@xpla/wallet-provider";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";

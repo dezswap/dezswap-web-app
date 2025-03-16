@@ -2,7 +2,6 @@ import axios from "axios";
 import { apiAddresses } from "constants/dezswap";
 import { Notification } from "stores/notifications";
 import { Pair, Pairs, Pool, Token } from "types/api";
-import { NetworkName } from "types/common";
 import {
   DashboardChartDuration,
   DashboardChartResponse,
@@ -69,7 +68,7 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
       }) {
         const res = await apiClient.get<Notification[]>(`/notices`, {
           params,
-          baseURL: getBaseUrl("mainnet", version),
+          baseURL: getBaseUrl("xpla", version),
         });
         return res.data;
       },
