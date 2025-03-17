@@ -1,44 +1,68 @@
 import { useWalletManager } from "@interchain-kit/react";
 import { useConnectedWallet } from "@xpla/wallet-provider";
-import { KeplrName } from "constants/dezswap";
 import { useAtom } from "jotai";
+import { useCallback, useEffect, useMemo } from "react";
 import { walletInfoAtom } from "stores/wallet";
+import useNetwork from "./useNetwork";
 
 const useWalletAddress = () => {
   const [walletInfo, setWalletInfo] = useAtom(walletInfoAtom);
   const wm = useWalletManager();
   const connectedWallet = useConnectedWallet();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
 
-  const resetWalletAddress = () => {
+  const resetWalletAddress = useCallback(() => {
     setWalletInfo({
       walletAddress: "",
-      isKeplr: false,
+      isInterchain: false,
     });
-  };
+  }, [setWalletInfo]);
 
-  const fetchWalletAddress = async (chainName: string, walletName?: string) => {
+  const fetchWalletAddress = useCallback(async () => {
     try {
-      const { address } = (await wm?.getAccount(KeplrName, chainName)) ?? {};
-      const isKeplr = walletName === KeplrName;
-      const walletAddress = isKeplr
-        ? address
-        : connectedWallet?.walletAddress || "";
+      const walletName = wm.currentWalletName;
+      const isInterchain = walletName
+        ? wm.isWalletConnected(walletName)
+        : false;
 
-      setWalletInfo({
-        walletAddress,
-        isKeplr,
-      });
+      if (isInterchain) {
+        const { address } =
+          (await wm?.getAccount(walletName as string, chainName)) ?? {};
+
+        setWalletInfo({
+          walletAddress: address,
+          isInterchain,
+        });
+      } else {
+        if (!connectedWallet) {
+          resetWalletAddress();
+          return;
+        }
+        setWalletInfo({
+          walletAddress: connectedWallet.walletAddress,
+          isInterchain,
+        });
+      }
     } catch (error) {
       console.error(error);
       resetWalletAddress();
     }
-  };
+  }, [wm, chainName, setWalletInfo, connectedWallet, resetWalletAddress]);
 
-  return {
-    ...walletInfo,
-    fetchWalletAddress,
-    resetWalletAddress,
-  };
+  useEffect(() => {
+    fetchWalletAddress();
+  }, [fetchWalletAddress]);
+
+  return useMemo(
+    () => ({
+      ...walletInfo,
+      fetchWalletAddress,
+      resetWalletAddress,
+    }),
+    [walletInfo, fetchWalletAddress, resetWalletAddress],
+  );
 };
 
 export default useWalletAddress;

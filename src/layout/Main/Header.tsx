@@ -305,7 +305,7 @@ function Header() {
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
-  const { walletAddress, isKeplr } = useWalletAddress();
+  const { walletAddress, isInterchain } = useWalletAddress();
   const { tokens: dashboardTokens } = useDashboard();
   const wm = useWalletManager();
 
@@ -323,9 +323,13 @@ function Header() {
 
   const walletName = useMemo(() => {
     if (isCosmostationWalletConnected) return "Cosmostation";
-    if (isKeplr) return "Keplr Wallet"; // TODO: check pretty name
+    if (isInterchain) return "Keplr Wallet"; // TODO: check pretty name
     return connectedWallet?.connection.name;
-  }, [isCosmostationWalletConnected, isKeplr]);
+  }, [
+    connectedWallet?.connection.name,
+    isCosmostationWalletConnected,
+    isInterchain,
+  ]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -694,7 +698,9 @@ function Header() {
                                   wallet.disconnect();
                                   cosmostationWallet.disconnect();
 
-                                  if (isKeplr) wm.disconnect(KeplrName);
+                                  if (isInterchain && wm.currentWalletName) {
+                                    wm.disconnect(wm.currentWalletName);
+                                  }
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);

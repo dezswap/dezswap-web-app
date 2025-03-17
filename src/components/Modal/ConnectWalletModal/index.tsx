@@ -53,9 +53,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
   const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
@@ -69,7 +66,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
         isInstalled: true,
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           connect(type, identifier, false);
-          fetchWalletAddress(chainName);
           if (props.onRequestClose) {
             props.onRequestClose(event);
           }
@@ -85,7 +81,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 isInstalled: true,
                 onClick: (event) => {
                   connect(p.type, p.identifier, true);
-                  fetchWalletAddress(chainName);
                   if (props.onRequestClose) {
                     props.onRequestClose(event);
                   }
@@ -102,7 +97,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
             isInstalled: true,
             onClick: (event) => {
               cosmostationWallet.connect();
-              fetchWalletAddress(chainName);
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
@@ -169,7 +163,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           onClick={async (e) => {
             try {
               await wm.connect(KeplrName);
-              fetchWalletAddress(chainName, KeplrName);
+              fetchWalletAddress();
               if (props.onRequestClose) {
                 props.onRequestClose(e);
               }
