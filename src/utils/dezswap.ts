@@ -222,7 +222,7 @@ export const generateSwapMsg = (
     contractAddress,
     {
       swap: {
-        offer_asset: assetMsg(networkName, {
+        offer_asset: assetMsg({
           address: fromAssetAddress,
           amount,
         }),
