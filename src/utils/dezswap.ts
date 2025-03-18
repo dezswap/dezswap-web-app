@@ -180,7 +180,6 @@ export const generateWithdrawLiquidityMsg = (
   );
 
 export const generateSwapMsg = (
-  networkName: string,
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,

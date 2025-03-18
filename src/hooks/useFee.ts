@@ -1,14 +1,12 @@
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useDeferredValue, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import useLCDClient from "hooks/useLCDClient";
 import useAPI from "./useAPI";
-import useWalletAddress from "./useWalletAddress";
+import useConnectedWallet from "./useConnectedWallet";
 
 const useFee = (txOptions?: CreateTxOptions) => {
-  const connectedWallet = useConnectedWallet();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const lcd = useLCDClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +23,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!connectedWallet || !deferredCreateTxOptions) {
+    if (!walletAddress || !deferredCreateTxOptions) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -96,7 +94,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
         clearTimeout(timerId);
       }
     };
-  }, [connectedWallet, lcd, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, lcd, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { fee, isLoading, isFailed, errMsg };
 };

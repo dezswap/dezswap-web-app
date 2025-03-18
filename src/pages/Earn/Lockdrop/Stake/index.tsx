@@ -27,7 +27,6 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -37,12 +36,12 @@ import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
-import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -62,11 +61,10 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const connectedWallet = useConnectedWallet();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -156,7 +154,7 @@ function StakePage() {
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress, lockdropEventInfo, lpValue]);
+  }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
   const { fee } = useFee(txOptions);
 

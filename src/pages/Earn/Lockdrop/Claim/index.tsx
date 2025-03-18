@@ -20,7 +20,6 @@ import {
   getTokenLink,
 } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -34,7 +33,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
-import useWalletAddress from "hooks/useWalletAddress";
+import useConnectedWallet from "hooks/useConnectedWallet";
 
 const Box = styled(box)`
   & > * {
@@ -54,14 +53,13 @@ function ClaimPage() {
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
 
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
-  const { walletAddress } = useWalletAddress();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -115,7 +113,7 @@ function ClaimPage() {
   );
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (!connectedWallet || !eventAddress || !duration) {
+    if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
     return {
@@ -127,7 +125,7 @@ function ClaimPage() {
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress]);
+  }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
 

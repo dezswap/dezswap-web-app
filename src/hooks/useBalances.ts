@@ -1,21 +1,19 @@
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { isNativeTokenAddress, getIbcTokenHash } from "utils";
 import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
 import useVerifiedAssets from "./useVerifiedAssets";
-import useWalletAddress from "./useWalletAddress";
+import useConnectedWallet from "./useConnectedWallet";
 
 const UPDATE_INTERVAL = 30000;
 
 const useBalances = (addresses: string[]) => {
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const { verifiedIbcAssets } = useVerifiedAssets();
   const {
     selectedChain: { chainName, chainId },
   } = useNetwork();
-  const { walletAddress } = useWalletAddress();
   const api = useAPI();
   const fetchBalance = useCallback(
     async (address: string) => {
@@ -32,7 +30,7 @@ const useBalances = (addresses: string[]) => {
       }
       return "0";
     },
-    [api, connectedWallet, verifiedIbcAssets],
+    [api, walletAddress, verifiedIbcAssets],
   );
 
   const balanceQueryResults = useQueries({

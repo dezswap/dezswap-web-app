@@ -1,7 +1,6 @@
 import axios from "axios";
 
 import { useCallback, useMemo } from "react";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { CreateTxOptions } from "@xpla/xpla.js";
 import {
   generateReverseSimulationMsg,
@@ -22,7 +21,7 @@ import useLCDClient from "hooks/useLCDClient";
 import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
 import api, { ApiVersion } from "api";
 import { ReverseSimulation, Simulation } from "types/pair";
-import useWalletAddress from "./useWalletAddress";
+import useConnectedWallet from "./useConnectedWallet";
 
 const useAPI = (version: ApiVersion = "v1") => {
   const {
@@ -30,8 +29,7 @@ const useAPI = (version: ApiVersion = "v1") => {
   } = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
-  const connectedWallet = useConnectedWallet();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
 
   const apiClient = useMemo(
     () => api(chainName, version),
@@ -270,7 +268,7 @@ const useAPI = (version: ApiVersion = "v1") => {
   // TODO: Replace with XplaSigningClient
   const estimateFee = useCallback(
     async (txOptions: CreateTxOptions) => {
-      if (!connectedWallet) {
+      if (!walletAddress) {
         return undefined;
       }
       const account = await lcd.auth.accountInfo(walletAddress);
@@ -286,7 +284,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res;
     },
-    [connectedWallet, lcd],
+    [walletAddress, lcd],
   );
 
   return useMemo(

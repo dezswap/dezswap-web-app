@@ -29,11 +29,9 @@ import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
-import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -46,15 +44,14 @@ import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   lpValue = "lpValue",
 }
 
 function WithdrawPage() {
-  const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["slippageTolerance", "txDeadline"],
@@ -63,7 +60,7 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
     selectedChain: { chainName, explorers },
@@ -154,7 +151,7 @@ function WithdrawPage() {
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
-      connectedWallet &&
+      walletAddress &&
       isLpPayable
         ? {
             msgs: [
@@ -181,7 +178,7 @@ function WithdrawPage() {
             ],
           }
         : undefined,
-    [connectedWallet, simulationResult, lpValue],
+    [walletAddress, simulationResult, lpValue],
   );
 
   const {

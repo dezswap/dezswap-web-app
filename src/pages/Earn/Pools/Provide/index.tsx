@@ -33,7 +33,6 @@ import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -51,8 +50,8 @@ import ProgressBar from "components/ProgressBar";
 import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import useWalletAddress from "hooks/useWalletAddress";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -62,7 +61,6 @@ export enum FormKey {
 const DISPLAY_DECIMAL = 3;
 
 function ProvidePage() {
-  const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["slippageTolerance", "txDeadline"],
@@ -79,7 +77,7 @@ function ProvidePage() {
     selectedChain: { chainName, explorers },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -154,7 +152,7 @@ function ProvidePage() {
     () =>
       simulationResult?.estimatedAmount &&
       !simulationResult?.isLoading &&
-      connectedWallet &&
+      walletAddress &&
       asset1?.token &&
       formData.asset1Value &&
       asset2?.token &&
@@ -189,7 +187,7 @@ function ProvidePage() {
         : undefined,
     [
       simulationResult,
-      connectedWallet,
+      walletAddress,
       asset1,
       isReversed,
       asset2,
@@ -286,7 +284,7 @@ function ProvidePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
       asset1?.token === XPLA_ADDRESS &&
@@ -309,7 +307,7 @@ function ProvidePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
       asset2?.token === XPLA_ADDRESS &&
@@ -784,7 +782,7 @@ function ProvidePage() {
             )}
           </div>
         )}
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

@@ -15,12 +15,11 @@ import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useBlocker } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
-import useWalletAddress from "hooks/useWalletAddress";
+import useConnectedWallet from "hooks/useConnectedWallet";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -130,8 +129,7 @@ function MainLayout({ children }: PropsWithChildren) {
   } = useNetwork();
 
   const globalElements = useAtomValue(globalElementsAtom);
-  const { walletAddress } = useWalletAddress();
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {

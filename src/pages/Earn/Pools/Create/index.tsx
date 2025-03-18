@@ -33,7 +33,6 @@ import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
@@ -47,9 +46,9 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import box from "components/Box";
 import ProgressBar from "components/ProgressBar";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
-import useWalletAddress from "hooks/useWalletAddress";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -69,7 +68,7 @@ const Box = styled(box)`
 `;
 
 function CreatePage() {
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
@@ -87,7 +86,6 @@ function CreatePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getAsset, validate } = useAssets();
-  const { walletAddress } = useWalletAddress();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     selectedChain: { chainName, explorers },
@@ -148,13 +146,13 @@ function CreatePage() {
     asset2,
     asset2Address,
     errorMessageModal,
-    network,
+    chainName,
     validate,
   ]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
-      connectedWallet &&
+      walletAddress &&
       asset1?.token &&
       formData.asset1Value &&
       asset2?.token &&
@@ -176,13 +174,7 @@ function CreatePage() {
             ]),
           }
         : undefined,
-    [
-      connectedWallet,
-      asset1,
-      asset2,
-      formData.asset1Value,
-      formData.asset2Value,
-    ],
+    [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
   );
 
   const {
@@ -200,7 +192,7 @@ function CreatePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       asset1?.token === XPLA_ADDRESS &&
       formData.asset1Value &&
@@ -220,7 +212,7 @@ function CreatePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       asset2?.token === XPLA_ADDRESS &&
       formData.asset2Value &&
@@ -538,7 +530,7 @@ function CreatePage() {
           </div>
         </div>
 
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

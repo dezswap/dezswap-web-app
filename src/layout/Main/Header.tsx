@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import styled from "@emotion/styled";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 
@@ -20,7 +20,8 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
+import { useWallet } from "@xpla/wallet-provider";
+import { useWalletManager } from "@interchain-kit/react";
 import {
   amountToValue,
   cutDecimal,
@@ -53,10 +54,8 @@ import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import NotificationModal from "./NotificationModal";
-import useWalletAddress from "hooks/useWalletAddress";
-import { useWalletManager } from "@interchain-kit/react";
-import { KeplrName } from "constants/dezswap";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -305,7 +304,6 @@ function Header() {
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
-  const { walletAddress, isInterchain } = useWalletAddress();
   const { tokens: dashboardTokens } = useDashboard();
   const wm = useWalletManager();
 
@@ -323,12 +321,12 @@ function Header() {
 
   const walletName = useMemo(() => {
     if (isCosmostationWalletConnected) return "Cosmostation";
-    if (isInterchain) return "Keplr Wallet"; // TODO: check pretty name
-    return connectedWallet?.connection.name;
+    if (connectedWallet.isInterchain) return "Keplr Wallet"; // TODO: check pretty name
+    return connectedWallet?.connection?.name;
   }, [
-    connectedWallet?.connection.name,
+    connectedWallet?.connection?.name,
     isCosmostationWalletConnected,
-    isInterchain,
+    connectedWallet.isInterchain,
   ]);
 
   useEffect(() => {
@@ -470,7 +468,7 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {walletAddress ? (
+                    {connectedWallet.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -507,9 +505,9 @@ function Header() {
                         connectButton={
                           <Button onClick={walletPopover.toggle}>
                             {screenClass === MOBILE_SCREEN_CLASS
-                              ? ellipsisCenter(walletAddress)
+                              ? ellipsisCenter(connectedWallet.walletAddress)
                               : `${ellipsisCenter(
-                                  walletAddress,
+                                  connectedWallet.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
                                     amountToValue(xplaBalance) || 0,
@@ -577,8 +575,8 @@ function Header() {
                                 <Col width="auto">
                                   <a
                                     href={getAddressLink(
-                                      walletAddress,
-                                      explorers?.[0].ur,
+                                      connectedWallet.walletAddress,
+                                      explorers?.[0].url,
                                     )}
                                     target="_blank"
                                     rel="noreferrer noopener"
@@ -614,14 +612,21 @@ function Header() {
                                     }
                                   `}
                                 >
-                                  <Col>{ellipsisCenter(walletAddress, 10)}</Col>
+                                  <Col>
+                                    {ellipsisCenter(
+                                      connectedWallet.walletAddress,
+                                      10,
+                                    )}
+                                  </Col>
                                   <Col
                                     width="auto"
                                     css={css`
                                       font-size: 0;
                                     `}
                                   >
-                                    <Copy value={walletAddress} />
+                                    <Copy
+                                      value={connectedWallet.walletAddress}
+                                    />
                                   </Col>
                                 </Row>
                               </Box>
@@ -698,7 +703,10 @@ function Header() {
                                   wallet.disconnect();
                                   cosmostationWallet.disconnect();
 
-                                  if (isInterchain && wm.currentWalletName) {
+                                  if (
+                                    connectedWallet.isInterchain &&
+                                    wm.currentWalletName
+                                  ) {
                                     wm.disconnect(wm.currentWalletName);
                                   }
                                   setTimeout(() => {

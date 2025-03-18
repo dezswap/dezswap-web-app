@@ -23,7 +23,6 @@ import {
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -34,10 +33,10 @@ import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
-import useWalletAddress from "hooks/useWalletAddress";
 
 const Box = styled(box)`
   & > * {
@@ -56,11 +55,10 @@ function CancelPage() {
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
-  const { walletAddress } = useWalletAddress();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -127,7 +125,7 @@ function CancelPage() {
   );
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (!connectedWallet || !eventAddress || !duration) {
+    if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
     return {
@@ -139,7 +137,7 @@ function CancelPage() {
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress]);
+  }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
 

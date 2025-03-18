@@ -15,9 +15,8 @@ import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
 import { useWalletManager } from "@interchain-kit/react";
-import useWalletAddress from "hooks/useWalletAddress";
 import { KeplrName } from "constants/dezswap";
-import useNetwork from "hooks/useNetwork";
+import useConnectedWallet from "hooks/useConnectedWallet";
 
 const WalletButton = styled.button`
   width: auto;
@@ -48,7 +47,7 @@ type WalletButtonProps = {
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
-  const { fetchWalletAddress } = useWalletAddress();
+  const { fetchWalletAddress } = useConnectedWallet();
 
   const theme = useTheme();
   const screenClass = useScreenClass();

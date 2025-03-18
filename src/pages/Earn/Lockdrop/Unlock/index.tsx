@@ -16,7 +16,6 @@ import {
   formatNumber,
   getTokenLink,
 } from "utils";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -29,10 +28,10 @@ import useRequestPost from "hooks/useRequestPost";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
-import useWalletAddress from "hooks/useWalletAddress";
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -42,8 +41,7 @@ function UnlockPage() {
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const connectedWallet = useConnectedWallet();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
@@ -97,7 +95,7 @@ function UnlockPage() {
   }, [duration, lockdropUserInfo]);
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (!connectedWallet || !eventAddress || !duration) {
+    if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
     return {
@@ -109,7 +107,7 @@ function UnlockPage() {
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress]);
+  }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
 

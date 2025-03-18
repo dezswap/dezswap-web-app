@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
+import { useWallet } from "@xpla/wallet-provider";
 import Button from "components/Button";
 import Copy from "components/Copy";
 import Hr from "components/Hr";
@@ -15,10 +15,10 @@ import useNetwork from "hooks/useNetwork";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { Outlet, useNavigate } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import ScrollToTop from "components/ScrollToTop";
 import Assets from "./Assets";
 import Pools from "./Pools";
-import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -29,11 +29,10 @@ const Wrapper = styled.div`
 function WalletPage() {
   const navigate = useNavigate();
   const wallet = useWallet();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const {
     selectedChain: { explorers },
   } = useNetwork();
-  const connectedWallet = useConnectedWallet();
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -57,7 +56,7 @@ function WalletPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [connectWalletModal, connectedWallet]);
+  }, [connectWalletModal, walletAddress]);
 
   useEffect(() => {
     if (!connectWalletModal.isOpen && !walletAddress && isModalOpened.current) {

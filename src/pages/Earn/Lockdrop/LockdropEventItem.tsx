@@ -40,12 +40,11 @@ import {
   generateClaimLockdropMsg,
   generateUnstakeLockdropMsg,
 } from "utils/dezswap";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import Expand from "../Expand";
-import useWalletAddress from "hooks/useWalletAddress";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
   padding: 2px;
@@ -320,10 +319,9 @@ function LockdropEventItem({
     screenClass,
   );
 
-  const connectedWallet = useConnectedWallet();
   const api = useAPI();
   const { getAsset } = useAssets();
-  const { walletAddress } = useWalletAddress();
+  const { walletAddress } = useConnectedWallet();
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -439,7 +437,7 @@ function LockdropEventItem({
         requestPost({ txOptions, fee, skipConfirmation: true });
       }
     },
-    [api, connectedWallet, lockdropEvent.addr, requestPost],
+    [api, walletAddress, lockdropEvent.addr, requestPost],
   );
 
   return (
