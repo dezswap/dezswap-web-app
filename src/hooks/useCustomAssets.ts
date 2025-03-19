@@ -21,7 +21,8 @@ const useCustomAssets = () => {
 
   const { client: lcd } = useLCDClient();
   const {
-    selectedChain: { chainName, chainId },
+    chainName,
+    selectedChain: { chainId },
   } = useNetwork();
   const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
     xpla: [],

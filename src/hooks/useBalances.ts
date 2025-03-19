@@ -12,7 +12,8 @@ const useBalances = (addresses: string[]) => {
   const { walletAddress } = useConnectedWallet();
   const { verifiedIbcAssets } = useVerifiedAssets();
   const {
-    selectedChain: { chainName, chainId },
+    chainName,
+    selectedChain: { chainId },
   } = useNetwork();
   const api = useAPI();
   const fetchBalance = useCallback(

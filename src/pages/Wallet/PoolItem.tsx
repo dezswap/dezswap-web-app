@@ -112,7 +112,8 @@ function PoolItem({
     screenClass,
   );
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
   const { getAsset } = useAssets();
   const { getPair } = usePairs();

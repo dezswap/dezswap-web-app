@@ -13,9 +13,7 @@ const useConnectedWallet = () => {
   const [walletInfo, setWalletInfo] = useAtom(walletInfoAtom);
   const wm = useWalletManager();
   const connectedXplaWallet = useConnectedXplaWallet();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
 
   const resetWalletAddress = useCallback(() => {
     setWalletInfo({

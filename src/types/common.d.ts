@@ -8,6 +8,12 @@ import {
 } from "@xpla/wallet-provider";
 import { Pair } from "types/pair";
 
+export interface NetworkInfo {
+  chainName: string;
+  selectedChain: Chain;
+  rpcUrl: string | HttpEndpoint;
+}
+
 export type TxError =
   | UserDenied
   | Timeout

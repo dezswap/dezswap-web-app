@@ -63,7 +63,8 @@ function WithdrawPage() {
   const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
 
   const handleModalClose = useCallback(() => {

@@ -124,9 +124,7 @@ const navBar = (
 
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
 
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();

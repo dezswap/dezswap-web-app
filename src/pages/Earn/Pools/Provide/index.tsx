@@ -74,7 +74,8 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();

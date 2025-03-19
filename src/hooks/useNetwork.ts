@@ -1,38 +1,53 @@
-import { assetLists, chains } from "@chain-registry/v2";
-import type { Chain, AssetList } from "@chain-registry/v2-types";
+import { useChain } from "@interchain-kit/react";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
-import { useEffect, useMemo, useState } from "react";
+import { DefaultChain } from "constants/dezswap";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { NetworkInfo } from "types/common";
 
 const useNetwork = () => {
+  const [network, setNetwork] = useState<NetworkInfo>({
+    chainName: "xpla",
+    selectedChain: DefaultChain[0],
+    rpcUrl: "",
+  });
   const wallet = useWallet();
+  const { getRpcEndpoint, chain } = useChain(network.chainName);
   const xplaNetwork = useMemo(
     () => ({ ...wallet.network, name: wallet.network.name }),
     [wallet.network],
   );
-  const [chainName, setChainName] = useState<string>("xpla");
+
+  const setChainName = useCallback((chainName: string) => {
+    setNetwork((prev) => ({ ...prev, chainName }));
+  }, []);
 
   useEffect(() => {
-    if (wallet.status === WalletStatus.WALLET_CONNECTED)
-      setChainName(xplaNetwork.name === "testnet" ? "xplatestnet" : "xpla");
-    else setChainName(import.meta.env?.DEV ? "xplatestnet" : "xpla");
-  }, [xplaNetwork, wallet.status]);
+    let chainName = "xpla";
 
-  return useMemo(() => {
-    const selectedChain =
-      chains.find((chain) => chain.chainName === chainName) ?? ({} as Chain);
-    const rpcUrl = selectedChain?.apis?.rpc?.[0]?.address || "";
-    const chainAssetList =
-      assetLists.find((assetList) => assetList.chainName === chainName) ??
-      ({} as AssetList);
+    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
+      chainName = xplaNetwork.name === "testnet" ? "xplatestnet" : "xpla";
+    } else {
+      chainName = import.meta.env?.DEV ? "xplatestnet" : "xpla";
+    }
 
-    return {
-      chainName,
-      setChainName, // Used to update wallet list that supports keplr-extension
-      selectedChain,
-      rpcUrl,
-      chainAssetList,
+    const settingNetwork = async () => {
+      const rpcUrl = await getRpcEndpoint();
+      setNetwork({
+        chainName,
+        selectedChain: chain,
+        rpcUrl,
+      });
     };
-  }, [chainName]);
+    settingNetwork();
+  }, [xplaNetwork, wallet.status, getRpcEndpoint, chain]);
+
+  return useMemo(
+    () => ({
+      ...network,
+      setChainName,
+    }),
+    [network, setChainName],
+  );
 };
 
 export default useNetwork;

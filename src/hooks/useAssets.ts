@@ -8,11 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 
 const useAssets = () => {
   const api = useAPI();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { getCustomAsset } = useCustomAssets();
-
   const { data: assets } = useQuery(
     ["assets", chainName],
     async () => {

@@ -24,9 +24,7 @@ const useSimulate = ({
   >();
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const api = useAPI();
 
   const deferredAmount = useDeferredValue(amount);

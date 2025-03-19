@@ -13,9 +13,7 @@ const useExpectedReward = ({
   duration?: number;
 }) => {
   const { getEstimatedLockdropReward } = useAPI();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { data } = useQuery({
     queryKey: [
       "estimatedLockdropReward",

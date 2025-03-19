@@ -92,9 +92,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const deferredSearchKeyword = useDeferredValue(searchKeyword.toLowerCase());
   const { getAsset } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
   const divRef = useRef<HTMLDivElement>(null);
 

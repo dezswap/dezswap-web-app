@@ -23,8 +23,8 @@ const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 const interchainOptions = {
-  chains: [DefaultChain],
-  assetLists: [DefaultAssetList],
+  chains: DefaultChain,
+  assetLists: DefaultAssetList,
   wallets: [keplrWallet],
   signerOptions: {
     signing: () => {
@@ -39,7 +39,7 @@ const interchainOptions = {
   endpointOptions: {
     endpoints: {
       injective: {
-        rpc: [DefaultRpcEndpoint],
+        rpc: DefaultRpcEndpoint,
       },
     },
   },

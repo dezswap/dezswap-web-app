@@ -4,9 +4,7 @@ import { bookmarksAtom } from "stores/pairs";
 import { useAtom } from "jotai";
 
 const usePairBookmark = () => {
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const [bookmarkStore, setBookmarkStore] = useAtom(bookmarksAtom);
 
   const toggleBookmark = useCallback(

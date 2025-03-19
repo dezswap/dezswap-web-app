@@ -51,7 +51,8 @@ const Wrapper = styled.div`
 function TokenDetailPage() {
   const screenClass = useScreenClass();
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
   const navigate = useNavigate();
   const { tokenAddress } = useParams<{ tokenAddress: string }>();

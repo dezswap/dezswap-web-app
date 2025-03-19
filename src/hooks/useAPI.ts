@@ -24,9 +24,7 @@ import { ReverseSimulation, Simulation } from "types/pair";
 import useConnectedWallet from "./useConnectedWallet";
 
 const useAPI = (version: ApiVersion = "v1") => {
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
   const { walletAddress } = useConnectedWallet();

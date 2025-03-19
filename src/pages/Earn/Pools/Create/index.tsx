@@ -88,7 +88,8 @@ function CreatePage() {
   const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({

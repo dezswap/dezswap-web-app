@@ -49,7 +49,8 @@ function PoolDetailPage() {
     screenClass,
   );
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
   const navigate = useNavigate();
   const { poolAddress } = useParams<{ poolAddress: string }>();

@@ -5,10 +5,12 @@ export type SupportedChain = "dimension" | "cube";
 export const KeplrName = "keplr-extension";
 export const DefaultChainName = import.meta.env?.DEV ? "xplatestnet" : "xpla";
 export const DefaultChain =
-  chains.find((chain) => chain.chainName === DefaultChainName) ?? ({} as Chain);
-export const DefaultRpcEndpoint = DefaultChain?.apis?.rpc?.[0]?.address || "";
+  chains.filter((chain) => chain.chainName.includes("xpla")) ?? [];
+export const DefaultRpcEndpoint = DefaultChain.map(
+  (chain) => chain?.apis?.rpc?.[0]?.address || "",
+);
 export const DefaultAssetList =
-  assetLists.find((assetList) => assetList.chainName === DefaultChainName) ??
+  assetLists.filter((assetList) => assetList.chainName.includes("xpla")) ??
   ({} as AssetList);
 
 export const supportedChains: {

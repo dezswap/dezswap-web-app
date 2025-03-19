@@ -4,9 +4,7 @@ import { lockdropBookmarksAtom } from "stores/lockdrops";
 import { useAtom } from "jotai";
 
 const useLockdropBookmark = () => {
-  const {
-    selectedChain: { chainName },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const [bookmarkStore, setBookmarkStore] = useAtom(lockdropBookmarksAtom);
 
   const toggleBookmark = useCallback(

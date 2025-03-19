@@ -300,7 +300,8 @@ function Header() {
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const {
-    selectedChain: { chainName, explorers },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
