@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
@@ -5,6 +6,10 @@ import useNetwork from "./useNetwork";
 const useVerifiedAssets = () => {
   const api = useAPI();
   const { chainName } = useNetwork();
+  const xplaNetworkName = useMemo(
+    () => (chainName === "xpla" ? "mainnet" : "testnet"),
+    [chainName],
+  );
   const { data: verifiedAssets } = useQuery({
     queryKey: ["verifiedAssets"],
     queryFn: api.getVerifiedTokenInfos,
@@ -23,8 +28,8 @@ const useVerifiedAssets = () => {
   });
 
   return {
-    verifiedAssets: verifiedAssets?.[chainName],
-    verifiedIbcAssets: verifiedIbcAssets?.[chainName],
+    verifiedAssets: verifiedAssets?.[xplaNetworkName],
+    verifiedIbcAssets: verifiedIbcAssets?.[xplaNetworkName],
   };
 };
 
