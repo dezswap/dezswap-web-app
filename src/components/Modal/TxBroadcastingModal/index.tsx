@@ -9,9 +9,9 @@ import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { ellipsisCenter, getTransactionLink } from "utils";
 import { TxInfo } from "@xpla/xpla.js";
 import { TxError } from "types/common";
-import useLCDClient from "hooks/useUpdatedLCDClient";
 import Panel from "components/Panel";
 import Modal from "components/Modal";
+import useRPCClient from "hooks/useRPCClient";
 import useNetwork from "hooks/useNetwork";
 import Typography from "components/Typography";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -29,7 +29,7 @@ interface TxBroadcastingModalProps {
   onRetryClick?: MouseEventHandler<HTMLButtonElement>;
 }
 interface XplaTxResponse extends Omit<TxResponse, "tx_response"> {
-  tx_response: TxInfo;
+  txResponse: TxInfo;
 }
 
 function TxBroadcastingModal({
@@ -43,7 +43,7 @@ function TxBroadcastingModal({
   const {
     selectedChain: { explorers },
   } = useNetwork();
-  const { client: lcd } = useLCDClient();
+  const { client } = useRPCClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
 
@@ -53,12 +53,11 @@ function TxBroadcastingModal({
 
   useEffect(() => {
     const fetchTxInfo = async () => {
-      if (lcd && txHash) {
-        const res = (await lcd.cosmos.tx.v1beta1.getTx({
+      if (client && txHash) {
+        const res = (await client.cosmos.tx.v1beta1.getTx({
           hash: txHash,
-        })) as XplaTxResponse;
-
-        setTxInfo(res.tx_response);
+        })) as unknown as XplaTxResponse;
+        setTxInfo(res.txResponse);
       }
     };
 
@@ -74,11 +73,11 @@ function TxBroadcastingModal({
         clearInterval(intervalId);
       }
     };
-  }, [lcd, txHash, txInfo]);
+  }, [client, txHash, txInfo]);
 
   useEffect(() => {
     setTimeAfterQueued(0);
-  }, [txHash, lcd]);
+  }, [txHash, client]);
 
   const hasError = useMemo(
     () => !!(txError || txInfo?.code),

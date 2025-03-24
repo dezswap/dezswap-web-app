@@ -1,5 +1,6 @@
 import { assetLists, chains } from "@chain-registry/v2";
 import type { AssetList } from "@chain-registry/v2-types";
+import Decimal from "decimal.js";
 
 export type SupportedChain = "dimension" | "cube";
 export const KeplrName = "keplr-extension";
@@ -51,6 +52,13 @@ export const contractAddresses: {
   },
 };
 
+export const GAS_INFO = {
+  multiplier: 1.2,
+  gasPrice: {
+    amount: new Decimal("280000000000"),
+    denom: "axpla",
+  },
+};
 export const LP_DECIMALS = 6;
 export const LOCKED_LP_SUPPLY = 1_000;
 

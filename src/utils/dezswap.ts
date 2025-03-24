@@ -2,13 +2,24 @@ import {
   AccAddress,
   Coin,
   Coins,
-  MsgExecuteContract,
+  MsgExecuteContract as BeforeMsgExecuteContract,
   Numeric,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
 import { contractAddresses } from "constants/dezswap";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
+import { toUtf8 } from "@cosmjs/encoding";
+import {
+  TxBody,
+  SignerInfo,
+  Tx,
+  AuthInfo,
+  Fee,
+} from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
+import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 
 export type Amount = string | number;
 
@@ -29,9 +40,39 @@ export const queryMessages = {
 };
 
 export const getQueryData = (query: object) => {
-  return Buffer.from(JSON.stringify(query)).toString("base64");
+  return new Uint8Array(Buffer.from(JSON.stringify(query)));
 };
 
+export const parseJsonFromBinary = (binaryData: Uint8Array) =>
+  JSON.parse(new TextDecoder().decode(binaryData));
+
+export const createEncodedTx = (
+  msg: MsgExecuteContract,
+  authSequence: bigint,
+): Uint8Array => {
+  const { executeContract } = MessageComposer.encoded;
+  const message = executeContract(msg);
+
+  const txBody = TxBody.fromPartial({
+    messages: [message],
+  });
+
+  const signerInfo = SignerInfo.fromPartial({
+    sequence: authSequence,
+    modeInfo: { single: { mode: SignMode.SIGN_MODE_UNSPECIFIED } },
+  });
+
+  const tx = Tx.fromPartial({
+    body: txBody,
+    authInfo: AuthInfo.fromPartial({
+      signerInfos: [signerInfo],
+      fee: Fee.fromPartial({}),
+    }),
+    signatures: [new Uint8Array()],
+  });
+
+  return Tx.encode(tx).finish();
+};
 const assetMsg = (asset: { address: string; amount: string }) => ({
   info: AccAddress.validate(asset.address)
     ? { token: { contract_addr: asset.address } }
@@ -81,7 +122,7 @@ export const generateCreatePoolMsg = (
     )
     .map(
       (a) =>
-        new MsgExecuteContract(
+        new BeforeMsgExecuteContract(
           senderAddress,
           a.address,
           {
@@ -93,7 +134,7 @@ export const generateCreatePoolMsg = (
           [],
         ),
     ),
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     contractAddresses[networkName]?.factory || "",
     {
@@ -116,7 +157,7 @@ export const generateAddLiquidityMsg = (
     .filter((a) => AccAddress.validate(a.address))
     .map(
       (a) =>
-        new MsgExecuteContract(
+        new BeforeMsgExecuteContract(
           senderAddress,
           a.address,
           {
@@ -128,7 +169,7 @@ export const generateAddLiquidityMsg = (
           [],
         ),
     ),
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     contractAddress,
     {
@@ -155,7 +196,7 @@ export const generateWithdrawLiquidityMsg = (
   minAssets?: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
 ) =>
-  new MsgExecuteContract(
+  new BeforeMsgExecuteContract(
     senderAddress,
     lpTokenAddress,
     {
@@ -178,16 +219,66 @@ export const generateWithdrawLiquidityMsg = (
   );
 
 export const generateSwapMsg = (
+  isSimulate: boolean,
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,
   amount: string,
+  authSequence: bigint,
   beliefPrice: Numeric.Input,
   maxSpread = "0.1",
   txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
-  if (AccAddress.validate(fromAssetAddress)) {
+  const isCW20 = AccAddress.validate(fromAssetAddress);
+  if (!isSimulate) {
+    if (isCW20) {
+      const sendMsg = window.btoa(
+        JSON.stringify({
+          swap: {
+            max_spread: `${maxSpreadFixed}`,
+            belief_price: `${beliefPrice}`,
+            deadline: Number(
+              Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+            ),
+          },
+        }),
+      );
+
+      return new BeforeMsgExecuteContract(
+        senderAddress,
+        fromAssetAddress,
+        {
+          send: {
+            msg: sendMsg,
+            amount,
+            contract: contractAddress,
+          },
+        },
+        [],
+      );
+    }
+
+    return new BeforeMsgExecuteContract(
+      senderAddress,
+      contractAddress,
+      {
+        swap: {
+          offer_asset: assetMsg({
+            address: fromAssetAddress,
+            amount,
+          }),
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
+        },
+      },
+      getCoins([{ address: fromAssetAddress, amount }]),
+    );
+  }
+  if (isCW20) {
     const sendMsg = window.btoa(
       JSON.stringify({
         swap: {
@@ -200,38 +291,48 @@ export const generateSwapMsg = (
       }),
     );
 
-    return new MsgExecuteContract(
-      senderAddress,
-      fromAssetAddress,
-      {
-        send: {
-          msg: sendMsg,
-          amount,
-          contract: contractAddress,
-        },
-      },
-      [],
-    );
-  }
-
-  return new MsgExecuteContract(
-    senderAddress,
-    contractAddress,
-    {
-      swap: {
-        offer_asset: assetMsg({
-          address: fromAssetAddress,
-          amount,
+    const msg = MsgExecuteContract.fromPartial({
+      sender: senderAddress,
+      contract: contractAddress,
+      msg: toUtf8(
+        JSON.stringify({
+          send: {
+            msg: sendMsg,
+            amount,
+            contract: contractAddress,
+          },
         }),
-        max_spread: `${maxSpreadFixed}`,
-        belief_price: `${beliefPrice}`,
-        deadline: Number(
-          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-        ),
+      ),
+    });
+
+    return createEncodedTx(msg, authSequence);
+  }
+  const msg = MsgExecuteContract.fromPartial({
+    sender: senderAddress,
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        swap: {
+          offer_asset: assetMsg({
+            address: fromAssetAddress,
+            amount,
+          }),
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
+        },
+      }),
+    ),
+    funds: [
+      {
+        denom: getCoins([{ address: fromAssetAddress, amount }]).denoms()?.[0],
+        amount,
       },
-    },
-    getCoins([{ address: fromAssetAddress, amount }]),
-  );
+    ],
+  });
+  return createEncodedTx(msg, authSequence);
 };
 
 export const generateIncreaseLockupContractMsg = ({
@@ -247,7 +348,7 @@ export const generateIncreaseLockupContractMsg = ({
   duration: number | string;
   amount?: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, lpTokenAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, lpTokenAddress, {
     send: {
       msg: window.btoa(
         JSON.stringify({
@@ -269,7 +370,7 @@ export const generateCancelLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     cancel: {
       duration: Number(duration),
     },
@@ -285,7 +386,7 @@ export const generateClaimLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     claim: {
       duration: Number(duration),
     },
@@ -301,7 +402,7 @@ export const generateUnstakeLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new MsgExecuteContract(senderAddress, contractAddress, {
+  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
     unlock: {
       duration: Number(duration),
     },

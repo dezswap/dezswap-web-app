@@ -6,7 +6,7 @@ import {
   WalletStatus,
   useWallet,
 } from "@xpla/wallet-provider";
-import { BaseAccount, CreateTxOptions, Fee } from "@xpla/xpla.js";
+import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import networks from "constants/network";
 import { useCallback, useEffect, useMemo } from "react";
 import { SEND_TRANSACTION_MODE } from "@cosmostation/extension-client/cosmos";
@@ -17,7 +17,8 @@ import {
 } from "utils/cosmostation-helpers";
 import { useAtom } from "jotai";
 import { cosmostationAtom } from "stores/cosmostation";
-import useLCDClient from "./useUpdatedLCDClient";
+import useRPCClient from "./useRPCClient";
+import { BaseAccount } from "@xpla/xplajs/cosmos/auth/v1beta1/auth";
 
 // TODO: support testnet
 const CHAIN_ID = networks.dimension.chainId;
@@ -26,7 +27,7 @@ const useCosmostationWallet = () => {
   // const [provider, setProvider] = useState<Cosmos>();
   // const [account, setAccount] = useState<RequestAccountResponse>();
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
-  const { client: lcd } = useLCDClient();
+  const { client } = useRPCClient();
   const xplaWallet = useWallet();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,15 +78,14 @@ const useCosmostationWallet = () => {
         throw new Error("Not connected");
       }
       try {
-        if (!lcd) {
-          console.log("Error: LCDClient is not exist");
+        if (!client) {
+          console.log("Error: RPCClient is not exist");
           return;
         }
-        const { info } = await lcd.cosmos.auth.v1beta1.accountInfo({
+        const { info } = await client.cosmos.auth.v1beta1.accountInfo({
           address: cosmostationWallet.account.address,
         });
-        const { account_number: accountNumber, sequence } =
-          info as unknown as BaseAccount;
+        const { accountNumber, sequence } = info as unknown as BaseAccount;
 
         const signRes = await cosmostationWallet.provider.signAmino(CHAIN_ID, {
           chain_id: CHAIN_ID,
@@ -146,7 +146,7 @@ const useCosmostationWallet = () => {
         throw new Error("Unknown error");
       }
     },
-    [cosmostationWallet, lcd],
+    [cosmostationWallet, client],
   );
 
   useEffect(() => {

@@ -23,9 +23,9 @@ import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import { Token } from "types/api";
-import useLCDClient from "hooks/useUpdatedLCDClient";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import { getQueryData } from "utils/dezswap";
+import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
+import useRPCClient from "hooks/useRPCClient";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -42,7 +42,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const {
     selectedChain: { chainName, chainId },
   } = useNetwork();
-  const { client: lcd } = useLCDClient();
+  const { client } = useRPCClient();
 
   const api = useAPI();
 
@@ -107,23 +107,24 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
           if (!isAborted) {
             setTokenInfo({
               ...res,
-              total_supply: "",
+              totalSupply: "",
             } as TokenInfo);
           }
         }
-      } else if (isValidAddress && lcd) {
+      } else if (isValidAddress && client) {
         try {
           const queryData = getQueryData({
             token_info: {},
           });
 
-          const { data: res } = await lcd.cosmwasm.wasm.v1.smartContractState({
-            address,
-            queryData,
-          });
+          const { data: res } =
+            await client.cosmwasm.wasm.v1.smartContractState({
+              address,
+              queryData,
+            });
 
           if (!isAborted) {
-            setTokenInfo(res as unknown as TokenInfo);
+            setTokenInfo(parseJsonFromBinary(res) as unknown as TokenInfo);
           }
         } catch (error) {
           console.log(error);
@@ -146,7 +147,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isIbcToken,
     verifiedIbcAssets,
     chainName,
-    lcd,
+    client,
     address,
   ]);
 
