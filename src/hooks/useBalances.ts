@@ -42,7 +42,7 @@ const useBalances = (addresses: string[]) => {
           walletAddress,
           address,
           chainId,
-          api.lcdUrl,
+          api.rpcEndpoint,
           api.isLoading,
         ],
         queryFn: async () => {
