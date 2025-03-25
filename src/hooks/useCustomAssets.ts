@@ -7,10 +7,10 @@ import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
-import useLCDClient from "./useUpdatedLCDClient";
+import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
+import useRPCClient from "./useRPCClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
-import { getQueryData } from "utils/dezswap";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -19,7 +19,7 @@ const useCustomAssets = () => {
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
 
-  const { client: lcd } = useLCDClient();
+  const { client } = useRPCClient();
   const {
     chainName,
     selectedChain: { chainId },
@@ -81,15 +81,19 @@ const useCustomAssets = () => {
               const queryData = getQueryData({
                 token_info: {},
               });
-              if (!lcd) {
-                console.log("Error: LCDClient is not exist");
+              if (!client) {
+                console.log("Error: RPCClient is not exist");
                 return;
               }
-              const { data } = await lcd.cosmwasm.wasm.v1.smartContractState({
-                address,
-                queryData,
-              });
-              const token = data as unknown as TokenInfo;
+
+              const { data } = await client.cosmwasm.wasm.v1.smartContractState(
+                {
+                  address,
+                  queryData,
+                },
+              );
+
+              const token = parseJsonFromBinary(data) as unknown as TokenInfo;
 
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];
@@ -133,7 +137,7 @@ const useCustomAssets = () => {
     customAssetStore,
     verifiedIbcAssets,
     setCustomAssetStore,
-    lcd,
+    client,
     verifiedAssets,
   ]);
 

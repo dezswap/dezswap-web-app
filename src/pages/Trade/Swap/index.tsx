@@ -18,14 +18,17 @@ import {
   formatNumber,
   valueToAmount,
 } from "utils";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import {
+  CreateTxOptions,
+  Numeric,
+  type MsgExecuteContract as BeforeMsgExecuteContract,
+} from "@xpla/xpla.js";
 import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useHashModal from "hooks/useHashModal";
 import { css, useTheme } from "@emotion/react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -59,6 +62,9 @@ import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import useAPI from "hooks/useAPI";
+import useBalanceMinusFee from "hooks/useBalanceMinusFee";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -150,8 +156,9 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
+  const [sequence, setSequence] = useState(0n);
   const { walletAddress } = useConnectedWallet();
-
+  const api = useAPI();
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
@@ -277,50 +284,76 @@ function SwapPage() {
     asset1?.decimals,
     asset2?.decimals,
   ]);
-
-  const createTxOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (
-      !simulationResult?.estimatedAmount ||
-      simulationResult?.isLoading ||
-      !walletAddress ||
-      !selectedPair ||
-      !asset1?.token ||
-      !asset1Value ||
-      isPoolEmpty ||
-      !Number(asset1Value)
-    ) {
-      return undefined;
-    }
-    return {
-      msgs: [
-        generateSwapMsg(
-          walletAddress,
-          selectedPair.contract_addr,
-          asset1.token,
-          valueToAmount(asset1Value, asset1?.decimals) || "",
-          beliefPrice || "",
-          `${slippageTolerance}`,
-          txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-        ),
-      ],
+  useEffect(() => {
+    const fetchAuthInfo = async () => {
+      try {
+        const { sequence: authSequence } = (await api.getAuthInfo()) || {};
+        setSequence(authSequence || 0n);
+      } catch (error) {
+        console.error("Failed to fetch auth info:", error);
+      }
     };
-  }, [
-    simulationResult,
-    walletAddress,
-    selectedPair,
-    asset1,
-    asset1Value,
-    slippageTolerance,
-    beliefPrice,
-    txDeadlineMinutes,
-    isPoolEmpty,
-  ]);
 
+    fetchAuthInfo();
+  }, [api]);
+
+  const createSwapTxBase = useCallback(
+    (isSimulate: boolean) => {
+      if (
+        !simulationResult?.estimatedAmount ||
+        simulationResult?.isLoading ||
+        !walletAddress ||
+        !selectedPair ||
+        !asset1?.token ||
+        !asset1Value ||
+        isPoolEmpty ||
+        !Number(asset1Value)
+      ) {
+        return undefined;
+      }
+
+      const swapMsg = generateSwapMsg(
+        isSimulate,
+        walletAddress,
+        selectedPair.contract_addr,
+        asset1.token,
+        valueToAmount(asset1Value, asset1?.decimals) || "",
+        sequence,
+        beliefPrice || "",
+        `${slippageTolerance}`,
+        txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+      );
+
+      return isSimulate ? swapMsg : { msgs: [swapMsg] };
+    },
+    [
+      simulationResult,
+      walletAddress,
+      selectedPair,
+      asset1,
+      asset1Value,
+      slippageTolerance,
+      beliefPrice,
+      txDeadlineMinutes,
+      isPoolEmpty,
+      sequence, // sequence 추가
+    ],
+  );
+
+  const createSimulateTxOptions = useMemo(
+    () => createSwapTxBase(true),
+    [createSwapTxBase],
+  );
+
+  const createTxOptions = useMemo(
+    () => createSwapTxBase(false),
+    [createSwapTxBase],
+  );
   const {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(createSimulateTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -416,7 +449,7 @@ function SwapPage() {
     if (asset1Address === XPLA_ADDRESS) {
       form.trigger(FormKey.asset1Value);
     }
-  }, [form, fee, asset1Address, asset2Address]);
+  }, [form, asset1Address, asset2Address]);
 
   const [preselectedAsset2Address, setPreselectedAsset2Address] =
     useSearchParamState("q", undefined, { replace: true });
@@ -944,7 +977,7 @@ function SwapPage() {
                   {
                     key: "expectedAmount",
                     label: `Expected${
-                      screenClass === MOBILE_SCREEN_CLASS ? "\n" : " "
+                      screenClass === MOBILE_SCREEN_CLASS ? "n" : " "
                     }amount`,
                     tooltip: (
                       <>
