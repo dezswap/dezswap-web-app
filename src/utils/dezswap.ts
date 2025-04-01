@@ -98,7 +98,7 @@ export const generateCreatePoolMsg = (
     contractAddresses[networkName]?.factory || "",
     {
       create_pair: {
-        assets: assets.map((a) => assetMsg(networkName, a)),
+        assets: assets.map((a) => assetMsg(a)),
       },
     },
     getCoins(assets),
@@ -134,7 +134,7 @@ export const generateAddLiquidityMsg = (
     contractAddress,
     {
       provide_liquidity: {
-        assets: assets.map((a) => assetMsg(networkName, a)),
+        assets: assets.map((a) => assetMsg(a)),
         receiver: `${senderAddress}`,
         deadline: Number(
           Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
@@ -165,7 +165,7 @@ export const generateWithdrawLiquidityMsg = (
         msg: window.btoa(
           JSON.stringify({
             withdraw_liquidity: {
-              min_assets: minAssets?.map((a) => assetMsg(networkName, a)),
+              min_assets: minAssets?.map((a) => assetMsg(a)),
               deadline: Number(
                 Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
               ),

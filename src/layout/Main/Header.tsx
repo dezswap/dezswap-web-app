@@ -341,10 +341,12 @@ function Header() {
     };
     handleScroll();
     const simpleBar = SimpleBar.instances.get(document.body);
-    simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
+    simpleBar?.getScrollElement()?.addEventListener("scroll", handleScroll);
     window.addEventListener("scroll", handleScroll);
     return () => {
-      simpleBar.getScrollElement().removeEventListener("scroll", handleScroll);
+      simpleBar
+        ?.getScrollElement()
+        ?.removeEventListener("scroll", handleScroll);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);

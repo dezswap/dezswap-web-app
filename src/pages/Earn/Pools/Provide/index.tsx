@@ -113,7 +113,7 @@ function ProvidePage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",

@@ -1,5 +1,5 @@
 import { assetLists, chains } from "@chain-registry/v2";
-import type { Chain, AssetList } from "@chain-registry/v2-types";
+import type { AssetList } from "@chain-registry/v2-types";
 
 export type SupportedChain = "dimension" | "cube";
 export const KeplrName = "keplr-extension";

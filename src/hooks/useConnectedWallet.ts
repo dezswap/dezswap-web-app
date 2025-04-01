@@ -55,7 +55,8 @@ const useConnectedWallet = () => {
 
   const post = useCallback(
     (tx: CreateTxOptions, walletApp?: WalletApp | boolean) => {
-      if (walletInfo.isInterchain) return `we can't use other wallets post`; // TODO: Implement with XplaSingingClient
+      if (walletInfo.isInterchain)
+        throw new Error(`we can't use other wallets post`);
       return connectedXplaWallet?.post(tx, walletApp);
     },
     [connectedXplaWallet, walletInfo.isInterchain],

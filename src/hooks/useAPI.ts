@@ -142,7 +142,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     const res =
       await updatedLcd.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
-    return res.block?.header.height ?? ("0" as unknown as string);
+    return res.block?.header.height.toString() ?? ("0" as unknown as string);
   }, [updatedLcd]);
 
   // unused func

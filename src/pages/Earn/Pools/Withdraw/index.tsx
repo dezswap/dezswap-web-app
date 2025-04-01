@@ -570,7 +570,7 @@ function WithdrawPage() {
             />
           </Expand>
         </div>
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"
