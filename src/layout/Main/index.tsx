@@ -1,4 +1,5 @@
 import { Fragment, PropsWithChildren, useEffect } from "react";
+import { useBlocker, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useAtomValue } from "jotai";
 import globalElementsAtom from "stores/globalElements";
@@ -15,11 +16,11 @@ import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
-import { useBlocker } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
-import useConnectedWallet from "hooks/useConnectedWallet";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -129,6 +130,13 @@ function MainLayout({ children }: PropsWithChildren) {
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
+    setSearchParams(newParams);
+  }
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname

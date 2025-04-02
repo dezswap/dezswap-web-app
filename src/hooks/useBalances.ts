@@ -11,10 +11,7 @@ const UPDATE_INTERVAL = 30000;
 const useBalances = (addresses: string[]) => {
   const { walletAddress } = useConnectedWallet();
   const { verifiedIbcAssets } = useVerifiedAssets();
-  const {
-    chainName,
-    selectedChain: { chainId },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const api = useAPI();
   const fetchBalance = useCallback(
     async (address: string) => {
@@ -37,14 +34,7 @@ const useBalances = (addresses: string[]) => {
   const balanceQueryResults = useQueries({
     queries:
       addresses?.map((address) => ({
-        queryKey: [
-          "balance",
-          walletAddress,
-          address,
-          chainId,
-          api.lcdUrl,
-          api.isLoading,
-        ],
+        queryKey: ["balance", walletAddress, address, chainName],
         queryFn: async () => {
           try {
             const balance = await fetchBalance(address);

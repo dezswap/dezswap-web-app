@@ -66,3 +66,5 @@ export const apiAddresses: {
     baseUrl: "https://cube-api.dezswap.io",
   },
 };
+
+export const CHAIN_NAME_SEARCH_PARAM = "chainName";
