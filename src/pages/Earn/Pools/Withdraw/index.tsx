@@ -157,7 +157,6 @@ function WithdrawPage() {
         ? {
             msgs: [
               generateWithdrawLiquidityMsg(
-                chainName,
                 walletAddress || "",
                 poolAddress || "",
                 pair?.liquidity_token || "",

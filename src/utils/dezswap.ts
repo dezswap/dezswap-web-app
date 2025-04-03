@@ -106,7 +106,6 @@ export const generateCreatePoolMsg = (
 ];
 
 export const generateAddLiquidityMsg = (
-  networkName: string,
   senderAddress: string,
   contractAddress: string,
   assets: { address: string; amount: string }[],
@@ -149,7 +148,6 @@ export const generateAddLiquidityMsg = (
 ];
 
 export const generateWithdrawLiquidityMsg = (
-  networkName: string,
   senderAddress: string,
   contractAddress: string,
   lpTokenAddress: string,

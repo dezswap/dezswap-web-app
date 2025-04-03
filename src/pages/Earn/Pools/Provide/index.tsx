@@ -69,12 +69,11 @@ function ProvidePage() {
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { getPair, pairs } = usePairs();
+  const { getPair } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
-    chainName,
     selectedChain: { explorers },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
@@ -113,7 +112,7 @@ function ProvidePage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -164,7 +163,6 @@ function ProvidePage() {
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
             msgs: generateAddLiquidityMsg(
-              chainName,
               walletAddress,
               poolAddress || "",
               [

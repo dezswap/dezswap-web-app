@@ -65,7 +65,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as ReverseSimulation;
     },
-    [chainName, updatedLcd],
+    [updatedLcd],
   );
 
   const getNativeTokenBalance = useCallback(
