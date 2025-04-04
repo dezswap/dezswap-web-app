@@ -4,18 +4,24 @@ import { CustomLCDClient } from "types/lcdClient";
 import useNetwork from "./useNetwork";
 
 const useLCDClient = () => {
-  const network = useNetwork();
+  const {
+    selectedChain: { apis },
+  } = useNetwork();
+  const restEndpoint = apis?.rest?.[0].address;
 
   const {
     data: client,
     isLoading,
     error,
   } = useQuery(
-    ["lcdClient", network.lcd],
+    ["lcdClient", restEndpoint],
     async () => {
       try {
+        if (!restEndpoint)
+          throw new Error("Chain lcd data could not be retrieved");
+
         const lcdClient = (await createLCDClient({
-          restEndpoint: network.lcd,
+          restEndpoint,
         })) as unknown as CustomLCDClient;
 
         return lcdClient;
@@ -33,7 +39,7 @@ const useLCDClient = () => {
     client,
     isLoading,
     error,
-    lcdUrl: network.lcd,
+    lcdUrl: restEndpoint,
   };
 };
 

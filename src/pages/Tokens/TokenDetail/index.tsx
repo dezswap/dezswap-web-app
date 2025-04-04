@@ -50,7 +50,10 @@ const Wrapper = styled.div`
 
 function TokenDetailPage() {
   const screenClass = useScreenClass();
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
   const navigate = useNavigate();
   const { tokenAddress } = useParams<{ tokenAddress: string }>();
   const { bookmarks, toggleBookmark } = useBookmark();
@@ -102,7 +105,7 @@ function TokenDetailPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [dashboardToken, invalidPathModal, network]);
+  }, [dashboardToken, invalidPathModal, chainName]);
 
   const actionButtons = useMemo(
     () => (
@@ -209,7 +212,7 @@ function TokenDetailPage() {
                     <Col xs="content">
                       <Outlink
                         iconSize={19}
-                        href={getTokenLink(tokenAddress, network.name)}
+                        href={getTokenLink(tokenAddress, explorers?.[0].url)}
                       />
                     </Col>
                   </Row>

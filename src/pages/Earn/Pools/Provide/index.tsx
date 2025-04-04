@@ -33,8 +33,6 @@ import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
-import { NetworkName } from "types/common";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -52,6 +50,7 @@ import ProgressBar from "components/ProgressBar";
 import Box from "components/Box";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 export enum FormKey {
@@ -62,7 +61,6 @@ export enum FormKey {
 const DISPLAY_DECIMAL = 3;
 
 function ProvidePage() {
-  const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["slippageTolerance", "txDeadline"],
@@ -71,12 +69,15 @@ function ProvidePage() {
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { getPair, pairs } = usePairs();
+  const { getPair } = usePairs();
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
+  const { walletAddress } = useConnectedWallet();
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -111,7 +112,7 @@ function ProvidePage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -151,7 +152,7 @@ function ProvidePage() {
     () =>
       simulationResult?.estimatedAmount &&
       !simulationResult?.isLoading &&
-      connectedWallet &&
+      walletAddress &&
       asset1?.token &&
       formData.asset1Value &&
       asset2?.token &&
@@ -162,8 +163,7 @@ function ProvidePage() {
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
             msgs: generateAddLiquidityMsg(
-              connectedWallet?.network.name as NetworkName,
-              connectedWallet.walletAddress,
+              walletAddress,
               poolAddress || "",
               [
                 {
@@ -186,7 +186,7 @@ function ProvidePage() {
         : undefined,
     [
       simulationResult,
-      connectedWallet,
+      walletAddress,
       asset1,
       isReversed,
       asset2,
@@ -283,7 +283,7 @@ function ProvidePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
       asset1?.token === XPLA_ADDRESS &&
@@ -306,7 +306,7 @@ function ProvidePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
       asset2?.token === XPLA_ADDRESS &&
@@ -652,7 +652,7 @@ function ProvidePage() {
                         <a
                           href={getTokenLink(
                             pair?.liquidity_token,
-                            network.name,
+                            explorers?.[0].url,
                           )}
                           target="_blank"
                           rel="noreferrer noopener"
@@ -679,7 +679,7 @@ function ProvidePage() {
                       <span>
                         {ellipsisCenter(asset1?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset1?.token, network.name)}
+                          href={getTokenLink(asset1?.token, explorers?.[0].url)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`
@@ -705,7 +705,7 @@ function ProvidePage() {
                       <span>
                         {ellipsisCenter(asset2?.token)}&nbsp;
                         <a
-                          href={getTokenLink(asset2?.token, network.name)}
+                          href={getTokenLink(asset2?.token, explorers?.[0].url)}
                           target="_blank"
                           rel="noreferrer noopener"
                           css={css`
@@ -781,7 +781,7 @@ function ProvidePage() {
             )}
           </div>
         )}
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

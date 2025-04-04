@@ -202,7 +202,9 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
     screenClass,
   );
   const { getAsset } = useAssets();
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(poolAddress), [getPair, poolAddress]);
   const lpBalance = useBalance(pair?.liquidity_token);
@@ -353,7 +355,7 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
           <Outlink
             href={
               pair?.contract_addr
-                ? getAddressLink(pair?.contract_addr, network.name)
+                ? getAddressLink(pair?.contract_addr, explorers?.[0].url)
                 : "#"
             }
           >

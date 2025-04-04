@@ -54,7 +54,9 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
     screenClass,
   );
   const limit = useMemo(() => (isSmallScreen ? 5 : 10), [isSmallScreen]);
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
 
   const [selectedFilterTabIndex, setSelectedFilterTabIndex] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -226,7 +228,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
                 return (
                   <OverflowTooltip content={actionDisplay}>
                     <a
-                      href={getTransactionLink(row.hash, network.name)}
+                      href={getTransactionLink(row.hash, explorers?.[0]?.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       css={css`
@@ -286,7 +288,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
                   address && (
                     <HoverUnderline>
                       <a
-                        href={getAddressLink(address, network.name)}
+                        href={getAddressLink(address, explorers?.[0]?.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         css={css`

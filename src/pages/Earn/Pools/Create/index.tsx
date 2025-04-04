@@ -33,8 +33,6 @@ import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
-import { NetworkName } from "types/common";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
@@ -48,6 +46,7 @@ import iconSettingHover from "assets/icons/icon-setting-hover.svg";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import box from "components/Box";
 import ProgressBar from "components/ProgressBar";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
 
@@ -69,7 +68,7 @@ const Box = styled(box)`
 `;
 
 function CreatePage() {
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
@@ -88,7 +87,10 @@ function CreatePage() {
   const screenClass = useScreenClass();
   const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -145,13 +147,13 @@ function CreatePage() {
     asset2,
     asset2Address,
     errorMessageModal,
-    network,
+    chainName,
     validate,
   ]);
 
   const createTxOptions = useMemo<CreateTxOptions | undefined>(
     () =>
-      connectedWallet &&
+      walletAddress &&
       asset1?.token &&
       formData.asset1Value &&
       asset2?.token &&
@@ -159,33 +161,21 @@ function CreatePage() {
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
         ? {
-            msgs: generateCreatePoolMsg(
-              connectedWallet?.network.name as NetworkName,
-              connectedWallet.walletAddress,
-              [
-                {
-                  address: asset1?.token || "",
-                  amount:
-                    valueToAmount(formData.asset1Value, asset1?.decimals) ||
-                    "0",
-                },
-                {
-                  address: asset2?.token || "",
-                  amount:
-                    valueToAmount(formData.asset2Value, asset2?.decimals) ||
-                    "0",
-                },
-              ],
-            ),
+            msgs: generateCreatePoolMsg(chainName, walletAddress, [
+              {
+                address: asset1?.token || "",
+                amount:
+                  valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+              },
+              {
+                address: asset2?.token || "",
+                amount:
+                  valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
+              },
+            ]),
           }
         : undefined,
-    [
-      connectedWallet,
-      asset1,
-      asset2,
-      formData.asset1Value,
-      formData.asset2Value,
-    ],
+    [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
   );
 
   const {
@@ -203,7 +193,7 @@ function CreatePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       asset1?.token === XPLA_ADDRESS &&
       formData.asset1Value &&
@@ -223,7 +213,7 @@ function CreatePage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       asset2?.token === XPLA_ADDRESS &&
       formData.asset2Value &&
@@ -503,7 +493,7 @@ function CreatePage() {
                     <>
                       {ellipsisCenter(asset?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset?.token, network.name)}
+                        href={getTokenLink(asset?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`
@@ -541,7 +531,7 @@ function CreatePage() {
           </div>
         </div>
 
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

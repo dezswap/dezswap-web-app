@@ -4,31 +4,33 @@ import useAPI from "../useAPI";
 import useNetwork from "../useNetwork";
 
 const useDashboard = () => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
 
   const { data: tokens } = useQuery({
-    queryKey: ["dashboard", "tokens", network.chainID],
+    queryKey: ["dashboard", "tokens", chainId],
     queryFn: api.dashboard.getTokens,
   });
 
   const { data: pools } = useQuery({
-    queryKey: ["dashboard", "pools", network.chainID],
+    queryKey: ["dashboard", "pools", chainId],
     queryFn: () => api.dashboard.getPools(),
   });
 
   const { data: recent } = useQuery({
-    queryKey: ["dashboard", "recent", network.chainID],
+    queryKey: ["dashboard", "recent", chainId],
     queryFn: api.dashboard.getRecent,
   });
 
   const { data: statistics } = useQuery({
-    queryKey: ["dashboard", "statistics", network.chainID],
+    queryKey: ["dashboard", "statistics", chainId],
     queryFn: api.dashboard.getStatistics,
   });
 
   const { data: transactions } = useQuery({
-    queryKey: ["dashboard", "transactions", network.chainID],
+    queryKey: ["dashboard", "transactions", chainId],
     queryFn: () => api.dashboard.getTransactions(),
   });
 

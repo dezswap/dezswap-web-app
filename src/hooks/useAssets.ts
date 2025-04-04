@@ -8,17 +8,16 @@ import { useQuery } from "@tanstack/react-query";
 
 const useAssets = () => {
   const api = useAPI();
-  const network = useNetwork();
+  const { chainName } = useNetwork();
   const { getCustomAsset } = useCustomAssets();
-
   const { data: assets } = useQuery(
-    ["assets", network.name],
+    ["assets", chainName],
     async () => {
       const res = await api.getTokens();
       return res;
     },
     {
-      enabled: !!network.name,
+      enabled: !!chainName,
       refetchOnReconnect: true,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
@@ -41,9 +40,9 @@ const useAssets = () => {
     (address: string | undefined) =>
       address &&
       (AccAddress.validate(address) ||
-        isNativeTokenAddress(network.name, address) ||
+        isNativeTokenAddress(chainName, address) ||
         assets?.find((item) => item.token === address)?.verified),
-    [assets, network.name],
+    [assets, chainName],
   );
 
   return useMemo(

@@ -3,7 +3,6 @@ import { useAtom } from "jotai";
 import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
-import { NetworkName } from "types/common";
 import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import { Token } from "types/api";
@@ -21,19 +20,21 @@ const useCustomAssets = () => {
   const { availableAssetAddresses } = usePairs();
 
   const { client: lcd } = useLCDClient();
-  const network = useNetwork();
-  const fetchQueue = useRef<{ [K in NetworkName]?: AccAddress[] }>({
-    mainnet: [],
-    testnet: [],
+  const {
+    chainName,
+    selectedChain: { chainId },
+  } = useNetwork();
+  const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
+    xpla: [],
+    xplatestnet: [],
   });
   const isFetching = useRef(false);
 
   const fetchAsset = useCallback(async () => {
     isFetching.current = true;
     try {
-      const networkName = network.name;
-      const store = customAssetStore[networkName] || [];
-      const address = fetchQueue.current[networkName]?.[0];
+      const store = customAssetStore[chainName] || [];
+      const address = fetchQueue.current[chainName]?.[0];
 
       if (address) {
         const index = store.findIndex((item) => item.token === address);
@@ -44,8 +45,8 @@ const useCustomAssets = () => {
               Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            if (isNativeTokenAddress(network.name, address)) {
-              const asset = nativeTokens[network.name]?.find(
+            if (isNativeTokenAddress(chainName, address)) {
+              const asset = nativeTokens[chainName]?.find(
                 (item) => item.token === address,
               );
               if (asset) {
@@ -55,7 +56,7 @@ const useCustomAssets = () => {
                 };
                 setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: customAssetStore[networkName],
+                  [chainName]: customAssetStore[chainName],
                 }));
               }
             } else if (verifiedIbcAssets?.[getIbcTokenHash(address)]) {
@@ -66,14 +67,14 @@ const useCustomAssets = () => {
                   total_supply: "",
                   token: asset.denom,
                   icon: asset.icon,
-                  chainId: network.chainID,
+                  chainId: chainId ?? "",
                   protocol: "",
                   verified: true,
                   updatedAt: new Date(),
                 };
                 setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: customAssetStore[networkName],
+                  [chainName]: customAssetStore[chainName],
                 }));
               }
             } else {
@@ -97,7 +98,7 @@ const useCustomAssets = () => {
                   name: token.name,
                   decimals: token.decimals,
                   symbol: token.symbol,
-                  chainId: network.chainID,
+                  chainId: chainId ?? "",
                   protocol: "",
                   verified: !!verifiedAsset,
                   token: address,
@@ -107,10 +108,10 @@ const useCustomAssets = () => {
                 };
                 setCustomAssetStore((current) => ({
                   ...current,
-                  [networkName]: customAssetStore[networkName],
+                  [chainName]: customAssetStore[chainName],
                 }));
-              } else if (!fetchQueue.current[networkName]?.includes(address)) {
-                fetchQueue.current[networkName]?.push(address);
+              } else if (!fetchQueue.current[chainName]?.includes(address)) {
+                fetchQueue.current[chainName]?.push(address);
               }
             }
           }
@@ -121,13 +122,14 @@ const useCustomAssets = () => {
     }
     isFetching.current = false;
     setTimeout(() => {
-      fetchQueue.current[network.name]?.shift();
-      if (fetchQueue.current[network.name]?.length) {
+      fetchQueue.current[chainName]?.shift();
+      if (fetchQueue.current[chainName]?.length) {
         fetchAsset();
       }
     }, 100);
   }, [
-    network,
+    chainName,
+    chainId,
     customAssetStore,
     verifiedIbcAssets,
     setCustomAssetStore,
@@ -136,7 +138,7 @@ const useCustomAssets = () => {
   ]);
 
   const addFetchQueue = useCallback(
-    (address: string, networkName: NetworkName) => {
+    (address: string, networkName: string) => {
       if (
         nativeTokens[networkName]?.some((item) => item.token === address) ||
         AccAddress.validate(address) ||
@@ -155,23 +157,23 @@ const useCustomAssets = () => {
 
   const getAsset = useCallback(
     (address: string): Partial<Token> | undefined => {
-      const asset = customAssetStore[network.name]?.find(
+      const asset = customAssetStore[chainName]?.find(
         (item) => item.token === address,
       );
       if (!asset?.token) {
         return undefined;
       }
       if (window.navigator.onLine) {
-        addFetchQueue(asset.token, network.name);
+        addFetchQueue(asset.token, chainName);
       }
       return asset;
     },
-    [customAssetStore, network, addFetchQueue],
+    [customAssetStore, chainName, addFetchQueue],
   );
 
   const addCustomAsset = useCallback(
     (asset: Token) => {
-      const store = customAssetStore[network.name] || [];
+      const store = customAssetStore[chainName] || [];
       const index = store.findIndex((item) => item.token === asset.token);
       if (index >= 0) {
         store[index] = asset;
@@ -180,25 +182,25 @@ const useCustomAssets = () => {
       }
       setCustomAssetStore((current) => ({
         ...current,
-        [network.name]: store,
+        [chainName]: store,
       }));
-      addFetchQueue(asset.token, network.name);
+      addFetchQueue(asset.token, chainName);
     },
-    [addFetchQueue, customAssetStore, network.name, setCustomAssetStore],
+    [addFetchQueue, customAssetStore, chainName, setCustomAssetStore],
   );
 
   const removeCustomAsset = useCallback(
     (address: string) => {
-      if (customAssetStore[network.name]?.some((a) => a.token === address)) {
+      if (customAssetStore[chainName]?.some((a) => a.token === address)) {
         setCustomAssetStore((current) => ({
           ...current,
-          [network.name]: customAssetStore[network.name]?.filter(
+          [chainName]: customAssetStore[chainName]?.filter(
             (a) => a.token !== address,
           ),
         }));
       }
     },
-    [customAssetStore, network.name, setCustomAssetStore],
+    [customAssetStore, chainName, setCustomAssetStore],
   );
 
   useEffect(() => {
@@ -209,18 +211,12 @@ const useCustomAssets = () => {
 
   return useMemo(
     () => ({
-      customAssets: customAssetStore[network.name],
+      customAssets: customAssetStore[chainName],
       addCustomAsset,
       removeCustomAsset,
       getCustomAsset: getAsset,
     }),
-    [
-      addCustomAsset,
-      customAssetStore,
-      getAsset,
-      network.name,
-      removeCustomAsset,
-    ],
+    [addCustomAsset, customAssetStore, getAsset, chainName, removeCustomAsset],
   );
 };
 

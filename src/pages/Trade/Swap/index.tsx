@@ -19,7 +19,6 @@ import {
   valueToAmount,
 } from "utils";
 import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
@@ -52,8 +51,8 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
-import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
 import useSearchParamState from "hooks/useSearchParamState";
@@ -139,7 +138,6 @@ function SelectAssetDrawer({
 }
 
 function SwapPage() {
-  const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
@@ -152,6 +150,7 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
+  const { walletAddress } = useConnectedWallet();
 
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
@@ -283,7 +282,7 @@ function SwapPage() {
     if (
       !simulationResult?.estimatedAmount ||
       simulationResult?.isLoading ||
-      !connectedWallet ||
+      !walletAddress ||
       !selectedPair ||
       !asset1?.token ||
       !asset1Value ||
@@ -295,8 +294,7 @@ function SwapPage() {
     return {
       msgs: [
         generateSwapMsg(
-          connectedWallet?.network.name as NetworkName,
-          connectedWallet.walletAddress,
+          walletAddress,
           selectedPair.contract_addr,
           asset1.token,
           valueToAmount(asset1Value, asset1?.decimals) || "",
@@ -308,7 +306,7 @@ function SwapPage() {
     };
   }, [
     simulationResult,
-    connectedWallet,
+    walletAddress,
     selectedPair,
     asset1,
     asset1Value,
@@ -360,7 +358,7 @@ function SwapPage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
@@ -1071,7 +1069,7 @@ function SwapPage() {
             </div>
           </Tooltip>
         )}
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

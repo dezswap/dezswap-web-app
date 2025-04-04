@@ -70,19 +70,32 @@ export const sanitizeNumberInput = (value: string, decimals = 18) => {
   }`;
 };
 
-export const getBlockLink = (height?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/block/${height}`;
+const XPLA_MAINNET_EXPLORER = "https://explorer.xpla.io";
+// TODO: delete the hard-coded explorer link.
+export const getBlockLink = (height?: string, explorers?: string) => {
+  if (explorers === XPLA_MAINNET_EXPLORER)
+    return `${explorers}/mainnet/block/${height}`;
+  return `${explorers}/block/${height}`;
+};
 
-export const getAddressLink = (address?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/address/${address}`;
+export const getAddressLink = (address?: string, explorers?: string) => {
+  if (explorers === XPLA_MAINNET_EXPLORER)
+    return `${explorers}/mainnet/address/${address}`;
+  return `${explorers}/address/${address}`;
+};
 
-export const getTransactionLink = (txHash?: string, network?: string) =>
-  `https://explorer.xpla.io/${network}/tx/${txHash}`;
+export const getTransactionLink = (txHash?: string, explorers?: string) => {
+  if (explorers === XPLA_MAINNET_EXPLORER)
+    return `${explorers}/mainnet/tx/${txHash}`;
+  return `${explorers}/tx/${txHash}`;
+};
 
-export const getTokenLink = (address?: string, network?: string) => {
-  return `https://explorer.xpla.io/${network}/token/${
-    address === XPLA_ADDRESS ? "xpla" : address
-  }`;
+export const getTokenLink = (address?: string, explorers?: string) => {
+  if (explorers === XPLA_MAINNET_EXPLORER)
+    return `${explorers}/mainnet/token/${
+      address === XPLA_ADDRESS ? "xpla" : address
+    }`;
+  return `${explorers}/token/${address === XPLA_ADDRESS ? "xpla" : address}`;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>

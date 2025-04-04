@@ -24,7 +24,7 @@ const useSimulate = ({
   >();
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
-  const network = useNetwork();
+  const { chainName } = useNetwork();
   const api = useAPI();
 
   const deferredAmount = useDeferredValue(amount);
@@ -94,7 +94,7 @@ const useSimulate = ({
     isReversed,
     lcd,
     toAddress,
-    network.name,
+    chainName,
   ]);
 
   return useMemo(

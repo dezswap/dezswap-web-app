@@ -19,7 +19,7 @@ const Tooltip = forwardRef<ComponentRef<typeof Tippy>, TippyProps>(
 
       window.addEventListener("scroll", handleScroll);
       try {
-        simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
+        simpleBar?.getScrollElement()?.addEventListener("scroll", handleScroll);
       } catch (error) {
         console.log(error);
       }

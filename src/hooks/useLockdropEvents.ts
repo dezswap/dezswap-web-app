@@ -5,14 +5,14 @@ import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
 
 const useLockdropEvents = () => {
-  const network = useNetwork();
+  const { selectedChain: chainId } = useNetwork();
   const api = useAPI();
   const {
     data: lockdropEvents,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["lockdropEvents", network?.chainID],
+    queryKey: ["lockdropEvents", chainId],
     queryFn: async () => {
       const fetchAll = async (
         prevData: LockdropEvent[] = [],

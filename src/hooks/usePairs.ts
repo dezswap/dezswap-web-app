@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getAddressFromAssetInfo } from "utils/dezswap";
 
 const usePairs = () => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
 
   const { data: pairs, isLoading } = useQuery({
-    queryKey: ["pairs", network.chainID],
+    queryKey: ["pairs", chainId],
     queryFn: async () => {
       const res = await api.getPairs();
       return res?.pairs.map((pair) => ({

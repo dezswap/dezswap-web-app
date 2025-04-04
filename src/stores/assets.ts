@@ -1,5 +1,4 @@
 import { atomWithStorage } from "jotai/utils";
-import { NetworkName } from "types/common";
 import { Token } from "types/api";
 
 interface CustomToken extends Token {
@@ -7,9 +6,9 @@ interface CustomToken extends Token {
 }
 
 export const customAssetsAtom = atomWithStorage<{
-  [K in NetworkName]?: CustomToken[];
-}>("customAssets", { mainnet: [], testnet: [] });
+  [K in string]?: CustomToken[];
+}>("customAssets", { xpla: [], xplatestnet: [] });
 
 export const bookmarksAtom = atomWithStorage<{
-  [K in NetworkName]?: string[];
-}>("bookmarks", { mainnet: [], testnet: [] });
+  [K in string]?: string[];
+}>("bookmarks", { xpla: [], xplatestnet: [] });

@@ -112,7 +112,9 @@ const infoMessages = [
 ];
 
 function Footer() {
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const latestBlock = useLatestBlock();
   return (
     <Wrapper>
@@ -129,7 +131,9 @@ function Footer() {
             `}
           >
             <a
-              href={latestBlock ? getBlockLink(latestBlock, network.name) : ""}
+              href={
+                latestBlock ? getBlockLink(latestBlock, explorers?.[0].url) : ""
+              }
               target="_blank"
               rel="noreferrer noopener"
               css={css`

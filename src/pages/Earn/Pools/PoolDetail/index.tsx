@@ -48,7 +48,10 @@ function PoolDetailPage() {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
   const navigate = useNavigate();
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const { bookmarks, toggleBookmark } = usePairBookmark();
@@ -122,7 +125,7 @@ function PoolDetailPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [dashboardPoolData, invalidPathModal, network]);
+  }, [dashboardPoolData, invalidPathModal, chainName]);
 
   return (
     <Wrapper>
@@ -202,7 +205,7 @@ function PoolDetailPage() {
                     <Col xs="content">
                       <Outlink
                         iconSize={19}
-                        href={getAddressLink(poolAddress, network.name)}
+                        href={getAddressLink(poolAddress, explorers?.[0].url)}
                       />
                     </Col>
                     {!isSmallScreen && (

@@ -22,7 +22,7 @@ const networks: Record<string, Network> = {
 };
 
 export const nativeTokens: Record<string, Token[]> = {
-  mainnet: [
+  xpla: [
     {
       token: XPLA_ADDRESS,
       decimals: 18,
@@ -35,7 +35,7 @@ export const nativeTokens: Record<string, Token[]> = {
       protocol: "",
     },
   ],
-  testnet: [
+  xplatestnet: [
     {
       token: XPLA_ADDRESS,
       decimals: 18,

@@ -1,4 +1,5 @@
 import { Fragment, PropsWithChildren, useEffect } from "react";
+import { useBlocker, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useAtomValue } from "jotai";
 import globalElementsAtom from "stores/globalElements";
@@ -15,9 +16,9 @@ import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
-import { useConnectedWallet } from "@xpla/wallet-provider";
-import { useBlocker } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
 
@@ -124,17 +125,23 @@ const navBar = (
 
 function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
-  const network = useNetwork();
+  const { chainName } = useNetwork();
 
   const globalElements = useAtomValue(globalElementsAtom);
-
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
+    setSearchParams(newParams);
+  }
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
     if (nextLocation.pathname.startsWith("/wallet")) {
-      if (!connectedWallet?.walletAddress) {
+      if (!walletAddress) {
         return true;
       }
     }
@@ -151,7 +158,7 @@ function MainLayout({ children }: PropsWithChildren) {
   return (
     <>
       <Header />
-      <Wrapper hasBanner={network.name !== "mainnet"}>
+      <Wrapper hasBanner={chainName !== "xpla"}>
         {children}
         <BrowserDelegateButton />
         <FooterWrapper>

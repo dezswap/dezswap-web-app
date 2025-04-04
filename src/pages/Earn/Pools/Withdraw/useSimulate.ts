@@ -13,7 +13,7 @@ const useSimulate = (
   liquidityTokenAddress: string,
   amount: string,
 ) => {
-  const { name: networkName } = useNetwork();
+  const { chainName } = useNetwork();
   const pool = usePool(pairAddress);
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
@@ -80,7 +80,7 @@ const useSimulate = (
     return () => {
       isAborted = true;
     };
-  }, [pairAddress, liquidityTokenAddress, amount, networkName, pool]);
+  }, [pairAddress, liquidityTokenAddress, amount, chainName, pool]);
 
   return useMemo(
     () => ({ ...result, isLoading, isFailed }),
