@@ -1410,6 +1410,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interchainjs/cosmos-types@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "@interchainjs/cosmos-types@npm:1.10.0"
+  dependencies:
+    "@interchainjs/types": "npm:1.10.0"
+    "@interchainjs/utils": "npm:1.10.0"
+  checksum: 10c0/92a6529edce8c0675986aaafbae4a85aeb29d41fa410d4bbae474507342ad57de569ba2f4fae921067d16c72a42a6aa08e3e6107bff71243e3195b3d189ae5d3
+  languageName: node
+  linkType: hard
+
 "@interchainjs/cosmos@npm:0.0.1-beta.20":
   version: 0.0.1-beta.20
   resolution: "@interchainjs/cosmos@npm:0.0.1-beta.20"
@@ -1470,6 +1480,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interchainjs/types@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@interchainjs/types@npm:1.10.0"
+  dependencies:
+    decimal.js: "npm:^10.4.3"
+  checksum: 10c0/4f53d632b5bfac01bf2ab39652e0e37eac772aaef450a985b3ec18e04f5af70194018f2899a6abee199df8863c9866ca4ee5bc8e4ea7d1b3fcb2a035db6c28f6
+  languageName: node
+  linkType: hard
+
 "@interchainjs/types@npm:1.9.14":
   version: 1.9.14
   resolution: "@interchainjs/types@npm:1.9.14"
@@ -1486,6 +1505,20 @@ __metadata:
     "@interchainjs/types": "npm:0.0.1-beta.41"
     bech32: "npm:^2.0.0"
   checksum: 10c0/d895a32149c45f8031f10fd9b5d493352d9ba0d1c5c26141951723cad5bc6803ab5a98ba3e5341930447409afe261fd9c9b07eb0f167ad2bcfb6916e3e609291
+  languageName: node
+  linkType: hard
+
+"@interchainjs/utils@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@interchainjs/utils@npm:1.10.0"
+  dependencies:
+    "@interchainjs/types": "npm:1.10.0"
+    bech32: "npm:^2.0.0"
+    decimal.js: "npm:^10.4.3"
+  peerDependencies:
+    "@chain-registry/v2": 1.71.71
+    "@chain-registry/v2-types": 0.53.72
+  checksum: 10c0/8a1b49799e94fef9d3c9d0f53d031362d356e5c5e9b90d631699aa8e0bbd79d87dba1acbf060c735787c7deeb483ff6b725a41ab950c5d3595189e16d7279889
   languageName: node
   linkType: hard
 
@@ -6109,6 +6142,7 @@ __metadata:
     "@interchain-kit/keplr-extension": "npm:0.0.1-beta.39"
     "@interchain-kit/react": "npm:0.0.1-beta.39"
     "@interchainjs/cosmos": "npm:^1.9.14"
+    "@interchainjs/cosmos-types": "npm:^1.10.0"
     "@rollup/plugin-inject": "npm:^5.0.3"
     "@tanstack/react-query": "npm:^4.29.7"
     "@tippyjs/react": "npm:^4.2.6"
