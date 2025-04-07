@@ -25,8 +25,6 @@ const useNetwork = () => {
 
     if (wallet.status === WalletStatus.WALLET_CONNECTED) {
       chainName = wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
-    } else {
-      chainName = import.meta.env?.DEV ? "xplatestnet" : "xpla";
     }
 
     setNetwork({
