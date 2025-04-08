@@ -21,6 +21,7 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
+import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -124,6 +125,7 @@ const navBar = (
 );
 
 function MainLayout({ children }: PropsWithChildren) {
+  const wallet = useWallet();
   const screenClass = useScreenClass();
   const { chainName } = useNetwork();
 
@@ -132,11 +134,21 @@ function MainLayout({ children }: PropsWithChildren) {
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
-    setSearchParams(newParams);
-  }
+  useEffect(() => {
+    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set(
+        CHAIN_NAME_SEARCH_PARAM,
+        wallet.network.name === "testnet" ? "xplatestnet" : "xpla",
+      );
+      setSearchParams(newParams);
+    }
+    if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
+      setSearchParams(newParams);
+    }
+  }, [chainName, searchParams, setSearchParams, wallet]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname

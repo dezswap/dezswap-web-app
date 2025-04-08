@@ -3,7 +3,7 @@ import type { AssetList } from "@chain-registry/v2-types";
 
 export type SupportedChain = "dimension" | "cube";
 export const KeplrName = "keplr-extension";
-export const DefaultChainName = import.meta.env?.DEV ? "xplatestnet" : "xpla";
+export const DefaultChainName = "xpla";
 export const DefaultChain =
   chains.filter((chain) => chain.chainName.includes("xpla")) ?? [];
 export const DefaultRpcEndpoint = DefaultChain.map(

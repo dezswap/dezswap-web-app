@@ -17,6 +17,8 @@ import {
 } from "utils/cosmostation-helpers";
 import { useAtom } from "jotai";
 import { cosmostationAtom } from "stores/cosmostation";
+import { useSearchParams } from "react-router-dom";
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
 import useLCDClient from "./useUpdatedLCDClient";
 
 // TODO: support testnet
@@ -28,6 +30,7 @@ const useCosmostationWallet = () => {
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
   const { client: lcd } = useLCDClient();
   const xplaWallet = useWallet();
+  const [_, setSearchParams] = useSearchParams();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isInstalled = !!(window as any).cosmostation;
 
@@ -57,6 +60,9 @@ const useCosmostationWallet = () => {
 
   const disconnect = useCallback(async () => {
     xplaWallet.disconnect();
+    const newParams = new URLSearchParams();
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, DefaultChainName);
+    setSearchParams(newParams);
     if (cosmostationWallet?.provider) {
       cosmostationWallet.provider.disconnect();
     }
@@ -65,7 +71,7 @@ const useCosmostationWallet = () => {
 
   useEffect(() => {
     if (xplaWallet.status === WalletStatus.WALLET_NOT_CONNECTED) {
-      disconnect();
+      xplaWallet.disconnect();
     }
   }, [xplaWallet, disconnect]);
 
