@@ -13,6 +13,7 @@ const useBalances = (addresses: string[]) => {
   const { verifiedIbcAssets } = useVerifiedAssets();
   const { chainName } = useNetwork();
   const api = useAPI();
+
   const fetchBalance = useCallback(
     async (address: string) => {
       if (address && chainName && walletAddress) {
@@ -34,7 +35,7 @@ const useBalances = (addresses: string[]) => {
   const balanceQueryResults = useQueries({
     queries:
       addresses?.map((address) => ({
-        queryKey: ["balance", walletAddress, address, chainName],
+        queryKey: ["balance", walletAddress, address, chainName, api.isLoading],
         queryFn: async () => {
           try {
             const balance = await fetchBalance(address);
