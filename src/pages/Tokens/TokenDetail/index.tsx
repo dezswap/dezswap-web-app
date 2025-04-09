@@ -17,7 +17,7 @@ import {
   Visible,
   useScreenClass,
 } from "react-grid-system";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -34,7 +34,9 @@ import useNetwork from "hooks/useNetwork";
 import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
+import Link from "components/Link";
 import ScrollToTop from "components/ScrollToTop";
+import { useNavigate } from "hooks/useNavigate";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Chart from "./Chart";

@@ -8,9 +8,9 @@ import styled from "@emotion/styled";
 import { DashboardToken } from "types/dashboard-api";
 import useAssets from "hooks/useAssets";
 import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
-import { Link } from "react-router-dom";
 import HoverUnderline from "components/utils/HoverUnderline";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import Link from "components/Link";
 
 interface MobileTokenItemProps {
   number: number;

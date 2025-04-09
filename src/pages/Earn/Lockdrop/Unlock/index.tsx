@@ -1,7 +1,7 @@
 import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { useScreenClass } from "react-grid-system";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import { useCallback, useEffect, useMemo } from "react";
 import Typography from "components/Typography";
@@ -27,6 +27,7 @@ import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
+import { useNavigate } from "hooks/useNavigate";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";

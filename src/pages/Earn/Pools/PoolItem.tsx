@@ -15,13 +15,13 @@ import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import styled from "@emotion/styled";
 import Box from "components/Box";
 import Button from "components/Button";
-import { Link } from "react-router-dom";
 import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
   TABLET_SCREEN_CLASS,
 } from "constants/layout";
+import Link from "components/Link";
 import Tooltip from "components/Tooltip";
 import usePairs from "hooks/usePairs";
 import Outlink from "components/Outlink";

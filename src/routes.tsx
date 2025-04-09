@@ -21,6 +21,7 @@ import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 import MainLayout from "layout/Main";
 import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
 import SwapPageAsModal from "components/Modal/SwapModal";
+import { useFormatTo } from "hooks/useFormatTo";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -31,10 +32,14 @@ import SwapPageAsModal from "components/Modal/SwapModal";
 // For legacy links
 function ReplaceToEarn() {
   const location = useLocation();
+  const { formatTo } = useFormatTo();
+
   return (
     <Navigate
       replace
-      to={`/earn${location.pathname}`.replace("/pool", "/pools")}
+      to={formatTo({
+        to: `/earn${location.pathname}`.replace("/pool", "/pools"),
+      })}
     />
   );
 }

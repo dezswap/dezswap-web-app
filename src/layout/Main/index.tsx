@@ -1,6 +1,8 @@
 import { Fragment, PropsWithChildren, useEffect } from "react";
 import { useBlocker, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
+import { useWallet, WalletStatus } from "@xpla/wallet-provider";
+import { useFormatTo } from "hooks/useFormatTo";
 import { useAtomValue } from "jotai";
 import globalElementsAtom from "stores/globalElements";
 import Header, {
@@ -8,6 +10,7 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
+import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -18,10 +21,8 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
-import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
-import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -82,53 +83,56 @@ const FooterWrapper = styled.div`
   }
 `;
 
-const navLinks = [
-  {
-    path: "/",
-    icon: iconOverview,
-    label: "Analytics",
-  },
-  {
-    path: "/trade",
-    icon: iconTrade,
-    label: "Trade",
-  },
-  {
-    path: "/earn",
-    icon: iconPool,
-    label: "Earn",
-  },
-  {
-    path: "/wallet",
-    icon: iconWallet,
-    label: "My Wallet",
-  },
-];
+function NavComponent() {
+  const { formatTo } = useFormatTo();
 
-const navBar = (
-  <NavBar
-    items={navLinks.map((navLink) => {
-      const children = (
-        <div>
-          <NavBarIcon style={{ backgroundImage: `url(${navLink.icon})` }} />
-          <Typography size={12} weight={900} color="primary">
-            {navLink.label}
-          </Typography>
-        </div>
-      );
-      return {
-        to: navLink.path,
-        children,
-      };
-    })}
-  />
-);
+  const navLinks = [
+    {
+      path: "/",
+      icon: iconOverview,
+      label: "Analytics",
+    },
+    {
+      path: "/trade",
+      icon: iconTrade,
+      label: "Trade",
+    },
+    {
+      path: "/earn",
+      icon: iconPool,
+      label: "Earn",
+    },
+    {
+      path: "/wallet",
+      icon: iconWallet,
+      label: "My Wallet",
+    },
+  ];
 
+  const navBar = (
+    <NavBar
+      items={navLinks.map((navLink) => {
+        const children = (
+          <div>
+            <NavBarIcon style={{ backgroundImage: `url(${navLink.icon})` }} />
+            <Typography size={12} weight={900} color="primary">
+              {navLink.label}
+            </Typography>
+          </div>
+        );
+        return {
+          to: formatTo({ to: navLink.path }),
+          children,
+        };
+      })}
+    />
+  );
+  return navBar;
+}
 function MainLayout({ children }: PropsWithChildren) {
   const wallet = useWallet();
   const screenClass = useScreenClass();
   const { chainName } = useNetwork();
-
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
@@ -148,7 +152,7 @@ function MainLayout({ children }: PropsWithChildren) {
       newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
       setSearchParams(newParams);
     }
-  }, [chainName, searchParams, setSearchParams, wallet]);
+  }, [searchParams, setSearchParams, wallet]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
@@ -180,8 +184,8 @@ function MainLayout({ children }: PropsWithChildren) {
 
       {[MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(screenClass) && (
         <>
-          <NavBarOffset>{navBar}</NavBarOffset>
-          <NavBarWrapper>{navBar}</NavBarWrapper>
+          <NavBarOffset>{NavComponent()}</NavBarOffset>
+          <NavBarWrapper>{NavComponent()}</NavBarWrapper>
         </>
       )}
       {globalElements.map(({ element, id }) => (

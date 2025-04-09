@@ -9,7 +9,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
 import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -23,12 +23,14 @@ import {
   getAddressLink,
 } from "utils";
 import useNetwork from "hooks/useNetwork";
+import Link from "components/Link";
 import Button from "components/Button";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useBalance from "hooks/useBalance";
 import usePairBookmark from "hooks/usePairBookmark";
 import usePairs from "hooks/usePairs";
 import { LP_DECIMALS } from "constants/dezswap";
+import { useNavigate } from "hooks/useNavigate";
 import usePool from "hooks/usePool";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import ScrollToTop from "components/ScrollToTop";

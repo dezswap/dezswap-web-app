@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import Modal from "components/Modal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import usePairs from "hooks/usePairs";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
@@ -52,6 +52,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { useNavigate } from "hooks/useNavigate";
 
 export enum FormKey {
   asset1Value = "asset1Value",

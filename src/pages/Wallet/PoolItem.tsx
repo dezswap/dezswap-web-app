@@ -24,10 +24,10 @@ import SimplePieChart from "components/SimplePieChart";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "pages/Earn/Expand";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import { Link } from "react-router-dom";
 import HoverUnderline from "components/utils/HoverUnderline";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import Link from "components/Link";
 
 interface PoolItemProps {
   pool: Pool;

@@ -1,7 +1,7 @@
 import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo } from "react";
@@ -42,6 +42,7 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
+import { useNavigate } from "hooks/useNavigate";
 
 enum FormKey {
   lpValue = "lpValue",

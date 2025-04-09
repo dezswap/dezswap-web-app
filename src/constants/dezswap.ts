@@ -67,4 +67,4 @@ export const apiAddresses: {
   },
 };
 
-export const CHAIN_NAME_SEARCH_PARAM = "chainName";
+export const CHAIN_NAME_SEARCH_PARAM = "chainname";

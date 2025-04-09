@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import Modal from "components/Modal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import { useForm } from "react-hook-form";
 import { useScreenClass } from "react-grid-system";
@@ -49,6 +49,7 @@ import ProgressBar from "components/ProgressBar";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
+import { useNavigate } from "hooks/useNavigate";
 
 enum FormKey {
   asset1Value = "asset1Value",

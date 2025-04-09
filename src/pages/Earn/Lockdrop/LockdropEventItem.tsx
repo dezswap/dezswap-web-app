@@ -28,7 +28,6 @@ import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
 import { useCallback, useMemo } from "react";
 import ProgressBar from "components/ProgressBar";
-import { Link } from "react-router-dom";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
 import Hr from "components/Hr";
@@ -40,6 +39,7 @@ import {
   generateClaimLockdropMsg,
   generateUnstakeLockdropMsg,
 } from "utils/dezswap";
+import Link from "components/Link";
 import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
