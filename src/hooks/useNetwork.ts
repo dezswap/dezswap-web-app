@@ -9,14 +9,8 @@ const useNetwork = () => {
   const wallet = useWallet();
   const [searchParams] = useSearchParams();
 
-  const chainName = useMemo(() => {
-    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
-      return wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
-    }
-
-    return searchParams.get(CHAIN_NAME_SEARCH_PARAM) || DefaultChainName;
-  }, [searchParams, wallet.network.name, wallet.status]);
-
+  const chainName =
+    searchParams.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
   const { getRpcEndpoint, chain: selectedChain } = useChain(chainName);
   const [network, setNetwork] = useState<NetworkInfo>({
     chainName,
