@@ -21,9 +21,12 @@
     ]
   },
   "dependencies": {
+    "@chain-registry/v2": "^1.71.146",
     "@cosmostation/extension-client": "^0.1.15",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@interchain-kit/keplr-extension": "0.0.1-beta.39",
+    "@interchain-kit/react": "0.0.1-beta.39",
     "@rollup/plugin-inject": "^5.0.3",
     "@tanstack/react-query": "^4.29.7",
     "@tippyjs/react": "^4.2.6",
@@ -76,6 +79,9 @@
     "vite-compatible-readable-stream": "^3.6.1",
     "vite-plugin-node-polyfills": "^0.8.2",
     "vite-tsconfig-paths": "^4.2.0"
+  },
+  "resolutions": {
+    "@types/react": "^18.0.17"
   },
   "packageManager": "yarn@4.3.0+sha512.1606bef7c84bc7d83b8576063de2fd08f7d69f9939015bed800f9585a002390268ecc777e9feeba7e26e9556aef6beaad4806968db2182ab5dd3e955ab3b9a0b"
 }

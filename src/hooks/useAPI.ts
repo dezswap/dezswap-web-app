@@ -1,49 +1,43 @@
 import axios from "axios";
 
 import { useCallback, useMemo } from "react";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import { CreateTxOptions } from "@xpla/xpla.js";
 import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
-import { contractAddresses } from "constants/dezswap";
-import useNetwork from "hooks/useNetwork";
-import useLCDClient from "hooks/useLCDClient";
-import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
-import api, { ApiVersion } from "api";
+import { TokenBalance } from "types/lcdClient";
 import {
   LockdropEstimatedReward,
   LockdropEventInfo,
   LockdropEvents,
   LockdropUserInfo,
 } from "types/lockdrop";
-import { CreateTxOptions } from "@xpla/xpla.js";
+import { contractAddresses } from "constants/dezswap";
+import useNetwork from "hooks/useNetwork";
+import useLCDClient from "hooks/useLCDClient";
+import useUpdatedLCDClient from "hooks/useUpdatedLCDClient";
+import api, { ApiVersion } from "api";
 import { ReverseSimulation, Simulation } from "types/pair";
-import { TokenBalance } from "types/lcdClient";
+import useConnectedWallet from "./useConnectedWallet";
 
 const useAPI = (version: ApiVersion = "v1") => {
-  const network = useNetwork();
+  const { chainName } = useNetwork();
   const lcd = useLCDClient();
   const { client: updatedLcd, lcdUrl, isLoading } = useUpdatedLCDClient();
-  const connectedWallet = useConnectedWallet();
-  const walletAddress = useMemo(
-    () => connectedWallet?.walletAddress,
-    [connectedWallet],
-  );
+  const { walletAddress } = useConnectedWallet();
 
   const apiClient = useMemo(
-    () => api(network.name, version),
-    [network.name, version],
+    () => api(chainName, version),
+    [chainName, version],
   );
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
       if (!updatedLcd) return undefined;
-      const queryData = getQueryData(
-        generateSimulationMsg(network.name, offerAsset, amount),
-      );
+      const queryData = getQueryData(generateSimulationMsg(offerAsset, amount));
       const { data: res } =
         await updatedLcd.cosmwasm.wasm.v1.smartContractState({
           address: contractAddress,
@@ -52,7 +46,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as Simulation;
     },
-    [network.name, updatedLcd],
+    [updatedLcd],
   );
 
   const reverseSimulate = useCallback(
@@ -60,7 +54,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       if (!updatedLcd) return undefined;
 
       const queryData = getQueryData(
-        generateReverseSimulationMsg(network.name, askAsset, amount),
+        generateReverseSimulationMsg(askAsset, amount),
       );
 
       const { data: res } =
@@ -71,7 +65,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as ReverseSimulation;
     },
-    [network.name, updatedLcd],
+    [updatedLcd],
   );
 
   const getNativeTokenBalance = useCallback(
@@ -143,18 +137,18 @@ const useAPI = (version: ApiVersion = "v1") => {
   );
 
   const getLatestBlockHeight = useCallback(async () => {
-    if (!updatedLcd) return undefined;
+    if (!updatedLcd) return "0";
 
     const res =
       await updatedLcd.cosmos.base.tendermint.v1beta1.getLatestBlock();
 
-    return res.block?.header.height as unknown as string;
+    return res.block?.header.height.toString() ?? ("0" as unknown as string);
   }, [updatedLcd]);
 
   // unused func
   // const getDecimal = useCallback(
   //   async (denom: string) => {
-  //     const contractAddress = contractAddresses[network.name]?.factory;
+  //     const contractAddress = contractAddresses[chainName]?.factory;
   //     if (!contractAddress || !denom) {
   //       return undefined;
   //     }
@@ -174,12 +168,12 @@ const useAPI = (version: ApiVersion = "v1") => {
   //     const tokenDecimals = res as unknown as Decimal;
   //     return tokenDecimals.decimals;
   //   },
-  //   [network.name, lcd],
+  //   [chainName, lcd],
   // );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
-      const contractAddress = contractAddresses[network.name]?.lockdrop;
+      const contractAddress = contractAddresses?.[chainName]?.lockdrop;
       if (!contractAddress || !updatedLcd) {
         return undefined;
       }
@@ -196,7 +190,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res as unknown as LockdropEvents;
     },
-    [updatedLcd, network.name],
+    [updatedLcd, chainName],
   );
 
   const getLockdropEventInfo = useCallback(
@@ -272,10 +266,10 @@ const useAPI = (version: ApiVersion = "v1") => {
   // TODO: Replace with XplaSigningClient
   const estimateFee = useCallback(
     async (txOptions: CreateTxOptions) => {
-      if (!connectedWallet) {
+      if (!walletAddress) {
         return undefined;
       }
-      const account = await lcd.auth.accountInfo(connectedWallet.walletAddress);
+      const account = await lcd.auth.accountInfo(walletAddress);
       const res = await lcd.tx.estimateFee(
         [
           {
@@ -288,7 +282,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       return res;
     },
-    [connectedWallet, lcd],
+    [walletAddress, lcd],
   );
 
   return useMemo(

@@ -10,12 +10,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import useDashboard from "hooks/dashboard/useDashboard";
 import useAssets from "hooks/useAssets";
-import { Link } from "react-router-dom";
 import HoverUnderline from "components/utils/HoverUnderline";
 import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import { DashboardToken } from "types/dashboard-api";
 import { getBasicSortFunction } from "utils/table";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import Link from "components/Link";
 import MobileTokenItem from "./MobileTokenItem";
 
 function AllTokens() {

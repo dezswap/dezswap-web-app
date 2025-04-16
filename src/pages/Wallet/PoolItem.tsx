@@ -24,10 +24,10 @@ import SimplePieChart from "components/SimplePieChart";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import Expand from "pages/Earn/Expand";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import { Link } from "react-router-dom";
 import HoverUnderline from "components/utils/HoverUnderline";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import Link from "components/Link";
 
 interface PoolItemProps {
   pool: Pool;
@@ -111,7 +111,10 @@ function PoolItem({
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
   const { getAsset } = useAssets();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
@@ -203,14 +206,14 @@ function PoolItem({
       <Outlink
         href={
           pair?.contract_addr
-            ? getAddressLink(pair?.contract_addr, network.name)
+            ? getAddressLink(pair?.contract_addr, explorers?.[0].url)
             : "#"
         }
       >
         Pair info
       </Outlink>
     ),
-    [network.name, pair?.contract_addr],
+    [chainName, pair?.contract_addr],
   );
 
   const userLiquidity = useMemo(

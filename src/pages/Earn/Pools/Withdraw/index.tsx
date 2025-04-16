@@ -18,7 +18,7 @@ import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import Button from "components/Button";
 import Modal from "components/Modal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import usePairs from "hooks/usePairs";
 import useNetwork from "hooks/useNetwork";
@@ -29,11 +29,9 @@ import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
-import { NetworkName } from "types/common";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -42,10 +40,12 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import { useNavigate } from "hooks/useNavigate";
 import useSettingsModal from "hooks/modals/useSettingsModal";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 enum FormKey {
@@ -53,7 +53,6 @@ enum FormKey {
 }
 
 function WithdrawPage() {
-  const connectedWallet = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["slippageTolerance", "txDeadline"],
@@ -62,8 +61,12 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
+  const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
 
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
@@ -107,7 +110,7 @@ function WithdrawPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, network, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -150,13 +153,12 @@ function WithdrawPage() {
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
-      connectedWallet &&
+      walletAddress &&
       isLpPayable
         ? {
             msgs: [
               generateWithdrawLiquidityMsg(
-                connectedWallet?.network.name as NetworkName,
-                connectedWallet?.walletAddress || "",
+                walletAddress || "",
                 poolAddress || "",
                 pair?.liquidity_token || "",
                 valueToAmount(lpValue, LP_DECIMALS) || "0",
@@ -177,7 +179,7 @@ function WithdrawPage() {
             ],
           }
         : undefined,
-    [connectedWallet, simulationResult, lpValue],
+    [walletAddress, simulationResult, lpValue],
   );
 
   const {
@@ -519,7 +521,7 @@ function WithdrawPage() {
                     <>
                       {ellipsisCenter(asset1?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset1?.token, network.name)}
+                        href={getTokenLink(asset1?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`
@@ -545,7 +547,7 @@ function WithdrawPage() {
                     <>
                       {ellipsisCenter(asset2?.token)}&nbsp;
                       <a
-                        href={getTokenLink(asset2?.token, network.name)}
+                        href={getTokenLink(asset2?.token, explorers?.[0].url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         css={css`
@@ -568,7 +570,7 @@ function WithdrawPage() {
             />
           </Expand>
         </div>
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"

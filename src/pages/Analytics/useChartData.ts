@@ -8,12 +8,14 @@ type ChartAPIParameters = Parameters<
 >[0];
 
 const useChartData = (type: ChartAPIParameters["type"]) => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
   const [duration, setDuration] =
     useState<ChartAPIParameters["duration"]>("month");
   const { data } = useQuery({
-    queryKey: [type, "chart", duration, network.chainID],
+    queryKey: [type, "chart", duration, chainId],
     queryFn: () => api.dashboard.getChart({ type, duration }),
   });
 

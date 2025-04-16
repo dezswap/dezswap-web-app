@@ -1,7 +1,7 @@
 import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import iconLink from "assets/icons/icon-link.svg";
 import { useCallback, useEffect, useMemo } from "react";
@@ -20,7 +20,6 @@ import {
   getTokenLink,
 } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -34,6 +33,8 @@ import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { useNavigate } from "hooks/useNavigate";
 
 const Box = styled(box)`
   & > * {
@@ -50,8 +51,10 @@ function ClaimPage() {
   const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
+  const { walletAddress } = useConnectedWallet();
 
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
@@ -60,7 +63,7 @@ function ClaimPage() {
   const { getAsset } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -71,7 +74,7 @@ function ClaimPage() {
   });
 
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -111,19 +114,19 @@ function ClaimPage() {
   );
 
   const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (!connectedWallet || !eventAddress || !duration) {
+    if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
     return {
       msgs: [
         generateClaimLockdropMsg({
-          senderAddress: connectedWallet?.walletAddress,
+          senderAddress: walletAddress,
           contractAddress: eventAddress,
           duration,
         }),
       ],
     };
-  }, [connectedWallet, duration, eventAddress]);
+  }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
 
@@ -307,7 +310,7 @@ function ClaimPage() {
                         <a
                           href={getTokenLink(
                             lockdropEventInfo?.lp_token_addr,
-                            network.name,
+                            explorers?.[0].url,
                           )}
                           target="_blank"
                           rel="noreferrer noopener"

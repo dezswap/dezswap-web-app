@@ -39,7 +39,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName, chainId },
+  } = useNetwork();
   const { client: lcd } = useLCDClient();
 
   const api = useAPI();
@@ -48,8 +50,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
   const isNativeToken = useMemo(
-    () => isNativeTokenAddress(network.name, address),
-    [network.name, address],
+    () => isNativeTokenAddress(chainName, address),
+    [chainName, address],
   );
   const isIbcToken = useMemo(
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
@@ -93,7 +95,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens[network.name]?.find(
+        const asset = nativeTokens[chainName]?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
@@ -143,7 +145,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    network,
+    chainName,
     lcd,
     address,
   ]);
@@ -159,7 +161,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -174,7 +176,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,

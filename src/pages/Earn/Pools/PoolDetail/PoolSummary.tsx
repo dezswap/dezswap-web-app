@@ -12,9 +12,9 @@ import { amountToValue, formatDecimals, formatNumber } from "utils";
 import usePool from "hooks/usePool";
 import { getAddressFromAssetInfo } from "utils/dezswap";
 import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import { Link } from "react-router-dom";
 import HoverUnderline from "components/utils/HoverUnderline";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import Link from "components/Link";
 
 const Wrapper = styled.div`
   width: 100%;

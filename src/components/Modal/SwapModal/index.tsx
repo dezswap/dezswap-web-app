@@ -1,6 +1,5 @@
 import ReactModal from "react-modal";
 import { useScreenClass } from "react-grid-system";
-import { useNavigate } from "react-router-dom";
 import SwapPage from "pages/Trade/Swap";
 import IconButton from "components/IconButton";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -9,6 +8,7 @@ import Modal from "components/Modal";
 
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
+import { useNavigate } from "hooks/useNavigate";
 
 function SwapModal(props: ReactModal.Props) {
   const navigate = useNavigate();

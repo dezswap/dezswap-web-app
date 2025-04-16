@@ -1,15 +1,11 @@
-import {
-  ConnectType,
-  CreateTxFailed,
-  TxResult,
-  useConnectedWallet,
-} from "@xpla/wallet-provider";
+import { ConnectType, CreateTxFailed, TxResult } from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 import useCosmostationWallet from "./useCosmostationWallet";
+import useConnectedWallet from "./useConnectedWallet";
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
@@ -37,7 +33,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
           console.log(error);
           if (
             error instanceof CreateTxFailed &&
-            connectedWallet?.connectType === ConnectType.WALLETCONNECT
+            connectedWallet.connectType === ConnectType.WALLETCONNECT
           ) {
             error.message =
               "Transaction creation failed, please check the details in your wallet and try again";
@@ -50,7 +46,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
       // Cosmostation
       if (
-        connectedWallet?.xplaAddress &&
+        connectedWallet?.walletAddress &&
         !connectedWallet?.availablePost &&
         createTxOptions.fee
       ) {
@@ -69,7 +65,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         }
       }
     },
-    [connectedWallet, cosmostationWallet, txBroadcastModal],
+    [connectedWallet.walletAddress, cosmostationWallet, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {

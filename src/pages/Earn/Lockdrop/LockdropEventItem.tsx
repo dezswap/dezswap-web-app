@@ -28,7 +28,6 @@ import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
 import { useCallback, useMemo } from "react";
 import ProgressBar from "components/ProgressBar";
-import { Link } from "react-router-dom";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
 import Hr from "components/Hr";
@@ -40,10 +39,11 @@ import {
   generateClaimLockdropMsg,
   generateUnstakeLockdropMsg,
 } from "utils/dezswap";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import Link from "components/Link";
 import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
@@ -319,10 +319,12 @@ function LockdropEventItem({
     screenClass,
   );
 
-  const connectedWallet = useConnectedWallet();
   const api = useAPI();
   const { getAsset } = useAssets();
-  const network = useNetwork();
+  const { walletAddress } = useConnectedWallet();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const { findPairByLpAddress } = usePairs();
   const { requestPost } = useRequestPost(() => {
     document.location.reload();
@@ -410,7 +412,7 @@ function LockdropEventItem({
 
   const lockdropAction = useCallback(
     async (messageType: "cancel" | "claim" | "unstake", duration: number) => {
-      if (!connectedWallet?.walletAddress) {
+      if (!walletAddress) {
         return;
       }
       const generateMsg = {
@@ -422,7 +424,7 @@ function LockdropEventItem({
       const txOptions: CreateTxOptions = {
         msgs: [
           generateMsg[messageType]({
-            senderAddress: connectedWallet?.walletAddress,
+            senderAddress: walletAddress,
             contractAddress: lockdropEvent.addr,
             duration,
           }),
@@ -435,7 +437,7 @@ function LockdropEventItem({
         requestPost({ txOptions, fee, skipConfirmation: true });
       }
     },
-    [api, connectedWallet, lockdropEvent.addr, requestPost],
+    [api, walletAddress, lockdropEvent.addr, requestPost],
   );
 
   return (
@@ -602,7 +604,7 @@ function LockdropEventItem({
           <OutlinkList>
             <Outlink>Project Site</Outlink>
             <Outlink
-              href={getAddressLink(lockdropEvent.addr, network.name)}
+              href={getAddressLink(lockdropEvent.addr, explorers?.[0].url)}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -28,6 +28,7 @@ const useCosmostationWallet = () => {
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
   const { client: lcd } = useLCDClient();
   const xplaWallet = useWallet();
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isInstalled = !!(window as any).cosmostation;
 
@@ -57,6 +58,7 @@ const useCosmostationWallet = () => {
 
   const disconnect = useCallback(async () => {
     xplaWallet.disconnect();
+
     if (cosmostationWallet?.provider) {
       cosmostationWallet.provider.disconnect();
     }
@@ -65,7 +67,7 @@ const useCosmostationWallet = () => {
 
   useEffect(() => {
     if (xplaWallet.status === WalletStatus.WALLET_NOT_CONNECTED) {
-      disconnect();
+      xplaWallet.disconnect();
     }
   }, [xplaWallet, disconnect]);
 

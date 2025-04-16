@@ -40,7 +40,9 @@ function TxBroadcastingModal({
   onRetryClick,
   ...modalProps
 }: ReactModal.Props & TxBroadcastingModalProps) {
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const { client: lcd } = useLCDClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -233,7 +235,7 @@ function TxBroadcastingModal({
               </Col>
               <Col>
                 <a
-                  href={getTransactionLink(txHash, network.name)}
+                  href={getTransactionLink(txHash, explorers?.[0]?.url)}
                   target="_blank"
                   rel="noreferrer"
                   css={css`
@@ -302,7 +304,7 @@ function TxBroadcastingModal({
                 </Col>
                 <Col width="auto">
                   <a
-                    href={getTransactionLink(txHash, network.name)}
+                    href={getTransactionLink(txHash, explorers?.[0]?.url)}
                     target="_blank"
                     rel="noreferrer"
                     css={css`

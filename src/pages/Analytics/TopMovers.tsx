@@ -11,8 +11,8 @@ import useAssets from "hooks/useAssets";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { Link } from "react-router-dom";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
+import Link from "components/Link";
 
 function TopMovers() {
   const screenClass = useScreenClass();

@@ -20,7 +20,8 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
+import { useWallet } from "@xpla/wallet-provider";
+import { useWalletManager } from "@interchain-kit/react";
 import {
   amountToValue,
   cutDecimal,
@@ -44,15 +45,16 @@ import Box from "components/Box";
 import Modal from "components/Modal";
 import Copy from "components/Copy";
 import Banner from "components/Banner";
+import Link from "components/Link";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
-import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
 import useHashModal from "hooks/useHashModal";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
@@ -297,11 +299,14 @@ function Header() {
   const notificationModal = useHashModal("notifications");
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers },
+  } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
-  const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
-
+  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
+  const wm = useWalletManager();
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -315,6 +320,16 @@ function Header() {
     [cosmostationWallet],
   );
 
+  const walletName = useMemo(() => {
+    if (isCosmostationWalletConnected) return "Cosmostation";
+    if (connectedWallet.isInterchain) return "Keplr Wallet"; // TODO: check pretty name
+    return connectedWallet?.connection?.name;
+  }, [
+    connectedWallet?.connection?.name,
+    isCosmostationWalletConnected,
+    connectedWallet.isInterchain,
+  ]);
+
   useEffect(() => {
     const handleScroll = (event?: Event) => {
       const { current } = wrapperRef;
@@ -326,10 +341,12 @@ function Header() {
     };
     handleScroll();
     const simpleBar = SimpleBar.instances.get(document.body);
-    simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
+    simpleBar?.getScrollElement()?.addEventListener("scroll", handleScroll);
     window.addEventListener("scroll", handleScroll);
     return () => {
-      simpleBar.getScrollElement().removeEventListener("scroll", handleScroll);
+      simpleBar
+        ?.getScrollElement()
+        ?.removeEventListener("scroll", handleScroll);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -355,7 +372,7 @@ function Header() {
               text-transform: uppercase;
             `}
           >
-            {connectedWallet?.network.name}
+            {chainName}
           </span>
         </Banner>
       )}
@@ -454,7 +471,7 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet ? (
+                    {connectedWallet.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -555,16 +572,14 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {isCosmostationWalletConnected
-                                      ? "Cosmostation"
-                                      : connectedWallet.connection.name}
+                                    {walletName}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
                                   <a
                                     href={getAddressLink(
                                       connectedWallet.walletAddress,
-                                      network.name,
+                                      explorers?.[0].url,
                                     )}
                                     target="_blank"
                                     rel="noreferrer noopener"
@@ -602,7 +617,7 @@ function Header() {
                                 >
                                   <Col>
                                     {ellipsisCenter(
-                                      connectedWallet?.walletAddress,
+                                      connectedWallet.walletAddress,
                                       10,
                                     )}
                                   </Col>
@@ -613,7 +628,7 @@ function Header() {
                                     `}
                                   >
                                     <Copy
-                                      value={connectedWallet?.walletAddress}
+                                      value={connectedWallet.walletAddress}
                                     />
                                   </Col>
                                 </Row>
@@ -690,6 +705,13 @@ function Header() {
                                 onClick={() => {
                                   wallet.disconnect();
                                   cosmostationWallet.disconnect();
+
+                                  if (
+                                    connectedWallet.isInterchain &&
+                                    wm.currentWalletName
+                                  ) {
+                                    wm.disconnect(wm.currentWalletName);
+                                  }
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);

@@ -12,11 +12,11 @@ import usePairs from "hooks/usePairs";
 import { amountToValue } from "utils";
 import { Token } from "types/api";
 import TabButton from "components/TabButton";
-import { Link } from "react-router-dom";
 import useBookmark from "hooks/useBookmark";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
+import Link from "components/Link";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";

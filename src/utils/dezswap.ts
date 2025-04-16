@@ -6,7 +6,6 @@ import {
   Numeric,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
-import { NetworkName } from "types/common";
 import { contractAddresses } from "constants/dezswap";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
@@ -33,10 +32,7 @@ export const getQueryData = (query: object) => {
   return Buffer.from(JSON.stringify(query)).toString("base64");
 };
 
-const assetMsg = (
-  networkName: NetworkName,
-  asset: { address: string; amount: string },
-) => ({
+const assetMsg = (asset: { address: string; amount: string }) => ({
   info: AccAddress.validate(asset.address)
     ? { token: { contract_addr: asset.address } }
     : { native_token: { denom: asset.address } },
@@ -53,13 +49,9 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
 
-export const generateSimulationMsg = (
-  networkName: NetworkName,
-  offerAsset: string,
-  amount: string,
-) => ({
+export const generateSimulationMsg = (offerAsset: string, amount: string) => ({
   simulation: {
-    offer_asset: assetMsg(networkName, {
+    offer_asset: assetMsg({
       address: offerAsset,
       amount,
     }),
@@ -67,12 +59,11 @@ export const generateSimulationMsg = (
 });
 
 export const generateReverseSimulationMsg = (
-  networkName: NetworkName,
   askAsset: string,
   amount: string,
 ) => ({
   reverse_simulation: {
-    ask_asset: assetMsg(networkName, {
+    ask_asset: assetMsg({
       address: askAsset,
       amount,
     }),
@@ -80,7 +71,7 @@ export const generateReverseSimulationMsg = (
 });
 
 export const generateCreatePoolMsg = (
-  networkName: NetworkName,
+  networkName: string,
   senderAddress: string,
   assets: { address: string; amount: string }[],
 ) => [
@@ -107,7 +98,7 @@ export const generateCreatePoolMsg = (
     contractAddresses[networkName]?.factory || "",
     {
       create_pair: {
-        assets: assets.map((a) => assetMsg(networkName, a)),
+        assets: assets.map((a) => assetMsg(a)),
       },
     },
     getCoins(assets),
@@ -115,7 +106,6 @@ export const generateCreatePoolMsg = (
 ];
 
 export const generateAddLiquidityMsg = (
-  networkName: NetworkName,
   senderAddress: string,
   contractAddress: string,
   assets: { address: string; amount: string }[],
@@ -143,7 +133,7 @@ export const generateAddLiquidityMsg = (
     contractAddress,
     {
       provide_liquidity: {
-        assets: assets.map((a) => assetMsg(networkName, a)),
+        assets: assets.map((a) => assetMsg(a)),
         receiver: `${senderAddress}`,
         deadline: Number(
           Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
@@ -158,7 +148,6 @@ export const generateAddLiquidityMsg = (
 ];
 
 export const generateWithdrawLiquidityMsg = (
-  networkName: NetworkName,
   senderAddress: string,
   contractAddress: string,
   lpTokenAddress: string,
@@ -174,7 +163,7 @@ export const generateWithdrawLiquidityMsg = (
         msg: window.btoa(
           JSON.stringify({
             withdraw_liquidity: {
-              min_assets: minAssets?.map((a) => assetMsg(networkName, a)),
+              min_assets: minAssets?.map((a) => assetMsg(a)),
               deadline: Number(
                 Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
               ),
@@ -189,7 +178,6 @@ export const generateWithdrawLiquidityMsg = (
   );
 
 export const generateSwapMsg = (
-  networkName: NetworkName,
   senderAddress: string,
   contractAddress: string,
   fromAssetAddress: string,
@@ -231,7 +219,7 @@ export const generateSwapMsg = (
     contractAddress,
     {
       swap: {
-        offer_asset: assetMsg(networkName, {
+        offer_asset: assetMsg({
           address: fromAssetAddress,
           amount,
         }),

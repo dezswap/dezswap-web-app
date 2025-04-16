@@ -10,6 +10,7 @@ import iconReloadHover from "assets/icons/icon-reload-hover.svg";
 import { NavLink as navLink, Outlet } from "react-router-dom";
 import styled from "@emotion/styled";
 import Tooltip from "components/Tooltip";
+import { useFormatTo } from "hooks/useFormatTo";
 
 const NavBar = styled.div`
   width: 100%;
@@ -44,11 +45,13 @@ const NavLink = styled(navLink)`
 
 function EarnPage() {
   const screenClass = useScreenClass();
+  const { formatTo } = useFormatTo();
+
   return (
     <>
       <Container>
         <NavBar>
-          <NavLink to="pools">
+          <NavLink to={formatTo({ to: "pools" })}>
             <Typography
               size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
               color="primary"
@@ -59,7 +62,7 @@ function EarnPage() {
           </NavLink>
           <Tooltip content="Coming soon" offset={[0, -12]}>
             <div>
-              <NavLink className="disabled" to="lockdrop">
+              <NavLink className="disabled" to={formatTo({ to: "lockdrop" })}>
                 <Typography
                   size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
                   color="primary"

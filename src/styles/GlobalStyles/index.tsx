@@ -39,6 +39,10 @@ function GlobalStyles() {
             text-decoration: none;
             color: inherit;
           }
+
+          #interchain-ui-overlays-manager {
+            display: none;
+          }
         `}
       />
       {/* React Modal */}

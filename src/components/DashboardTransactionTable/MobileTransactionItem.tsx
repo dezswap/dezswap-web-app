@@ -6,7 +6,7 @@ import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
 import useNetwork from "hooks/useNetwork";
 import Expand from "pages/Earn/Expand";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { DashboardTransaction } from "types/dashboard-api";
 import {
   ellipsisCenter,
@@ -45,7 +45,9 @@ Value.defaultProps = {
 };
 
 function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
-  const network = useNetwork();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const expand = useModal();
   const { getAsset } = useAssets();
 
@@ -70,7 +72,7 @@ function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
             <Label>Transaction</Label>
             <Value>
               <a
-                href={getTransactionLink(transaction.hash, network.name)}
+                href={getTransactionLink(transaction.hash, explorers?.[0]?.url)}
                 target="_blank"
                 rel="noreferrer noopener"
               >

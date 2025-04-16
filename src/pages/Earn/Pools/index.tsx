@@ -1,11 +1,12 @@
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { css, Global } from "@emotion/react";
 import Pagination from "components/Pagination";
 import TabButton from "components/TabButton";
+import Link from "components/Link";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useEffect, useMemo, useState } from "react";
 import usePairs from "hooks/usePairs";
