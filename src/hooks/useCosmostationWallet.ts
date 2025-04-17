@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useMemo } from "react";
+import { useAtom } from "jotai";
 import { cosmos, InstallError } from "@cosmostation/extension-client";
 import {
   ConnectType,
@@ -7,18 +9,16 @@ import {
   useWallet,
 } from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
-import networks from "constants/network";
-import { useCallback, useEffect, useMemo } from "react";
+import { BaseAccount } from "@xpla/xplajs/cosmos/auth/v1beta1/auth";
 import { SEND_TRANSACTION_MODE } from "@cosmostation/extension-client/cosmos";
 import {
   getAuthInfoBytes,
   getTxBodyBytes,
   protoTxBytes,
 } from "utils/cosmostation-helpers";
-import { useAtom } from "jotai";
+import networks from "constants/network";
 import { cosmostationAtom } from "stores/cosmostation";
 import useRPCClient from "./useRPCClient";
-import { BaseAccount } from "@xpla/xplajs/cosmos/auth/v1beta1/auth";
 
 // TODO: support testnet
 const CHAIN_ID = networks.dimension.chainId;
@@ -29,7 +29,6 @@ const useCosmostationWallet = () => {
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
   const { client } = useRPCClient();
   const xplaWallet = useWallet();
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isInstalled = !!(window as any).cosmostation;
 

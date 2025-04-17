@@ -27,12 +27,12 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateCreatePoolMsg } from "utils/dezswap";
+import { convertProtoToAminoMsg, generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
@@ -50,6 +50,7 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
 import { useNavigate } from "hooks/useNavigate";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -152,7 +153,7 @@ function CreatePage() {
     validate,
   ]);
 
-  const createTxOptions = useMemo<CreateTxOptions | undefined>(
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>
       walletAddress &&
       asset1?.token &&
@@ -161,20 +162,18 @@ function CreatePage() {
       formData.asset2Value &&
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
-        ? {
-            msgs: generateCreatePoolMsg(chainName, walletAddress, [
-              {
-                address: asset1?.token || "",
-                amount:
-                  valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
-              },
-              {
-                address: asset2?.token || "",
-                amount:
-                  valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
-              },
-            ]),
-          }
+        ? generateCreatePoolMsg(chainName, walletAddress, [
+            {
+              address: asset1?.token || "",
+              amount:
+                valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+            },
+            {
+              address: asset2?.token || "",
+              amount:
+                valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
+            },
+          ])
         : undefined,
     [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
   );
@@ -237,7 +236,7 @@ function CreatePage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: createTxOptions,
+          txOptions: convertProtoToAminoMsg(createTxOptions),
           fee,
           formElement: event.target as HTMLFormElement,
         });

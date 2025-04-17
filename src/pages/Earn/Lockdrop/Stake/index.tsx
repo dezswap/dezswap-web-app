@@ -27,7 +27,10 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateIncreaseLockupContractMsg } from "utils/dezswap";
+import {
+  convertProtoToAminoMsg,
+  generateIncreaseLockupContractMsg,
+} from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -43,6 +46,7 @@ import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 import { useNavigate } from "hooks/useNavigate";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -140,21 +144,19 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
+  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateIncreaseLockupContractMsg({
-          senderAddress: walletAddress,
-          contractAddress: eventAddress,
-          lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-          amount: valueToAmount(lpValue, LP_DECIMALS),
-          duration: Number(duration),
-        }),
-      ],
-    };
+    return [
+      generateIncreaseLockupContractMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        lpTokenAddress: lockdropEventInfo?.lp_token_addr,
+        amount: valueToAmount(lpValue, LP_DECIMALS),
+        duration: Number(duration),
+      }),
+    ];
   }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
   const { fee } = useFee(txOptions);
@@ -187,7 +189,11 @@ function StakePage() {
     async (event) => {
       event.preventDefault();
       if (txOptions && fee) {
-        requestPost({ txOptions, fee, formElement: event.currentTarget });
+        requestPost({
+          txOptions: convertProtoToAminoMsg(txOptions),
+          fee,
+          formElement: event.currentTarget,
+        });
       }
     },
     [fee, requestPost, txOptions],

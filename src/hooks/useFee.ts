@@ -1,19 +1,21 @@
-import { Coin, CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { useDeferredValue, useEffect, useState } from "react";
+import { Coin, Fee } from "@xpla/xpla.js";
+import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { AxiosError } from "axios";
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
+import useAuthSequence from "./useAuthSequence";
 
-const useFee = (txOptions?: CreateTxOptions) => {
+const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const { walletAddress } = useConnectedWallet();
   const { client } = useRPCClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
   const api = useAPI();
-
+  const { sequence } = useAuthSequence();
+  const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
           return;
         }
 
-        const res = await api.estimateFee(deferredCreateTxOptions);
+        const res = await api.estimateFee(deferredCreateTxOptions, sequence);
 
         if (res && !isAborted) {
           setFee(

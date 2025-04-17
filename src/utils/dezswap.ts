@@ -47,14 +47,14 @@ export const parseJsonFromBinary = (binaryData: Uint8Array) =>
   JSON.parse(new TextDecoder().decode(binaryData));
 
 export const createEncodedTx = (
-  msg: MsgExecuteContract,
+  msgs: MsgExecuteContract[],
   authSequence: bigint,
 ): Uint8Array => {
   const { executeContract } = MessageComposer.encoded;
-  const message = executeContract(msg);
+  const messages = msgs.map((msg) => executeContract(msg));
 
   const txBody = TxBody.fromPartial({
-    messages: [message],
+    messages,
   });
 
   const signerInfo = SignerInfo.fromPartial({
@@ -73,12 +73,6 @@ export const createEncodedTx = (
 
   return Tx.encode(tx).finish();
 };
-const assetMsg = (asset: { address: string; amount: string }) => ({
-  info: AccAddress.validate(asset.address)
-    ? { token: { contract_addr: asset.address } }
-    : { native_token: { denom: asset.address } },
-  amount: asset.amount,
-});
 
 const getCoins = (assets: { address: string; amount: string }[]) =>
   new Coins(
@@ -89,6 +83,35 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .sort((a, b) => a.address.localeCompare(b.address))
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
+
+const createEncodedMessage = (msg: Record<string, unknown>) =>
+  window.btoa(JSON.stringify(msg));
+
+export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
+  return {
+    msgs: protoMsgs.map(
+      (protoMsg) =>
+        new BeforeMsgExecuteContract(
+          protoMsg.sender,
+          protoMsg.contract,
+          parseJsonFromBinary(protoMsg.msg),
+          getCoins(
+            protoMsg.funds?.map((fund) => ({
+              address: fund.denom,
+              amount: fund.amount,
+            })) || [],
+          ),
+        ),
+    ),
+  };
+};
+
+const assetMsg = (asset: { address: string; amount: string }) => ({
+  info: AccAddress.validate(asset.address)
+    ? { token: { contract_addr: asset.address } }
+    : { native_token: { denom: asset.address } },
+  amount: asset.amount,
+});
 
 export const generateSimulationMsg = (offerAsset: string, amount: string) => ({
   simulation: {
@@ -113,41 +136,47 @@ export const generateReverseSimulationMsg = (
 
 export const generateCreatePoolMsg = (
   networkName: string,
-  senderAddress: string,
+  sender: string,
   assets: { address: string; amount: string }[],
 ) => [
   ...assets
     .filter(
       (a) => AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
     )
-    .map(
-      (a) =>
-        new BeforeMsgExecuteContract(
-          senderAddress,
-          a.address,
-          {
+    .map((a) =>
+      MsgExecuteContract.fromPartial({
+        sender,
+        contract: a.address,
+        msg: toUtf8(
+          JSON.stringify({
             increase_allowance: {
               amount: a.amount,
               spender: contractAddresses[networkName]?.factory,
             },
-          },
-          [],
+          }),
         ),
+        funds: [],
+      }),
     ),
-  new BeforeMsgExecuteContract(
-    senderAddress,
-    contractAddresses[networkName]?.factory || "",
-    {
-      create_pair: {
-        assets: assets.map((a) => assetMsg(a)),
-      },
-    },
-    getCoins(assets),
-  ),
+  MsgExecuteContract.fromPartial({
+    sender,
+    contract: contractAddresses[networkName]?.factory || "",
+    msg: toUtf8(
+      JSON.stringify({
+        create_pair: {
+          assets: assets.map((a) => assetMsg(a)),
+        },
+      }),
+    ),
+    funds: getCoins(assets).map((coin) => ({
+      denom: coin.denom,
+      amount: coin.amount.toString(),
+    })),
+  }),
 ];
 
 export const generateAddLiquidityMsg = (
-  senderAddress: string,
+  sender: string,
   contractAddress: string,
   assets: { address: string; amount: string }[],
   slippageTolerance: string,
@@ -155,54 +184,60 @@ export const generateAddLiquidityMsg = (
 ) => [
   ...assets
     .filter((a) => AccAddress.validate(a.address))
-    .map(
-      (a) =>
-        new BeforeMsgExecuteContract(
-          senderAddress,
-          a.address,
-          {
+    .map((a) =>
+      MsgExecuteContract.fromPartial({
+        sender,
+        contract: a.address,
+        msg: toUtf8(
+          JSON.stringify({
             increase_allowance: {
               amount: a.amount,
               spender: contractAddress,
             },
-          },
-          [],
+          }),
         ),
+        funds: [],
+      }),
     ),
-  new BeforeMsgExecuteContract(
-    senderAddress,
-    contractAddress,
-    {
-      provide_liquidity: {
-        assets: assets.map((a) => assetMsg(a)),
-        receiver: `${senderAddress}`,
-        deadline: Number(
-          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-        ),
-        slippage_tolerance: `${(parseFloat(slippageTolerance) / 100).toFixed(
-          4,
-        )}`,
-      },
-    },
-    getCoins(assets),
-  ),
+  MsgExecuteContract.fromPartial({
+    sender,
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        provide_liquidity: {
+          assets: assets.map((a) => assetMsg(a)),
+          receiver: `${sender}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
+          slippage_tolerance: `${(parseFloat(slippageTolerance) / 100).toFixed(
+            4,
+          )}`,
+        },
+      }),
+    ),
+    funds: getCoins(assets).map((coin) => ({
+      denom: coin.denom,
+      amount: coin.amount.toString(),
+    })),
+  }),
 ];
 
 export const generateWithdrawLiquidityMsg = (
-  senderAddress: string,
+  sender: string,
   contractAddress: string,
   lpTokenAddress: string,
   amount: string,
   minAssets?: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
 ) =>
-  new BeforeMsgExecuteContract(
-    senderAddress,
-    lpTokenAddress,
-    {
-      send: {
-        msg: window.btoa(
-          JSON.stringify({
+  MsgExecuteContract.fromPartial({
+    sender,
+    contract: lpTokenAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        send: {
+          msg: createEncodedMessage({
             withdraw_liquidity: {
               min_assets: minAssets?.map((a) => assetMsg(a)),
               deadline: Number(
@@ -210,90 +245,40 @@ export const generateWithdrawLiquidityMsg = (
               ),
             },
           }),
-        ),
-        amount,
-        contract: contractAddress,
-      },
-    },
-    [],
-  );
+          amount,
+          contract: contractAddress,
+        },
+      }),
+    ),
+    funds: [],
+  });
 
 export const generateSwapMsg = (
-  isSimulate: boolean,
-  senderAddress: string,
+  sender: string,
   contractAddress: string,
   fromAssetAddress: string,
   amount: string,
-  authSequence: bigint,
   beliefPrice: Numeric.Input,
   maxSpread = "0.1",
   txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
   const isCW20 = AccAddress.validate(fromAssetAddress);
-  if (!isSimulate) {
-    if (isCW20) {
-      const sendMsg = window.btoa(
-        JSON.stringify({
-          swap: {
-            max_spread: `${maxSpreadFixed}`,
-            belief_price: `${beliefPrice}`,
-            deadline: Number(
-              Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-            ),
-          },
-        }),
-      );
 
-      return new BeforeMsgExecuteContract(
-        senderAddress,
-        fromAssetAddress,
-        {
-          send: {
-            msg: sendMsg,
-            amount,
-            contract: contractAddress,
-          },
-        },
-        [],
-      );
-    }
-
-    return new BeforeMsgExecuteContract(
-      senderAddress,
-      contractAddress,
-      {
-        swap: {
-          offer_asset: assetMsg({
-            address: fromAssetAddress,
-            amount,
-          }),
-          max_spread: `${maxSpreadFixed}`,
-          belief_price: `${beliefPrice}`,
-          deadline: Number(
-            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-          ),
-        },
-      },
-      getCoins([{ address: fromAssetAddress, amount }]),
-    );
-  }
   if (isCW20) {
-    const sendMsg = window.btoa(
-      JSON.stringify({
-        swap: {
-          max_spread: `${maxSpreadFixed}`,
-          belief_price: `${beliefPrice}`,
-          deadline: Number(
-            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-          ),
-        },
-      }),
-    );
+    const sendMsg = createEncodedMessage({
+      swap: {
+        max_spread: `${maxSpreadFixed}`,
+        belief_price: `${beliefPrice}`,
+        deadline: Number(
+          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+        ),
+      },
+    });
 
-    const msg = MsgExecuteContract.fromPartial({
-      sender: senderAddress,
-      contract: contractAddress,
+    return MsgExecuteContract.fromPartial({
+      sender,
+      contract: fromAssetAddress,
       msg: toUtf8(
         JSON.stringify({
           send: {
@@ -304,11 +289,9 @@ export const generateSwapMsg = (
         }),
       ),
     });
-
-    return createEncodedTx(msg, authSequence);
   }
-  const msg = MsgExecuteContract.fromPartial({
-    sender: senderAddress,
+  return MsgExecuteContract.fromPartial({
+    sender,
     contract: contractAddress,
     msg: toUtf8(
       JSON.stringify({
@@ -325,14 +308,11 @@ export const generateSwapMsg = (
         },
       }),
     ),
-    funds: [
-      {
-        denom: getCoins([{ address: fromAssetAddress, amount }]).denoms()?.[0],
-        amount,
-      },
-    ],
+    funds: getCoins([{ address: fromAssetAddress, amount }]).map((coin) => ({
+      denom: coin.denom,
+      amount: coin.amount.toString(),
+    })),
   });
-  return createEncodedTx(msg, authSequence);
 };
 
 export const generateIncreaseLockupContractMsg = ({
@@ -348,16 +328,20 @@ export const generateIncreaseLockupContractMsg = ({
   duration: number | string;
   amount?: number | string;
 }) => {
-  return new BeforeMsgExecuteContract(senderAddress, lpTokenAddress, {
-    send: {
-      msg: window.btoa(
-        JSON.stringify({
-          increase_lockup: { duration: Number(duration) },
-        }),
-      ),
-      amount: `${amount}`,
-      contract: contractAddress,
-    },
+  return MsgExecuteContract.fromPartial({
+    sender: senderAddress,
+    contract: lpTokenAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        send: {
+          msg: createEncodedMessage({
+            increase_lockup: { duration: Number(duration) },
+          }),
+          amount: `${amount}`,
+          contract: contractAddress,
+        },
+      }),
+    ),
   });
 };
 
@@ -370,10 +354,16 @@ export const generateCancelLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
-    cancel: {
-      duration: Number(duration),
-    },
+  return MsgExecuteContract.fromPartial({
+    sender: senderAddress,
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        cancel: {
+          duration: Number(duration),
+        },
+      }),
+    ),
   });
 };
 
@@ -386,10 +376,16 @@ export const generateClaimLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
-    claim: {
-      duration: Number(duration),
-    },
+  return MsgExecuteContract.fromPartial({
+    sender: senderAddress,
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        claim: {
+          duration: Number(duration),
+        },
+      }),
+    ),
   });
 };
 
@@ -402,10 +398,16 @@ export const generateUnstakeLockdropMsg = ({
   contractAddress: string;
   duration: number | string;
 }) => {
-  return new BeforeMsgExecuteContract(senderAddress, contractAddress, {
-    unlock: {
-      duration: Number(duration),
-    },
+  return MsgExecuteContract.fromPartial({
+    sender: senderAddress,
+    contract: contractAddress,
+    msg: toUtf8(
+      JSON.stringify({
+        unlock: {
+          duration: Number(duration),
+        },
+      }),
+    ),
   });
 };
 

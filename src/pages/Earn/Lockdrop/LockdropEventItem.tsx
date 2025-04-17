@@ -26,24 +26,16 @@ import iconBadge from "assets/icons/icon-badge.svg";
 import useAssets from "hooks/useAssets";
 import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import ProgressBar from "components/ProgressBar";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
 import Hr from "components/Hr";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import useAPI from "hooks/useAPI";
-import useRequestPost from "hooks/useRequestPost";
-import {
-  generateCancelLockdropMsg,
-  generateClaimLockdropMsg,
-  generateUnstakeLockdropMsg,
-} from "utils/dezswap";
+import { Numeric } from "@xpla/xpla.js";
 import Link from "components/Link";
 import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import useConnectedWallet from "hooks/useConnectedWallet";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
@@ -319,16 +311,11 @@ function LockdropEventItem({
     screenClass,
   );
 
-  const api = useAPI();
   const { getAsset } = useAssets();
-  const { walletAddress } = useConnectedWallet();
   const {
     selectedChain: { explorers },
   } = useNetwork();
   const { findPairByLpAddress } = usePairs();
-  const { requestPost } = useRequestPost(() => {
-    document.location.reload();
-  });
   const pair = useMemo(
     () => findPairByLpAddress(lockdropEvent.lp_token_addr),
     [findPairByLpAddress, lockdropEvent],
@@ -410,36 +397,40 @@ function LockdropEventItem({
     [isBookmarked, lockdropEvent, onBookmarkToggle],
   );
 
-  const lockdropAction = useCallback(
-    async (messageType: "cancel" | "claim" | "unstake", duration: number) => {
-      if (!walletAddress) {
-        return;
-      }
-      const generateMsg = {
-        cancel: generateCancelLockdropMsg,
-        claim: generateClaimLockdropMsg,
-        unstake: generateUnstakeLockdropMsg,
-      };
+  /* 
+  * lockdropAction callback is temporarily disabled as it's not being used
+  * - Uncomment when needed
+  * 
+  * const lockdropAction = useCallback(
+  *   async (messageType: "cancel" | "claim" | "unstake", duration: number) => {
+  *     if (!walletAddress) {
+  *       return;
+  *     }
+  *     const generateMsg = {
+  *       cancel: generateCancelLockdropMsg,
+  *       claim: generateClaimLockdropMsg,
+  *       unstake: generateUnstakeLockdropMsg,
+  *     };
 
-      const txOptions: CreateTxOptions = {
-        msgs: [
-          generateMsg[messageType]({
-            senderAddress: walletAddress,
-            contractAddress: lockdropEvent.addr,
-            duration,
-          }),
-        ],
-      };
+  *     const txOptions: MsgExecuteContract = generateMsg[messageType]({
+  *       senderAddress: walletAddress,
+  *       contractAddress: lockdropEvent.addr,
+  *       duration,
+  *     });
 
-      const fee = await api.estimateFee(txOptions);
+  *     const fee = await api.estimateFee(txOptions, sequence);
 
-      if (fee) {
-        requestPost({ txOptions, fee, skipConfirmation: true });
-      }
-    },
-    [api, walletAddress, lockdropEvent.addr, requestPost],
-  );
-
+  *     if (fee) {
+  *       requestPost({
+  *         txOptions: convertProtoToAminoMsg(txOptions),
+  *         fee,
+  *         skipConfirmation: true,
+  *       });
+  *     }
+  *   },
+  *   [api, walletAddress, lockdropEvent.addr, requestPost],
+  * );
+  */
   return (
     <Wrapper isNeedAction={isNeedAction}>
       <Expand

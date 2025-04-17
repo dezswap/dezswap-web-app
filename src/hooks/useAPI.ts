@@ -3,6 +3,7 @@ import axios from "axios";
 import { useCallback, useMemo } from "react";
 
 import {
+  createEncodedTx,
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
@@ -13,6 +14,8 @@ import { contractAddresses, GAS_INFO } from "constants/dezswap";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { LockdropUserInfo } from "types/lockdrop";
 import useRPCClient from "./useRPCClient";
 import useConnectedWallet from "./useConnectedWallet";
 
@@ -218,7 +221,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromBinary(data) as LockdropUserInfo;
     },
     [client, walletAddress],
   );
@@ -262,10 +265,12 @@ const useAPI = (version: ApiVersion = "v1") => {
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
-    async (txBytes: RequestRedirect) => {
-      if (!txBytes || !client) {
+    async (msg: MsgExecuteContract[], authSequence: bigint) => {
+      if (!msg || !client) {
         return undefined;
       }
+
+      const txBytes = createEncodedTx(msg, authSequence);
 
       const res = await client?.cosmos.tx.v1beta1.simulate({
         txBytes,

@@ -18,14 +18,10 @@ import {
   formatNumber,
   valueToAmount,
 } from "utils";
-import {
-  CreateTxOptions,
-  Numeric,
-  type MsgExecuteContract as BeforeMsgExecuteContract,
-} from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
-import { generateSwapMsg } from "utils/dezswap";
+import { convertProtoToAminoMsg, generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -156,9 +152,7 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const [sequence, setSequence] = useState(0n);
   const { walletAddress } = useConnectedWallet();
-  const api = useAPI();
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
@@ -284,71 +278,56 @@ function SwapPage() {
     asset1?.decimals,
     asset2?.decimals,
   ]);
-  useEffect(() => {
-    const fetchAuthInfo = async () => {
-      try {
-        const { sequence: authSequence } = (await api.getAuthInfo()) || {};
-        setSequence(authSequence || 0n);
-      } catch (error) {
-        console.error("Failed to fetch auth info:", error);
-      }
-    };
 
-    fetchAuthInfo();
-  }, [api]);
+  const createSwapTxBase = useCallback(() => {
+    if (
+      !simulationResult?.estimatedAmount ||
+      simulationResult?.isLoading ||
+      !walletAddress ||
+      !selectedPair ||
+      !asset1?.token ||
+      !asset1Value ||
+      isPoolEmpty ||
+      !Number(asset1Value)
+    ) {
+      return undefined;
+    }
 
-  const createSwapTxBase = useCallback(
-    (isSimulate: boolean) => {
-      if (
-        !simulationResult?.estimatedAmount ||
-        simulationResult?.isLoading ||
-        !walletAddress ||
-        !selectedPair ||
-        !asset1?.token ||
-        !asset1Value ||
-        isPoolEmpty ||
-        !Number(asset1Value)
-      ) {
-        return undefined;
-      }
-
-      const swapMsg = generateSwapMsg(
-        isSimulate,
+    const swapMsg = [
+      generateSwapMsg(
         walletAddress,
         selectedPair.contract_addr,
         asset1.token,
         valueToAmount(asset1Value, asset1?.decimals) || "",
-        sequence,
         beliefPrice || "",
         `${slippageTolerance}`,
         txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-      );
+      ),
+    ];
 
-      return isSimulate ? swapMsg : { msgs: [swapMsg] };
-    },
-    [
-      simulationResult,
-      walletAddress,
-      selectedPair,
-      asset1,
-      asset1Value,
-      slippageTolerance,
-      beliefPrice,
-      txDeadlineMinutes,
-      isPoolEmpty,
-      sequence, // sequence 추가
-    ],
-  );
+    return swapMsg;
+  }, [
+    simulationResult,
+    walletAddress,
+    selectedPair,
+    asset1,
+    asset1Value,
+    slippageTolerance,
+    beliefPrice,
+    txDeadlineMinutes,
+    isPoolEmpty,
+  ]);
 
   const createSimulateTxOptions = useMemo(
-    () => createSwapTxBase(true),
+    () => createSwapTxBase(),
     [createSwapTxBase],
   );
+  const createTxOptions = useMemo(() => {
+    const tx = createSwapTxBase();
+    if (!tx) return undefined;
+    return convertProtoToAminoMsg(tx);
+  }, [createSwapTxBase]);
 
-  const createTxOptions = useMemo(
-    () => createSwapTxBase(false),
-    [createSwapTxBase],
-  );
   const {
     fee,
     isLoading: isFeeLoading,

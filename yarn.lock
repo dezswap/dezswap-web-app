@@ -1441,7 +1441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchainjs/cosmos@npm:1.11.2":
+"@interchainjs/cosmos@npm:1.11.2, @interchainjs/cosmos@npm:^1.11.2":
   version: 1.11.2
   resolution: "@interchainjs/cosmos@npm:1.11.2"
   dependencies:
@@ -6269,6 +6269,7 @@ __metadata:
     "@interchain-kit/core": "npm:^0.3.1"
     "@interchain-kit/keplr-extension": "npm:0.3.0"
     "@interchain-kit/react": "npm:^0.3.0"
+    "@interchainjs/cosmos": "npm:^1.11.2"
     "@rollup/plugin-inject": "npm:^5.0.3"
     "@tanstack/react-query": "npm:^4.29.7"
     "@tippyjs/react": "npm:^4.2.6"

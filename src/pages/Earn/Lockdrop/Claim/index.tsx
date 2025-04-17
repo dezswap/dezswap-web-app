@@ -20,10 +20,13 @@ import {
   getTokenLink,
 } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateClaimLockdropMsg } from "utils/dezswap";
+import {
+  convertProtoToAminoMsg,
+  generateClaimLockdropMsg,
+} from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
@@ -35,6 +38,7 @@ import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 const Box = styled(box)`
   & > * {
@@ -113,19 +117,17 @@ function ClaimPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
+  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateClaimLockdropMsg({
-          senderAddress: walletAddress,
-          contractAddress: eventAddress,
-          duration,
-        }),
-      ],
-    };
+    return [
+      generateClaimLockdropMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        duration,
+      }),
+    ];
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
@@ -150,7 +152,11 @@ function ClaimPage() {
       if (!txOptions || !fee) {
         return;
       }
-      requestPost({ txOptions, fee, skipConfirmation: true });
+      requestPost({
+        txOptions: convertProtoToAminoMsg(txOptions),
+        fee,
+        skipConfirmation: true,
+      });
     },
     [fee, requestPost, txOptions],
   );
