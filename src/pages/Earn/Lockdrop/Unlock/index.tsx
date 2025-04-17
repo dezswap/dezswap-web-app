@@ -16,7 +16,10 @@ import {
   formatNumber,
   getTokenLink,
 } from "utils";
-import { generateUnstakeLockdropMsg } from "utils/dezswap";
+import {
+  convertProtoToAminoMsg,
+  generateUnstakeLockdropMsg,
+} from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
@@ -33,6 +36,7 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -95,19 +99,17 @@ function UnlockPage() {
     );
   }, [duration, lockdropUserInfo]);
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
+  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateUnstakeLockdropMsg({
-          senderAddress: walletAddress,
-          contractAddress: eventAddress,
-          duration,
-        }),
-      ],
-    };
+    return [
+      generateUnstakeLockdropMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        duration,
+      }),
+    ];
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
@@ -132,7 +134,11 @@ function UnlockPage() {
       if (!txOptions || !fee) {
         return;
       }
-      requestPost({ txOptions, fee, skipConfirmation: true });
+      requestPost({
+        txOptions: convertProtoToAminoMsg(txOptions),
+        fee,
+        skipConfirmation: true,
+      });
     },
     [fee, requestPost, txOptions],
   );

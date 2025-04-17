@@ -16,7 +16,7 @@ import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
 import { useWalletManager } from "@interchain-kit/react";
 import { KeplrName } from "constants/dezswap";
-import useConnectedWallet from "hooks/useConnectedWallet";
+import useNetwork from "hooks/useNetwork";
 
 const WalletButton = styled.button`
   width: auto;
@@ -47,7 +47,7 @@ type WalletButtonProps = {
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
-  const { fetchWalletAddress } = useConnectedWallet();
+  const { chainName } = useNetwork();
 
   const theme = useTheme();
   const screenClass = useScreenClass();
@@ -161,8 +161,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
         <button
           onClick={async (e) => {
             try {
-              await wm.connect(KeplrName);
-              fetchWalletAddress();
+              await wm.connect(KeplrName, chainName);
               if (props.onRequestClose) {
                 props.onRequestClose(e);
               }

@@ -17,6 +17,7 @@ export const useLatestBlock = () => {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+  if (typeof height === "bigint") return height.toString();
 
-  return height;
+  return height || "0";
 };

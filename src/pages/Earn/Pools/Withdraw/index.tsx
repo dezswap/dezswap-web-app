@@ -31,7 +31,10 @@ import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
-import { generateWithdrawLiquidityMsg } from "utils/dezswap";
+import {
+  convertProtoToAminoMsg,
+  generateWithdrawLiquidityMsg,
+} from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -47,6 +50,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -149,35 +153,31 @@ function WithdrawPage() {
     [lpValue, balance],
   );
 
-  const createTxOptions = useMemo<CreateTxOptions | undefined>(
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
       walletAddress &&
       isLpPayable
-        ? {
-            msgs: [
-              generateWithdrawLiquidityMsg(
-                walletAddress || "",
-                poolAddress || "",
-                pair?.liquidity_token || "",
-                valueToAmount(lpValue, LP_DECIMALS) || "0",
-                [asset1?.token, asset2?.token].map((address) => ({
-                  address: address || "",
-                  amount: Numeric.parse(
-                    simulationResult?.estimatedAmount?.find(
-                      (a) => a.address === address,
-                    )?.amount || "0",
-                  )
-                    .mul(
-                      Numeric.parse((1 - slippageTolerance / 100).toString()),
-                    )
-                    .toFixed(0),
-                })),
-                txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-              ),
-            ],
-          }
+        ? [
+            generateWithdrawLiquidityMsg(
+              walletAddress || "",
+              poolAddress || "",
+              pair?.liquidity_token || "",
+              valueToAmount(lpValue, LP_DECIMALS) || "0",
+              [asset1?.token, asset2?.token].map((address) => ({
+                address: address || "",
+                amount: Numeric.parse(
+                  simulationResult?.estimatedAmount?.find(
+                    (a) => a.address === address,
+                  )?.amount || "0",
+                )
+                  .mul(Numeric.parse((1 - slippageTolerance / 100).toString()))
+                  .toFixed(0),
+              })),
+              txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+            ),
+          ]
         : undefined,
     [walletAddress, simulationResult, lpValue],
   );
@@ -193,7 +193,7 @@ function WithdrawPage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: createTxOptions,
+          txOptions: convertProtoToAminoMsg(createTxOptions),
           fee,
           formElement: event.target as HTMLFormElement,
         });

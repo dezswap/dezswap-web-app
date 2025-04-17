@@ -40,6 +40,6 @@ export interface Token {
   protocol: string;
   symbol: string;
   token: string;
-  total_supply: string;
   verified: boolean;
+  total_supply?: string;
 }

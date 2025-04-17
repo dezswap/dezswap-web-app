@@ -50,7 +50,7 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
     return undefined;
   }
   try {
-    return Numeric.parse(value || 0)
+    return Numeric.parse(value.toString() || 0)
       .mul(10 ** -decimals)
       .toFixed(decimals, Decimal.ROUND_FLOOR);
   } catch (error) {

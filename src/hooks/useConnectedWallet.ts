@@ -1,58 +1,69 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CreateTxOptions } from "@xpla/xpla.js";
 import { useWalletManager } from "@interchain-kit/react";
+import { WalletState } from "@interchain-kit/core";
+import { useQuery } from "@tanstack/react-query";
 import {
   useConnectedWallet as useConnectedXplaWallet,
   WalletApp,
 } from "@xpla/wallet-provider";
-import { useAtom } from "jotai";
-import { useCallback, useEffect, useMemo } from "react";
-import { walletInfoAtom } from "stores/wallet";
 import useNetwork from "./useNetwork";
 
 const useConnectedWallet = () => {
-  const [walletInfo, setWalletInfo] = useAtom(walletInfoAtom);
   const wm = useWalletManager();
   const connectedXplaWallet = useConnectedXplaWallet();
   const { chainName } = useNetwork();
-
-  const resetWalletAddress = useCallback(() => {
-    setWalletInfo({
-      walletAddress: "",
-      isInterchain: false,
-    });
-  }, [setWalletInfo]);
+  const resetWalletValue = {
+    walletAddress: "",
+    isInterchain: false,
+  };
 
   const fetchWalletAddress = useCallback(async () => {
+    const { currentWalletName, currentChainName } = wm;
+    const { walletState } =
+      wm.getChainWalletState(currentWalletName, chainName) ?? {};
+
     try {
-      const walletName = wm.currentWalletName;
-      const isInterchain = walletName
-        ? wm.isWalletConnected(walletName)
-        : false;
-
-      if (isInterchain) {
-        const { address } =
-          (await wm?.getAccount(walletName as string, chainName)) ?? {};
-
-        setWalletInfo({
-          walletAddress: address,
-          isInterchain,
-        });
-      } else {
-        if (!connectedXplaWallet) {
-          resetWalletAddress();
-          return;
-        }
-        setWalletInfo({
-          walletAddress: connectedXplaWallet.walletAddress,
-          isInterchain,
-        });
+      if (currentChainName && currentChainName !== chainName) {
+        wm.disconnect(currentWalletName, currentChainName);
       }
+      if (walletState === WalletState.Connected) {
+        const { address } =
+          (await wm?.getAccount(currentWalletName, chainName)) ?? {};
+        return {
+          walletAddress: address,
+          isInterchain: true,
+        };
+      }
+      if (connectedXplaWallet?.walletAddress) {
+        return {
+          walletAddress: connectedXplaWallet.walletAddress,
+          isInterchain: false,
+        };
+      }
+
+      return resetWalletValue;
     } catch (error) {
       console.error(error);
-      resetWalletAddress();
+      return resetWalletValue;
     }
-  }, [wm, chainName, setWalletInfo, connectedXplaWallet, resetWalletAddress]);
+  }, [chainName, connectedXplaWallet?.walletAddress, resetWalletValue, wm]);
 
+  const { data: walletAddressResult } = useQuery({
+    queryKey: [
+      "walletAddress",
+      chainName,
+      wm.currentWalletName,
+      connectedXplaWallet?.connectType,
+    ],
+    queryFn: async () => {
+      return fetchWalletAddress();
+    },
+  });
+
+  const prevDataString = useRef("");
+
+  const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const post = useCallback(
     (tx: CreateTxOptions, walletApp?: WalletApp | boolean) => {
       if (walletInfo.isInterchain)
@@ -84,28 +95,21 @@ const useConnectedWallet = () => {
   );
 
   useEffect(() => {
-    fetchWalletAddress();
-  }, [fetchWalletAddress]);
+    if (prevDataString.current !== JSON.stringify(walletAddressResult)) {
+      prevDataString.current = JSON.stringify(walletAddressResult);
+      setWalletInfo((prevData) => ({ ...prevData, ...walletAddressResult }));
+    }
+  }, [walletAddressResult]);
 
   return useMemo(
     () => ({
       ...walletInfo,
-      fetchWalletAddress,
-      resetWalletAddress,
       post,
       availablePost,
       connectType,
       connection,
     }),
-    [
-      walletInfo,
-      fetchWalletAddress,
-      resetWalletAddress,
-      post,
-      availablePost,
-      connectType,
-      connection,
-    ],
+    [walletInfo, post, availablePost, connectType, connection],
   );
 };
 
