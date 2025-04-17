@@ -6,7 +6,7 @@ export type TokenInfo = {
   name: string;
   symbol: string;
   decimals: number;
-  totalSupply: string;
+  totalSupply?: string;
 };
 
 export type VerifiedTokenInfo = {

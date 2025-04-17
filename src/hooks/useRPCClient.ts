@@ -9,9 +9,9 @@ const useRPCClient = () => {
     data: client,
     isLoading,
     error,
-  } = useQuery(
-    ["rpcClient", rpcEndpoint],
-    async () => {
+  } = useQuery({
+    queryKey: ["rpcClient", rpcEndpoint],
+    queryFn: async () => {
       try {
         if (!rpcEndpoint)
           throw new Error("Chain rpc data could not be retrieved");
@@ -26,10 +26,7 @@ const useRPCClient = () => {
         throw err;
       }
     },
-    {
-      retry: 2,
-    },
-  );
+  });
 
   return {
     client,
