@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import Button from "components/Button";
@@ -23,10 +24,13 @@ import {
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateCancelLockdropMsg } from "utils/dezswap";
+import {
+  convertProtoToAminoMsg,
+  generateCancelLockdropMsg,
+} from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -125,19 +129,17 @@ function CancelPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
+  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateCancelLockdropMsg({
-          senderAddress: walletAddress,
-          contractAddress: eventAddress,
-          duration,
-        }),
-      ],
-    };
+    return [
+      generateCancelLockdropMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        duration,
+      }),
+    ];
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
@@ -152,7 +154,11 @@ function CancelPage() {
     (event) => {
       event.preventDefault();
       if (txOptions && fee) {
-        requestPost({ txOptions, fee, skipConfirmation: true });
+        requestPost({
+          txOptions: convertProtoToAminoMsg(txOptions),
+          fee,
+          skipConfirmation: true,
+        });
       }
     },
     [fee, requestPost, txOptions],

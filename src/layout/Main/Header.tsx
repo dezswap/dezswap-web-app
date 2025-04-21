@@ -710,7 +710,10 @@ function Header() {
                                     connectedWallet.isInterchain &&
                                     wm.currentWalletName
                                   ) {
-                                    wm.disconnect(wm.currentWalletName);
+                                    wm.disconnect(
+                                      wm.currentWalletName,
+                                      chainName,
+                                    );
                                   }
                                   setTimeout(() => {
                                     window.location.reload();

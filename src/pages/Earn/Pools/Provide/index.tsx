@@ -32,7 +32,7 @@ import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateAddLiquidityMsg } from "utils/dezswap";
+import { convertProtoToAminoMsg, generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -53,6 +53,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { useNavigate } from "hooks/useNavigate";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -149,7 +150,7 @@ function ProvidePage() {
         },
   );
 
-  const createTxOptions = useMemo<CreateTxOptions | undefined>(
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>
       simulationResult?.estimatedAmount &&
       !simulationResult?.isLoading &&
@@ -162,28 +163,24 @@ function ProvidePage() {
       Number(formData.asset2Value) &&
       !Numeric.parse(formData.asset1Value).isNaN() &&
       !Numeric.parse(formData.asset2Value).isNaN()
-        ? {
-            msgs: generateAddLiquidityMsg(
-              walletAddress,
-              poolAddress || "",
-              [
-                {
-                  address: asset1?.token || "",
-                  amount:
-                    valueToAmount(formData.asset1Value, asset1?.decimals) ||
-                    "0",
-                },
-                {
-                  address: asset2?.token || "",
-                  amount:
-                    valueToAmount(formData.asset2Value, asset2?.decimals) ||
-                    "0",
-                },
-              ],
-              `${slippageTolerance}`,
-              txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-            ),
-          }
+        ? generateAddLiquidityMsg(
+            walletAddress,
+            poolAddress || "",
+            [
+              {
+                address: asset1?.token || "",
+                amount:
+                  valueToAmount(formData.asset1Value, asset1?.decimals) || "0",
+              },
+              {
+                address: asset2?.token || "",
+                amount:
+                  valueToAmount(formData.asset2Value, asset2?.decimals) || "0",
+              },
+            ],
+            `${slippageTolerance}`,
+            txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+          )
         : undefined,
     [
       simulationResult,
@@ -262,7 +259,7 @@ function ProvidePage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: createTxOptions,
+          txOptions: convertProtoToAminoMsg(createTxOptions),
           fee,
           formElement: event.target as HTMLFormElement,
         });

@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useMemo } from "react";
+import { useAtom } from "jotai";
 import { cosmos, InstallError } from "@cosmostation/extension-client";
 import {
   ConnectType,
@@ -6,18 +8,17 @@ import {
   WalletStatus,
   useWallet,
 } from "@xpla/wallet-provider";
-import { BaseAccount, CreateTxOptions, Fee } from "@xpla/xpla.js";
-import networks from "constants/network";
-import { useCallback, useEffect, useMemo } from "react";
+import { CreateTxOptions, Fee } from "@xpla/xpla.js";
+import { BaseAccount } from "@xpla/xplajs/cosmos/auth/v1beta1/auth";
 import { SEND_TRANSACTION_MODE } from "@cosmostation/extension-client/cosmos";
 import {
   getAuthInfoBytes,
   getTxBodyBytes,
   protoTxBytes,
 } from "utils/cosmostation-helpers";
-import { useAtom } from "jotai";
+import networks from "constants/network";
 import { cosmostationAtom } from "stores/cosmostation";
-import useLCDClient from "./useUpdatedLCDClient";
+import useRPCClient from "./useRPCClient";
 
 // TODO: support testnet
 const CHAIN_ID = networks.dimension.chainId;
@@ -26,9 +27,8 @@ const useCosmostationWallet = () => {
   // const [provider, setProvider] = useState<Cosmos>();
   // const [account, setAccount] = useState<RequestAccountResponse>();
   const [cosmostationWallet, setCosmostationWallet] = useAtom(cosmostationAtom);
-  const { client: lcd } = useLCDClient();
+  const { client } = useRPCClient();
   const xplaWallet = useWallet();
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isInstalled = !!(window as any).cosmostation;
 
@@ -77,15 +77,14 @@ const useCosmostationWallet = () => {
         throw new Error("Not connected");
       }
       try {
-        if (!lcd) {
-          console.log("Error: LCDClient is not exist");
+        if (!client) {
+          console.log("Error: RPCClient is not exist");
           return;
         }
-        const { info } = await lcd.cosmos.auth.v1beta1.accountInfo({
+        const { info } = await client.cosmos.auth.v1beta1.accountInfo({
           address: cosmostationWallet.account.address,
         });
-        const { account_number: accountNumber, sequence } =
-          info as unknown as BaseAccount;
+        const { accountNumber, sequence } = info as unknown as BaseAccount;
 
         const signRes = await cosmostationWallet.provider.signAmino(CHAIN_ID, {
           chain_id: CHAIN_ID,
@@ -146,7 +145,7 @@ const useCosmostationWallet = () => {
         throw new Error("Unknown error");
       }
     },
-    [cosmostationWallet, lcd],
+    [cosmostationWallet, client],
   );
 
   useEffect(() => {
