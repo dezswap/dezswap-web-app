@@ -27,12 +27,12 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { convertProtoToAminoMsg, generateAddLiquidityMsg } from "utils/dezswap";
+import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -259,7 +259,7 @@ function ProvidePage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: convertProtoToAminoMsg(createTxOptions),
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.target as HTMLFormElement,
         });

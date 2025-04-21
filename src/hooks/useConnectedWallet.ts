@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CreateTxOptions } from "@xpla/xpla.js";
 import { useWalletManager } from "@interchain-kit/react";
 import { WalletState } from "@interchain-kit/core";
 import { useQuery } from "@tanstack/react-query";
@@ -7,12 +6,18 @@ import {
   useConnectedWallet as useConnectedXplaWallet,
   WalletApp,
 } from "@xpla/wallet-provider";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useNetwork from "./useNetwork";
+import { NewMsgTxOptions } from "./useRequestPost";
+import useSigningClient from "./useSigningClient";
 
 const useConnectedWallet = () => {
+  const { signingClient } = useSigningClient();
   const wm = useWalletManager();
-  const connectedXplaWallet = useConnectedXplaWallet();
   const { chainName } = useNetwork();
+  const connectedXplaWallet = useConnectedXplaWallet();
+
   const resetWalletValue = {
     walletAddress: "",
     isInterchain: false,
@@ -65,18 +70,37 @@ const useConnectedWallet = () => {
 
   const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const post = useCallback(
-    (tx: CreateTxOptions, walletApp?: WalletApp | boolean) => {
-      if (walletInfo.isInterchain)
-        throw new Error(`we can't use other wallets post`);
-      return connectedXplaWallet?.post(tx, walletApp);
+    (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
+      if (walletInfo.isInterchain) {
+        const { executeContract } = MessageComposer.fromPartial;
+        const messages = tx.msgs.map((txOption) => executeContract(txOption));
+        if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
+          throw new Error("PostError: Fee Not Found");
+        }
+        return signingClient?.signAndBroadcast(
+          walletInfo.walletAddress,
+          messages,
+          {
+            amount: [...tx.fee.amount],
+            gas: tx.fee.gas_limit.toString(),
+          },
+        );
+      }
+      return connectedXplaWallet?.post(
+        { ...tx, ...convertProtoToAminoMsg(tx.msgs) },
+        walletApp,
+      );
     },
-    [connectedXplaWallet, walletInfo.isInterchain],
+    [
+      connectedXplaWallet,
+      signingClient,
+      walletInfo.isInterchain,
+      walletInfo.walletAddress,
+    ],
   );
 
   const availablePost = useMemo(
-    () =>
-      walletInfo.isInterchain ? false : connectedXplaWallet?.availablePost,
-    // TODO: Implement with XplaSingingClient
+    () => (walletInfo.isInterchain ? null : connectedXplaWallet?.availablePost),
     [connectedXplaWallet?.availablePost, walletInfo.isInterchain],
   );
 

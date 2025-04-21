@@ -24,10 +24,7 @@ import {
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import {
-  convertProtoToAminoMsg,
-  generateCancelLockdropMsg,
-} from "utils/dezswap";
+import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
@@ -129,7 +126,7 @@ function CancelPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
@@ -142,7 +139,7 @@ function CancelPage() {
     ];
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -153,15 +150,15 @@ function CancelPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (txOptions && fee) {
+      if (createTxOptions && fee) {
         requestPost({
-          txOptions: convertProtoToAminoMsg(txOptions),
+          txOptions: { msgs: createTxOptions },
           fee,
           skipConfirmation: true,
         });
       }
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, createTxOptions],
   );
 
   useEffect(() => {

@@ -8,7 +8,6 @@ import {
 import { Asset, NativeAsset } from "types/pair";
 import { contractAddresses } from "constants/dezswap";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
 import {
@@ -19,6 +18,7 @@ import {
   Fee,
 } from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
+import { EncodeObject } from "@xpla/xplajs/types";
 
 export type Amount = string | number;
 
@@ -46,12 +46,9 @@ export const parseJsonFromBinary = (binaryData: Uint8Array) =>
   JSON.parse(new TextDecoder().decode(binaryData));
 
 export const createEncodedTx = (
-  msgs: MsgExecuteContract[],
+  messages: EncodeObject[],
   authSequence: bigint,
 ): Uint8Array => {
-  const { executeContract } = MessageComposer.encoded;
-  const messages = msgs.map((msg) => executeContract(msg));
-
   const txBody = TxBody.fromPartial({
     messages,
   });

@@ -16,14 +16,12 @@ import {
   formatNumber,
   getTokenLink,
 } from "utils";
-import {
-  convertProtoToAminoMsg,
-  generateUnstakeLockdropMsg,
-} from "utils/dezswap";
+import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
 import Button from "components/Button";
@@ -36,7 +34,6 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -135,7 +132,7 @@ function UnlockPage() {
         return;
       }
       requestPost({
-        txOptions: convertProtoToAminoMsg(txOptions),
+        txOptions: { msgs: txOptions },
         fee,
         skipConfirmation: true,
       });

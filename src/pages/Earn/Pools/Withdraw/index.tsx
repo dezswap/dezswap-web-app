@@ -28,13 +28,10 @@ import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
-import {
-  convertProtoToAminoMsg,
-  generateWithdrawLiquidityMsg,
-} from "utils/dezswap";
+import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -193,7 +190,7 @@ function WithdrawPage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: convertProtoToAminoMsg(createTxOptions),
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.target as HTMLFormElement,
         });

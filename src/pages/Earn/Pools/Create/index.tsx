@@ -32,7 +32,7 @@ import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { convertProtoToAminoMsg, generateCreatePoolMsg } from "utils/dezswap";
+import { generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
@@ -236,7 +236,7 @@ function CreatePage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: convertProtoToAminoMsg(createTxOptions),
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.target as HTMLFormElement,
         });

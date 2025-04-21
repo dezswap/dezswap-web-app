@@ -1,6 +1,7 @@
 import { useDeferredValue, useEffect, useState } from "react";
 import { Coin, Fee } from "@xpla/xpla.js";
 import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { AxiosError } from "axios";
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
@@ -17,6 +18,8 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const { sequence } = useAuthSequence();
   const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
+  const { executeContract } = MessageComposer.encoded;
+  const messages = deferredCreateTxOptions?.map((msg) => executeContract(msg));
 
   useEffect(() => {
     setIsLoading(true);
@@ -34,7 +37,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
 
     const estimateFee = async () => {
       try {
-        if (!walletAddress || !deferredCreateTxOptions) {
+        if (!walletAddress || !messages) {
           setFee(undefined);
           setErrMsg("");
           setIsFailed(false);
@@ -42,7 +45,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
           return;
         }
 
-        const res = await api.estimateFee(deferredCreateTxOptions, sequence);
+        const res = await api.estimateFee(messages, sequence);
 
         if (res && !isAborted) {
           setFee(

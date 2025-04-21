@@ -27,13 +27,10 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import {
-  convertProtoToAminoMsg,
-  generateIncreaseLockupContractMsg,
-} from "utils/dezswap";
+import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
@@ -144,7 +141,7 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
@@ -159,7 +156,7 @@ function StakePage() {
     ];
   }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -188,15 +185,15 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-      if (txOptions && fee) {
+      if (createTxOptions && fee) {
         requestPost({
-          txOptions: convertProtoToAminoMsg(txOptions),
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.currentTarget,
         });
       }
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, createTxOptions],
   );
 
   useEffect(() => {
