@@ -184,8 +184,12 @@ function MainLayout({ children }: PropsWithChildren) {
 
       {[MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(screenClass) && (
         <>
-          <NavBarOffset>{NavComponent()}</NavBarOffset>
-          <NavBarWrapper>{NavComponent()}</NavBarWrapper>
+          <NavBarOffset>
+            <NavComponent />
+          </NavBarOffset>
+          <NavBarWrapper>
+            <NavComponent />
+          </NavBarWrapper>
         </>
       )}
       {globalElements.map(({ element, id }) => (
