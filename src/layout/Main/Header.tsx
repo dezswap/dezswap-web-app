@@ -372,7 +372,7 @@ function Header() {
               text-transform: uppercase;
             `}
           >
-            {chainName}
+            TESTNET
           </span>
         </Banner>
       )}
