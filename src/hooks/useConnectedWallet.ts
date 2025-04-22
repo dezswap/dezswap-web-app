@@ -12,46 +12,45 @@ import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
 
+const resetWalletValue = {
+  walletAddress: "",
+  isInterchain: false,
+};
+
 const useConnectedWallet = () => {
   const { signingClient } = useSigningClient();
   const wm = useWalletManager();
   const { chainName } = useNetwork();
   const connectedXplaWallet = useConnectedXplaWallet();
-
-  const resetWalletValue = {
-    walletAddress: "",
-    isInterchain: false,
-  };
+  const [walletInfo, setWalletInfo] = useState(resetWalletValue);
 
   const fetchWalletAddress = useCallback(async () => {
     const { currentWalletName, currentChainName } = wm;
     const { walletState } =
       wm.getChainWalletState(currentWalletName, chainName) ?? {};
 
-    try {
-      if (currentChainName && currentChainName !== chainName) {
-        wm.disconnect(currentWalletName, currentChainName);
-      }
-      if (walletState === WalletState.Connected) {
-        const { address } =
-          (await wm?.getAccount(currentWalletName, chainName)) ?? {};
-        return {
-          walletAddress: address,
-          isInterchain: true,
-        };
-      }
-      if (connectedXplaWallet?.walletAddress) {
-        return {
-          walletAddress: connectedXplaWallet.walletAddress,
-          isInterchain: false,
-        };
-      }
-
-      return resetWalletValue;
-    } catch (error) {
-      console.error(error);
-      return resetWalletValue;
+    if (currentChainName && currentChainName !== chainName) {
+      wm.disconnect(currentWalletName, currentChainName);
     }
+    if (walletState === WalletState.Connected) {
+      const accountData = await wm.getAccount(
+        currentWalletName,
+        currentChainName,
+      );
+      if (!accountData) throw new Error("Failed to fetch account data");
+      return {
+        walletAddress: accountData.address,
+        isInterchain: true,
+      };
+    }
+    if (connectedXplaWallet?.walletAddress) {
+      return {
+        walletAddress: connectedXplaWallet.walletAddress,
+        isInterchain: false,
+      };
+    }
+
+    return resetWalletValue;
   }, [chainName, connectedXplaWallet?.walletAddress, resetWalletValue, wm]);
 
   const { data: walletAddressResult } = useQuery({
@@ -61,14 +60,15 @@ const useConnectedWallet = () => {
       wm.currentWalletName,
       connectedXplaWallet?.connectType,
     ],
-    queryFn: async () => {
+    queryFn: () => {
       return fetchWalletAddress();
     },
+    enabled: !!chainName && !!wm,
+    retry: 2,
   });
 
   const prevDataString = useRef("");
 
-  const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const post = useCallback(
     (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
       if (walletInfo.isInterchain) {
