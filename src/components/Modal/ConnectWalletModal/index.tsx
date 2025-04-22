@@ -43,6 +43,19 @@ type WalletButtonProps = {
   isInstalled?: boolean;
 };
 
+const { userAgent } = navigator;
+
+const getBrowser = () => {
+  if (/Chrome/.test(userAgent) && !/Edge|Edg|OPR/.test(userAgent)) {
+    return "chrome";
+  }
+  if (/Firefox/.test(userAgent)) {
+    return "firefox";
+  }
+  return undefined;
+};
+const browserType = getBrowser();
+
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
@@ -101,25 +114,34 @@ function ConnectWalletModal(props: ReactModal.Props) {
           } as WalletButtonProps,
         ]
       : []),
-    ...wm.wallets.map(({ info: { logo, windowKey, name, prettyName } }) => {
-      return {
-        label: prettyName,
-        iconSrc: logo,
-        isInstalled:
+    ...wm.wallets.map(
+      ({ info: { logo, windowKey, name, prettyName, downloads } }) => {
+        const isInstalled =
           windowKey &&
-          (window as unknown as Record<string, unknown>)[windowKey],
-        onClick: async (event) => {
-          try {
-            await wm.connect(name, chainName);
-            if (props.onRequestClose) {
-              props.onRequestClose(event);
+          (window as unknown as Record<string, unknown>)[windowKey];
+        return {
+          label: prettyName,
+          iconSrc: logo,
+          isInstalled,
+          onClick: async (event) => {
+            try {
+              if (!isInstalled) {
+                const url = downloads?.find(
+                  (d) => d.browser === browserType,
+                )?.link;
+                if (url) window.open(url);
+              }
+              await wm.connect(name, chainName);
+              if (props.onRequestClose) {
+                props.onRequestClose(event);
+              }
+            } catch (error) {
+              console.log(error);
             }
-          } catch (error) {
-            console.log(error);
-          }
-        },
-      } as WalletButtonProps;
-    }),
+          },
+        } as WalletButtonProps;
+      },
+    ),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ icon, name, url }) => ({
