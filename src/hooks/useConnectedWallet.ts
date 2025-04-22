@@ -51,7 +51,7 @@ const useConnectedWallet = () => {
     }
 
     return resetWalletValue;
-  }, [chainName, connectedXplaWallet?.walletAddress, resetWalletValue, wm]);
+  }, [chainName, connectedXplaWallet?.walletAddress, wm]);
 
   const { data: walletAddressResult } = useQuery({
     queryKey: [
@@ -64,6 +64,7 @@ const useConnectedWallet = () => {
       return fetchWalletAddress();
     },
     enabled: !!chainName && !!wm,
+    refetchOnMount: false,
     retry: 2,
   });
 

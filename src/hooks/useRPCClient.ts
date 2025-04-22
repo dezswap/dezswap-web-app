@@ -26,6 +26,8 @@ const useRPCClient = () => {
         throw err;
       }
     },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   return {

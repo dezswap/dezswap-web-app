@@ -25,6 +25,8 @@ function useSigningClient() {
       }
     },
     enabled: walletState === WalletState.Connected,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
   return { signingClient };
 }

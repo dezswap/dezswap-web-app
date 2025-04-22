@@ -37,7 +37,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
             ...createTxOptions,
             msgs: createTxOptions.msgs,
           });
-
+          console.log({ ...createTxOptions, msgs: createTxOptions.msgs });
           if (connectedWallet.isInterchain && result) {
             const { transactionHash } = result as DeliverTxResponse;
             setTxHash(transactionHash);
