@@ -78,7 +78,7 @@ const useConnectedWallet = () => {
         if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
           throw new Error("PostError: Fee Not Found");
         }
-        return signingClient?.signAndBroadcast(
+        return signingClient?.signAndBroadcastSync(
           walletInfo.walletAddress,
           messages,
           {
