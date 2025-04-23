@@ -116,12 +116,14 @@ function ConnectWalletModal(props: ReactModal.Props) {
       : []),
     ...wm.wallets.map(
       ({ info: { logo, windowKey, name, prettyName, downloads } }) => {
-        const isInstalled =
-          windowKey &&
-          (window as unknown as Record<string, unknown>)[windowKey];
+        const isInstalled = !!(
+          windowKey && (window as unknown as Record<string, unknown>)[windowKey]
+        );
+        const iconSrc = typeof logo === "string" ? logo : logo?.major ?? "";
+
         return {
           label: prettyName,
-          iconSrc: logo,
+          iconSrc,
           isInstalled,
           onClick: async (event) => {
             try {
