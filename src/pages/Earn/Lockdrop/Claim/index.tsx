@@ -20,10 +20,7 @@ import {
   getTokenLink,
 } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import {
-  convertProtoToAminoMsg,
-  generateClaimLockdropMsg,
-} from "utils/dezswap";
+import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
@@ -117,7 +114,7 @@ function ClaimPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
@@ -130,7 +127,7 @@ function ClaimPage() {
     ];
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -149,16 +146,16 @@ function ClaimPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!txOptions || !fee) {
+      if (!createTxOptions || !fee) {
         return;
       }
       requestPost({
-        txOptions: convertProtoToAminoMsg(txOptions),
+        txOptions: { msgs: createTxOptions },
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, createTxOptions],
   );
 
   useEffect(() => {
@@ -346,7 +343,7 @@ function ClaimPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !txOptions}
+          disabled={!fee || !createTxOptions}
         >
           Claim
         </Button>

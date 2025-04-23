@@ -422,7 +422,7 @@ function LockdropEventItem({
 
   *     if (fee) {
   *       requestPost({
-  *         txOptions: convertProtoToAminoMsg(txOptions),
+  *         txOptions:  { msgs: txOptions },
   *         fee,
   *         skipConfirmation: true,
   *       });

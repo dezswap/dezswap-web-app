@@ -23,6 +23,8 @@ const useNetwork = () => {
       }
       return null;
     },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const prevDataString = useRef("");

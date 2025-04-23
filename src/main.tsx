@@ -3,7 +3,7 @@ import { ChainProvider } from "@interchain-kit/react";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { defaultSignerOptions } from "@xpla/xpla/defaults";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -29,6 +29,7 @@ const interchainOptions = {
   signerOptions: {
     signing: () => {
       return {
+        signerOptions: defaultSignerOptions.Cosmos,
         broadcast: {
           checkTx: true,
           deliverTx: true,

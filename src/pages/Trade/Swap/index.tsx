@@ -21,7 +21,7 @@ import {
 import { Numeric } from "@xpla/xpla.js";
 import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
-import { convertProtoToAminoMsg, generateSwapMsg } from "utils/dezswap";
+import { generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
@@ -279,7 +279,7 @@ function SwapPage() {
     asset2?.decimals,
   ]);
 
-  const createSwapTxBase = useCallback(() => {
+  const createTxOptions = useMemo(() => {
     if (
       !simulationResult?.estimatedAmount ||
       simulationResult?.isLoading ||
@@ -318,21 +318,11 @@ function SwapPage() {
     isPoolEmpty,
   ]);
 
-  const createSimulateTxOptions = useMemo(
-    () => createSwapTxBase(),
-    [createSwapTxBase],
-  );
-  const createTxOptions = useMemo(() => {
-    const tx = createSwapTxBase();
-    if (!tx) return undefined;
-    return convertProtoToAminoMsg(tx);
-  }, [createSwapTxBase]);
-
   const {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createSimulateTxOptions);
+  } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -415,7 +405,7 @@ function SwapPage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: createTxOptions,
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.target as HTMLFormElement,
         });
