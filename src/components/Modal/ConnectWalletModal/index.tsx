@@ -15,7 +15,6 @@ import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import useCosmostationWallet from "hooks/useCosmostationWallet";
 import { useWalletManager } from "@interchain-kit/react";
-import { KeplrName } from "constants/dezswap";
 import useNetwork from "hooks/useNetwork";
 
 const WalletButton = styled.button`
@@ -44,11 +43,23 @@ type WalletButtonProps = {
   isInstalled?: boolean;
 };
 
+const { userAgent } = navigator;
+
+const getBrowser = () => {
+  if (/Chrome/.test(userAgent) && !/Edge|Edg|OPR/.test(userAgent)) {
+    return "chrome";
+  }
+  if (/Firefox/.test(userAgent)) {
+    return "firefox";
+  }
+  return undefined;
+};
+const browserType = getBrowser();
+
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
   const { chainName } = useNetwork();
-
   const theme = useTheme();
   const screenClass = useScreenClass();
   const cosmostationWallet = useCosmostationWallet();
@@ -103,6 +114,36 @@ function ConnectWalletModal(props: ReactModal.Props) {
           } as WalletButtonProps,
         ]
       : []),
+    ...wm.wallets.map(
+      ({ info: { logo, windowKey, name, prettyName, downloads } }) => {
+        const isInstalled = !!(
+          windowKey && (window as unknown as Record<string, unknown>)[windowKey]
+        );
+        const iconSrc = typeof logo === "string" ? logo : logo?.major ?? "";
+
+        return {
+          label: prettyName,
+          iconSrc,
+          isInstalled,
+          onClick: async (event) => {
+            try {
+              if (!isInstalled) {
+                const url = downloads?.find(
+                  (d) => d.browser === browserType,
+                )?.link;
+                if (url) window.open(url);
+              }
+              await wm.connect(name, chainName);
+              if (props.onRequestClose) {
+                props.onRequestClose(event);
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        } as WalletButtonProps;
+      },
+    ),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ icon, name, url }) => ({
@@ -158,22 +199,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
           height: "100%",
         }}
       >
-        <button
-          onClick={async (e) => {
-            try {
-              await wm.connect(KeplrName, chainName);
-              if (props.onRequestClose) {
-                props.onRequestClose(e);
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }}
-          type="button"
-        >
-          Keplr
-        </button>
-
         {buttons.map((item) => (
           <Col
             xs={6}

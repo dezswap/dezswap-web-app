@@ -3,7 +3,6 @@ import type { AssetList } from "@chain-registry/v2-types";
 import Decimal from "decimal.js";
 
 export type SupportedChain = "dimension" | "cube";
-export const KeplrName = "keplr-extension";
 export const DefaultChainName = "xpla";
 export const DefaultChain =
   chains.filter((chain) => chain.chainName.includes("xpla")) ?? [];
