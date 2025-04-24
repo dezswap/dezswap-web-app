@@ -291,7 +291,6 @@ function WalletInfo({
 function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
-  const wallet = useWallet();
   const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
   const xplaBalance = useBalance(XPLA_ADDRESS);

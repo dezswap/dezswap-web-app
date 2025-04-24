@@ -29,7 +29,6 @@ const Wrapper = styled.div`
 
 function WalletPage() {
   const navigate = useNavigate();
-  const wallet = useWallet();
   const { walletAddress, disconnect } = useConnectedWallet();
   const {
     selectedChain: { explorers },
