@@ -17,7 +17,7 @@ import {
   Visible,
   useScreenClass,
 } from "react-grid-system";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
@@ -41,6 +41,7 @@ import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
 import TokenPools from "./TokenPools";
+import Link from "components/Link";
 
 const Wrapper = styled.div`
   width: 100%;
