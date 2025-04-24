@@ -1,4 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import TxBroadcastingModal from "components/Modal/TxBroadcastingModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useGlobalElement from "hooks/useGlobalElement";
 import useModal from "hooks/useModal";
 import { useMemo } from "react";
@@ -14,6 +16,8 @@ const useTxBroadcastingModal = ({
   onDoneClick?: () => void;
 }) => {
   const modal = useModal();
+  const queryClient = useQueryClient();
+  const { walletAddress } = useConnectedWallet();
   const element = useMemo(
     () => (
       <TxBroadcastingModal
@@ -23,6 +27,12 @@ const useTxBroadcastingModal = ({
         onDoneClick={() => {
           if (onDoneClick) {
             onDoneClick();
+            queryClient.invalidateQueries({
+              predicate: (query) => {
+                const keys = query.queryKey;
+                return keys.includes(walletAddress);
+              },
+            });
           } else {
             window.location.reload();
           }
