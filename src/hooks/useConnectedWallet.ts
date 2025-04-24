@@ -4,6 +4,7 @@ import { WalletState } from "@interchain-kit/core";
 import { useQuery } from "@tanstack/react-query";
 import {
   useConnectedWallet as useConnectedXplaWallet,
+  useWallet,
   WalletApp,
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
@@ -11,6 +12,7 @@ import { convertProtoToAminoMsg } from "utils/dezswap";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
+import useCosmostationWallet from "./useCosmostationWallet";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -23,7 +25,8 @@ const useConnectedWallet = () => {
   const { chainName } = useNetwork();
   const connectedXplaWallet = useConnectedXplaWallet();
   const [walletInfo, setWalletInfo] = useState(resetWalletValue);
-
+  const wallet = useWallet();
+  const cosmostationWallet = useCosmostationWallet();
   const fetchWalletAddress = useCallback(async () => {
     const { currentWalletName, currentChainName } = wm;
     const { walletState } =
@@ -119,6 +122,18 @@ const useConnectedWallet = () => {
     [connectedXplaWallet?.connection, walletInfo.isInterchain],
   );
 
+  const disconnect = useCallback(() => {
+    wallet.disconnect();
+    cosmostationWallet.disconnect();
+
+    if (walletInfo.isInterchain && wm.currentWalletName) {
+      wm.disconnect(wm.currentWalletName, chainName);
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  }, [chainName, cosmostationWallet, wallet, walletInfo.isInterchain, wm]);
+
   useEffect(() => {
     if (prevDataString.current !== JSON.stringify(walletAddressResult)) {
       prevDataString.current = JSON.stringify(walletAddressResult);
@@ -133,8 +148,9 @@ const useConnectedWallet = () => {
       availablePost,
       connectType,
       connection,
+      disconnect,
     }),
-    [walletInfo, post, availablePost, connectType, connection],
+    [walletInfo, post, availablePost, connectType, connection, disconnect],
   );
 };
 

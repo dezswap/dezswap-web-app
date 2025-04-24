@@ -703,21 +703,7 @@ function Header() {
                                     .background};
                                 `}
                                 onClick={() => {
-                                  wallet.disconnect();
-                                  cosmostationWallet.disconnect();
-
-                                  if (
-                                    connectedWallet.isInterchain &&
-                                    wm.currentWalletName
-                                  ) {
-                                    wm.disconnect(
-                                      wm.currentWalletName,
-                                      chainName,
-                                    );
-                                  }
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 100);
+                                  connectedWallet.disconnect();
                                 }}
                               >
                                 Disconnect
