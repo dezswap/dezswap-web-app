@@ -1,5 +1,5 @@
-import { Fragment, PropsWithChildren, useEffect } from "react";
-import { useBlocker, useSearchParams } from "react-router-dom";
+import { Fragment, PropsWithChildren, useEffect, useMemo } from "react";
+import { useBlocker } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 import { useFormatTo } from "hooks/useFormatTo";
@@ -10,7 +10,7 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
-import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -18,6 +18,7 @@ import iconPool from "assets/icons/icon-pool.svg";
 import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+import useSearchParamState from "hooks/useSearchParamState";
 import useNetwork from "hooks/useNetwork";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
@@ -136,28 +137,26 @@ function MainLayout({ children }: PropsWithChildren) {
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParam, setSearchParam] = useSearchParamState<string>(
+    CHAIN_NAME_SEARCH_PARAM,
+    DefaultChainName,
+  );
+
+  const name = useMemo(() => {
+    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
+      return wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
+    }
+    return searchParam ?? DefaultChainName;
+  }, [searchParam, wallet.network.name, wallet.status]);
 
   useEffect(() => {
-    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set(
-        CHAIN_NAME_SEARCH_PARAM,
-        wallet.network.name === "testnet" ? "xplatestnet" : "xpla",
-      );
-      setSearchParams(newParams);
-    }
-    if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
-      setSearchParams(newParams);
-    }
-  }, [searchParams, setSearchParams, wallet]);
+    setSearchParam(name);
+  }, [name, setSearchParam]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
     if (nextLocation.pathname.startsWith("/wallet")) {
-      if (!walletAddress) {
+      if (wallet.status !== WalletStatus.WALLET_CONNECTED && !walletAddress) {
         return true;
       }
     }

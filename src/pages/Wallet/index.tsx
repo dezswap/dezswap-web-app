@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useWallet } from "@xpla/wallet-provider";
 import Button from "components/Button";
 import Copy from "components/Copy";
 import Hr from "components/Hr";
@@ -46,10 +45,9 @@ function WalletPage() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
+      if (walletAddress) return;
       connectWalletModal.open(!walletAddress);
-      if (!walletAddress) {
-        isModalOpened.current = true;
-      }
+      isModalOpened.current = true;
     }, 1000);
 
     return () => {
