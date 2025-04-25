@@ -40,14 +40,11 @@ const useConnectedWallet = () => {
 
     walletState = wm.getChainWalletState(
       wm.currentWalletName,
-      wm.currentChainName,
+      chainName,
     )?.walletState;
 
     if (walletState === WalletState.Connected) {
-      const accountData = await wm.getAccount(
-        wm.currentWalletName,
-        wm.currentChainName,
-      );
+      const accountData = await wm.getAccount(wm.currentWalletName, chainName);
       if (!accountData) throw new Error("Failed to fetch account data");
       return {
         walletAddress: accountData.address,
