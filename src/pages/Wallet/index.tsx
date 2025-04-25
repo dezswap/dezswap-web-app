@@ -29,8 +29,7 @@ const Wrapper = styled.div`
 
 function WalletPage() {
   const navigate = useNavigate();
-  const wallet = useWallet();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress, disconnect } = useConnectedWallet();
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -42,8 +41,7 @@ function WalletPage() {
   const isModalOpened = useRef(false);
 
   const handleDisconnectClick = () => {
-    wallet.disconnect();
-    navigate("/", { replace: true });
+    disconnect();
   };
 
   useEffect(() => {
