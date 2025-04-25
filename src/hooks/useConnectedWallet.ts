@@ -28,17 +28,25 @@ const useConnectedWallet = () => {
   const wallet = useWallet();
   const cosmostationWallet = useCosmostationWallet();
   const fetchWalletAddress = useCallback(async () => {
-    const { currentWalletName, currentChainName } = wm;
-    const { walletState } =
-      wm.getChainWalletState(currentWalletName, chainName) ?? {};
+    let { walletState } =
+      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
 
-    if (currentChainName && currentChainName !== chainName) {
-      wm.disconnect(currentWalletName, currentChainName);
+    if (wm.currentChainName !== chainName) {
+      if (walletState === WalletState.Connected) {
+        await wm.disconnect(wm.currentWalletName, wm.currentChainName);
+      }
+      wm.setCurrentChainName(chainName);
     }
+
+    walletState = wm.getChainWalletState(
+      wm.currentWalletName,
+      wm.currentChainName,
+    )?.walletState;
+
     if (walletState === WalletState.Connected) {
       const accountData = await wm.getAccount(
-        currentWalletName,
-        currentChainName,
+        wm.currentWalletName,
+        wm.currentChainName,
       );
       if (!accountData) throw new Error("Failed to fetch account data");
       return {
