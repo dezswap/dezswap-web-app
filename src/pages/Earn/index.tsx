@@ -3,7 +3,7 @@ import Hr from "components/Hr";
 import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import { Col, Container, Row, useScreenClass } from "react-grid-system";
+import { Container, useScreenClass } from "react-grid-system";
 
 import iconReload from "assets/icons/icon-reload.svg";
 import iconReloadHover from "assets/icons/icon-reload-hover.svg";
