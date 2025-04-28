@@ -1,15 +1,27 @@
 import { useChain } from "@interchain-kit/react";
 import { useQuery } from "@tanstack/react-query";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
+import {
+  CHAIN_NAME_SEARCH_PARAM,
+  DefaultChain,
+  DefaultChainName,
+} from "constants/dezswap";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { NetworkInfo } from "types/common";
 
 const useNetwork = () => {
   const [searchParams] = useSearchParams();
+  const paramName = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
 
-  const chainName =
-    searchParams.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
+  const isValidChain = DefaultChain.some(
+    (supportChain) => supportChain.chainName === paramName,
+  );
+
+  const chainName = useMemo(
+    () => (isValidChain ? paramName ?? DefaultChainName : DefaultChainName),
+    [isValidChain, paramName],
+  );
+
   const { getRpcEndpoint, chain: selectedChain } = useChain(chainName);
 
   const { data: networkResult } = useQuery({
@@ -23,6 +35,7 @@ const useNetwork = () => {
       }
       return null;
     },
+    enabled: !isValidChain,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
@@ -38,14 +51,15 @@ const useNetwork = () => {
   useEffect(() => {
     if (
       prevDataString.current !== JSON.stringify(networkResult) &&
-      networkResult
+      networkResult &&
+      !isValidChain
     ) {
       prevDataString.current = JSON.stringify(networkResult);
       setNetwork(networkResult);
     }
-  }, [networkResult]);
+  }, [isValidChain, networkResult]);
 
-  return useMemo(() => network, [network]);
+  return network;
 };
 
 export default useNetwork;

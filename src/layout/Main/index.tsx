@@ -1,4 +1,10 @@
-import { Fragment, PropsWithChildren, useEffect } from "react";
+import {
+  Fragment,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import { useBlocker, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
@@ -10,7 +16,7 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
-import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChain } from "constants/dezswap";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -19,6 +25,8 @@ import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import { useNavigate } from "hooks/useNavigate";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import Footer from "./Footer";
@@ -137,6 +145,30 @@ function MainLayout({ children }: PropsWithChildren) {
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const handleModalClose = useCallback(() => {
+    navigate("/", { replace: true });
+    window.location.reload();
+  }, [navigate]);
+
+  const { isOpen, open } = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
+  const { paramName, isValidChain } = useMemo(() => {
+    const searchName = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
+    const isSupported = DefaultChain.some(
+      (supportChain) => supportChain.chainName === searchName,
+    );
+    return { paramName: searchName, isValidChain: isSupported };
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (paramName && !isValidChain) {
+      if (!isOpen) open();
+    }
+  }, [isOpen, isValidChain, open, paramName, searchParams]);
 
   useEffect(() => {
     if (wallet.status === WalletStatus.WALLET_CONNECTED) {
@@ -147,12 +179,12 @@ function MainLayout({ children }: PropsWithChildren) {
       );
       setSearchParams(newParams);
     }
-    if (!searchParams.get(CHAIN_NAME_SEARCH_PARAM)) {
+    if (!paramName) {
       const newParams = new URLSearchParams(searchParams);
       newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
       setSearchParams(newParams);
     }
-  }, [searchParams, setSearchParams, wallet]);
+  }, [chainName, paramName, searchParams, setSearchParams, wallet]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
