@@ -46,7 +46,7 @@ const ButtonWrapper = styled.div`
 `;
 
 function BrowserDelegateButton() {
-  const match = useMatch("/trade*");
+  const match = useMatch("/trade/*");
   const isTradePage = !!match;
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const [isHidden, setIsHidden] = useState(false);
