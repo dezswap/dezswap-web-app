@@ -16,7 +16,11 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChain } from "constants/dezswap";
+import {
+  CHAIN_NAME_SEARCH_PARAM,
+  DefaultChain,
+  DefaultChainName,
+} from "constants/dezswap";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -26,7 +30,6 @@ import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import { useNavigate } from "hooks/useNavigate";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import Footer from "./Footer";
@@ -145,12 +148,13 @@ function MainLayout({ children }: PropsWithChildren) {
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const handleModalClose = useCallback(() => {
-    navigate("/", { replace: true });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, DefaultChainName);
+    setSearchParams(newParams);
     window.location.reload();
-  }, [navigate]);
+  }, [searchParams, setSearchParams]);
 
   const { isOpen, open } = useInvalidPathModal({
     onReturnClick: handleModalClose,
@@ -166,7 +170,7 @@ function MainLayout({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (paramName && !isValidChain) {
-      if (!isOpen) open();
+      open();
     }
   }, [isOpen, isValidChain, open, paramName, searchParams]);
 

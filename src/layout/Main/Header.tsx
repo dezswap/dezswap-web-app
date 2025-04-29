@@ -20,7 +20,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useWallet } from "@xpla/wallet-provider";
 import { useWalletManager } from "@interchain-kit/react";
 import {
   amountToValue,
