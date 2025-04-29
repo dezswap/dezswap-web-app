@@ -11,11 +11,10 @@ import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import iconInstall from "assets/icons/icon-install.svg";
 import iconInstalled from "assets/icons/icon-installed.svg";
-import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
-import useCosmostationWallet from "hooks/useCosmostationWallet";
 import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
+import { BaseWallet, WalletState } from "@interchain-kit/core";
 
 const WalletButton = styled.button`
   width: auto;
@@ -62,111 +61,94 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const { chainName } = useNetwork();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const cosmostationWallet = useCosmostationWallet();
   const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
-    ...availableConnections
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ type, icon, name, identifier }) => ({
-        label: name,
-        identifier,
-        type,
-        iconSrc: icon,
-        isInstalled: true,
-        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          connect(type, identifier, false);
-          if (props.onRequestClose) {
-            props.onRequestClose(event);
-          }
-        },
-      }))
-      .flatMap((p) =>
-        isMobile() && p.label === "Wallet Connect"
-          ? [
-              p as WalletButtonProps,
-              {
-                label: `${p.label}\n(XPLA GAMES)`,
-                iconSrc: p.iconSrc,
-                isInstalled: true,
-                onClick: (event) => {
-                  connect(p.type, p.identifier, true);
-                  if (props.onRequestClose) {
-                    props.onRequestClose(event);
-                  }
-                },
-              } as WalletButtonProps,
-            ]
-          : (p as WalletButtonProps),
-      ),
-    ...(cosmostationWallet.isInstalled
-      ? [
-          {
-            label: "Cosmostation",
-            iconSrc: iconCosmostation,
+        ...availableConnections
+          .filter(({ type }) => type !== ConnectType.READONLY)
+          .map(({ type, icon, name, identifier }) => ({
+            label: name,
+            identifier,
+            type,
+            iconSrc: icon,
             isInstalled: true,
-            onClick: (event) => {
-              cosmostationWallet.connect();
+            onClick: (
+              event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+            ) => {
+              connect(type, identifier, false);
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
             },
-          } as WalletButtonProps,
-        ]
-      : []),
-    ...wm.wallets.map(
-      ({ info: { logo, windowKey, name, prettyName, downloads } }) => {
-        const isInstalled = !!(
-          windowKey && (window as unknown as Record<string, unknown>)[windowKey]
-        );
-        const iconSrc = typeof logo === "string" ? logo : logo?.major ?? "";
+          }))
+          .flatMap((p) =>
+            isMobile() && p.label === "Wallet Connect"
+              ? [
+                  p as WalletButtonProps,
+                  {
+                    label: `${p.label}\n(XPLA GAMES)`,
+                    iconSrc: p.iconSrc,
+                    isInstalled: true,
+                    onClick: (event) => {
+                      try {
+                        connect(p.type, p.identifier, true);  
+                      } catch (error) {
+                        console.log(error);
+                      }
+                      
+                      if (props.onRequestClose) {
+                        props.onRequestClose(event);
+                      }
+                    },
+                  } as WalletButtonProps,
+                ]
+              : (p as WalletButtonProps),
+          ),
+        ...wm.wallets.map((wallet: BaseWallet) => {
+          const isInstalled = wallet.walletState !== WalletState.NotExist;
 
-        return {
-          label: prettyName,
-          iconSrc,
-          isInstalled,
-          onClick: async (event) => {
-            try {
-              if (!isInstalled) {
-                const url = downloads?.find(
-                  (d) => d.browser === browserType,
-                )?.link;
-                if (url) window.open(url);
+          const iconSrc =
+            typeof wallet.info.logo === "string"
+              ? wallet.info.logo
+              : wallet.info.logo?.major ?? "";
+
+          return {
+            label: wallet.info.prettyName,
+            iconSrc,
+            isInstalled,
+            onClick: async (event) => {
+              try {
+                if (!isInstalled) {
+                  const url = wallet.info.downloads?.find(
+                    (d) => d.browser === browserType,
+                  )?.link;
+                  if (url) window.open(url);
+                }
+
+                await wm.connect(wallet.info.name, chainName);
+                if(wm.getChainWalletState(wallet.info.name, chainName)?.walletState !== WalletState.Connected) {
+                  // TODO: open unsupported wallet modal
+                }
+                
+                if (props.onRequestClose) {
+                  props.onRequestClose(event);
+                }
+              } catch (error) {
+                console.log(error);
               }
-              await wm.connect(name, chainName);
-              if (props.onRequestClose) {
-                props.onRequestClose(event);
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          },
-        } as WalletButtonProps;
-      },
-    ),
-    ...availableInstallations
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ icon, name, url }) => ({
-        label: `${name}`,
-        iconSrc: icon,
-        onClick: () => {
-          window.open(url);
-        },
-      })),
-    ...(!cosmostationWallet.isInstalled && !isMobile()
-      ? [
-          {
-            label: "Cosmostation",
-            iconSrc: iconCosmostation,
-            onClick: () => {
-              window.open(
-                "https://chrome.google.com/webstore/detail/cosmostation/fpkhgmpbidmiogeglndfbkegfdlnajnf",
-              );
             },
-          },
-        ]
-      : []),
-  ];
+          } as WalletButtonProps;
+        }),
+        ...availableInstallations
+          .filter(({ type }) => type !== ConnectType.READONLY)
+          .map(({ icon, name, url }) => ({
+            label: `${name}`,
+            iconSrc: icon,
+            onClick: () => {
+              window.open(url);
+            },
+          })),
+      ];
 
   return (
     <Modal
