@@ -35,7 +35,6 @@ const useNetwork = () => {
       }
       return null;
     },
-    enabled: !isValidChain,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
@@ -51,13 +50,12 @@ const useNetwork = () => {
   useEffect(() => {
     if (
       prevDataString.current !== JSON.stringify(networkResult) &&
-      networkResult &&
-      !isValidChain
+      networkResult
     ) {
       prevDataString.current = JSON.stringify(networkResult);
       setNetwork(networkResult);
     }
-  }, [isValidChain, networkResult]);
+  }, [networkResult]);
 
   return network;
 };
