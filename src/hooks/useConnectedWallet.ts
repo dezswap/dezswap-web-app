@@ -9,6 +9,7 @@ import {
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { convertProtoToAminoMsg } from "utils/dezswap";
+import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
@@ -92,7 +93,14 @@ const useConnectedWallet = () => {
           walletInfo.walletAddress,
           messages,
           {
-            amount: [...tx.fee.amount],
+            amount: [
+              ...tx.fee.amount.map((coin) =>
+                Coin.fromPartial({
+                  amount: coin.amount.toString(),
+                  denom: coin.denom,
+                }),
+              ),
+            ],
             gas: tx.fee.gas_limit.toString(),
           },
         );
