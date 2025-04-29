@@ -46,7 +46,7 @@ function App() {
       <RouterProvider router={routes} />
     </ScreenClassProvider>
   ) : (
-    <div>Loading...</div>
+    <div />
   );
 }
 
