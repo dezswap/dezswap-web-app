@@ -67,6 +67,7 @@ const useConnectedWallet = () => {
       chainName,
       wm.currentWalletName,
       connectedXplaWallet?.connectType,
+      wm,
     ],
     queryFn: () => {
       return fetchWalletAddress();
@@ -127,12 +128,13 @@ const useConnectedWallet = () => {
     [connectedXplaWallet?.connection, walletInfo.isInterchain],
   );
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     wallet.disconnect();
     cosmostationWallet.disconnect();
 
     if (walletInfo.isInterchain && wm.currentWalletName) {
-      wm.disconnect(wm.currentWalletName, chainName);
+      
+      await wm.disconnect(wm.currentWalletName, chainName);
     }
     setTimeout(() => {
       window.location.reload();

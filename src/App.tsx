@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 import routes from "routes";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import GlobalStyles from "styles/GlobalStyles";
 import {
   ScreenClassProvider,
@@ -8,6 +8,7 @@ import {
   useScreenClass,
 } from "react-grid-system";
 import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
+import { useWalletManager } from "@interchain-kit/react";
 
 setGridConfiguration(gridConfiguration);
 
@@ -31,11 +32,21 @@ function App() {
     });
   }, []);
 
-  return (
+  const wm = useWalletManager();
+  const [isInitialized, setIsInitialized] = useState(false);
+  useEffect(() => {
+    wm.init().then(() => {
+      setIsInitialized(true);
+    });
+  }, []);
+
+  return isInitialized ? (
     <ScreenClassProvider>
       <GlobalStyles />
       <RouterProvider router={routes} />
     </ScreenClassProvider>
+  ) : (
+    <div>Loading...</div>
   );
 }
 
