@@ -15,6 +15,7 @@ import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
 import { BaseWallet, WalletState } from "@interchain-kit/core";
+import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
 
 const WalletButton = styled.button`
   width: auto;
@@ -104,7 +105,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 ]
               : (p as WalletButtonProps),
           ),
-        ...wm.wallets.map((wallet: BaseWallet) => {
+        ...wm.wallets
+        .filter((wallet: BaseWallet) => !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name))
+        .map((wallet: BaseWallet) => {
           const isInstalled = wallet.walletState !== WalletState.NotExist;
 
           const iconSrc =
