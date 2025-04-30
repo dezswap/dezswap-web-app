@@ -33,6 +33,7 @@ const useConnectedWallet = () => {
 
     if (wm.currentChainName !== chainName) {
       if (walletState === WalletState.Connected) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         await wm.disconnect(wm.currentWalletName, wm.currentChainName);
       }
       wm.setCurrentChainName(chainName);
@@ -133,7 +134,6 @@ const useConnectedWallet = () => {
     cosmostationWallet.disconnect();
 
     if (walletInfo.isInterchain && wm.currentWalletName) {
-      
       await wm.disconnect(wm.currentWalletName, chainName);
     }
     setTimeout(() => {
