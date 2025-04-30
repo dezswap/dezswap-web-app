@@ -1163,9 +1163,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchain-kit/core@npm:0.3.14, @interchain-kit/core@npm:^0.3.14":
-  version: 0.3.14
-  resolution: "@interchain-kit/core@npm:0.3.14"
+"@interchain-kit/core@npm:^0.3.15, @interchain-kit/core@npm:^0.3.16":
+  version: 0.3.16
+  resolution: "@interchain-kit/core@npm:0.3.16"
   dependencies:
     "@chain-registry/v2": "npm:^1.71.71"
     "@chain-registry/v2-keplr": "npm:^0.0.72"
@@ -1183,44 +1183,35 @@ __metadata:
     buffer: "npm:^6.0.3"
     interchainjs: "npm:1.11.5"
     long: "npm:^5.2.3"
-  checksum: 10c0/75e7fbbd516d378868e3573947a25279b149bb41047b8751836fd19036ce3c17b5fdcccf15ced1fde2751bf369ee9f96cfc9050cc1b876b3f7826b8dd51a8213
+  checksum: 10c0/8245c845ad67752c4027086431f1a800f5549b419f83e1dbd342ee4f39a8bd26e13bc9323d799deb1de6df388bbc09883561b7346b6b91dc5fe9f255fc540dd1
   languageName: node
   linkType: hard
 
-"@interchain-kit/cosmostation-extension@npm:^0.3.14":
-  version: 0.3.14
-  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.14"
+"@interchain-kit/cosmostation-extension@npm:^0.3.15":
+  version: 0.3.16
+  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.16"
   dependencies:
-    "@interchain-kit/core": "npm:0.3.14"
-  checksum: 10c0/693a2b72c9fa649aaaa163a619dc138a7a4c3b5b88c6c723f18f0b11575324fbad154039f4d69c7698322c4c1cff66be685632062199ef414873c4cc12d477c0
+    "@interchain-kit/core": "npm:^0.3.16"
+  checksum: 10c0/7909b97ff90b463439306efb10d1681e467bbabbb90e313b76e744827963c2d3555bbbb9a0cdf0869400cd7489545d1b186632ab518c42234f738c26999638a2
   languageName: node
   linkType: hard
 
-"@interchain-kit/keplr-extension@npm:^0.3.14":
-  version: 0.3.14
-  resolution: "@interchain-kit/keplr-extension@npm:0.3.14"
+"@interchain-kit/keplr-extension@npm:^0.3.15":
+  version: 0.3.16
+  resolution: "@interchain-kit/keplr-extension@npm:0.3.16"
   dependencies:
-    "@interchain-kit/core": "npm:0.3.14"
+    "@interchain-kit/core": "npm:^0.3.16"
     "@keplr-wallet/provider-extension": "npm:^0.12.102"
-  checksum: 10c0/2b338e8e438696ed1d2a234c9b71fbf9a709de155d2205ec2e14a54e324df721572d28862f1176c2a853c3b84d0ec5b4134121f533473148a78d13080f9cb8ec
+  checksum: 10c0/ed3ae6a6dcdde6fb1b9c94d426aba0003d95627ee96cbcf1f08c5296917ded745fab47e8553b3b667b71afdd248e38d3e4f208fe0065c2078ba3d94b02ff69c8
   languageName: node
   linkType: hard
 
-"@interchain-kit/keplr-mobile@npm:^0.3.14":
-  version: 0.3.14
-  resolution: "@interchain-kit/keplr-mobile@npm:0.3.14"
-  dependencies:
-    "@interchain-kit/core": "npm:0.3.14"
-  checksum: 10c0/158e27bc25e9647dfcb36584d728cfeff6e3d5d5467b244a00c709faf102f7d464be524c08315226a56e59919000da120d20c786d16ca120b7508c23056e2950
-  languageName: node
-  linkType: hard
-
-"@interchain-kit/react@npm:^0.3.14":
-  version: 0.3.14
-  resolution: "@interchain-kit/react@npm:0.3.14"
+"@interchain-kit/react@npm:^0.3.15":
+  version: 0.3.16
+  resolution: "@interchain-kit/react@npm:0.3.16"
   dependencies:
     "@chain-registry/v2-types": "npm:^0.53.40"
-    "@interchain-kit/core": "npm:0.3.14"
+    "@interchain-kit/core": "npm:^0.3.16"
     "@interchain-ui/react": "npm:1.26.1"
     "@interchainjs/cosmos": "npm:1.11.5"
     "@interchainjs/cosmos-types": "npm:1.11.5"
@@ -1233,7 +1224,7 @@ __metadata:
     "@types/react-dom": ^19.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
-  checksum: 10c0/63d8a96fd5ca949219343662004fa1b70483535ab2d56d41308eb82bbcd5962e024a7d2ed90c46d03056908bf47adafe9ab4bd8ad45580b770f4959f22accaf8
+  checksum: 10c0/8716053fa6e28d2842398e972a23f2ca208d697243eb904244ac8004df79d53a1373a7e3c0d103d796d27db305079961794e04d63ad6658937ee88b227c812f7
   languageName: node
   linkType: hard
 
@@ -6113,11 +6104,10 @@ __metadata:
     "@emotion/babel-plugin": "npm:^11.10.2"
     "@emotion/react": "npm:^11.10.6"
     "@emotion/styled": "npm:^11.10.6"
-    "@interchain-kit/core": "npm:^0.3.14"
-    "@interchain-kit/cosmostation-extension": "npm:^0.3.14"
-    "@interchain-kit/keplr-extension": "npm:^0.3.14"
-    "@interchain-kit/keplr-mobile": "npm:^0.3.14"
-    "@interchain-kit/react": "npm:^0.3.14"
+    "@interchain-kit/core": "npm:^0.3.15"
+    "@interchain-kit/cosmostation-extension": "npm:^0.3.15"
+    "@interchain-kit/keplr-extension": "npm:^0.3.15"
+    "@interchain-kit/react": "npm:^0.3.15"
     "@interchainjs/cosmos": "npm:^1.11.2"
     "@rollup/plugin-inject": "npm:^5.0.3"
     "@tanstack/react-query": "npm:^4.29.7"
