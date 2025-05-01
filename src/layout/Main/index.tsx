@@ -169,9 +169,7 @@ function MainLayout({ children }: PropsWithChildren) {
   }, [searchParams]);
 
   useEffect(() => {
-    if (paramName && !isValidChain) {
-      open();
-    }
+    open(!!(paramName && !isValidChain));
   }, [isOpen, isValidChain, open, paramName, searchParams]);
 
   useEffect(() => {
