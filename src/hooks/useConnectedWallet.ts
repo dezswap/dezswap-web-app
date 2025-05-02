@@ -9,10 +9,10 @@ import {
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { convertProtoToAminoMsg } from "utils/dezswap";
+import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
-import useCosmostationWallet from "./useCosmostationWallet";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -26,12 +26,10 @@ const useConnectedWallet = () => {
   const connectedXplaWallet = useConnectedXplaWallet();
   const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const wallet = useWallet();
-  const cosmostationWallet = useCosmostationWallet();
   const fetchWalletAddress = useCallback(async () => {
-    let { walletState } =
-      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
-
     if (wm.currentChainName !== chainName) {
+      const { walletState } =
+      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
       if (walletState === WalletState.Connected) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await wm.disconnect(wm.currentWalletName, wm.currentChainName);
@@ -39,10 +37,10 @@ const useConnectedWallet = () => {
       wm.setCurrentChainName(chainName);
     }
 
-    walletState = wm.getChainWalletState(
+    const { walletState } = wm.getChainWalletState(
       wm.currentWalletName,
       chainName,
-    )?.walletState;
+    ) ?? {};
 
     if (walletState === WalletState.Connected) {
       const accountData = await wm.getAccount(wm.currentWalletName, chainName);
@@ -68,7 +66,7 @@ const useConnectedWallet = () => {
       chainName,
       wm.currentWalletName,
       connectedXplaWallet?.connectType,
-      wm,
+      wm
     ],
     queryFn: () => {
       return fetchWalletAddress();
@@ -92,7 +90,14 @@ const useConnectedWallet = () => {
           walletInfo.walletAddress,
           messages,
           {
-            amount: [...tx.fee.amount],
+            amount: [
+              ...tx.fee.amount.map((coin) =>
+                Coin.fromPartial({
+                  amount: coin.amount.toString(),
+                  denom: coin.denom,
+                }),
+              ),
+            ],
             gas: tx.fee.gas_limit.toString(),
           },
         );
@@ -131,7 +136,6 @@ const useConnectedWallet = () => {
 
   const disconnect = useCallback(async () => {
     wallet.disconnect();
-    cosmostationWallet.disconnect();
 
     if (walletInfo.isInterchain && wm.currentWalletName) {
       await wm.disconnect(wm.currentWalletName, chainName);
@@ -139,7 +143,7 @@ const useConnectedWallet = () => {
     setTimeout(() => {
       window.location.reload();
     }, 100);
-  }, [chainName, cosmostationWallet, wallet, walletInfo.isInterchain, wm]);
+  }, [chainName, wallet, walletInfo.isInterchain, wm]);
 
   useEffect(() => {
     if (prevDataString.current !== JSON.stringify(walletAddressResult)) {

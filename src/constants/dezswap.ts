@@ -76,10 +76,9 @@ export const apiAddresses: {
 
 export const CHAIN_NAME_SEARCH_PARAM = "chainname";
 
-export declare enum InterchainWalletState {
-  Disconnected = "Disconnected",
-  Connecting = "Connecting",
-  Connected = "Connected",
-  Rejected = "Rejected",
-  NotExist = "NotExist",
-}
+export const UNSUPPORT_WALLET_LIST: {
+  [K in string]: string[];
+} = {
+  xpla: [],
+  xplatestnet: ["cosmostation-extension"],
+};

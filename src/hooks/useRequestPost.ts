@@ -7,7 +7,6 @@ import { TxError } from "types/common";
 import { convertProtoToAminoMsg } from "utils/dezswap";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
-import useCosmostationWallet from "./useCosmostationWallet";
 import useConnectedWallet from "./useConnectedWallet";
 
 export interface NewMsgTxOptions extends Omit<CreateTxOptions, "msgs"> {
@@ -16,7 +15,6 @@ export interface NewMsgTxOptions extends Omit<CreateTxOptions, "msgs"> {
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
-  const cosmostationWallet = useCosmostationWallet();
   const [args, setArgs] = useState<NewMsgTxOptions>();
   const [txHash, setTxHash] = useState<string>();
   const [txError, setTxError] = useState<TxError>();
@@ -58,34 +56,8 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
           }
         }
       }
-
-      // Cosmostation
-      if (
-        !connectedWallet.isInterchain &&
-        connectedWallet?.walletAddress &&
-        !connectedWallet?.availablePost &&
-        createTxOptions.fee
-      ) {
-        try {
-          txBroadcastModal.open();
-          const result = await cosmostationWallet.post(
-            {
-              ...createTxOptions,
-              ...convertProtoToAminoMsg(createTxOptions.msgs),
-            },
-            createTxOptions.fee,
-          );
-          const { result: res } = result as TxResult;
-          setTxHash(res.txhash);
-        } catch (error) {
-          console.log(error);
-          if (error instanceof Error) {
-            setTxError(error);
-          }
-        }
-      }
     },
-    [connectedWallet.walletAddress, cosmostationWallet, txBroadcastModal],
+    [connectedWallet.walletAddress, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {

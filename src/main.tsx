@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@emotion/react";
 import { ChainProvider } from "@interchain-kit/react";
+import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,7 +26,7 @@ const root = ReactDOM.createRoot(document.getElementById("root")!);
 const interchainOptions = {
   chains: DefaultChain,
   assetLists: DefaultAssetList,
-  wallets: [keplrWallet],
+  wallets: [keplrWallet, cosmostationWallet],
   signerOptions: {
     signing: () => {
       return {
