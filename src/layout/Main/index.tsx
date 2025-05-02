@@ -150,7 +150,6 @@ function MainLayout({ children }: PropsWithChildren) {
     const newParams = new URLSearchParams(searchParams);
     newParams.set(CHAIN_NAME_SEARCH_PARAM, DefaultChainName);
     setSearchParams(newParams);
-    window.location.reload();
   }, [searchParams, setSearchParams]);
 
   const { isOpen, open } = useInvalidPathModal({
