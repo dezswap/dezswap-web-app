@@ -3,19 +3,21 @@ import { toEncoders } from "@interchainjs/cosmos/utils";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useQuery } from "@tanstack/react-query";
 import { WalletState } from "@interchain-kit/core";
+import useNetwork from "./useNetwork";
 
 function useSigningClient() {
   const wm = useWalletManager();
   const { currentChainName, currentWalletName, getChainWalletState } = wm;
+  const { chainName } = useNetwork();
   const { walletState } =
-    getChainWalletState(currentWalletName, currentChainName) ?? {};
+    getChainWalletState(currentWalletName, chainName) ?? {};
   const { data: signingClient } = useQuery({
-    queryKey: ["signingClient", currentChainName],
+    queryKey: ["signingClient", chainName],
     queryFn: async () => {
       try {
         const client = await wm.getSigningClient(
           currentWalletName,
-          currentChainName,
+          chainName,
         );
         client.addEncoders(toEncoders(MsgExecuteContract));
         return client;
@@ -24,7 +26,7 @@ function useSigningClient() {
         throw err;
       }
     },
-    enabled: walletState === WalletState.Connected,
+    enabled: walletState === WalletState.Connected && chainName === currentChainName,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });

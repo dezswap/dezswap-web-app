@@ -28,18 +28,24 @@ const useConnectedWallet = () => {
   const wallet = useWallet();
   const cosmostationWallet = useCosmostationWallet();
   const fetchWalletAddress = useCallback(async () => {
-    const { currentWalletName, currentChainName } = wm;
-    const { walletState } =
-      wm.getChainWalletState(currentWalletName, chainName) ?? {};
+    let { walletState } =
+      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
 
-    if (currentChainName && currentChainName !== chainName) {
-      wm.disconnect(currentWalletName, currentChainName);
+    if (wm.currentChainName !== chainName) {
+      if (walletState === WalletState.Connected) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await wm.disconnect(wm.currentWalletName, wm.currentChainName);
+      }
+      wm.setCurrentChainName(chainName);
     }
+
+    walletState = wm.getChainWalletState(
+      wm.currentWalletName,
+      chainName,
+    )?.walletState;
+
     if (walletState === WalletState.Connected) {
-      const accountData = await wm.getAccount(
-        currentWalletName,
-        currentChainName,
-      );
+      const accountData = await wm.getAccount(wm.currentWalletName, chainName);
       if (!accountData) throw new Error("Failed to fetch account data");
       return {
         walletAddress: accountData.address,
@@ -62,6 +68,7 @@ const useConnectedWallet = () => {
       chainName,
       wm.currentWalletName,
       connectedXplaWallet?.connectType,
+      wm,
     ],
     queryFn: () => {
       return fetchWalletAddress();
@@ -122,12 +129,12 @@ const useConnectedWallet = () => {
     [connectedXplaWallet?.connection, walletInfo.isInterchain],
   );
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     wallet.disconnect();
     cosmostationWallet.disconnect();
 
     if (walletInfo.isInterchain && wm.currentWalletName) {
-      wm.disconnect(wm.currentWalletName, chainName);
+      await wm.disconnect(wm.currentWalletName, chainName);
     }
     setTimeout(() => {
       window.location.reload();
