@@ -163,7 +163,7 @@ function MainLayout({ children }: PropsWithChildren) {
 
   useEffect(() => {
     open(!!(paramChainName && !isValidChain));
-  }, [isOpen, isValidChain, open, paramChainName, searchParams]);
+  }, [isValidChain, open, paramChainName]);
 
   useEffect(() => {
     if (wallet.status === WalletStatus.WALLET_CONNECTED && isValidChain) {
