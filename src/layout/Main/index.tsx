@@ -171,7 +171,6 @@ function MainLayout({ children }: PropsWithChildren) {
   useEffect(() => {
     open(!!(paramName && !isValidChain));
   }, [isOpen, isValidChain, open, paramName, searchParams]);
-
   useEffect(() => {
     if (wallet.status === WalletStatus.WALLET_CONNECTED) {
       const newParams = new URLSearchParams(searchParams);
@@ -191,7 +190,7 @@ function MainLayout({ children }: PropsWithChildren) {
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
     if (nextLocation.pathname.startsWith("/wallet")) {
-      if (!walletAddress) {
+      if (wallet.status !== WalletStatus.WALLET_CONNECTED && !walletAddress) {
         return true;
       }
     }

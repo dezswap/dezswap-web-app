@@ -9,10 +9,10 @@ import {
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { convertProtoToAminoMsg } from "utils/dezswap";
+import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
-import useCosmostationWallet from "./useCosmostationWallet";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -26,20 +26,24 @@ const useConnectedWallet = () => {
   const connectedXplaWallet = useConnectedXplaWallet();
   const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const wallet = useWallet();
-  const cosmostationWallet = useCosmostationWallet();
   const fetchWalletAddress = useCallback(async () => {
-    const { currentWalletName, currentChainName } = wm;
-    const { walletState } =
-      wm.getChainWalletState(currentWalletName, chainName) ?? {};
-
-    if (currentChainName && currentChainName !== chainName) {
-      wm.disconnect(currentWalletName, currentChainName);
+    if (wm.currentChainName !== chainName) {
+      const { walletState } =
+      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
+      if (walletState === WalletState.Connected) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await wm.disconnect(wm.currentWalletName, wm.currentChainName);
+      }
+      wm.setCurrentChainName(chainName);
     }
+
+    const { walletState } = wm.getChainWalletState(
+      wm.currentWalletName,
+      chainName,
+    ) ?? {};
+
     if (walletState === WalletState.Connected) {
-      const accountData = await wm.getAccount(
-        currentWalletName,
-        currentChainName,
-      );
+      const accountData = await wm.getAccount(wm.currentWalletName, chainName);
       if (!accountData) throw new Error("Failed to fetch account data");
       return {
         walletAddress: accountData.address,
@@ -62,6 +66,7 @@ const useConnectedWallet = () => {
       chainName,
       wm.currentWalletName,
       connectedXplaWallet?.connectType,
+      wm
     ],
     queryFn: () => {
       return fetchWalletAddress();
@@ -85,7 +90,14 @@ const useConnectedWallet = () => {
           walletInfo.walletAddress,
           messages,
           {
-            amount: [...tx.fee.amount],
+            amount: [
+              ...tx.fee.amount.map((coin) =>
+                Coin.fromPartial({
+                  amount: coin.amount.toString(),
+                  denom: coin.denom,
+                }),
+              ),
+            ],
             gas: tx.fee.gas_limit.toString(),
           },
         );
@@ -122,17 +134,16 @@ const useConnectedWallet = () => {
     [connectedXplaWallet?.connection, walletInfo.isInterchain],
   );
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     wallet.disconnect();
-    cosmostationWallet.disconnect();
 
     if (walletInfo.isInterchain && wm.currentWalletName) {
-      wm.disconnect(wm.currentWalletName, chainName);
+      await wm.disconnect(wm.currentWalletName, chainName);
     }
     setTimeout(() => {
       window.location.reload();
     }, 100);
-  }, [chainName, cosmostationWallet, wallet, walletInfo.isInterchain, wm]);
+  }, [chainName, wallet, walletInfo.isInterchain, wm]);
 
   useEffect(() => {
     if (prevDataString.current !== JSON.stringify(walletAddressResult)) {

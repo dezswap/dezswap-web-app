@@ -20,7 +20,7 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useWalletManager } from "@interchain-kit/react";
+import { useChain } from "@interchain-kit/react";
 import {
   amountToValue,
   cutDecimal,
@@ -33,7 +33,6 @@ import useBalance from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconXpla from "assets/icons/icon-xpla-24px.svg";
-import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -52,7 +51,6 @@ import useHashModal from "hooks/useHashModal";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
-import useCosmostationWallet from "hooks/useCosmostationWallet";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import NotificationModal from "./NotificationModal";
 
@@ -290,7 +288,6 @@ function WalletInfo({
 function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
-  const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
   const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
@@ -299,12 +296,12 @@ function Header() {
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, chainId },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const wm = useWalletManager();
+  const { wallet: interchainWallet } = useChain(chainName);
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -313,19 +310,21 @@ function Header() {
     return dashboardToken?.price;
   }, [dashboardTokens]);
 
-  const isCosmostationWalletConnected = useMemo(
-    () => !!cosmostationWallet?.account,
-    [cosmostationWallet],
-  );
-
-  const walletName = useMemo(() => {
-    if (isCosmostationWalletConnected) return "Cosmostation";
-    if (connectedWallet.isInterchain) return "Keplr Wallet"; // TODO: check pretty name
-    return connectedWallet?.connection?.name;
+  const { walletName, logo } = useMemo(() => {
+    if (connectedWallet.isInterchain)
+      return {
+        walletName: interchainWallet.info.prettyName,
+        logo: interchainWallet.info.logo?.toString(),
+      };
+    return {
+      walletName: connectedWallet?.connection?.name,
+      logo: connectedWallet?.connection?.icon,
+    };
   }, [
     connectedWallet?.connection?.name,
-    isCosmostationWalletConnected,
+    connectedWallet?.connection?.icon,
     connectedWallet.isInterchain,
+    interchainWallet,
   ]);
 
   useEffect(() => {
@@ -558,9 +557,7 @@ function Header() {
                                   <IconButton
                                     size={24}
                                     icons={{
-                                      default: isCosmostationWalletConnected
-                                        ? iconCosmostation
-                                        : iconXpla,
+                                      default: logo,
                                     }}
                                   />
                                 </Col>
@@ -702,6 +699,15 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   connectedWallet.disconnect();
+                                  if (
+                                    connectedWallet.isInterchain &&
+                                    interchainWallet
+                                  ) {
+                                    interchainWallet.disconnect(chainId);
+                                  }
+                                  setTimeout(() => {
+                                    window.location.reload();
+                                  }, 100);
                                 }}
                               >
                                 Disconnect
