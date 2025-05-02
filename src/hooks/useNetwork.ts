@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { NetworkInfo } from "types/common";
@@ -13,7 +13,7 @@ const useNetwork = () => {
     getRpcEndpoint,
     chain: selectedChain,
     chainName,
-  } = useChain(paramName ?? DefaultChainName);
+  } = useChain(paramName);
 
   const { data: networkResult } = useQuery({
     queryKey: ["useNetwork", chainName],

@@ -380,6 +380,7 @@ function Modal({
             noPadding={noPadding}
             style={{
               paddingTop: 0,
+              height: "100%",
             }}
             wrapperStyle={{
               flex: 1,

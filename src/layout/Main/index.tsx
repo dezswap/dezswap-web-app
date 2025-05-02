@@ -16,11 +16,7 @@ import Header, {
   BANNER_HEIGHT,
 } from "layout/Main/Header";
 import NavBar from "components/NavBar";
-import {
-  CHAIN_NAME_SEARCH_PARAM,
-  DefaultChain,
-  DefaultChainName,
-} from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
 import Typography from "components/Typography";
 import iconOverview from "assets/icons/icon-overview-24px.svg";
 import iconTrade from "assets/icons/icon-trade.svg";
@@ -29,8 +25,8 @@ import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import useNetwork from "hooks/useNetwork";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { getValidChain } from "utils/dezswap";
 import Footer from "./Footer";
@@ -190,7 +186,7 @@ function MainLayout({ children }: PropsWithChildren) {
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
     if (nextLocation.pathname.startsWith("/wallet")) {
-      if (!walletAddress) {
+      if (wallet.status !== WalletStatus.WALLET_CONNECTED && !walletAddress) {
         return true;
       }
     }

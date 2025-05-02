@@ -400,7 +400,12 @@ export const getAddressFromAssetInfo = (assetInfo: AssetInfo) => {
 
   return undefined;
 };
-export const getValidChain = (inputChainName: string) => {
+export const getValidChain = (inputChainName: string | null | undefined) => {
+  if (!inputChainName)
+    return {
+      chainName: DefaultChainName,
+      isValidChain: true,
+    };
   const isValidChain = DefaultChain.some(
     (supportChain) => supportChain.chainName === inputChainName,
   );

@@ -10,6 +10,7 @@ import { Pair } from "types/pair";
 
 export interface NetworkInfo {
   chainName: string;
+  // TODO: resolve Chain, HttpEndpoint types
   selectedChain: Chain;
   rpcUrl: string | HttpEndpoint;
 }
