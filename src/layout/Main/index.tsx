@@ -166,12 +166,13 @@ function MainLayout({ children }: PropsWithChildren) {
   }, [isOpen, isValidChain, open, paramChainName, searchParams]);
 
   useEffect(() => {
-    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
+    if (wallet.status === WalletStatus.WALLET_CONNECTED && isValidChain) {
       const newParams = new URLSearchParams(searchParams);
-      newParams.set(
-        CHAIN_NAME_SEARCH_PARAM,
-        wallet.network.name === "testnet" ? "xplatestnet" : "xpla",
-      );
+      const walletChain =
+        wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
+
+      if (paramChainName === walletChain) return;
+      newParams.set(CHAIN_NAME_SEARCH_PARAM, walletChain);
       setSearchParams(newParams);
     }
 
@@ -180,7 +181,14 @@ function MainLayout({ children }: PropsWithChildren) {
       newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
       setSearchParams(newParams);
     }
-  }, [chainName, paramChainName, searchParams, setSearchParams, wallet]);
+  }, [
+    chainName,
+    isValidChain,
+    paramChainName,
+    searchParams,
+    setSearchParams,
+    wallet,
+  ]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname
