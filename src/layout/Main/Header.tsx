@@ -20,8 +20,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useWallet } from "@xpla/wallet-provider";
-import { useWalletManager } from "@interchain-kit/react";
 import {
   amountToValue,
   cutDecimal,
@@ -305,7 +303,6 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const wm = useWalletManager();
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
