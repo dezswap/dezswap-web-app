@@ -32,6 +32,7 @@ import useNetwork from "hooks/useNetwork";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
+import { getValidChain } from "utils/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
 
@@ -160,17 +161,14 @@ function MainLayout({ children }: PropsWithChildren) {
     onReturnClick: handleModalClose,
   });
 
-  const { paramName, isValidChain } = useMemo(() => {
-    const searchName = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
-    const isSupported = DefaultChain.some(
-      (supportChain) => supportChain.chainName === searchName,
-    );
-    return { paramName: searchName, isValidChain: isSupported };
+  const { paramChainName, isValidChain } = useMemo(() => {
+    const paramValue = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
+    return { paramChainName: paramValue, ...getValidChain(paramValue || "") };
   }, [searchParams]);
 
   useEffect(() => {
-    open(!!(paramName && !isValidChain));
-  }, [isOpen, isValidChain, open, paramName, searchParams]);
+    open(!!(paramChainName && !isValidChain));
+  }, [isOpen, isValidChain, open, paramChainName, searchParams]);
 
   useEffect(() => {
     if (wallet.status === WalletStatus.WALLET_CONNECTED) {
@@ -181,12 +179,13 @@ function MainLayout({ children }: PropsWithChildren) {
       );
       setSearchParams(newParams);
     }
-    if (!paramName) {
+
+    if (!paramChainName) {
       const newParams = new URLSearchParams(searchParams);
       newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
       setSearchParams(newParams);
     }
-  }, [chainName, paramName, searchParams, setSearchParams, wallet]);
+  }, [chainName, paramChainName, searchParams, setSearchParams, wallet]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname

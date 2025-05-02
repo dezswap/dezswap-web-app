@@ -304,7 +304,6 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const wm = useWalletManager();
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
