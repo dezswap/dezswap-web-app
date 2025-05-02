@@ -65,12 +65,11 @@ function NavBar({ items, flex = true }: NavBarProps) {
           },
           ...navItemProps
         }) => (
-          <Tippy {...tippyProps}>
+          <Tippy {...tippyProps} key={key ?? `${to.toString()}`}>
             <NavItem
               className={`${navItemProps.className ?? ""} ${
                 disabled ? "disabled" : ""
               }`}
-              key={key ?? `${to.toString()}`}
               to={formatTo({ to: disabled ? "#" : to })}
               {...navItemProps}
               flex={flex}
