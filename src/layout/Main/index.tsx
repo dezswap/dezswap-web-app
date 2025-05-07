@@ -152,7 +152,7 @@ function MainLayout({ children }: PropsWithChildren) {
     setSearchParams(newParams);
   }, [searchParams, setSearchParams]);
 
-  const { isOpen, open } = useInvalidPathModal({
+  const { open } = useInvalidPathModal({
     onReturnClick: handleModalClose,
   });
 
