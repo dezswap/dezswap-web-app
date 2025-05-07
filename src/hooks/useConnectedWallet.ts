@@ -63,7 +63,7 @@ const useConnectedWallet = () => {
       "walletAddress",
       chainName,
       wm.currentWalletName,
-      JSON.stringify(wm.chainWalletState),
+      wm.chainWalletState,
       connectedXplaWallet?.connectType,
     ],
     queryFn: () => {
