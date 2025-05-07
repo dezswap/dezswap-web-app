@@ -20,7 +20,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useChain } from "@interchain-kit/react";
 import {
   amountToValue,
   cutDecimal,
@@ -52,6 +51,7 @@ import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useConnectedWallet from "hooks/useConnectedWallet";
+import { useChain } from "hooks/useChain";
 import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
