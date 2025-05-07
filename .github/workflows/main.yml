@@ -11,7 +11,7 @@ jobs:
     runs-on: [ubuntu-latest]
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
     steps:
       - uses: actions/checkout@v2
 
@@ -23,7 +23,7 @@ jobs:
       - name: Install yarn
         run: npm install --location=global yarn
 
-      - name: Package install
+      - name: Enable Corepack
         run: corepack enable
 
       - name: Package install
