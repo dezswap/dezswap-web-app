@@ -175,8 +175,8 @@ function PoolItem({
             min-width: 0;
           `}
         >
-          <Link to={`/earn/pools/${pool.address}`}>
-            <HoverUnderline>
+          <HoverUnderline>
+            <Link to={`/earn/pools/${pool.address}`}>
               <Typography
                 size={16}
                 weight={500}
@@ -186,16 +186,17 @@ function PoolItem({
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
+                  display: inline;
                 `}
               >
                 {asset1?.symbol}-{asset2?.symbol}
               </Typography>
-            </HoverUnderline>
-          </Link>
+            </Link>
+          </HoverUnderline>
         </Col>
       </Row>
     ),
-    [asset1, asset2],
+    [asset1, asset2, pool],
   );
 
   const pairInfoOutlink = useMemo(
