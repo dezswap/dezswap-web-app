@@ -2,16 +2,16 @@ name: deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
   deploy:
     name: Build, Deploy to S3 bucket
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     strategy:
       matrix:
-        node-version: [ 18.x ]
+        node-version: [18.x]
     steps:
       - uses: actions/checkout@v2
 
@@ -38,12 +38,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_MANAGER_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-northeast-2
-          SOURCE_DIR: 'dist'
+          SOURCE_DIR: "dist"
 
       - name: Invalidate Cloudfront Distribution
         uses: awact/cloudfront-action@master
         env:
-          SOURCE_PATH: '/*'
+          SOURCE_PATH: "/*"
           AWS_REGION: ap-northeast-2
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_MANAGER_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
