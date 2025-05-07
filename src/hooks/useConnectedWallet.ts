@@ -29,7 +29,7 @@ const useConnectedWallet = () => {
   const fetchWalletAddress = useCallback(async () => {
     if (wm.currentChainName !== chainName) {
       const { walletState } =
-      wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
+        wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
       if (walletState === WalletState.Connected) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await wm.disconnect(wm.currentWalletName, wm.currentChainName);
@@ -37,10 +37,8 @@ const useConnectedWallet = () => {
       wm.setCurrentChainName(chainName);
     }
 
-    const { walletState } = wm.getChainWalletState(
-      wm.currentWalletName,
-      chainName,
-    ) ?? {};
+    const { walletState } =
+      wm.getChainWalletState(wm.currentWalletName, chainName) ?? {};
 
     if (walletState === WalletState.Connected) {
       const accountData = await wm.getAccount(wm.currentWalletName, chainName);
@@ -65,8 +63,8 @@ const useConnectedWallet = () => {
       "walletAddress",
       chainName,
       wm.currentWalletName,
+      JSON.stringify(wm.chainWalletState),
       connectedXplaWallet?.connectType,
-      wm
     ],
     queryFn: () => {
       return fetchWalletAddress();
