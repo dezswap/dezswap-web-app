@@ -1,5 +1,11 @@
-import { Fragment, PropsWithChildren, useEffect, useMemo } from "react";
-import { useBlocker } from "react-router-dom";
+import {
+  Fragment,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
+import { useBlocker, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 import { useFormatTo } from "hooks/useFormatTo";
@@ -18,10 +24,11 @@ import iconPool from "assets/icons/icon-pool.svg";
 import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useSearchParamState from "hooks/useSearchParamState";
 import useNetwork from "hooks/useNetwork";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
+import { getValidChain } from "utils/dezswap";
 import Footer from "./Footer";
 import BrowserDelegateButton from "./BrowserDelegateButton";
 
@@ -137,21 +144,51 @@ function MainLayout({ children }: PropsWithChildren) {
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
-  const [searchParam, setSearchParam] = useSearchParamState<string>(
-    CHAIN_NAME_SEARCH_PARAM,
-    DefaultChainName,
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const name = useMemo(() => {
-    if (wallet.status === WalletStatus.WALLET_CONNECTED) {
-      return wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
-    }
-    return searchParam ?? DefaultChainName;
-  }, [searchParam, wallet.network.name, wallet.status]);
+  const handleModalClose = useCallback(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, DefaultChainName);
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams]);
+
+  const { open } = useInvalidPathModal({
+    onReturnClick: handleModalClose,
+  });
+
+  const { paramChainName, isValidChain } = useMemo(() => {
+    const paramValue = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
+    return { paramChainName: paramValue, ...getValidChain(paramValue || "") };
+  }, [searchParams]);
 
   useEffect(() => {
-    setSearchParam(name);
-  }, [name, setSearchParam]);
+    open(!!(paramChainName && !isValidChain));
+  }, [isValidChain, open, paramChainName]);
+
+  useEffect(() => {
+    if (wallet.status === WalletStatus.WALLET_CONNECTED && isValidChain) {
+      const newParams = new URLSearchParams(searchParams);
+      const walletChain =
+        wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
+
+      if (paramChainName === walletChain) return;
+      newParams.set(CHAIN_NAME_SEARCH_PARAM, walletChain);
+      setSearchParams(newParams);
+    }
+
+    if (!paramChainName) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
+      setSearchParams(newParams);
+    }
+  }, [
+    chainName,
+    isValidChain,
+    paramChainName,
+    searchParams,
+    setSearchParams,
+    wallet,
+  ]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname

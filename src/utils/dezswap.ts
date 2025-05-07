@@ -6,7 +6,11 @@ import {
   Numeric,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
-import { contractAddresses } from "constants/dezswap";
+import {
+  contractAddresses,
+  DefaultChain,
+  DefaultChainName,
+} from "constants/dezswap";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { AssetInfo } from "types/api";
 import { Buffer } from "buffer";
@@ -395,4 +399,18 @@ export const getAddressFromAssetInfo = (assetInfo: AssetInfo) => {
   }
 
   return undefined;
+};
+export const getValidChain = (inputChainName: string | null | undefined) => {
+  if (!inputChainName)
+    return {
+      chainName: DefaultChainName,
+      isValidChain: true,
+    };
+  const isValidChain = DefaultChain.some(
+    (supportChain) => supportChain.chainName === inputChainName,
+  );
+  return {
+    chainName: isValidChain ? inputChainName : DefaultChainName,
+    isValidChain,
+  };
 };

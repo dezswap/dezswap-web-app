@@ -1,16 +1,19 @@
-import { useChain } from "@interchain-kit/react";
 import { useQuery } from "@tanstack/react-query";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { NetworkInfo } from "types/common";
+import { useChain } from "./useChain";
 
 const useNetwork = () => {
   const [searchParams] = useSearchParams();
+  const paramName = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
 
-  const chainName =
-    searchParams.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
-  const { getRpcEndpoint, chain: selectedChain } = useChain(chainName);
+  const {
+    getRpcEndpoint,
+    chain: selectedChain,
+    chainName,
+  } = useChain(paramName);
 
   const { data: networkResult } = useQuery({
     queryKey: ["useNetwork", chainName],
@@ -45,7 +48,7 @@ const useNetwork = () => {
     }
   }, [networkResult]);
 
-  return useMemo(() => network, [network]);
+  return network;
 };
 
 export default useNetwork;
