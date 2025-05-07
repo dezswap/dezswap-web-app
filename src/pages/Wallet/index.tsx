@@ -53,7 +53,7 @@ function WalletPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [ walletAddress]);
+  }, [walletAddress]);
 
   useEffect(() => {
     if (!connectWalletModal.isOpen && !walletAddress && isModalOpened.current) {
