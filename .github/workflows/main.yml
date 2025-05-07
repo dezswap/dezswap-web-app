@@ -24,6 +24,9 @@ jobs:
         run: npm install --location=global yarn
 
       - name: Package install
+        run: corepack enable
+
+      - name: Package install
         run: yarn
 
       - name: Build
