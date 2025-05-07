@@ -62,8 +62,8 @@ const useConnectedWallet = () => {
       "walletAddress",
       chainName,
       wm.currentWalletName,
+      wm.chainWalletState,
       connectedXplaWallet?.connectType,
-      wm,
     ],
     queryFn: () => {
       return fetchWalletAddress();

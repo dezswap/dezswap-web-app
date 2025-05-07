@@ -106,6 +106,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
     ...wm.wallets
       .filter(
         (wallet: BaseWallet) =>
+          !isMobile() &&
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
       .map((wallet: BaseWallet) => {
@@ -130,6 +131,12 @@ function ConnectWalletModal(props: ReactModal.Props) {
               }
 
               await wm.connect(wallet.info.name, chainName);
+              if (
+                wm.getChainWalletState(wallet.info.name, chainName)
+                  ?.walletState !== WalletState.Connected
+              ) {
+                // TODO: open unsupported wallet modal
+              }
 
               if (props.onRequestClose) {
                 props.onRequestClose(event);
