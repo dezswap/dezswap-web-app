@@ -50,6 +50,7 @@ import box from "components/Box";
 import ProgressBar from "components/ProgressBar";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -477,14 +478,14 @@ function CreatePage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                 ]}
               />

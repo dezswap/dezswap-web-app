@@ -1,5 +1,5 @@
 import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
@@ -15,12 +15,9 @@ import Button from "components/Button";
 import Message from "components/Message";
 import useLockdropEvents from "hooks/useLockdropEvents";
 import {
-  amountToValue,
-  cutDecimal,
   ellipsisCenter,
   sanitizeNumberInput,
   formatDateTime,
-  formatNumber,
   getTokenLink,
   valueToAmount,
 } from "utils";
@@ -40,6 +37,8 @@ import useNetwork from "hooks/useNetwork";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import PercentageFormatter from "components/utils/PercentageFormatter";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -359,12 +358,11 @@ function StakePage() {
                 display: inline-block;
               `}
             >
-              {formatNumber(
-                cutDecimal(
-                  amountToValue(expectedReward, rewardAsset?.decimals) || 0,
-                  DISPLAY_DECIMAL,
-                ),
-              )}
+              <AssetValueFormatter
+                amount={expectedReward}
+                asset={rewardAsset}
+                showSymbol={false}
+              />
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -396,27 +394,27 @@ function StakePage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount
-                    ? `${formatNumber(
-                        cutDecimal(
-                          amountToValue(feeAmount) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      )} ${XPLA_SYMBOL}`
-                    : "",
+                  value: feeAmount ? (
+                    <AssetValueFormatter
+                      asset={{ symbol: XPLA_SYMBOL }}
+                      amount={feeAmount}
+                    />
+                  ) : (
+                    ""
+                  ),
                 },
                 {
                   key: "shareOfPool",
                   label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                  value: `${cutDecimal(
-                    Numeric.parse(expectedReward || "0")
-                      .dividedBy(
-                        lockdropEventInfo?.total_lockdrop_reward || "1",
-                      )
-                      .mul(100)
-                      .toString(),
-                    2,
-                  )}%`,
+                  value: (
+                    <PercentageFormatter
+                      value={Numeric.parse(expectedReward || "0")
+                        .dividedBy(
+                          lockdropEventInfo?.total_lockdrop_reward || "1",
+                        )
+                        .mul(100)}
+                    />
+                  ),
                 },
               ]}
             />
