@@ -1,7 +1,7 @@
 import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo } from "react";
@@ -27,21 +27,23 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
+import { useNavigate } from "hooks/useNavigate";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -61,8 +63,10 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -77,7 +81,7 @@ function StakePage() {
   const { getLockdropEventInfo } = useLockdropEvents();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -137,28 +141,22 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (
-      !connectedWallet?.walletAddress ||
-      !eventAddress ||
-      !lockdropEventInfo?.lp_token_addr
-    ) {
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+    if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateIncreaseLockupContractMsg({
-          senderAddress: connectedWallet?.walletAddress,
-          contractAddress: eventAddress,
-          lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-          amount: valueToAmount(lpValue, LP_DECIMALS),
-          duration: Number(duration),
-        }),
-      ],
-    };
-  }, [connectedWallet, duration, eventAddress, lockdropEventInfo, lpValue]);
+    return [
+      generateIncreaseLockupContractMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        lpTokenAddress: lockdropEventInfo?.lp_token_addr,
+        amount: valueToAmount(lpValue, LP_DECIMALS),
+        duration: Number(duration),
+      }),
+    ];
+  }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -187,11 +185,15 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-      if (txOptions && fee) {
-        requestPost({ txOptions, fee, formElement: event.currentTarget });
+      if (createTxOptions && fee) {
+        requestPost({
+          txOptions: { msgs: createTxOptions },
+          fee,
+          formElement: event.currentTarget,
+        });
       }
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, createTxOptions],
   );
 
   useEffect(() => {
@@ -439,7 +441,7 @@ function StakePage() {
                       <a
                         href={getTokenLink(
                           lockdropEventInfo?.lp_token_addr,
-                          network.name,
+                          explorers?.[0].url,
                         )}
                         target="_blank"
                         rel="noreferrer noopener"

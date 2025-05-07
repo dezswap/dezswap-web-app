@@ -23,8 +23,9 @@ import { nativeTokens } from "constants/network";
 import imgSuccess from "assets/images/success-import.svg";
 import useVerifiedAssets from "hooks/useVerifiedAssets";
 import { Token } from "types/api";
-import useLCDClient from "hooks/useLCDClient";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
+import useRPCClient from "hooks/useRPCClient";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -38,8 +39,10 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { customAssets, addCustomAsset } = useCustomAssets();
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
-  const network = useNetwork();
-  const lcd = useLCDClient();
+  const {
+    selectedChain: { chainName, chainId },
+  } = useNetwork();
+  const { client } = useRPCClient();
 
   const api = useAPI();
 
@@ -47,8 +50,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
   const isNativeToken = useMemo(
-    () => isNativeTokenAddress(network.name, address),
-    [network.name, address],
+    () => isNativeTokenAddress(chainName, address),
+    [chainName, address],
   );
   const isIbcToken = useMemo(
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
@@ -92,7 +95,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens[network.name]?.find(
+        const asset = nativeTokens[chainName]?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
@@ -104,17 +107,24 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
           if (!isAborted) {
             setTokenInfo({
               ...res,
-              total_supply: "",
+              totalSupply: "",
             } as TokenInfo);
           }
         }
-      } else if (isValidAddress) {
+      } else if (isValidAddress && client) {
         try {
-          const res = await lcd.wasm.contractQuery<TokenInfo>(address, {
+          const queryData = getQueryData({
             token_info: {},
           });
+
+          const { data: res } =
+            await client.cosmwasm.wasm.v1.smartContractState({
+              address,
+              queryData,
+            });
+
           if (!isAborted) {
-            setTokenInfo(res);
+            setTokenInfo(parseJsonFromBinary(res) as unknown as TokenInfo);
           }
         } catch (error) {
           console.log(error);
@@ -136,8 +146,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    network,
-    lcd,
+    chainName,
+    client,
     address,
   ]);
 
@@ -152,7 +162,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -167,7 +177,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId: network.chainID,
+        chainId,
         icon: iconSrc || "",
         protocol: "",
         token: address,

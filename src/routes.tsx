@@ -1,10 +1,4 @@
-import {
-  Navigate,
-  Outlet,
-  createBrowserRouter,
-  redirect,
-  useLocation,
-} from "react-router-dom";
+import { Outlet, createBrowserRouter, useLocation } from "react-router-dom";
 import PlaygroundPage from "pages/Playground";
 import SwapPage from "pages/Trade/Swap";
 import ProvidePage from "pages/Earn/Pools/Provide";
@@ -21,6 +15,7 @@ import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
 import MainLayout from "layout/Main";
 import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
 import SwapPageAsModal from "components/Modal/SwapModal";
+import Redirect from "components/Redirect";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -31,11 +26,9 @@ import SwapPageAsModal from "components/Modal/SwapModal";
 // For legacy links
 function ReplaceToEarn() {
   const location = useLocation();
+
   return (
-    <Navigate
-      replace
-      to={`/earn${location.pathname}`.replace("/pool", "/pools")}
-    />
+    <Redirect to={`/earn${location.pathname}`.replace("/pool", "/pools")} />
   );
 }
 
@@ -73,7 +66,7 @@ const routes = createBrowserRouter([
         element: <TradePage />,
         children: [
           { path: "swap", element: <SwapPage /> },
-          { index: true, loader: () => redirect("swap") },
+          { index: true, element: <Redirect to="swap" /> },
           { path: "*", element: <Error404 /> },
         ],
       },
@@ -118,7 +111,7 @@ const routes = createBrowserRouter([
           //     },
           //   ],
           // },
-          { index: true, loader: () => redirect("pools") },
+          { index: true, element: <Redirect to="pools" /> },
         ],
       },
 

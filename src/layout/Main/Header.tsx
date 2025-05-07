@@ -20,7 +20,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "constants/layout";
 import useModal from "hooks/useModal";
-import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
 import {
   amountToValue,
   cutDecimal,
@@ -33,7 +32,6 @@ import useBalance from "hooks/useBalance";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconXpla from "assets/icons/icon-xpla-24px.svg";
-import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -44,15 +42,16 @@ import Box from "components/Box";
 import Modal from "components/Modal";
 import Copy from "components/Copy";
 import Banner from "components/Banner";
+import Link from "components/Link";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
-import { Link } from "react-router-dom";
 import SimpleBar from "simplebar/dist";
 import useHashModal from "hooks/useHashModal";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
-import useCosmostationWallet from "hooks/useCosmostationWallet";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { useChain } from "hooks/useChain";
 import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
@@ -289,19 +288,20 @@ function WalletInfo({
 function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
-  const wallet = useWallet();
-  const cosmostationWallet = useCosmostationWallet();
   const connectedWallet = useConnectedWallet();
   const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const notificationModal = useHashModal("notifications");
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
-  const network = useNetwork();
+  const {
+    chainName,
+    selectedChain: { explorers, chainId },
+  } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
-  const isTestnet = useMemo(() => network.name !== "mainnet", [network.name]);
-
+  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
+  const { wallet: interchainWallet } = useChain(chainName);
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -310,10 +310,22 @@ function Header() {
     return dashboardToken?.price;
   }, [dashboardTokens]);
 
-  const isCosmostationWalletConnected = useMemo(
-    () => !!cosmostationWallet?.account,
-    [cosmostationWallet],
-  );
+  const { walletName, logo } = useMemo(() => {
+    if (connectedWallet.isInterchain)
+      return {
+        walletName: interchainWallet.info.prettyName,
+        logo: interchainWallet.info.logo?.toString(),
+      };
+    return {
+      walletName: connectedWallet?.connection?.name,
+      logo: connectedWallet?.connection?.icon,
+    };
+  }, [
+    connectedWallet?.connection?.name,
+    connectedWallet?.connection?.icon,
+    connectedWallet.isInterchain,
+    interchainWallet,
+  ]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -326,10 +338,12 @@ function Header() {
     };
     handleScroll();
     const simpleBar = SimpleBar.instances.get(document.body);
-    simpleBar.getScrollElement().addEventListener("scroll", handleScroll);
+    simpleBar?.getScrollElement()?.addEventListener("scroll", handleScroll);
     window.addEventListener("scroll", handleScroll);
     return () => {
-      simpleBar.getScrollElement().removeEventListener("scroll", handleScroll);
+      simpleBar
+        ?.getScrollElement()
+        ?.removeEventListener("scroll", handleScroll);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -355,7 +369,7 @@ function Header() {
               text-transform: uppercase;
             `}
           >
-            {connectedWallet?.network.name}
+            TESTNET
           </span>
         </Banner>
       )}
@@ -454,7 +468,7 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet ? (
+                    {connectedWallet.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -543,9 +557,7 @@ function Header() {
                                   <IconButton
                                     size={24}
                                     icons={{
-                                      default: isCosmostationWalletConnected
-                                        ? iconCosmostation
-                                        : iconXpla,
+                                      default: logo,
                                     }}
                                   />
                                 </Col>
@@ -555,16 +567,14 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {isCosmostationWalletConnected
-                                      ? "Cosmostation"
-                                      : connectedWallet.connection.name}
+                                    {walletName}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
                                   <a
                                     href={getAddressLink(
                                       connectedWallet.walletAddress,
-                                      network.name,
+                                      explorers?.[0].url,
                                     )}
                                     target="_blank"
                                     rel="noreferrer noopener"
@@ -602,7 +612,7 @@ function Header() {
                                 >
                                   <Col>
                                     {ellipsisCenter(
-                                      connectedWallet?.walletAddress,
+                                      connectedWallet.walletAddress,
                                       10,
                                     )}
                                   </Col>
@@ -613,7 +623,7 @@ function Header() {
                                     `}
                                   >
                                     <Copy
-                                      value={connectedWallet?.walletAddress}
+                                      value={connectedWallet.walletAddress}
                                     />
                                   </Col>
                                 </Row>
@@ -688,8 +698,13 @@ function Header() {
                                     .background};
                                 `}
                                 onClick={() => {
-                                  wallet.disconnect();
-                                  cosmostationWallet.disconnect();
+                                  connectedWallet.disconnect();
+                                  if (
+                                    connectedWallet.isInterchain &&
+                                    interchainWallet
+                                  ) {
+                                    interchainWallet.disconnect(chainId);
+                                  }
                                   setTimeout(() => {
                                     window.location.reload();
                                   }, 100);

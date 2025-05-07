@@ -4,7 +4,7 @@ import { ReverseSimulation, Simulation } from "types/pair";
 import usePairs from "hooks/usePairs";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
-import useLCDClient from "hooks/useLCDClient";
+import useRPCClient from "hooks/useRPCClient";
 
 const useSimulate = ({
   fromAddress,
@@ -17,14 +17,14 @@ const useSimulate = ({
   amount?: Numeric.Input;
   isReversed?: boolean;
 }) => {
-  const lcd = useLCDClient();
+  const { client } = useRPCClient();
   const { findPair } = usePairs();
   const [result, setResult] = useState<
     Simulation | ReverseSimulation | undefined
   >();
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
-  const network = useNetwork();
+  const { chainName } = useNetwork();
   const api = useAPI();
 
   const deferredAmount = useDeferredValue(amount);
@@ -92,9 +92,9 @@ const useSimulate = ({
     findPair,
     fromAddress,
     isReversed,
-    lcd,
+    client,
     toAddress,
-    network.name,
+    chainName,
   ]);
 
   return useMemo(

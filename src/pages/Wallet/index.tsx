@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useConnectedWallet, useWallet } from "@xpla/wallet-provider";
 import Button from "components/Button";
 import Copy from "components/Copy";
 import Hr from "components/Hr";
@@ -13,8 +12,10 @@ import iconOutlink from "assets/icons/icon-link-28.svg";
 import { ellipsisCenter, getAddressLink } from "utils";
 import useNetwork from "hooks/useNetwork";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { useNavigate } from "hooks/useNavigate";
 import ScrollToTop from "components/ScrollToTop";
 import Assets from "./Assets";
 import Pools from "./Pools";
@@ -27,9 +28,10 @@ const Wrapper = styled.div`
 
 function WalletPage() {
   const navigate = useNavigate();
-  const wallet = useWallet();
-  const network = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const { walletAddress, disconnect } = useConnectedWallet();
+  const {
+    selectedChain: { explorers },
+  } = useNetwork();
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -38,29 +40,23 @@ function WalletPage() {
   const isModalOpened = useRef(false);
 
   const handleDisconnectClick = () => {
-    wallet.disconnect();
-    navigate("/", { replace: true });
+    disconnect();
   };
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      connectWalletModal.open(!connectedWallet?.walletAddress);
-      if (!connectedWallet?.walletAddress) {
-        isModalOpened.current = true;
-      }
+      if (walletAddress) return;
+      connectWalletModal.open(!walletAddress);
+      isModalOpened.current = true;
     }, 1000);
 
     return () => {
       clearTimeout(timerId);
     };
-  }, [connectWalletModal, connectedWallet]);
+  }, [walletAddress]);
 
   useEffect(() => {
-    if (
-      !connectWalletModal.isOpen &&
-      !connectedWallet?.walletAddress &&
-      isModalOpened.current
-    ) {
+    if (!connectWalletModal.isOpen && !walletAddress && isModalOpened.current) {
       navigate("/", { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +65,7 @@ function WalletPage() {
   return (
     <Wrapper>
       <ScrollToTop />
-      {connectedWallet?.walletAddress && (
+      {walletAddress && (
         <>
           <Container>
             <Typography
@@ -116,23 +112,20 @@ function WalletPage() {
                         weight={900}
                       >
                         {isSmallScreen
-                          ? ellipsisCenter(connectedWallet?.walletAddress, 8)
-                          : connectedWallet?.walletAddress}
+                          ? ellipsisCenter(walletAddress, 8)
+                          : walletAddress}
                       </Typography>
                     </Col>
                     <Col xs="content">
                       <Row justify="start" align="center" gutterWidth={10}>
                         <Col xs="content">
-                          <Copy
-                            size={38}
-                            value={connectedWallet?.walletAddress}
-                          />
+                          <Copy size={38} value={walletAddress} />
                         </Col>
                         <Col xs="content">
                           <a
                             href={getAddressLink(
-                              connectedWallet?.walletAddress,
-                              network.name,
+                              walletAddress,
+                              explorers?.[0].url,
                             )}
                             target="_blank"
                             rel="noreferrer noopener"

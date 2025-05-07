@@ -62,7 +62,9 @@ const TableHeader = styled(Box)`
 const LIMIT = 10;
 
 function LockdropPage() {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const location = useLocation();
 
   const screenClass = useScreenClass();
@@ -85,7 +87,7 @@ function LockdropPage() {
 
   const lockdropUserInfoResults = useQueries({
     queries: lockdropEvents.map((lockdropEvent) => ({
-      queryKey: ["lockdropUserInfo", lockdropEvent.addr, network.chainID],
+      queryKey: ["lockdropUserInfo", lockdropEvent.addr, chainId],
       queryFn: async () => {
         const res = await api.getLockdropUserInfo(lockdropEvent.addr);
         if (!res) {

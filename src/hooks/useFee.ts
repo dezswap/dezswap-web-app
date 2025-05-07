@@ -1,20 +1,25 @@
-import { CreateTxOptions, Fee } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { useDeferredValue, useEffect, useState } from "react";
+import { Coin, Fee } from "@xpla/xpla.js";
+import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { AxiosError } from "axios";
-import useLCDClient from "hooks/useLCDClient";
 import useAPI from "./useAPI";
+import useConnectedWallet from "./useConnectedWallet";
+import useRPCClient from "./useRPCClient";
+import useAuthSequence from "./useAuthSequence";
 
-const useFee = (txOptions?: CreateTxOptions) => {
-  const connectedWallet = useConnectedWallet();
-  const lcd = useLCDClient();
+const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
+  const { walletAddress } = useConnectedWallet();
+  const { client } = useRPCClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
   const api = useAPI();
-
+  const { sequence } = useAuthSequence();
+  const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
+  const { executeContract } = MessageComposer.encoded;
+  const messages = deferredCreateTxOptions?.map((msg) => executeContract(msg));
 
   useEffect(() => {
     setIsLoading(true);
@@ -23,7 +28,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!connectedWallet || !deferredCreateTxOptions) {
+    if (!walletAddress || !deferredCreateTxOptions) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -32,7 +37,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
 
     const estimateFee = async () => {
       try {
-        if (!connectedWallet?.walletAddress || !deferredCreateTxOptions) {
+        if (!walletAddress || !messages) {
           setFee(undefined);
           setErrMsg("");
           setIsFailed(false);
@@ -40,10 +45,14 @@ const useFee = (txOptions?: CreateTxOptions) => {
           return;
         }
 
-        const res = await api.estimateFee(deferredCreateTxOptions);
+        const res = await api.estimateFee(messages, sequence);
 
         if (res && !isAborted) {
-          setFee(res);
+          setFee(
+            new Fee(Number(res.gas), [
+              new Coin(res.amount[0].denom, res.amount[0].amount),
+            ]),
+          );
           setErrMsg("");
           setIsLoading(false);
           setIsFailed(false);
@@ -94,7 +103,7 @@ const useFee = (txOptions?: CreateTxOptions) => {
         clearTimeout(timerId);
       }
     };
-  }, [connectedWallet, lcd, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, client, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { fee, isLoading, isFailed, errMsg };
 };

@@ -6,10 +6,10 @@ const UPDATE_INTERVAL = 3000;
 
 export const useLatestBlock = () => {
   const api = useAPI();
-  const network = useNetwork();
+  const { selectedChain: chainName } = useNetwork();
 
   const { data: height } = useQuery({
-    queryKey: ["latestBlockHeight", network.name],
+    queryKey: ["latestBlockHeight", chainName],
     queryFn: api.getLatestBlockHeight,
     refetchInterval: UPDATE_INTERVAL,
     refetchIntervalInBackground: false,
@@ -17,6 +17,7 @@ export const useLatestBlock = () => {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+  if (typeof height === "bigint") return height.toString();
 
-  return height;
+  return height || "0";
 };

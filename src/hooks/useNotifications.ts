@@ -9,11 +9,13 @@ import useNetwork from "./useNetwork";
 import useAPI from "./useAPI";
 
 const useNotifications = () => {
-  const network = useNetwork();
+  const {
+    selectedChain: { chainId },
+  } = useNetwork();
   const api = useAPI();
 
   const { fetchNextPage, data, hasNextPage, isLoading } = useInfiniteQuery({
-    queryKey: ["notices", network.chainID],
+    queryKey: ["notices", chainId],
     queryFn: async ({ pageParam }) => {
       const res = await api.getNotices({
         asc: false,

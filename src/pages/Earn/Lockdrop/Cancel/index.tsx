@@ -1,13 +1,14 @@
 import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import Button from "components/Button";
@@ -23,17 +24,18 @@ import {
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { useConnectedWallet } from "@xpla/wallet-provider";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, CreateTxOptions, Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
 import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useConnectedWallet from "hooks/useConnectedWallet";
+import { useNavigate } from "hooks/useNavigate";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
@@ -52,14 +54,16 @@ function CancelPage() {
   const screenClass = useScreenClass();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const network = useNetwork();
-  const connectedWallet = useConnectedWallet();
+  const {
+    selectedChain: { chainId, explorers },
+  } = useNetwork();
+  const { walletAddress } = useConnectedWallet();
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
-    queryKey: ["lockdropEventInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -80,7 +84,7 @@ function CancelPage() {
   });
 
   const { data: lockdropUserInfo } = useQuery({
-    queryKey: ["lockdropUserInfo", eventAddress, network.chainID],
+    queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
       if (!eventAddress) {
         return null;
@@ -122,22 +126,20 @@ function CancelPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const txOptions = useMemo<CreateTxOptions | undefined>(() => {
-    if (!connectedWallet || !eventAddress || !duration) {
+  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+    if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateCancelLockdropMsg({
-          senderAddress: connectedWallet?.walletAddress,
-          contractAddress: eventAddress,
-          duration,
-        }),
-      ],
-    };
-  }, [connectedWallet, duration, eventAddress]);
+    return [
+      generateCancelLockdropMsg({
+        senderAddress: walletAddress,
+        contractAddress: eventAddress,
+        duration,
+      }),
+    ];
+  }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
@@ -148,11 +150,15 @@ function CancelPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (txOptions && fee) {
-        requestPost({ txOptions, fee, skipConfirmation: true });
+      if (createTxOptions && fee) {
+        requestPost({
+          txOptions: { msgs: createTxOptions },
+          fee,
+          skipConfirmation: true,
+        });
       }
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, createTxOptions],
   );
 
   useEffect(() => {
@@ -341,7 +347,7 @@ function CancelPage() {
                       <a
                         href={getTokenLink(
                           lockdropEventInfo?.lp_token_addr,
-                          network.name,
+                          explorers?.[0].url,
                         )}
                         target="_blank"
                         rel="noreferrer noopener"

@@ -11,9 +11,11 @@ import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import iconInstall from "assets/icons/icon-install.svg";
 import iconInstalled from "assets/icons/icon-installed.svg";
-import iconCosmostation from "assets/icons/icon-cosmostation.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
-import useCosmostationWallet from "hooks/useCosmostationWallet";
+import { useWalletManager } from "@interchain-kit/react";
+import useNetwork from "hooks/useNetwork";
+import { BaseWallet, WalletState } from "@interchain-kit/core";
+import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
 
 const WalletButton = styled.button`
   width: auto;
@@ -41,12 +43,26 @@ type WalletButtonProps = {
   isInstalled?: boolean;
 };
 
+const { userAgent } = navigator;
+
+const getBrowser = () => {
+  if (/Chrome/.test(userAgent) && !/Edge|Edg|OPR/.test(userAgent)) {
+    return "chrome";
+  }
+  if (/Firefox/.test(userAgent)) {
+    return "firefox";
+  }
+  return undefined;
+};
+const browserType = getBrowser();
+
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
-  const { connect, availableConnectTypes } = useWallet();
+  const { connect } = useWallet();
+  const { chainName } = useNetwork();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const cosmostationWallet = useCosmostationWallet();
+  const wm = useWalletManager();
 
   const buttons: WalletButtonProps[] = [
     ...availableConnections
@@ -73,7 +89,12 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 iconSrc: p.iconSrc,
                 isInstalled: true,
                 onClick: (event) => {
-                  connect(p.type, p.identifier, true);
+                  try {
+                    connect(p.type, p.identifier, true);
+                  } catch (error) {
+                    console.log(error);
+                  }
+
                   if (props.onRequestClose) {
                     props.onRequestClose(event);
                   }
@@ -82,21 +103,50 @@ function ConnectWalletModal(props: ReactModal.Props) {
             ]
           : (p as WalletButtonProps),
       ),
-    ...(cosmostationWallet.isInstalled
-      ? [
-          {
-            label: "Cosmostation",
-            iconSrc: iconCosmostation,
-            isInstalled: true,
-            onClick: (event) => {
-              cosmostationWallet.connect();
+    ...wm.wallets
+      .filter(
+        (wallet: BaseWallet) =>
+          !isMobile() &&
+          !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
+      )
+      .map((wallet: BaseWallet) => {
+        const isInstalled = wallet.walletState !== WalletState.NotExist;
+
+        const iconSrc =
+          typeof wallet.info.logo === "string"
+            ? wallet.info.logo
+            : wallet.info.logo?.major ?? "";
+
+        return {
+          label: wallet.info.prettyName,
+          iconSrc,
+          isInstalled,
+          onClick: async (event) => {
+            try {
+              if (!isInstalled) {
+                const url = wallet.info.downloads?.find(
+                  (d) => d.browser === browserType,
+                )?.link;
+                if (url) window.open(url);
+              }
+
+              await wm.connect(wallet.info.name, chainName);
+              if (
+                wm.getChainWalletState(wallet.info.name, chainName)
+                  ?.walletState !== WalletState.Connected
+              ) {
+                // TODO: open unsupported wallet modal
+              }
+
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
-            },
-          } as WalletButtonProps,
-        ]
-      : []),
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        } as WalletButtonProps;
+      }),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ icon, name, url }) => ({
@@ -106,19 +156,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
           window.open(url);
         },
       })),
-    ...(!cosmostationWallet.isInstalled && !isMobile()
-      ? [
-          {
-            label: "Cosmostation",
-            iconSrc: iconCosmostation,
-            onClick: () => {
-              window.open(
-                "https://chrome.google.com/webstore/detail/cosmostation/fpkhgmpbidmiogeglndfbkegfdlnajnf",
-              );
-            },
-          },
-        ]
-      : []),
   ];
 
   return (

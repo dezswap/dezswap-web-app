@@ -14,9 +14,9 @@ import { Numeric } from "@xpla/xpla.js";
 import { getBasicSortFunction } from "utils/table";
 import usePairs from "hooks/usePairs";
 import AssetIcon from "components/AssetIcon";
-import { Link } from "react-router-dom";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import Link from "components/Link";
 import MobilePoolItem from "./MobilePoolItem";
 
 interface DashboardPoolTableProps {

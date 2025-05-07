@@ -8,12 +8,12 @@ import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
 import usePairs from "hooks/usePairs";
 import Expand from "pages/Earn/Expand";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
-import { Link } from "react-router-dom";
 import { DashboardPool } from "types/dashboard-api";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import Link from "components/Link";
 
 interface MobilePoolItemProps {
   pool: DashboardPool;

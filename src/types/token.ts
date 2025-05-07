@@ -6,7 +6,7 @@ export type TokenInfo = {
   name: string;
   symbol: string;
   decimals: number;
-  total_supply: string;
+  totalSupply?: string;
 };
 
 export type VerifiedTokenInfo = {
@@ -29,9 +29,9 @@ export type VerifiedIbcTokenInfo = {
 };
 
 export type VerifiedAssets = {
-  [K in NetworkName]?: { [address: string]: VerifiedTokenInfo | undefined };
+  [K in string]?: { [address: string]: VerifiedTokenInfo | undefined };
 };
 
 export type VerifiedIbcAssets = {
-  [K in NetworkName]?: { [address: string]: VerifiedIbcTokenInfo | undefined };
+  [K in string]?: { [address: string]: VerifiedIbcTokenInfo | undefined };
 };

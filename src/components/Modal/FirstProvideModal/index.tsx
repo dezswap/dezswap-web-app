@@ -8,8 +8,8 @@ import { useScreenClass } from "react-grid-system";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import Button from "components/Button";
 import ReactModal from "react-modal";
-import { Link } from "react-router-dom";
 import { convertIbcTokenAddressForPath } from "utils";
+import Link from "components/Link";
 
 interface FirstProvideModalProps {
   addresses?: [string, string];

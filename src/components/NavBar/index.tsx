@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Tippy, { TippyProps } from "@tippyjs/react/headless";
+import { useFormatTo } from "hooks/useFormatTo";
 import { NavLink } from "react-router-dom";
 
 const Wrapper = styled.div`
@@ -50,6 +51,8 @@ interface NavBarProps {
 }
 
 function NavBar({ items, flex = true }: NavBarProps) {
+  const { formatTo } = useFormatTo();
+
   return (
     <Wrapper>
       {items.map(
@@ -62,13 +65,12 @@ function NavBar({ items, flex = true }: NavBarProps) {
           },
           ...navItemProps
         }) => (
-          <Tippy {...tippyProps}>
+          <Tippy {...tippyProps} key={key ?? `${to.toString()}`}>
             <NavItem
               className={`${navItemProps.className ?? ""} ${
                 disabled ? "disabled" : ""
               }`}
-              key={key ?? `${to.toString()}`}
-              to={disabled ? "#" : to}
+              to={formatTo({ to: disabled ? "#" : to })}
               {...navItemProps}
               flex={flex}
             />

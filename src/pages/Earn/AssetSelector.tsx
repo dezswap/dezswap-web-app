@@ -58,11 +58,13 @@ function AssetSelector({
   const screenClass = useScreenClass();
 
   const { availableAssetAddresses, findPair } = usePairs();
-  const network = useNetwork();
+  const {
+    selectedChain: { chainName },
+  } = useNetwork();
   const [customAssetStore] = useAtom(customAssetsAtom);
   const customAssetAddresses = useMemo(() => {
-    return customAssetStore[network.name]?.map((asset) => asset.token) || [];
-  }, [customAssetStore, network.name]);
+    return customAssetStore[chainName]?.map((asset) => asset.token) || [];
+  }, [customAssetStore, chainName]);
 
   const { getAsset } = useAssets();
 

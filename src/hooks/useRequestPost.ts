@@ -1,25 +1,25 @@
-import {
-  ConnectType,
-  CreateTxFailed,
-  TxResult,
-  useConnectedWallet,
-} from "@xpla/wallet-provider";
+import { ConnectType, CreateTxFailed, TxResult } from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { DeliverTxResponse } from "@xpla/xplajs/types";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
-import useCosmostationWallet from "./useCosmostationWallet";
+import useConnectedWallet from "./useConnectedWallet";
+
+export interface NewMsgTxOptions extends Omit<CreateTxOptions, "msgs"> {
+  msgs: MsgExecuteContract[];
+}
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const connectedWallet = useConnectedWallet();
-  const cosmostationWallet = useCosmostationWallet();
-  const [txOptions, setTxOptions] = useState<CreateTxOptions>();
-
-  const [txResult, setTxResult] = useState<TxResult>();
+  const [args, setArgs] = useState<NewMsgTxOptions>();
+  const [txHash, setTxHash] = useState<string>();
   const [txError, setTxError] = useState<TxError>();
   const txBroadcastModal = useTxBroadcastingModal({
-    txHash: txResult?.result.txhash,
+    txHash,
     txError,
     onDoneClick: onDoneTx,
   });
@@ -27,17 +27,26 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const [fee, setFee] = useState<Fee>();
 
   const postTx = useCallback(
-    async (createTxOptions: CreateTxOptions) => {
-      if (connectedWallet?.availablePost) {
+    async (createTxOptions: NewMsgTxOptions) => {
+      if (connectedWallet.isInterchain || connectedWallet.availablePost) {
         try {
           txBroadcastModal.open();
-          const result = await connectedWallet.post(createTxOptions);
-          setTxResult(result);
+          const result = await connectedWallet.post({
+            ...createTxOptions,
+            msgs: createTxOptions.msgs,
+          });
+          if (connectedWallet.isInterchain && result) {
+            const { transactionHash } = result as DeliverTxResponse;
+            setTxHash(transactionHash);
+          } else {
+            const { result: res } = result as TxResult;
+            setTxHash(res.txhash);
+          }
         } catch (error) {
           console.log(error);
           if (
             error instanceof CreateTxFailed &&
-            connectedWallet?.connectType === ConnectType.WALLETCONNECT
+            connectedWallet.connectType === ConnectType.WALLETCONNECT
           ) {
             error.message =
               "Transaction creation failed, please check the details in your wallet and try again";
@@ -47,36 +56,15 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
           }
         }
       }
-
-      // Cosmostation
-      if (
-        connectedWallet?.xplaAddress &&
-        !connectedWallet?.availablePost &&
-        createTxOptions.fee
-      ) {
-        try {
-          txBroadcastModal.open();
-          const result = await cosmostationWallet.post(
-            createTxOptions,
-            createTxOptions.fee,
-          );
-          setTxResult(result);
-        } catch (error) {
-          console.log(error);
-          if (error instanceof Error) {
-            setTxError(error);
-          }
-        }
-      }
     },
-    [connectedWallet, cosmostationWallet, txBroadcastModal],
+    [connectedWallet.walletAddress, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {
-    if (txOptions) {
-      postTx({ ...txOptions, fee: fee ?? txOptions.fee });
+    if (args) {
+      postTx({ ...args, fee: fee ?? args.fee });
     }
-  }, [fee, postTx, txOptions]);
+  }, [fee, postTx, args]);
 
   const [node, setNode] = useState<Node>();
   const confirmationModal = useConfirmationModal({
@@ -99,27 +87,30 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   }, [confirmationModal.isOpen]);
 
   const requestPost = useCallback(
-    (args: {
-      txOptions: CreateTxOptions;
+    (createTxOptions: {
+      txOptions: NewMsgTxOptions;
       fee?: Fee;
       formElement?: HTMLFormElement;
       skipConfirmation?: boolean;
     }) => {
-      if (args.skipConfirmation) {
-        if (args.txOptions) {
-          postTx({ ...args.txOptions, fee: args.fee ?? args.txOptions.fee });
+      if (createTxOptions.skipConfirmation) {
+        if (createTxOptions.txOptions || connectedWallet.isInterchain) {
+          postTx({
+            ...createTxOptions.txOptions,
+            fee: createTxOptions.fee ?? createTxOptions.txOptions.fee,
+          });
         }
         return;
       }
 
       startTransition(() => {
-        setTxOptions(args.txOptions);
-        setFee(args.fee);
-        if (!args.formElement) {
+        setArgs({ ...createTxOptions.txOptions });
+        setFee(createTxOptions.fee);
+        if (!createTxOptions.formElement) {
           setNode(undefined);
           return;
         }
-        const newNode = document.importNode(args.formElement, true);
+        const newNode = document.importNode(createTxOptions.formElement, true);
         newNode.addEventListener("submit", (e) => {
           e.preventDefault();
         });

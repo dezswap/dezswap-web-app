@@ -19,15 +19,13 @@ import {
   formatNumber,
   valueToAmount,
 } from "utils";
-import { CreateTxOptions, Numeric } from "@xpla/xpla.js";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import { Numeric } from "@xpla/xpla.js";
 import usePairs from "hooks/usePairs";
 import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
 import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useHashModal from "hooks/useHashModal";
 import { css, useTheme } from "@emotion/react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -53,14 +51,17 @@ import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import useRequestPost from "hooks/useRequestPost";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import Decimal from "decimal.js";
-import { NetworkName } from "types/common";
 import usePool from "hooks/usePool";
+import useConnectedWallet from "hooks/useConnectedWallet";
 import useFirstProvideModal from "hooks/modals/useFirstProvideModal";
 import InfoTable from "components/InfoTable";
 import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
+import useAPI from "hooks/useAPI";
+import useBalanceMinusFee from "hooks/useBalanceMinusFee";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -140,7 +141,6 @@ function SelectAssetDrawer({
 }
 
 function SwapPage() {
-  const connectedWallet = useConnectedWallet();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
@@ -153,7 +153,7 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
-
+  const { walletAddress } = useConnectedWallet();
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
@@ -293,11 +293,11 @@ function SwapPage() {
     asset2?.decimals,
   ]);
 
-  const createTxOptions = useMemo<CreateTxOptions | undefined>(() => {
+  const createTxOptions = useMemo(() => {
     if (
       !simulationResult?.estimatedAmount ||
       simulationResult?.isLoading ||
-      !connectedWallet ||
+      !walletAddress ||
       !selectedPair ||
       !asset1?.token ||
       !asset1Value ||
@@ -306,23 +306,23 @@ function SwapPage() {
     ) {
       return undefined;
     }
-    return {
-      msgs: [
-        generateSwapMsg(
-          connectedWallet?.network.name as NetworkName,
-          connectedWallet.walletAddress,
-          selectedPair.contract_addr,
-          asset1.token,
-          valueToAmount(asset1Value, asset1?.decimals) || "",
-          beliefPrice || "",
-          `${slippageTolerance}`,
-          txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-        ),
-      ],
-    };
+
+    const swapMsg = [
+      generateSwapMsg(
+        walletAddress,
+        selectedPair.contract_addr,
+        asset1.token,
+        valueToAmount(asset1Value, asset1?.decimals) || "",
+        beliefPrice || "",
+        `${slippageTolerance}`,
+        txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+      ),
+    ];
+
+    return swapMsg;
   }, [
     simulationResult,
-    connectedWallet,
+    walletAddress,
     selectedPair,
     asset1,
     asset1Value,
@@ -374,7 +374,7 @@ function SwapPage() {
 
   useEffect(() => {
     if (
-      connectedWallet &&
+      walletAddress &&
       balanceApplied &&
       !isReversed &&
       asset1Address === XPLA_ADDRESS &&
@@ -419,7 +419,7 @@ function SwapPage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: createTxOptions,
+          txOptions: { msgs: createTxOptions },
           fee,
           formElement: event.target as HTMLFormElement,
         });
@@ -432,7 +432,7 @@ function SwapPage() {
     if (asset1Address === XPLA_ADDRESS) {
       form.trigger(FormKey.asset1Value);
     }
-  }, [form, fee, asset1Address, asset2Address]);
+  }, [form, asset1Address, asset2Address]);
 
   const [preselectedAsset2Address, setPreselectedAsset2Address] =
     useSearchParamState("q", undefined, { replace: true });
@@ -971,7 +971,7 @@ function SwapPage() {
                   {
                     key: "expectedAmount",
                     label: `Expected${
-                      screenClass === MOBILE_SCREEN_CLASS ? "\n" : " "
+                      screenClass === MOBILE_SCREEN_CLASS ? "n" : " "
                     }amount`,
                     tooltip: (
                       <>
@@ -1096,7 +1096,7 @@ function SwapPage() {
             </div>
           </Tooltip>
         )}
-        {connectedWallet ? (
+        {walletAddress ? (
           <Button
             type="submit"
             size="large"
