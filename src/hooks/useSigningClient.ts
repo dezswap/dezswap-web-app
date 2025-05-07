@@ -15,10 +15,7 @@ function useSigningClient() {
     queryKey: ["signingClient", chainName],
     queryFn: async () => {
       try {
-        const client = await wm.getSigningClient(
-          currentWalletName,
-          chainName,
-        );
+        const client = await wm.getSigningClient(currentWalletName, chainName);
         client.addEncoders(toEncoders(MsgExecuteContract));
         return client;
       } catch (err) {
@@ -26,7 +23,8 @@ function useSigningClient() {
         throw err;
       }
     },
-    enabled: walletState === WalletState.Connected && chainName === currentChainName,
+    enabled:
+      walletState === WalletState.Connected && chainName === currentChainName,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });

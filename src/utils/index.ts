@@ -258,7 +258,7 @@ export const formatPercentage = (value: Numeric.Input) => {
   const numberFormatOptions = {
     style: "percent",
     maximumFractionDigits: 2,
-  };
+  } satisfies Intl.NumberFormatOptions;
 
   if (numericValue.lt(0.01)) {
     numberFormatOptions.maximumFractionDigits = 4;
