@@ -129,10 +129,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 }
 
                 await wm.connect(wallet.info.name, chainName);
-                if(wm.getChainWalletState(wallet.info.name, chainName)?.walletState !== WalletState.Connected) {
-                  // TODO: open unsupported wallet modal
-                }
-                
+ 
                 if (props.onRequestClose) {
                   props.onRequestClose(event);
                 }
