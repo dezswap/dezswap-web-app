@@ -110,8 +110,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
       .map((wallet: BaseWallet) => {
-        const isInstalled = !!(
-          wallet.info.windowKey && wallet.info.windowKey in window
+        const isInstalled = !(
+          wm.getChainWalletState(wallet.info.name, chainName)?.walletState ===
+          WalletState.NotExist
         );
 
         const iconSrc =
@@ -133,12 +134,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
               }
 
               await wm.connect(wallet.info.name, chainName);
-              if (
-                wm.getChainWalletState(wallet.info.name, chainName)
-                  ?.walletState !== WalletState.Connected
-              ) {
-                // TODO: open unsupported wallet modal
-              }
 
               if (props.onRequestClose) {
                 props.onRequestClose(event);
