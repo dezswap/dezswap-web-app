@@ -110,10 +110,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
       .map((wallet: BaseWallet) => {
-        const isInstalled = !(
-          wm.getChainWalletState(wallet.info.name, chainName)?.walletState ===
-          WalletState.NotExist
-        );
+        const isInstalled =
+          wm.getChainWalletState(wallet.info.name, chainName)?.walletState !==
+          WalletState.NotExist;
 
         const iconSrc =
           typeof wallet.info.logo === "string"
