@@ -4,7 +4,12 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
-import { ConnectType, useWallet } from "@xpla/wallet-provider";
+import {
+  ConnectType,
+  useWallet,
+  Connection,
+  Installation,
+} from "@xpla/wallet-provider";
 import React, { MouseEventHandler } from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
@@ -64,93 +69,125 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
 
-  const buttons: WalletButtonProps[] = [
-    ...availableConnections
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ type, icon, name, identifier }) => ({
-        label: name,
-        identifier,
-        type,
-        iconSrc: icon,
-        isInstalled: true,
-        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          connect(type, identifier, false);
+  const isSupportedWalletManager = (wallet: BaseWallet) => {
+    const isMobileDevice = isMobile();
+    const isWalletAvailable = isMobileDevice
+      ? wallet.walletState !== WalletState.NotExist
+      : true;
+    const isNotInUnsupportedList = !UNSUPPORT_WALLET_LIST[chainName].includes(
+      wallet.info.name,
+    );
+    return isWalletAvailable && isNotInUnsupportedList;
+  };
+
+  const createWalletManagerWalletButtonProps = (
+    wallet: BaseWallet,
+  ): WalletButtonProps => {
+    const isInstalled = wallet.walletState !== WalletState.NotExist;
+    const iconSrc =
+      typeof wallet.info.logo === "string"
+        ? wallet.info.logo
+        : wallet.info.logo?.major ?? "";
+
+    return {
+      label: wallet.info.prettyName,
+      iconSrc,
+      isInstalled,
+      onClick: async (event) => {
+        try {
+          if (!isInstalled) {
+            const url = wallet.info.downloads?.find(
+              (d) => d.browser === browserType,
+            )?.link;
+            if (url) window.open(url);
+          }
+
+          await wm.connect(wallet.info.name, chainName);
+
           if (props.onRequestClose) {
             props.onRequestClose(event);
           }
-        },
-      }))
-      .flatMap((p) =>
-        isMobile() && p.label === "Wallet Connect"
-          ? [
-              p as WalletButtonProps,
-              {
-                label: `${p.label}\n(XPLA GAMES)`,
-                iconSrc: p.iconSrc,
-                isInstalled: true,
-                onClick: (event) => {
-                  try {
-                    connect(p.type, p.identifier, true);
-                  } catch (error) {
-                    console.log(error);
-                  }
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    };
+  };
 
-                  if (props.onRequestClose) {
-                    props.onRequestClose(event);
-                  }
-                },
-              } as WalletButtonProps,
-            ]
-          : (p as WalletButtonProps),
-      ),
-    ...wm.wallets
-      .filter(
-        (wallet: BaseWallet) =>
-          !isMobile() &&
-          !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
-      )
-      .map((wallet: BaseWallet) => {
-        const isInstalled = wallet.walletState !== WalletState.NotExist;
+  const createXplaConnectionButtonProps = (
+    connection: Connection,
+  ): WalletButtonProps => ({
+    label: connection.name,
+    iconSrc: connection.icon,
+    isInstalled: true,
+    onClick: (event) => {
+      if (connection.identifier) {
+        connect(connection.type, connection.identifier, false);
+        if (props.onRequestClose) {
+          props.onRequestClose(event);
+        }
+      }
+    },
+  });
 
-        const iconSrc =
-          typeof wallet.info.logo === "string"
-            ? wallet.info.logo
-            : wallet.info.logo?.major ?? "";
+  const createXplaGamesButtonProps = (
+    connection: Connection,
+  ): WalletButtonProps => ({
+    label: `${connection.name}\n(XPLA GAMES)`,
+    iconSrc: connection.icon,
+    isInstalled: true,
+    onClick: (event) => {
+      try {
+        if (connection.identifier) {
+          connect(connection.type, connection.identifier, true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
 
-        return {
-          label: wallet.info.prettyName,
-          iconSrc,
-          isInstalled,
-          onClick: async (event) => {
-            try {
-              if (!isInstalled) {
-                const url = wallet.info.downloads?.find(
-                  (d) => d.browser === browserType,
-                )?.link;
-                if (url) window.open(url);
-              }
+      if (props.onRequestClose) {
+        props.onRequestClose(event);
+      }
+    },
+  });
 
-              await wm.connect(wallet.info.name, chainName);
+  const createXplaInstallationButtonProps = (
+    installation: Installation,
+  ): WalletButtonProps => ({
+    label: installation.name,
+    iconSrc: installation.icon,
+    onClick: () => {
+      window.open(installation.url);
+    },
+  });
 
-              if (props.onRequestClose) {
-                props.onRequestClose(event);
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          },
-        } as WalletButtonProps;
-      }),
-    ...availableInstallations
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ icon, name, url }) => ({
-        label: `${name}`,
-        iconSrc: icon,
-        onClick: () => {
-          window.open(url);
-        },
-      })),
-  ];
+  const wmButtons = wm.wallets
+    .filter(isSupportedWalletManager)
+    .map(createWalletManagerWalletButtonProps);
+
+  const connectionButtons = availableConnections
+    .filter(({ type }) => type !== ConnectType.READONLY)
+    .map(createXplaConnectionButtonProps)
+    .flatMap((button) => {
+      if (isMobile() && button.label === "Wallet Connect") {
+        const xplaConnection = availableConnections.find(
+          (c) => c.name === button.label,
+        );
+        if (xplaConnection) {
+          return [button, createXplaGamesButtonProps(xplaConnection)];
+        }
+      }
+      return button;
+    });
+
+  const installationButtons = availableInstallations
+    .filter(({ type }) => !isMobile() && type !== ConnectType.READONLY)
+    .map(createXplaInstallationButtonProps);
+
+  const buttons: WalletButtonProps[] =
+    isMobile() && wmButtons.length > 0
+      ? wmButtons
+      : [...connectionButtons, ...wmButtons, ...installationButtons];
 
   return (
     <Modal
