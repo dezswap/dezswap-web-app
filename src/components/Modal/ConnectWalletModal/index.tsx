@@ -5,7 +5,7 @@ import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
-import React, { MouseEventHandler } from "react";
+import React, { MouseEventHandler, useState } from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -14,8 +14,9 @@ import iconInstalled from "assets/icons/icon-installed.svg";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
-import { BaseWallet, WalletState } from "@interchain-kit/core";
+import { BaseWallet, WalletState, WCWallet } from "@interchain-kit/core";
 import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
+import QRCode from "react-qr-code";
 
 const WalletButton = styled.button`
   width: auto;
@@ -63,7 +64,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const theme = useTheme();
   const screenClass = useScreenClass();
   const wm = useWalletManager();
-
+  const [url, setUrl] = useState();
   const buttons: WalletButtonProps[] = [
     ...availableConnections
       .filter(({ type }) => type !== ConnectType.READONLY)
@@ -105,42 +106,62 @@ function ConnectWalletModal(props: ReactModal.Props) {
       ),
     ...wm.wallets
       .filter(
-        (wallet: BaseWallet) =>
-          !isMobile() &&
+        (wallet: any) =>
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: BaseWallet) => {
+      .map((wallet: any) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
-
         const iconSrc =
           typeof wallet.info.logo === "string"
             ? wallet.info.logo
             : wallet.info.logo?.major ?? "";
-
+        if (wallet?.pairingUri && wallet.info.walletconnect?.formatNativeUrl) {
+          const keplrDeepLink = wallet.pairingUri
+            ? wallet.info.walletconnect?.formatNativeUrl(
+                "keplrwallet:",
+                wallet.pairingUri,
+                "ios",
+              )
+            : undefined;
+          if (keplrDeepLink !== url) setUrl(keplrDeepLink);
+        }
+        //TODO: fix wallet type
         return {
           label: wallet.info.prettyName,
           iconSrc,
           isInstalled,
           onClick: async (event) => {
             try {
-              if (!isInstalled) {
-                const url = wallet.info.downloads?.find(
-                  (d) => d.browser === browserType,
-                )?.link;
-                if (url) window.open(url);
-              }
+              // if (!isInstalled) {
+              //   const url = wallet.info.downloads?.find(
+              //     (d) => d.browser === browserType,
+              //   )?.link;
+              //   if (url) window.open(url);
+              // }
 
-              await wm.connect(wallet.info.name, chainName);
-              if (
-                wm.getChainWalletState(wallet.info.name, chainName)
-                  ?.walletState !== WalletState.Connected
-              ) {
-                // TODO: open unsupported wallet modal
-              }
+              await wm.connect(wallet.info.name, "xplatestnet");
 
-              if (props.onRequestClose) {
-                props.onRequestClose(event);
+              if (wallet.pairingUri) {
+                const keplrDeepLink =
+                  wallet.info.walletconnect?.formatNativeUrl(
+                    "keplrwallet:",
+                    wallet.pairingUri,
+                    "ios",
+                  );
+
+                if (isMobile()) window.location.href = keplrDeepLink;
+                else setUrl(keplrDeepLink);
               }
+              // if (
+              //   wm.getChainWalletState("keplr-mobile", chainName)
+              //     ?.walletState !== WalletState.Connected
+              // ) {
+              //   // TODO: open unsupported wallet modal
+              // }
+
+              // if (props.onRequestClose) {
+              //   props.onRequestClose(event);
+              // }
             } catch (error) {
               console.log(error);
             }
@@ -258,6 +279,8 @@ function ConnectWalletModal(props: ReactModal.Props) {
             </WalletButton>
           </Col>
         ))}
+
+        {url && <QRCode value={url} />}
       </Row>
     </Modal>
   );

@@ -65,7 +65,7 @@ function NavBar({ items, flex = true }: NavBarProps) {
           },
           ...navItemProps
         }) => (
-          <Tippy {...tippyProps} key={key ?? `${to.toString()}`}>
+          <Tippy {...tippyProps}>
             <NavItem
               className={`${navItemProps.className ?? ""} ${
                 disabled ? "disabled" : ""

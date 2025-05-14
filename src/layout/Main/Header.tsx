@@ -301,8 +301,7 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const { wallet: interchainWallet } = useChain(chainName);
-
+  const { wallet: interchainWallet, disconnect } = useChain(chainName);
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
       (item) => item.address === XPLA_ADDRESS,
@@ -703,11 +702,11 @@ function Header() {
                                     connectedWallet.isInterchain &&
                                     interchainWallet
                                   ) {
-                                    interchainWallet.disconnect(chainId);
+                                    disconnect();
                                   }
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 100);
+                                  // setTimeout(() => {
+                                  //   window.location.reload();
+                                  // }, 100);
                                 }}
                               >
                                 Disconnect

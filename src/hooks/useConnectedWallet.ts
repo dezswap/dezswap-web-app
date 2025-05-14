@@ -7,6 +7,8 @@ import {
   useWallet,
   WalletApp,
 } from "@xpla/wallet-provider";
+import { TxBody, TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
+
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { convertProtoToAminoMsg } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
@@ -18,6 +20,15 @@ const resetWalletValue = {
   walletAddress: "",
   isInterchain: false,
 };
+function base64ToUint8Array(base64String: string) {
+  const rawData = atob(base64String);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
 
 const useConnectedWallet = () => {
   const { signingClient } = useSigningClient();
@@ -76,14 +87,32 @@ const useConnectedWallet = () => {
   const prevDataString = useRef("");
 
   const post = useCallback(
-    (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
+    async (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
       if (walletInfo.isInterchain) {
         const { executeContract } = MessageComposer.fromPartial;
         const messages = tx.msgs.map((txOption) => executeContract(txOption));
         if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
           throw new Error("PostError: Fee Not Found");
         }
-        return signingClient?.signAndBroadcastSync(
+        // const result = signingClient?.signAndBroadcastSync(
+        //   walletInfo.walletAddress,
+        //   messages,
+        //   {
+        //     amount: [
+        //       ...tx.fee.amount.map((coin) =>
+        //         Coin.fromPartial({
+        //           amount: coin.amount.toString(),
+        //           denom: coin.denom,
+        //         }),
+        //       ),
+        //     ],
+        //     gas: tx.fee.gas_limit.toString(),
+        //   },
+        // );
+        // console.log("result", result);
+        // return result;
+
+        let txRaw = await signingClient?.sign(
           walletInfo.walletAddress,
           messages,
           {
@@ -97,7 +126,29 @@ const useConnectedWallet = () => {
             ],
             gas: tx.fee.gas_limit.toString(),
           },
+          "",
         );
+
+        // convert to uint8Array like
+        if (txRaw?.authInfoBytes && txRaw?.bodyBytes && txRaw?.signatures) {
+          txRaw = {
+            authInfoBytes: base64ToUint8Array(
+              (txRaw?.authInfoBytes ?? "") as unknown as string,
+            ),
+            bodyBytes: base64ToUint8Array(
+              (txRaw?.bodyBytes ?? "") as unknown as string,
+            ),
+            signatures: txRaw?.signatures,
+          };
+
+          const txBytes = TxRaw.encode(txRaw).finish();
+          const broadcasted = await signingClient?.broadcastTx(txBytes, {
+            checkTx: true,
+            deliverTx: false,
+          });
+          console.log(broadcasted);
+          return broadcasted?.origin;
+        }
       }
       return connectedXplaWallet?.post(
         { ...tx, ...convertProtoToAminoMsg(tx.msgs) },

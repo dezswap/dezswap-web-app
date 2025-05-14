@@ -11,12 +11,15 @@ function useSigningClient() {
   const { chainName } = useNetwork();
   const { walletState } =
     getChainWalletState(currentWalletName, chainName) ?? {};
+
   const { data: signingClient } = useQuery({
     queryKey: ["signingClient", chainName],
     queryFn: async () => {
       try {
         const client = await wm.getSigningClient(currentWalletName, chainName);
+        console.log("wallet,chain,", currentWalletName, chainName);
         client.addEncoders(toEncoders(MsgExecuteContract));
+
         return client;
       } catch (err) {
         console.error("Signing client Error:", err);
