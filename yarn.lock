@@ -1156,9 +1156,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchain-kit/core@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@interchain-kit/core@npm:0.3.20"
+"@interchain-kit/core@npm:^0.3.24":
+  version: 0.3.24
+  resolution: "@interchain-kit/core@npm:0.3.24"
   dependencies:
     "@chain-registry/v2": "npm:^1.71.71"
     "@chain-registry/v2-keplr": "npm:^0.0.72"
@@ -1173,39 +1173,40 @@ __metadata:
     "@walletconnect/sign-client": "npm:^2.19.1"
     "@walletconnect/types": "npm:^2.19.1"
     "@walletconnect/universal-provider": "npm:^2.19.1"
+    base64-js: "npm:^1.5.1"
     bowser: "npm:^2.11.0"
     buffer: "npm:^6.0.3"
     interchainjs: "npm:1.11.9"
     long: "npm:^5.2.3"
-  checksum: 10c0/8cacee92af29d53cc0bf24b2d56e775035b3eb585bb265bb2f5105e4b8e881a8b07950ef8513f71c2dfa87f2b7f67070e96e024f1f9580072eabf03d9931d13a
+  checksum: 10c0/190637d6a70876407b5dd47926560fb5378825e105dc11d239144911956ecd0ba24af97d19d54c7c48934ecaaf9ce88c1ce898c4a435761b65c2ae4db32d98e8
   languageName: node
   linkType: hard
 
-"@interchain-kit/cosmostation-extension@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.20"
+"@interchain-kit/cosmostation-extension@npm:^0.3.24":
+  version: 0.3.24
+  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.24"
   dependencies:
-    "@interchain-kit/core": "npm:^0.3.20"
-  checksum: 10c0/97834f8b9052be9e2f7434d324a8156cdbfeced9ee8f2d500b2a7df0f273be3669529243c9e4f1d48bedfbe80c6799ccab221009608c5dba265d03ac3a69606f
+    "@interchain-kit/core": "npm:^0.3.24"
+  checksum: 10c0/2be92978e06b396fa160b94a51e8f16402bee13806115e975b70108e995138d855405108222b1856358425404f84dfad86ce9cb7bcf6804640e339ab122bb3c2
   languageName: node
   linkType: hard
 
-"@interchain-kit/keplr-extension@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@interchain-kit/keplr-extension@npm:0.3.20"
+"@interchain-kit/keplr-extension@npm:^0.3.24":
+  version: 0.3.24
+  resolution: "@interchain-kit/keplr-extension@npm:0.3.24"
   dependencies:
-    "@interchain-kit/core": "npm:^0.3.20"
+    "@interchain-kit/core": "npm:^0.3.24"
     "@keplr-wallet/provider-extension": "npm:^0.12.102"
-  checksum: 10c0/c11c193cb13fc7ef74d2d6d3d3d87dee4651494ba749cbdebba0ece9d83e56fbd397558126ba722908f2e5f776c3a042ae90343a90c9d9b562e60123f0cd77c4
+  checksum: 10c0/e45575967a09d36e5d56c1dc96b234423e30495aa85023a2f9d31335f27732afca260bd7220fe35329a25e6040401b1cca183509c42e816050880a2074734208
   languageName: node
   linkType: hard
 
-"@interchain-kit/react@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@interchain-kit/react@npm:0.3.20"
+"@interchain-kit/react@npm:^0.3.24":
+  version: 0.3.24
+  resolution: "@interchain-kit/react@npm:0.3.24"
   dependencies:
     "@chain-registry/v2-types": "npm:^0.53.40"
-    "@interchain-kit/core": "npm:^0.3.20"
+    "@interchain-kit/core": "npm:^0.3.24"
     "@interchain-ui/react": "npm:1.26.1"
     "@interchainjs/cosmos": "npm:1.11.9"
     "@interchainjs/cosmos-types": "npm:1.11.9"
@@ -1219,7 +1220,7 @@ __metadata:
     "@types/react-dom": ^19.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
-  checksum: 10c0/b73efd469d02d12d728ddbffff84b7b32335c76dbb31a13a2c29d60bca9d5c291da9ba8c2d779e5a1743183b04b5a403d2e6326376961a42326c0bc537083c6c
+  checksum: 10c0/cac54bf5fbc41f56bfd14ef10101ca2ea301972d9c02eba5e62e6a97d446a0bee27a1b94a9aabd60edd22392d58bdb8cde02c22b3f4db5ac553cb5dadd982e22
   languageName: node
   linkType: hard
 
@@ -1332,7 +1333,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchainjs/cosmos@npm:1.11.4, @interchainjs/cosmos@npm:^1.11.2, @interchainjs/cosmos@npm:^1.9.14":
+"@interchainjs/cosmos@npm:1.11.4, @interchainjs/cosmos@npm:^1.9.14":
   version: 1.11.4
   resolution: "@interchainjs/cosmos@npm:1.11.4"
   dependencies:
@@ -1349,7 +1350,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchainjs/cosmos@npm:1.11.9":
+"@interchainjs/cosmos@npm:1.11.9, @interchainjs/cosmos@npm:^1.11.9":
   version: 1.11.9
   resolution: "@interchainjs/cosmos@npm:1.11.9"
   dependencies:
@@ -5108,7 +5109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.3.0, base64-js@npm:^1.3.1":
+"base64-js@npm:^1.3.0, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 10c0/f23823513b63173a001030fae4f2dabe283b99a9d324ade3ad3d148e218134676f1ee8568c877cd79ec1c53158dcf2d2ba527a97c606618928ba99dd930102bf
@@ -6098,11 +6099,11 @@ __metadata:
     "@emotion/babel-plugin": "npm:^11.10.2"
     "@emotion/react": "npm:^11.10.6"
     "@emotion/styled": "npm:^11.10.6"
-    "@interchain-kit/core": "npm:^0.3.20"
-    "@interchain-kit/cosmostation-extension": "npm:^0.3.20"
-    "@interchain-kit/keplr-extension": "npm:^0.3.20"
-    "@interchain-kit/react": "npm:^0.3.20"
-    "@interchainjs/cosmos": "npm:^1.11.2"
+    "@interchain-kit/core": "npm:^0.3.24"
+    "@interchain-kit/cosmostation-extension": "npm:^0.3.24"
+    "@interchain-kit/keplr-extension": "npm:^0.3.24"
+    "@interchain-kit/react": "npm:^0.3.24"
+    "@interchainjs/cosmos": "npm:^1.11.9"
     "@rollup/plugin-inject": "npm:^5.0.3"
     "@tanstack/react-query": "npm:^4.29.7"
     "@tippyjs/react": "npm:^4.2.6"
