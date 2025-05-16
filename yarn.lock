@@ -1201,6 +1201,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interchain-kit/keplr-mobile@npm:^0.3.24":
+  version: 0.3.24
+  resolution: "@interchain-kit/keplr-mobile@npm:0.3.24"
+  dependencies:
+    "@interchain-kit/core": "npm:^0.3.24"
+  checksum: 10c0/8aab1e40097989918c144f3a66cd2e8615e2ecf664c00d97cf94bf2bee896dba7e4d38248feeafa93c9e6cd808a1ca6f1c69784675c18c55e72c35cb527fbd51
+  languageName: node
+  linkType: hard
+
 "@interchain-kit/react@npm:^0.3.24":
   version: 0.3.24
   resolution: "@interchain-kit/react@npm:0.3.24"
@@ -6102,6 +6111,7 @@ __metadata:
     "@interchain-kit/core": "npm:^0.3.24"
     "@interchain-kit/cosmostation-extension": "npm:^0.3.24"
     "@interchain-kit/keplr-extension": "npm:^0.3.24"
+    "@interchain-kit/keplr-mobile": "npm:^0.3.24"
     "@interchain-kit/react": "npm:^0.3.24"
     "@interchainjs/cosmos": "npm:^1.11.9"
     "@rollup/plugin-inject": "npm:^5.0.3"

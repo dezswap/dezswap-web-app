@@ -5,6 +5,7 @@ import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { defaultSignerOptions } from "@xpla/xpla/defaults";
+import { keplrMobile } from "@interchain-kit/keplr-mobile";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -26,8 +27,20 @@ const root = ReactDOM.createRoot(document.getElementById("root")!);
 const interchainOptions = {
   chains: DefaultChain,
   assetLists: DefaultAssetList,
-  wallets: [keplrWallet, cosmostationWallet],
+  wallets: [keplrWallet, cosmostationWallet, keplrMobile],
   walletModal: InterchainWalletModal,
+  walletConnectOptions: {
+    signClient: {
+      projectId: "bb7c346a9734b19a12c5d5828fa48eb8",
+      relayUrl: "wss://relay.walletconnect.com",
+      metadata: {
+        name: "Dezswap",
+        description: "Dezswap",
+        url: "https://localhost:5173/",
+        icons: [],
+      },
+    },
+  },
   signerOptions: {
     signing: () => {
       return {
