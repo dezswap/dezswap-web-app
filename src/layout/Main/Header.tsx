@@ -490,7 +490,8 @@ function Header() {
                       TODO: it will be updated https://github.com/cosmos/chain-registry/pull/6266
                       {prettyName}
                        */
-                        chainName === "xpla" ? "XPLA" : "XPLA Testnet"
+                        screenClass !== MOBILE_SCREEN_CLASS &&
+                          (chainName === "xpla" ? "XPLA" : "XPLA Testnet")
                       }
                     </ChainButton>
                   </Col>
