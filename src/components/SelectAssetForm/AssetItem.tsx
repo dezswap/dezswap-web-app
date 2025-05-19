@@ -87,7 +87,7 @@ const Wrapper = styled.div<WrapperProps>`
 interface AssetIconProps {
   src?: string;
 }
-const AssetIcon = styled.div<AssetIconProps>`
+export const AssetIcon = styled.div<AssetIconProps>`
   width: 32px;
   height: 32px;
   min-width: 32px;
