@@ -13,6 +13,16 @@ import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import { useSearchParams } from "react-router-dom";
 
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  inset: 0;
+  z-index: 5000;
+`;
+
 const ChainsWrapper = styled.button`
   width: 100%;
   background: none;
@@ -46,65 +56,67 @@ function ChainModal(modalProps: ReactModal.Props) {
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  return (
-    <Modal
-      {...modalProps}
-      title="Select a network"
-      hasCloseButton
-      drawer={screenClass === MOBILE_SCREEN_CLASS}
-      overlay={screenClass === MOBILE_SCREEN_CLASS}
-      noPadding
-      style={
-        screenClass === MOBILE_SCREEN_CLASS
-          ? {}
-          : {
-              overlay: {
-                position: "absolute",
-                width: `calc(100% - ${DEFAULT_GUTTER_WIDTH}px)`,
-                maxWidth: `${GRID_MAX_WIDTH[screenClass]}`,
-                margin: "0 auto",
-                alignItems: "start",
-                justifyContent: "end",
-              },
-              content: {
-                marginTop: isTestnet ? "135px" : "105px",
-                marginRight: "116px",
-                top: "0",
-                width: "372px",
-              },
-              panel: {
-                maxHeight: "unset",
-                overflowY: "visible",
-                overflow: "hidden",
-              },
-            }
-      }
-    >
-      {DefaultChain.map((chain) => (
-        <ChainsWrapper
-          onClick={() => {
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set(CHAIN_NAME_SEARCH_PARAM, chain.chainName);
-            setSearchParams(newParams);
-          }}
-          type="button"
-        >
-          <AssetIcon
-            asset={{
-              icon: chain.logoURIs?.svg ?? chain.logoURIs?.png,
+  return modalProps.isOpen ? (
+    <Overlay onClick={modalProps.onRequestClose}>
+      <Modal
+        {...modalProps}
+        title="Select a network"
+        hasCloseButton
+        drawer={screenClass === MOBILE_SCREEN_CLASS}
+        overlay={screenClass === MOBILE_SCREEN_CLASS}
+        noPadding
+        style={
+          screenClass === MOBILE_SCREEN_CLASS
+            ? {}
+            : {
+                overlay: {
+                  position: "absolute",
+                  width: `calc(100% - ${DEFAULT_GUTTER_WIDTH}px)`,
+                  maxWidth: `${GRID_MAX_WIDTH[screenClass]}`,
+                  margin: "0 auto",
+                  alignItems: "start",
+                  justifyContent: "end",
+                },
+                content: {
+                  marginTop: isTestnet ? "135px" : "105px",
+                  marginRight: "116px",
+                  top: "0",
+                  width: "372px",
+                },
+                panel: {
+                  maxHeight: "unset",
+                  overflowY: "visible",
+                  overflow: "hidden",
+                },
+              }
+        }
+      >
+        {DefaultChain.map((chain) => (
+          <ChainsWrapper
+            onClick={(e) => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set(CHAIN_NAME_SEARCH_PARAM, chain.chainName);
+              setSearchParams(newParams);
             }}
-          />
-          {
-            /* 
+            type="button"
+          >
+            <AssetIcon
+              asset={{
+                icon: chain.logoURIs?.svg ?? chain.logoURIs?.png,
+              }}
+            />
+            {
+              /* 
             TODO: it will be updated https://github.com/cosmos/chain-registry/pull/6266
               {chain.prettyName}
               */
-            chain.chainName === "xpla" ? "XPLA" : "XPLA Testnet"
-          }
-        </ChainsWrapper>
-      ))}
-    </Modal>
-  );
+              chain.chainName === "xpla" ? "XPLA" : "XPLA Testnet"
+            }
+          </ChainsWrapper>
+        ))}
+      </Modal>
+    </Overlay>
+  ) : null;
 }
 
 export default ChainModal;
