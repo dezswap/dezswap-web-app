@@ -17,6 +17,16 @@ export const LARGE_BROWSER_SCREEN_CLASS: ScreenClass = "lg";
 
 export const DEFAULT_GUTTER_WIDTH = 32;
 
+export const GRID_MAX_WIDTH = {
+  xs: "unset",
+  sm: "940px",
+  md: "1180px",
+  lg: "1300px",
+  xl: "1300px",
+  xxl: "1300px",
+  xxxl: "1300px",
+};
+
 export const gridConfiguration: Configuration = {
   // Available: (xs), sm, md, lg
   // Disabled: xl, xxl, xxxl

@@ -256,6 +256,7 @@ function Modal({
       {...modalProps}
     >
       <Container
+        onClick={(e) => e.stopPropagation()}
         css={css`
           width: 100%;
           display: block;

@@ -53,6 +53,7 @@ import useNotifications from "hooks/useNotifications";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useChain } from "hooks/useChain";
 import NotificationModal from "./NotificationModal";
+import ChainModal from "./ChainModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -118,6 +119,20 @@ const Wrapper = styled.header<WrapperProps>`
       padding-top: 10px;
       padding-bottom: 10px;
     }
+  }
+`;
+
+const ChainButton = styled(Button)`
+  background-color: ${({ theme }) => theme.colors.text.background};
+  display: flex;
+  gap: 4px;
+  border: 0;
+  padding: 10px;
+  position: relative;
+
+  img {
+    height: 19px;
+    width: 19px;
   }
 `;
 
@@ -292,11 +307,12 @@ function Header() {
   const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const notificationModal = useHashModal("notifications");
+  const chainModal = useHashModal("chains");
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers, chainId },
+    selectedChain: { explorers, chainId, logoURIs, prettyName },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
@@ -465,6 +481,19 @@ function Header() {
                             }
                       }
                     />
+                  </Col>
+                  <Col width="auto">
+                    <ChainButton onClick={() => chainModal.open()}>
+                      <img src={logoURIs.png} alt={prettyName} />
+                      {
+                        /* 
+                      TODO: it will be updated https://github.com/cosmos/chain-registry/pull/6266
+                      {prettyName}
+                       */
+                        screenClass !== MOBILE_SCREEN_CLASS &&
+                          (chainName === "xpla" ? "XPLA" : "XPLA Testnet")
+                      }
+                    </ChainButton>
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
@@ -734,6 +763,10 @@ function Header() {
       <NotificationModal
         isOpen={notificationModal.isOpen}
         onRequestClose={() => notificationModal.close()}
+      />
+      <ChainModal
+        isOpen={chainModal.isOpen}
+        onRequestClose={() => chainModal.open(false)}
       />
     </>
   );
