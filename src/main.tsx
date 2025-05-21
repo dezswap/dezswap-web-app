@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { ChainProvider } from "@interchain-kit/react";
+import { ChainProvider, InterchainWalletModal } from "@interchain-kit/react";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
@@ -23,10 +23,12 @@ window.ResizeObserver = ResizeObserver;
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+
 const interchainOptions = {
   chains: DefaultChain,
   assetLists: DefaultAssetList,
   wallets: [keplrWallet, cosmostationWallet],
+  walletModal: InterchainWalletModal,
   signerOptions: {
     signing: () => {
       return {
@@ -50,8 +52,6 @@ getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>
       <ChainProvider {...interchainOptions}>
-        {/* TODO fix type error */}
-        {/* @ts-ignore */}
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
             <App />

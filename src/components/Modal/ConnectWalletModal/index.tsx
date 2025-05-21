@@ -106,7 +106,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
     ...wm.wallets
       .filter(
         (wallet: BaseWallet) =>
-          !isMobile() &&
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
       .map((wallet: BaseWallet) => {
