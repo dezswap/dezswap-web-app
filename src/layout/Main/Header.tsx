@@ -485,14 +485,7 @@ function Header() {
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
                       <img src={logoURIs.png} alt={prettyName} />
-                      {
-                        /* 
-                      TODO: it will be updated https://github.com/cosmos/chain-registry/pull/6266
                       {prettyName}
-                       */
-                        screenClass !== MOBILE_SCREEN_CLASS &&
-                          (chainName === "xpla" ? "XPLA" : "XPLA Testnet")
-                      }
                     </ChainButton>
                   </Col>
                   <Col width="auto">

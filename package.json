@@ -21,7 +21,7 @@
     ]
   },
   "dependencies": {
-    "@chain-registry/v2": "^1.71.146",
+    "@chain-registry/v2": "^1.71.217",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@interchain-kit/core": "^0.3.20",
