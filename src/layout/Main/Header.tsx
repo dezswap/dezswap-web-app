@@ -485,7 +485,7 @@ function Header() {
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
                       <img src={logoURIs.png} alt={prettyName} />
-                      {prettyName}
+                      {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
