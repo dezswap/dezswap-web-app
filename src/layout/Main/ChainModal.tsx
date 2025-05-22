@@ -105,13 +105,7 @@ function ChainModal(modalProps: ReactModal.Props) {
                 icon: chain.logoURIs?.svg ?? chain.logoURIs?.png,
               }}
             />
-            {
-              /* 
-            TODO: it will be updated https://github.com/cosmos/chain-registry/pull/6266
-              {chain.prettyName}
-              */
-              chain.chainName === "xpla" ? "XPLA" : "XPLA Testnet"
-            }
+            {chain.prettyName}
           </ChainsWrapper>
         ))}
       </Modal>
