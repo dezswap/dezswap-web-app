@@ -26,18 +26,7 @@ function PlayAnalytics() {
     <Wrapper key={tokenAddress}>
       <ScrollToTop />
       <Container style={{ padding: "20px 0" }}>
-        {dashboardToken === null ? (
-          <Typography
-            color="primary"
-            size={32}
-            weight={900}
-            css={css`
-              margin-bottom: 19px;
-            `}
-          >
-            Invalid token...
-          </Typography>
-        ) : (
+        {dashboardToken !== null && (
           <>
             <Row
               justify="between"
