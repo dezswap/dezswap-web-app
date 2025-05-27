@@ -16,6 +16,7 @@ import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
 import { BaseWallet, WalletState } from "@interchain-kit/core";
 import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
+import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
 
 const WalletButton = styled.button`
   width: auto;
@@ -105,11 +106,11 @@ function ConnectWalletModal(props: ReactModal.Props) {
       ),
     ...wm.wallets
       .filter(
-        (wallet: BaseWallet) =>
+        (wallet: StatefulWallet) =>
           !isMobile() &&
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: BaseWallet) => {
+      .map((wallet: StatefulWallet) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
 
         const iconSrc =
