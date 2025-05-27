@@ -4,7 +4,10 @@ import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { defaultSignerOptions } from "@xpla/xpla/defaults";
+import {
+  defaultSignerOptions,
+  defaultSignerOptions as xplaSignerOptions,
+} from "@xpla/xpla/defaults";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -13,13 +16,18 @@ import "simplebar";
 import "simplebar/dist/simplebar.css";
 import "utils/overrideXplaNumeric";
 import {
-  DefaultAssetList,
-  DefaultChain,
-  DefaultRpcEndpoint,
+  CHAIN_NAME_SEARCH_PARAM,
+  getDefaultAssetList,
+  DefaultChainName,
+  getDefaultRpcEndpoint,
+  getDefaultChain,
 } from "constants/dezswap";
 import { WCWallet } from "@interchain-kit/core";
 
 window.ResizeObserver = ResizeObserver;
+
+const params = new URLSearchParams(window.location.search);
+const chainName = params.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
 
 const queryClient = new QueryClient();
 const defaultOption = {
@@ -40,13 +48,15 @@ const walletConnect = new WCWallet(undefined, defaultOption);
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 const interchainOptions = {
-  chains: DefaultChain,
-  assetLists: DefaultAssetList,
+  chains: getDefaultChain(chainName),
+  assetLists: getDefaultAssetList(chainName),
   wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
     signing: () => {
       return {
-        signerOptions: defaultSignerOptions.Cosmos,
+        signerOptions: chainName.includes("xpla")
+          ? xplaSignerOptions.Cosmos
+          : defaultSignerOptions,
         broadcast: {
           checkTx: true,
         },
@@ -56,7 +66,7 @@ const interchainOptions = {
   endpointOptions: {
     endpoints: {
       injective: {
-        rpc: DefaultRpcEndpoint,
+        rpc: [getDefaultRpcEndpoint(chainName)],
       },
     },
   },
