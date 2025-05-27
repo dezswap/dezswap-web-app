@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import AssetIcon from "components/AssetIcon";
 import Modal from "components/Modal";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChain } from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChains } from "constants/dezswap";
 import {
   DEFAULT_GUTTER_WIDTH,
   GRID_MAX_WIDTH,
@@ -91,7 +91,7 @@ function ChainModal(modalProps: ReactModal.Props) {
               }
         }
       >
-        {DefaultChain.map((chain) => (
+        {DefaultChains.map((chain) => (
           <ChainsWrapper
             onClick={(e) => {
               const newParams = new URLSearchParams(searchParams);
