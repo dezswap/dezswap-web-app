@@ -33,7 +33,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -476,9 +476,11 @@ function WithdrawPage() {
                     value: (
                       <AssetValueFormatter
                         asset={{ symbol: XPLA_SYMBOL }}
-                        amount={fee?.amount
-                          ?.get(XPLA_ADDRESS)
-                          ?.amount.toString()}
+                        amount={
+                          fee?.amount
+                            ?.get(nativeTokens?.[chainName]?.[0].token)
+                            ?.amount.toString() || "0"
+                        }
                       />
                     ),
                   },

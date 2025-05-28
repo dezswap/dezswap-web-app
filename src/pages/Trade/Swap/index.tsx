@@ -349,10 +349,10 @@ function SwapPage() {
   const feeAmount = useMemo(() => {
     return (
       fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].name)
+        ?.get(nativeTokens?.[chainName]?.[0].token)
         ?.amount.toString() || "0"
     );
-  }, [fee]);
+  }, [chainName, fee?.amount]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
