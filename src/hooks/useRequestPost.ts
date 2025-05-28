@@ -39,8 +39,8 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
             const { transactionHash } = result as DeliverTxResponse;
             setTxHash(transactionHash);
           } else {
-            const { result: res } = result as TxResult;
-            setTxHash(res.txhash);
+            const { result: res } = (result as TxResult) ?? {};
+            setTxHash(res?.txhash);
           }
         } catch (error) {
           console.log(error);

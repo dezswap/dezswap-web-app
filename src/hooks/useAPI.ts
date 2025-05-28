@@ -253,17 +253,6 @@ const useAPI = (version: ApiVersion = "v1") => {
     [client, walletAddress],
   );
 
-  const getAuthInfo = useCallback(async () => {
-    if (!walletAddress || !client) {
-      return undefined;
-    }
-    const { info } =
-      (await client?.cosmos.auth.v1beta1.accountInfo({
-        address: walletAddress,
-      })) || {};
-    return info;
-  }, [walletAddress, client]);
-
   const estimateFee = useCallback(
     async (msg: EncodeObject[], authSequence: bigint) => {
       if (!msg || !client) {
@@ -304,7 +293,6 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
       isLoading,
     }),
@@ -323,7 +311,6 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
       isLoading,
     ],
