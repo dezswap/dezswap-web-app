@@ -52,8 +52,11 @@ const ChainsWrapper = styled.button`
 `;
 function ChainModal(modalProps: ReactModal.Props) {
   const screenClass = useScreenClass();
-  const { chainName } = useNetwork();
-  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
+  const {
+    chainName,
+    selectedChain: { networkType },
+  } = useNetwork();
+  const isTestnet = useMemo(() => networkType === "testnet", [chainName]);
   const [searchParams, setSearchParams] = useSearchParams();
 
   return modalProps.isOpen ? (
