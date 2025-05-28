@@ -18,7 +18,7 @@ import {
 } from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
@@ -41,6 +41,7 @@ function UnlockPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
+    chainName,
     selectedChain: { chainId, explorers },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
@@ -112,8 +113,12 @@ function UnlockPage() {
   const { fee } = useFee(txOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
