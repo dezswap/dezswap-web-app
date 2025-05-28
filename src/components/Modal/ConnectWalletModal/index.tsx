@@ -65,7 +65,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
 
-  const buttons: WalletButtonProps[] = [
+  const xplaButtons: WalletButtonProps[] = [
     ...availableConnections
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ type, icon, name, identifier }) => ({
@@ -104,6 +104,18 @@ function ConnectWalletModal(props: ReactModal.Props) {
             ]
           : (p as WalletButtonProps),
       ),
+
+    ...availableInstallations
+      .filter(({ type }) => type !== ConnectType.READONLY)
+      .map(({ icon, name, url }) => ({
+        label: `${name}`,
+        iconSrc: icon,
+        onClick: () => {
+          window.open(url);
+        },
+      })),
+  ];
+  const interchainButtons: WalletButtonProps[] = [
     ...wm.wallets
       .filter(
         (wallet: StatefulWallet) =>
@@ -142,15 +154,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
           },
         } as WalletButtonProps;
       }),
-    ...availableInstallations
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ icon, name, url }) => ({
-        label: `${name}`,
-        iconSrc: icon,
-        onClick: () => {
-          window.open(url);
-        },
-      })),
   ];
 
   return (
@@ -184,7 +187,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
           height: "100%",
         }}
       >
-        {buttons.map((item) => (
+        {[
+          ...(chainName.includes("xpla") ? xplaButtons : []),
+          ...interchainButtons,
+        ].map((item) => (
           <Col
             xs={6}
             sm={4}
