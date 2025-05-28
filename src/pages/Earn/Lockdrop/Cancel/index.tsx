@@ -26,7 +26,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
@@ -61,7 +61,7 @@ function CancelPage() {
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
-
+  const { chainName } = useNetwork();
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -142,8 +142,12 @@ function CancelPage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const { requestPost } = useRequestPost(handleModalClose);
 

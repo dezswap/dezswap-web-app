@@ -22,7 +22,7 @@ import {
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -50,6 +50,7 @@ const Box = styled(box)`
 function ClaimPage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
+  const { chainName } = useNetwork();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
@@ -128,10 +129,13 @@ function ClaimPage() {
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(createTxOptions);
-
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });

@@ -340,10 +340,10 @@ function SwapPage() {
   const feeAmount = useMemo(() => {
     return (
       fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].name)
+        ?.get(nativeTokens?.[chainName]?.[0].token)
         ?.amount.toString() || "0"
     );
-  }, [fee]);
+  }, [chainName, fee?.amount]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
@@ -371,7 +371,7 @@ function SwapPage() {
       console.log(error);
     }
     return "Enter an amount";
-  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+  }, [asset1, asset2, isPoolEmpty, asset1Value, asset1BalanceMinusFee]);
 
   const [shiftAssets, setShiftAssets] = useState(false);
 
@@ -396,7 +396,16 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee, asset1Value, form]);
+  }, [
+    asset1?.decimals,
+    asset1Address,
+    asset1BalanceMinusFee,
+    asset1Value,
+    balanceApplied,
+    form,
+    isReversed,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     setTimeout(() => {
