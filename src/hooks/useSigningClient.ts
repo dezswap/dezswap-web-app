@@ -7,12 +7,19 @@ import useNetwork from "./useNetwork";
 
 function useSigningClient() {
   const wm = useWalletManager();
-  const { currentChainName, currentWalletName, getChainWalletState } = wm;
+  const { currentChainName, currentWalletName, getChainWalletState, isReady } =
+    wm;
   const { chainName } = useNetwork();
   const { walletState } =
     getChainWalletState(currentWalletName, chainName) ?? {};
   const { data: signingClient } = useQuery({
-    queryKey: ["signingClient", chainName],
+    queryKey: [
+      "signingClient",
+      currentWalletName,
+      wm,
+      currentChainName,
+      isReady,
+    ],
     queryFn: async () => {
       try {
         const client = await wm.getSigningClient(currentWalletName, chainName);
@@ -23,8 +30,7 @@ function useSigningClient() {
         throw err;
       }
     },
-    enabled:
-      walletState === WalletState.Connected && chainName === currentChainName,
+    enabled: isReady && walletState === WalletState.Connected,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
