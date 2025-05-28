@@ -5,7 +5,7 @@ import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -110,7 +110,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
     }
   }, [wm?.walletConnectQRCodeUri]);
 
-  const buttons: WalletButtonProps[] = [
+  const xplaButtons: WalletButtonProps[] = [
     ...availableConnections
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ type, icon, name, identifier }) => ({
@@ -151,6 +151,18 @@ function ConnectWalletModal(props: ReactModal.Props) {
             ]
           : (p as WalletButtonProps),
       ),
+    ...availableInstallations
+      .filter(({ type }) => type !== ConnectType.READONLY)
+      .map(({ icon, name, url }) => ({
+        label: `${name}`,
+        iconSrc: icon,
+        key: `xpla-${name}-install`,
+        onClick: () => {
+          window.open(url);
+        },
+      })),
+  ];
+  const interchainButtons: WalletButtonProps[] = [
     ...wm.wallets
       .filter(
         (wallet: StatefulWallet) =>
@@ -186,16 +198,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
           },
         } as WalletButtonProps;
       }),
-    ...availableInstallations
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ icon, name, url }) => ({
-        label: `${name}`,
-        iconSrc: icon,
-        key: `xpla-${name}-install`,
-        onClick: () => {
-          window.open(url);
-        },
-      })),
   ];
 
   return (
@@ -240,7 +242,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
               height: "100%",
             }}
           >
-            {buttons.map((item) => (
+            {[
+              ...(chainName.includes("xpla") ? xplaButtons : []),
+              ...interchainButtons,
+            ].map((item) => (
               <Col
                 xs={6}
                 sm={4}
