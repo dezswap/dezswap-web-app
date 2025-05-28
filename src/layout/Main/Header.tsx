@@ -30,7 +30,6 @@ import {
 } from "utils";
 import useBalance from "hooks/useBalance";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
-import iconXpla from "assets/icons/icon-xpla-24px.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -52,6 +51,7 @@ import useNotifications from "hooks/useNotifications";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useChain } from "hooks/useChain";
 import { nativeTokens } from "constants/network";
+import { CHAIN_ICONS } from "constants/dezswap";
 import NotificationModal from "./NotificationModal";
 import ChainModal from "./ChainModal";
 
@@ -318,10 +318,11 @@ function Header() {
   const { tokens: dashboardTokens } = useDashboard();
   const { wallet: interchainWallet } = useChain(chainName);
 
-  const { token: tokenAddress, symbol: tokenSymbol } = useMemo(
-    () => nativeTokens?.[chainName][0],
-    [chainName],
-  );
+  const {
+    token: tokenAddress,
+    symbol: tokenSymbol,
+    icon: tokenIcon,
+  } = useMemo(() => nativeTokens?.[chainName][0], [chainName]);
 
   const tokenBalance = useBalance(tokenAddress);
 
@@ -490,8 +491,12 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
-                      <img src={logoURIs?.png} alt={prettyName} />
-                      {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
+                      <img
+                        src={CHAIN_ICONS?.[chainName] ?? logoURIs?.png}
+                        alt={prettyName}
+                      />
+                      {screenClass !== MOBILE_SCREEN_CLASS &&
+                        prettyName.replace("Fetch.ai", "ASI")}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
@@ -667,7 +672,7 @@ function Header() {
                                 <Col width="auto">
                                   <IconButton
                                     size={24}
-                                    icons={{ default: iconXpla }}
+                                    icons={{ default: tokenIcon }}
                                   />
                                 </Col>
                                 <Col style={{ paddingLeft: "4px" }}>

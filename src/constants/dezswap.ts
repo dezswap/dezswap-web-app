@@ -1,6 +1,8 @@
 import { assetLists, chains } from "@chain-registry/v2";
-import type { AssetList } from "@chain-registry/v2-types";
 import Decimal from "decimal.js";
+import iconXpla from "assets/icons/icon-chain-xpla-32px.svg";
+import iconXplaGray from "assets/icons/icon-chain-xpla-gray-32px.svg";
+import iconASI from "assets/icons/icon-chain-asi-32px.svg";
 import { nativeTokens } from "./network";
 
 export type SupportedChain = "dimension" | "cube";
@@ -101,6 +103,15 @@ export const apiAddresses: {
   },
 };
 
+export const CHAIN_ICONS: {
+  [K in string]: string;
+} = {
+  xpla: iconXpla,
+  xplatestnet: iconXplaGray,
+  fetchhub: iconASI,
+  fetchhubtestnet: iconASI,
+};
+
 export const CHAIN_NAME_SEARCH_PARAM = "chainname";
 
 export const UNSUPPORT_WALLET_LIST: {
@@ -108,6 +119,6 @@ export const UNSUPPORT_WALLET_LIST: {
 } = {
   xpla: [],
   xplatestnet: ["cosmostation-extension"],
-  fetchhub: ["cosmostation-extension"],
-  fetchhubtestnet: ["cosmostation-extension"],
+  fetchhub: [],
+  fetchhubtestnet: [],
 };
