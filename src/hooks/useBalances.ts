@@ -30,7 +30,7 @@ const useBalances = (addresses: string[]) => {
       }
       return "0";
     },
-    [api, walletAddress, verifiedIbcAssets],
+    [chainName, walletAddress, verifiedIbcAssets, api],
   );
 
   const balanceQueryResults = useQueries({
