@@ -21,7 +21,7 @@ function useAuthSequence() {
     };
 
     fetchAuthInfo();
-  }, [api]);
+  }, [api, client, walletAddress]);
 
   return { sequence };
 }
