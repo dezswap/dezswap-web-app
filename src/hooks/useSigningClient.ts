@@ -6,9 +6,13 @@ import { WalletState } from "@interchain-kit/core";
 import useNetwork from "./useNetwork";
 
 function useSigningClient() {
-  const wm = useWalletManager();
-  const { currentChainName, currentWalletName, getChainWalletState, isReady } =
-    wm;
+  const {
+    currentChainName,
+    currentWalletName,
+    getChainWalletState,
+    isReady,
+    getSigningClient,
+  } = useWalletManager();
   const { chainName } = useNetwork();
   const { walletState } =
     getChainWalletState(currentWalletName, chainName) ?? {};
@@ -16,13 +20,13 @@ function useSigningClient() {
     queryKey: [
       "signingClient",
       currentWalletName,
-      wm,
+      walletState,
       currentChainName,
       isReady,
     ],
     queryFn: async () => {
       try {
-        const client = await wm.getSigningClient(currentWalletName, chainName);
+        const client = await getSigningClient(currentWalletName, chainName);
         client.addEncoders(toEncoders(MsgExecuteContract));
         return client;
       } catch (err) {

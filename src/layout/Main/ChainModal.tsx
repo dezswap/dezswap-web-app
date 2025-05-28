@@ -61,7 +61,7 @@ function ChainModal(modalProps: ReactModal.Props) {
     selectedChain: { networkType },
   } = useNetwork();
   const isTestnet = useMemo(() => networkType === "testnet", [chainName]);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   return modalProps.isOpen ? (
     <Overlay onClick={modalProps.onRequestClose}>
