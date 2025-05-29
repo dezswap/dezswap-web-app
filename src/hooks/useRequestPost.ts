@@ -9,10 +9,10 @@ import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { DeliverTxResponse } from "@xpla/xplajs/types";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
-import { convertProtoToAminoMsg } from "utils/dezswap";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 import useConnectedWallet from "./useConnectedWallet";
+import useSigningClient from "./useSigningClient";
 
 export interface NewMsgTxOptions extends Omit<CreateTxOptions, "msgs"> {
   msgs: MsgExecuteContract[];
@@ -23,6 +23,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const [args, setArgs] = useState<NewMsgTxOptions>();
   const [txHash, setTxHash] = useState<string>();
   const [txError, setTxError] = useState<TxError>();
+  const { signingClient } = useSigningClient();
   const txBroadcastModal = useTxBroadcastingModal({
     txHash,
     txError,
@@ -36,10 +37,13 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
       if (connectedWallet.isInterchain || connectedWallet.availablePost) {
         try {
           txBroadcastModal.open();
-          const result = await connectedWallet.post({
-            ...createTxOptions,
-            msgs: createTxOptions.msgs,
-          });
+          const result = await connectedWallet.post(
+            {
+              ...createTxOptions,
+              msgs: createTxOptions.msgs,
+            },
+            signingClient,
+          );
           if (connectedWallet.isInterchain && result) {
             const { transactionHash, code, rawLog } =
               result as DeliverTxResponse;
@@ -77,7 +81,11 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         }
       }
     },
-    [connectedWallet, txBroadcastModal],
+    [
+      connectedWallet.walletAddress,
+      txBroadcastModal,
+      signingClient === undefined,
+    ],
   );
 
   const handleConfirm = useCallback(async () => {
