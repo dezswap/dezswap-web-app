@@ -19,7 +19,7 @@ import Modal from "components/Modal";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import useChartData from "./useChartData";
 
-const chartTypeTabs = ["Volume", "TVL", "Price"].map((label) => ({
+const defaultChartTypeTabs = ["Volume", "TVL", "Price"].map((label) => ({
   key: label,
   label,
   value: label.toLowerCase() as DashboardTokenChartType,
@@ -33,9 +33,18 @@ const chartDurationOptions = ["Month", "Quarter", "Year", "All"].map(
   }),
 );
 
-function Chart({ tokenAddress }: { tokenAddress: string }) {
+function Chart({
+  tokenAddress,
+  isPriceFirst = false,
+}: {
+  tokenAddress: string;
+  isPriceFirst?: boolean;
+}) {
   const screenClass = useScreenClass();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const chartTypeTabs = useMemo(() => {
+    return isPriceFirst ? defaultChartTypeTabs.reverse() : defaultChartTypeTabs;
+  }, [isPriceFirst]);
   const selectedTabValue = useMemo(() => {
     return chartTypeTabs[selectedTabIndex].value;
   }, [selectedTabIndex]);

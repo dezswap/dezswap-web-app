@@ -38,7 +38,9 @@ function PlayAnalytics() {
               `}
             >
               <Col xs={12} md={7}>
-                {tokenAddress && <Chart tokenAddress={tokenAddress} />}
+                {tokenAddress && (
+                  <Chart tokenAddress={tokenAddress} isPriceFirst />
+                )}
               </Col>
               <Col xs={12} md={5}>
                 {tokenAddress && <TokenSummary tokenAddress={tokenAddress} />}
