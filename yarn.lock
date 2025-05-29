@@ -321,10 +321,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chain-registry/v2-types@npm:^0.53.132":
-  version: 0.53.132
-  resolution: "@chain-registry/v2-types@npm:0.53.132"
-  checksum: 10c0/ad87fd68e9e3d258a5c3635bffdf4c7dbe8c2b000e9fd963b7d90fba285b653f45dceb3a59d7cf46504f0274022bd2ef583e09a3b2ce84634a00a982edc669bc
+"@chain-registry/v2-types@npm:^0.53.138":
+  version: 0.53.138
+  resolution: "@chain-registry/v2-types@npm:0.53.138"
+  checksum: 10c0/4bab50e7cdb7471b652dc008450cbeb2116a48dad6a3e689678d6f068875d9249aec0168c5587619d38594e30ddb13c57cc38622773fce0b06d174f807ae5d24
   languageName: node
   linkType: hard
 
@@ -337,12 +337,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chain-registry/v2@npm:^1.71.217":
-  version: 1.71.217
-  resolution: "@chain-registry/v2@npm:1.71.217"
+"@chain-registry/v2@npm:^1.71.225":
+  version: 1.71.225
+  resolution: "@chain-registry/v2@npm:1.71.225"
   dependencies:
-    "@chain-registry/v2-types": "npm:^0.53.132"
-  checksum: 10c0/74f4c8e54b902f66e71fa5fa25bf9369861ccef032568046271ac8421d8c315f7e3ff5129661e4d170865bfbe2fd40f21542838640149531b7d9507af21f57a5
+    "@chain-registry/v2-types": "npm:^0.53.138"
+  checksum: 10c0/d920889937ec89198b9007e85480dd554432dff1070b3f2d9b0c8d9fd613d9afbeeb2faef44f4190bf84666f41502a09be94deb3b27f23d8cfa3f2317f6dbaf1
   languageName: node
   linkType: hard
 
@@ -6111,7 +6111,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dezswap-web-app@workspace:."
   dependencies:
-    "@chain-registry/v2": "npm:^1.71.217"
+    "@chain-registry/v2": "npm:^1.71.225"
     "@emotion/babel-plugin": "npm:^11.10.2"
     "@emotion/react": "npm:^11.10.6"
     "@emotion/styled": "npm:^11.10.6"
