@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useWalletManager } from "@interchain-kit/react";
+import { useWalletManager, type SigningClient } from "@interchain-kit/react";
 import { WalletState } from "@interchain-kit/core";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -8,12 +8,11 @@ import {
   WalletApp,
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { convertProtoToAminoMsg } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
+import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
-import useSigningClient from "./useSigningClient";
-import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -37,7 +36,6 @@ function base64ToUint8Array(data: string | Uint8Array) {
 }
 
 const useConnectedWallet = () => {
-  const { signingClient } = useSigningClient();
   const wm = useWalletManager();
   const { chainName } = useNetwork();
   const connectedXplaWallet = useConnectedXplaWallet();
@@ -93,7 +91,11 @@ const useConnectedWallet = () => {
   const prevDataString = useRef("");
 
   const post = useCallback(
-    async (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
+    async (
+      tx: NewMsgTxOptions,
+      signingClient?: SigningClient,
+      walletApp?: WalletApp | boolean,
+    ) => {
       if (walletInfo.isInterchain) {
         const { executeContract } = MessageComposer.fromPartial;
         const messages = tx.msgs.map((txOption) => executeContract(txOption));
@@ -137,12 +139,7 @@ const useConnectedWallet = () => {
         walletApp,
       );
     },
-    [
-      connectedXplaWallet,
-      signingClient,
-      walletInfo.isInterchain,
-      walletInfo.walletAddress,
-    ],
+    [connectedXplaWallet, walletInfo.isInterchain, walletInfo.walletAddress],
   );
 
   const availablePost = useMemo(
