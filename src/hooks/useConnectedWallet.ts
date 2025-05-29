@@ -8,11 +8,11 @@ import {
   WalletApp,
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { convertProtoToAminoMsg } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
+import { SigningClient } from "@interchain-kit/react";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
-import useSigningClient from "./useSigningClient";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -20,7 +20,6 @@ const resetWalletValue = {
 };
 
 const useConnectedWallet = () => {
-  const { signingClient } = useSigningClient();
   const wm = useWalletManager();
   const { chainName } = useNetwork();
   const connectedXplaWallet = useConnectedXplaWallet();
@@ -76,7 +75,11 @@ const useConnectedWallet = () => {
   const prevDataString = useRef("");
 
   const post = useCallback(
-    (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
+    (
+      tx: NewMsgTxOptions,
+      signingClient?: SigningClient,
+      walletApp?: WalletApp | boolean,
+    ) => {
       if (walletInfo.isInterchain) {
         const { executeContract } = MessageComposer.fromPartial;
         const messages = tx.msgs.map((txOption) => executeContract(txOption));
@@ -104,12 +107,7 @@ const useConnectedWallet = () => {
         walletApp,
       );
     },
-    [
-      connectedXplaWallet,
-      signingClient,
-      walletInfo.isInterchain,
-      walletInfo.walletAddress,
-    ],
+    [connectedXplaWallet, walletInfo.isInterchain, walletInfo.walletAddress],
   );
 
   const availablePost = useMemo(
