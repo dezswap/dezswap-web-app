@@ -39,7 +39,7 @@ function PlayAnalytics() {
             >
               <Col xs={12} md={7}>
                 {tokenAddress && (
-                  <Chart tokenAddress={tokenAddress} isPriceFirst />
+                  <Chart tokenAddress={tokenAddress} defaultTabIndex={2} />
                 )}
               </Col>
               <Col xs={12} md={5}>
