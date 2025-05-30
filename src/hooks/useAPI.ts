@@ -10,7 +10,7 @@ import {
   parseJsonFromBinary,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
-import { contractAddresses, GAS_INFO } from "constants/dezswap";
+import { contractAddresses, getGasInfo } from "constants/dezswap";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
@@ -253,17 +253,6 @@ const useAPI = (version: ApiVersion = "v1") => {
     [client, walletAddress],
   );
 
-  const getAuthInfo = useCallback(async () => {
-    if (!walletAddress || !client) {
-      return undefined;
-    }
-    const { info } =
-      (await client?.cosmos.auth.v1beta1.accountInfo({
-        address: walletAddress,
-      })) || {};
-    return info;
-  }, [walletAddress, client]);
-
   const estimateFee = useCallback(
     async (msg: EncodeObject[], authSequence: bigint) => {
       if (!msg || !client) {
@@ -278,7 +267,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       const fee = await calculateFee(
         { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
+        getGasInfo(chainName),
         () => Promise.resolve(chainId),
       );
 
@@ -304,7 +293,6 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
       isLoading,
     }),
@@ -323,7 +311,6 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
       isLoading,
     ],
