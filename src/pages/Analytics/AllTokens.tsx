@@ -49,7 +49,7 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
         value?.toLowerCase().includes(searchKeyword.toLowerCase()),
       );
     });
-  }, [getAsset, searchKeyword, tokens]);
+  }, [getAsset, searchKeyword, tokens, whiteList]);
 
   const sortedTokens = useMemo(() => {
     if (!filteredTokens?.length) return [];
