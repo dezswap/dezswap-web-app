@@ -23,7 +23,7 @@ import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { nativeTokens, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
@@ -62,7 +62,7 @@ function ClaimPage() {
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -163,18 +163,22 @@ function ClaimPage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      lockdropEventInfoError ||
-      lockdropUserInfoError ||
-      (!lockdropEventInfoError &&
-        !lockdropUserInfoError &&
-        lockdropUserInfo &&
-        !lockupInfo) ||
-      (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        lockdropEventInfoError ||
+        lockdropUserInfoError ||
+        (!lockdropEventInfoError &&
+          !lockdropUserInfoError &&
+          lockdropUserInfo &&
+          !lockupInfo) ||
+        (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     eventAddress,
     invalidPathModal,

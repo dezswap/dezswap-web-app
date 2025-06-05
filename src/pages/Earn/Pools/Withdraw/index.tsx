@@ -84,7 +84,7 @@ function WithdrawPage() {
     () => (poolAddress ? getPair(poolAddress) : undefined),
     [getPair, poolAddress],
   );
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [asset1, asset2] = useMemo(
     () =>
       pair
@@ -97,21 +97,26 @@ function WithdrawPage() {
   const dashboardToken2 = useDashboardTokenDetail(asset2?.token || "");
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1?.token || !asset2?.token) {
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (!asset1?.token || !asset2?.token) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
+      }
+      if (poolAddress && !(await validate(poolAddress))) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+
+      return () => {
+        clearTimeout(timerId);
+      };
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+
+    checkValidation();
+  }, [asset1, asset2, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",

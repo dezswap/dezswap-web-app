@@ -27,7 +27,7 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
@@ -72,7 +72,7 @@ function ProvidePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
@@ -101,20 +101,28 @@ function ProvidePage() {
   );
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1 || !asset2) {
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (!asset1 || !asset2) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
+      }
+      if (
+        poolAddress &&
+        !(await validate(poolAddress)) &&
+        !errorMessageModal.isOpen
+      ) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+      return () => {
+        clearTimeout(timerId);
+      };
     };
+
+    checkValidation();
   }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({

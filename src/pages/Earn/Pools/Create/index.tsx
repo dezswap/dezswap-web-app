@@ -124,34 +124,33 @@ function CreatePage() {
   }, [asset1Address, asset2Address, getAsset]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (asset1 === null || asset2 === null) {
-        errorMessageModal.open();
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (asset1 === null || asset2 === null) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
 
-    if (
-      !validate(asset1Address) ||
-      !validate(asset2Address) ||
-      asset1Address === asset2Address
-    ) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+      if (asset1 && asset2) {
+        const isValid1 = await validate(asset1Address);
+        const isValid2 = await validate(asset2Address);
+
+        if (isValid1 && isValid2) return;
+
+        if (!isValid1 || !isValid2 || asset1Address === asset2Address) {
+          errorMessageModal.open();
+        }
+      }
+      return () => {
+        clearTimeout(timerId);
+      };
     };
-  }, [
-    asset1,
-    asset1Address,
-    asset2,
-    asset2Address,
-    errorMessageModal,
-    chainName,
-    validate,
-  ]);
+
+    checkValidation();
+  }, [asset1, asset1Address, asset2, asset2Address, chainName, validate]);
 
   const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>

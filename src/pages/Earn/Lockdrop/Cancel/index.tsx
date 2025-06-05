@@ -27,7 +27,7 @@ import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
 import { nativeTokens, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -58,7 +58,7 @@ function CancelPage() {
     selectedChain: { chainId, explorers },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
   const { chainName } = useNetwork();
@@ -166,14 +166,18 @@ function CancelPage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      (lockdropEventInfo &&
-        lockdropEventInfo.event_cancelable_until * 1000 < Date.now()) ||
-      lockdropEventInfoError
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        (lockdropEventInfo &&
+          lockdropEventInfo.event_cancelable_until * 1000 < Date.now()) ||
+        lockdropEventInfoError
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     lockdropEventInfo,
     lockdropEventInfoError,
