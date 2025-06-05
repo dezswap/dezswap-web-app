@@ -262,12 +262,12 @@ const useAPI = (version: ApiVersion = "v1") => {
       return undefined;
     }
     let res: WhiteList = [];
-    let i = 0;
+    let lastAddress = "";
 
     while (true) {
       const queryData = getQueryData({
         get_complete_meme_data_list: {
-          start_after: i.toString(),
+          start_after: lastAddress,
           limit: PLAY3_LIST_SIZE,
         },
       });
@@ -282,7 +282,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
         if (!parsed || parsed.length === 0) break;
         res = [...res, ...parsed];
-        i = i + PLAY3_LIST_SIZE;
+        lastAddress = res[res.length - 1].cont_addr;
         if (parsed.length < PLAY3_LIST_SIZE) break;
       } catch (e) {
         return res;
