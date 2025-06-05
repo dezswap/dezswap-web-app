@@ -17,6 +17,7 @@ import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
 import SwapPageAsModal from "components/Modal/SwapModal";
 import Redirect from "components/Redirect";
 import PlayAnalytics from "pages/PlayAnalytics";
+import PlayMain from "pages/PlayMain";
 // TODO: uncomment when lockdrop is ready
 // import LockdropPage from "pages/Earn/Lockdrop";
 // import StakePage from "pages/Earn/Lockdrop/Stake";
@@ -135,6 +136,7 @@ const routes = createBrowserRouter([
     ],
   },
   { path: "/play3-analytics/:tokenAddress", element: <PlayAnalytics /> },
+  { path: "/play3-main", element: <PlayMain /> },
 ]);
 
 export default routes;
