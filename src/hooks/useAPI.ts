@@ -267,8 +267,8 @@ const useAPI = (version: ApiVersion = "v1") => {
     while (true) {
       const queryData = getQueryData({
         get_complete_meme_data_list: {
-          start_after: "",
-          limit: 20,
+          start_after: i.toString(),
+          limit: PLAY3_LIST_SIZE,
         },
       });
       try {
@@ -282,9 +282,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
         if (!parsed || parsed.length === 0) break;
         res = [...res, ...parsed];
-
-        i = parsed[parsed.length - 1]?.id;
-
+        i = i + PLAY3_LIST_SIZE;
         if (parsed.length < PLAY3_LIST_SIZE) break;
       } catch (e) {
         return res;
