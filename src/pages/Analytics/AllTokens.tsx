@@ -18,7 +18,7 @@ import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import Link from "components/Link";
 import MobileTokenItem from "./MobileTokenItem";
 
-function AllTokens() {
+function AllTokens({ whiteList }: { whiteList?: string[] }) {
   const screenClass = useScreenClass();
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
@@ -38,8 +38,11 @@ function AllTokens() {
 
   const filteredTokens = useMemo(() => {
     if (!tokens) return [];
+    const tokenList = whiteList
+      ? tokens?.filter((token) => whiteList.includes(token.address))
+      : tokens;
 
-    return tokens.filter((token) => {
+    return tokenList.filter((token) => {
       if (!searchKeyword) return true;
       const asset = getAsset(token.address);
       return [asset?.token, asset?.name, asset?.symbol].some((value) =>
