@@ -5,9 +5,7 @@ import { Outlet } from "react-router-dom";
 import TopMovers from "pages/Analytics/TopMovers";
 import AllTokens from "pages/Analytics/AllTokens";
 import Transactions from "pages/Analytics/Transactions";
-import useAPI from "hooks/useAPI";
-import useWhiteList from "hooks/useWhiteList";
-import { useMemo } from "react";
+import usePlay3WhiteList from "hooks/usePlay3WhiteList";
 import { css } from "@emotion/react";
 
 const Wrapper = styled(Container)`
@@ -18,7 +16,7 @@ const Wrapper = styled(Container)`
 `;
 
 function PlayMain() {
-  const whiteList = useWhiteList();
+  const whiteList = usePlay3WhiteList();
 
   return (
     <Wrapper>

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import useAPI from "./useAPI";
 
-const useWhiteList = () => {
+const usePlay3WhiteList = () => {
   const api = useAPI();
 
   const { data: whiteList = [] } = useQuery({
@@ -21,4 +21,4 @@ const useWhiteList = () => {
   return whiteList;
 };
 
-export default useWhiteList;
+export default usePlay3WhiteList;
