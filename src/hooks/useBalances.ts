@@ -19,6 +19,7 @@ const useBalances = (addresses: string[]) => {
       if (address && chainName && walletAddress) {
         if (
           isNativeTokenAddress(chainName, address) ||
+          address.includes("ibc") ||
           (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)])
         ) {
           const value = await api.getNativeTokenBalance(address);
@@ -29,7 +30,7 @@ const useBalances = (addresses: string[]) => {
       }
       return "0";
     },
-    [api, walletAddress, verifiedIbcAssets],
+    [chainName, walletAddress, verifiedIbcAssets, api],
   );
 
   const balanceQueryResults = useQueries({

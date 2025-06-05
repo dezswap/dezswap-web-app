@@ -33,7 +33,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -84,7 +84,7 @@ function WithdrawPage() {
     () => (poolAddress ? getPair(poolAddress) : undefined),
     [getPair, poolAddress],
   );
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [asset1, asset2] = useMemo(
     () =>
       pair
@@ -97,21 +97,26 @@ function WithdrawPage() {
   const dashboardToken2 = useDashboardTokenDetail(asset2?.token || "");
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1?.token || !asset2?.token) {
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (!asset1?.token || !asset2?.token) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
+      }
+      if (poolAddress && !(await validate(poolAddress))) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+
+      return () => {
+        clearTimeout(timerId);
+      };
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+
+    checkValidation();
+  }, [asset1, asset2, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -476,9 +481,11 @@ function WithdrawPage() {
                     value: (
                       <AssetValueFormatter
                         asset={{ symbol: XPLA_SYMBOL }}
-                        amount={fee?.amount
-                          ?.get(XPLA_ADDRESS)
-                          ?.amount.toString()}
+                        amount={
+                          fee?.amount
+                            ?.get(nativeTokens?.[chainName]?.[0].token)
+                            ?.amount.toString() || "0"
+                        }
                       />
                     ),
                   },

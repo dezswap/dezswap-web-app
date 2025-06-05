@@ -18,8 +18,8 @@ import {
 } from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
+import { Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import useNetwork from "hooks/useNetwork";
@@ -41,6 +41,7 @@ function UnlockPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
+    chainName,
     selectedChain: { chainId, explorers },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
@@ -48,7 +49,7 @@ function UnlockPage() {
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -112,8 +113,12 @@ function UnlockPage() {
   const { fee } = useFee(txOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -141,20 +146,24 @@ function UnlockPage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      lockdropEventInfoError ||
-      lockdropUserInfoError ||
-      (!lockdropEventInfoError &&
-        !lockdropUserInfo &&
-        lockdropUserInfo &&
-        !lockupInfo) ||
-      (lockupInfo &&
-        (lockupInfo.unlock_second * 1000 > Date.now() ||
-          Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        lockdropEventInfoError ||
+        lockdropUserInfoError ||
+        (!lockdropEventInfoError &&
+          !lockdropUserInfo &&
+          lockdropUserInfo &&
+          !lockupInfo) ||
+        (lockupInfo &&
+          (lockupInfo.unlock_second * 1000 > Date.now() ||
+            Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     eventAddress,
     invalidPathModal,

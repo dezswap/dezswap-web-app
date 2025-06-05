@@ -25,7 +25,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_ADDRESS } from "constants/network";
 import useHashModal from "hooks/useHashModal";
 import { css, useTheme } from "@emotion/react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -59,9 +59,8 @@ import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
-import useAPI from "hooks/useAPI";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import useNetwork from "hooks/useNetwork";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -158,7 +157,7 @@ function SwapPage() {
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
   );
-
+  const { chainName } = useNetwork();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -339,8 +338,12 @@ function SwapPage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
@@ -368,7 +371,7 @@ function SwapPage() {
       console.log(error);
     }
     return "Enter an amount";
-  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+  }, [asset1, asset2, isPoolEmpty, asset1Value, asset1BalanceMinusFee]);
 
   const [shiftAssets, setShiftAssets] = useState(false);
 
@@ -393,7 +396,16 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee, asset1Value, form]);
+  }, [
+    asset1?.decimals,
+    asset1Address,
+    asset1BalanceMinusFee,
+    asset1Value,
+    balanceApplied,
+    form,
+    isReversed,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -1013,7 +1025,9 @@ function SwapPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{ symbol: XPLA_SYMBOL }}
+                        asset={{
+                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                        }}
                         amount={feeAmount}
                       />
                     ),

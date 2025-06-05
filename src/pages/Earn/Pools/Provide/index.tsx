@@ -27,11 +27,11 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
@@ -72,10 +72,11 @@ function ProvidePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
+    chainName,
     selectedChain: { explorers },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
@@ -100,20 +101,28 @@ function ProvidePage() {
   );
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1 || !asset2) {
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (!asset1 || !asset2) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
+      }
+      if (
+        poolAddress &&
+        !(await validate(poolAddress)) &&
+        !errorMessageModal.isOpen
+      ) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+      return () => {
+        clearTimeout(timerId);
+      };
     };
+
+    checkValidation();
   }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
@@ -183,13 +192,18 @@ function ProvidePage() {
           )
         : undefined,
     [
-      simulationResult,
+      simulationResult?.estimatedAmount,
+      simulationResult?.isLoading,
       walletAddress,
-      asset1,
-      isReversed,
-      asset2,
+      asset1?.token,
+      asset1?.decimals,
       formData.asset1Value,
       formData.asset2Value,
+      asset2?.token,
+      asset2?.decimals,
+      poolAddress,
+      slippageTolerance,
+      txDeadlineMinutes,
     ],
   );
 
@@ -200,8 +214,12 @@ function ProvidePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 
@@ -247,11 +265,14 @@ function ProvidePage() {
 
     return "Enter an amount";
   }, [
-    asset1,
-    asset2,
-    asset1BalanceMinusFee,
     formData.asset1Value,
     formData.asset2Value,
+    asset1BalanceMinusFee,
+    asset1?.decimals,
+    asset1?.symbol,
+    asset2BalanceMinusFee,
+    asset2?.decimals,
+    asset2?.symbol,
   ]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -323,7 +344,17 @@ function ProvidePage() {
         },
       );
     }
-  }, [asset2BalanceMinusFee, formData.asset2Value, form]);
+  }, [
+    asset2BalanceMinusFee,
+    formData.asset2Value,
+    form,
+    walletAddress,
+    balanceApplied,
+    isReversed,
+    isPoolEmpty,
+    asset2?.token,
+    asset2?.decimals,
+  ]);
 
   useEffect(() => {
     if (!simulationResult?.isLoading && !isPoolEmpty) {
@@ -336,7 +367,14 @@ function ProvidePage() {
         { shouldValidate: true },
       );
     }
-  }, [simulationResult, isPoolEmpty]);
+  }, [
+    simulationResult,
+    isPoolEmpty,
+    form,
+    isReversed,
+    asset1?.decimals,
+    asset2?.decimals,
+  ]);
 
   return (
     <Modal

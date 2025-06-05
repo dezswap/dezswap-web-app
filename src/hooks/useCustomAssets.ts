@@ -11,6 +11,7 @@ import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
 import useRPCClient from "./useRPCClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
+import useAssets from "./useAssets";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -18,7 +19,7 @@ const useCustomAssets = () => {
   const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
-
+  const { validate } = useAssets();
   const { client } = useRPCClient();
   const {
     chainName,
@@ -142,10 +143,11 @@ const useCustomAssets = () => {
   ]);
 
   const addFetchQueue = useCallback(
-    (address: string, networkName: string) => {
+    async (address: string, networkName: string) => {
+      const isValidate = await validate(address);
       if (
         nativeTokens[networkName]?.some((item) => item.token === address) ||
-        AccAddress.validate(address) ||
+        isValidate ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
@@ -156,7 +158,7 @@ const useCustomAssets = () => {
         fetchAsset();
       }
     },
-    [fetchAsset, verifiedIbcAssets],
+    [],
   );
 
   const getAsset = useCallback(

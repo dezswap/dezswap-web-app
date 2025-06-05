@@ -29,8 +29,8 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { nativeTokens, XPLA_SYMBOL } from "constants/network";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
@@ -40,10 +40,10 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import InputGroup from "./InputGroup";
-import useExpectedReward from "./useEstimatedReward";
 import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import InputGroup from "./InputGroup";
+import useExpectedReward from "./useEstimatedReward";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -65,6 +65,7 @@ function StakePage() {
   const [searchParams] = useSearchParams();
   const { walletAddress } = useConnectedWallet();
   const {
+    chainName,
     selectedChain: { chainId, explorers },
   } = useNetwork();
   const form = useForm<Record<FormKey, string>>({
@@ -76,7 +77,7 @@ function StakePage() {
     },
   });
 
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -159,8 +160,12 @@ function StakePage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -197,15 +202,19 @@ function StakePage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      (lockdropEventInfo &&
-        (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
-          lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
-      lockdropEventInfoError
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        (lockdropEventInfo &&
+          (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
+            lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
+        lockdropEventInfoError
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     lockdropEventInfo,
     lockdropEventInfoError,

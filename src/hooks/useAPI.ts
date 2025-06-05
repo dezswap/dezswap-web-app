@@ -10,7 +10,7 @@ import {
   parseJsonFromBinary,
 } from "utils/dezswap";
 import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
-import { contractAddresses, GAS_INFO } from "constants/dezswap";
+import { contractAddresses, getGasInfo } from "constants/dezswap";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
@@ -139,31 +139,38 @@ const useAPI = (version: ApiVersion = "v1") => {
     return res.block?.header.height ?? ("0" as unknown as string);
   }, [client]);
 
-  // unused func
-  // const getDecimal = useCallback(
-  //   async (denom: string) => {
-  //     const contractAddress = contractAddresses[chainName]?.factory;
-  //     if (!contractAddress || !denom) {
-  //       return undefined;
-  //     }
+  const getDecimal = useCallback(
+    async (denom: string) => {
+      const contractAddress = contractAddresses[chainName]?.factory;
+      if (!denom || !client || !contractAddress) {
+        return undefined;
+      }
 
-  //     const queryData = toBase64(
-  //       toUtf8(
-  //         JSON.stringify({
-  //           native_token_decimals: { denom },
-  //         }),
-  //       ),
-  //     )
+      const isNativeTokenAddress =
+        denom.startsWith("xpla1") || denom.startsWith("fetch1");
+      const queryData = getQueryData(
+        isNativeTokenAddress
+          ? { token_info: {} }
+          : { native_token_decimals: { denom } },
+      );
 
-  //     const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-  //       address: contractAddress,
-  //       queryData,
-  //     });
-  //     const tokenDecimals = parseJsonFromBinary(res) as unknown as Decimal;
-  //     return tokenDecimals.decimals;
-  //   },
-  //   [chainName, client],
-  // );
+      const targetAddress = isNativeTokenAddress ? denom : contractAddress;
+
+      try {
+        const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+          address: targetAddress,
+          queryData,
+        });
+
+        const parsed = parseJsonFromBinary(res);
+        return isNativeTokenAddress ? { a: parsed.decimals } : parsed.decimals;
+      } catch (e) {
+        console.log(e);
+        return undefined;
+      }
+    },
+    [chainName, client],
+  );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
@@ -253,17 +260,6 @@ const useAPI = (version: ApiVersion = "v1") => {
     [client, walletAddress],
   );
 
-  const getAuthInfo = useCallback(async () => {
-    if (!walletAddress || !client) {
-      return undefined;
-    }
-    const { info } =
-      (await client?.cosmos.auth.v1beta1.accountInfo({
-        address: walletAddress,
-      })) || {};
-    return info;
-  }, [walletAddress, client]);
-
   const estimateFee = useCallback(
     async (msg: EncodeObject[], authSequence: bigint) => {
       if (!msg || !client) {
@@ -278,7 +274,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       const fee = await calculateFee(
         { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
+        getGasInfo(chainName),
         () => Promise.resolve(chainId),
       );
 
@@ -304,8 +300,8 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
+      getDecimal,
       isLoading,
     }),
     [
@@ -317,14 +313,13 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      // getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
       estimateFee,
-      getAuthInfo,
       rpcEndpoint,
+      getDecimal,
       isLoading,
     ],
   );

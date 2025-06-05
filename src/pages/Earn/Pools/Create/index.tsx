@@ -31,7 +31,7 @@ import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -124,34 +124,33 @@ function CreatePage() {
   }, [asset1Address, asset2Address, getAsset]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (asset1 === null || asset2 === null) {
-        errorMessageModal.open();
+    const checkValidation = async () => {
+      const timerId = setTimeout(() => {
+        if (asset1 === null || asset2 === null) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (asset1 && asset2) {
+        errorMessageModal.close();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
 
-    if (
-      !validate(asset1Address) ||
-      !validate(asset2Address) ||
-      asset1Address === asset2Address
-    ) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+      if (asset1 && asset2) {
+        const isValid1 = await validate(asset1Address);
+        const isValid2 = await validate(asset2Address);
+
+        if (isValid1 && isValid2) return;
+
+        if (!isValid1 || !isValid2 || asset1Address === asset2Address) {
+          errorMessageModal.open();
+        }
+      }
+      return () => {
+        clearTimeout(timerId);
+      };
     };
-  }, [
-    asset1,
-    asset1Address,
-    asset2,
-    asset2Address,
-    errorMessageModal,
-    chainName,
-    validate,
-  ]);
+
+    checkValidation();
+  }, [asset1, asset1Address, asset2, asset2Address, chainName, validate]);
 
   const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>
@@ -175,7 +174,16 @@ function CreatePage() {
             },
           ])
         : undefined,
-    [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
+    [
+      walletAddress,
+      asset1?.token,
+      asset1?.decimals,
+      formData.asset1Value,
+      formData.asset2Value,
+      asset2?.token,
+      asset2?.decimals,
+      chainName,
+    ],
   );
 
   const {
@@ -185,9 +193,12 @@ function CreatePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
-
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
 
@@ -209,7 +220,15 @@ function CreatePage() {
         },
       );
     }
-  }, [asset1Balance, formData.asset1Value, form]);
+  }, [
+    asset1Balance,
+    formData.asset1Value,
+    form,
+    walletAddress,
+    balanceApplied,
+    asset1?.token,
+    asset1?.decimals,
+  ]);
 
   useEffect(() => {
     if (
