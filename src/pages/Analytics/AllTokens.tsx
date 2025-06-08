@@ -68,7 +68,7 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
   }, [filteredTokens, limit]);
 
   return (
-    <Panel shadow>
+    <Panel shadow isPlay3={whiteList !== undefined}>
       <Row
         justify="between"
         align="center"
