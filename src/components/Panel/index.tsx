@@ -4,6 +4,7 @@ import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { PropsWithChildren } from "react";
 
 interface StyledPanelProps {
+  isPlay3?: boolean;
   shadow?: boolean;
   border?: boolean;
   noPadding?: boolean;
@@ -45,6 +46,12 @@ const Wrapper = styled.div<StyledPanelProps>`
         padding-bottom: ${`${MOBILE_SHADOW_OFFSET}px`};
       }
     `}
+
+     ${({ isPlay3 }) =>
+    isPlay3 &&
+    css`
+      height: 100%;
+    `}
 `;
 
 const Content = styled.div<StyledPanelProps>`
@@ -68,8 +75,8 @@ const Content = styled.div<StyledPanelProps>`
     css`
       border: 3px solid ${theme.colors.primary};
     `}
-
-  ${({ shadow }) =>
+    
+    ${({ shadow }) =>
     shadow &&
     css`
       box-shadow: ${`${DESKTOP_SHADOW_OFFSET}px`}
@@ -80,6 +87,11 @@ const Content = styled.div<StyledPanelProps>`
           ${`${MOBILE_SHADOW_OFFSET}px`} 0px #000000;
       }
     `}
+      ${({ isPlay3 }) =>
+    isPlay3 &&
+    css`
+      height: 100%;
+    `}
 `;
 
 function Panel({
@@ -88,12 +100,24 @@ function Panel({
   wrapperStyle,
   wrapperCss,
   shadow,
+  isPlay3 = false,
   border = true,
   ...divProps
 }: PanelProps) {
   return (
-    <Wrapper shadow={shadow} style={wrapperStyle} css={wrapperCss}>
-      <Content {...divProps} shadow={shadow} border={border} style={style}>
+    <Wrapper
+      shadow={shadow}
+      style={wrapperStyle}
+      css={wrapperCss}
+      isPlay3={isPlay3}
+    >
+      <Content
+        {...divProps}
+        shadow={shadow}
+        border={border}
+        style={style}
+        isPlay3={isPlay3}
+      >
         {children}
       </Content>
     </Wrapper>
