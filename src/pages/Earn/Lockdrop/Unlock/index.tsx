@@ -12,7 +12,7 @@ import useLockdropEvents from "hooks/useLockdropEvents";
 import { amountToValue, ellipsisCenter, getTokenLink } from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import useNetwork from "hooks/useNetwork";
@@ -43,7 +43,7 @@ function UnlockPage() {
   const api = useAPI();
   const { nativeTokens } = useNativeTokens();
   const { findPairByLpAddress } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos, validate } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -76,8 +76,8 @@ function UnlockPage() {
   );
 
   const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
+    () => pair?.asset_addresses.map((address) => assetInfos?.[address]) || [],
+    [assetInfos, pair],
   );
 
   const duration = useMemo(() => {
@@ -139,20 +139,24 @@ function UnlockPage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      lockdropEventInfoError ||
-      lockdropUserInfoError ||
-      (!lockdropEventInfoError &&
-        !lockdropUserInfo &&
-        lockdropUserInfo &&
-        !lockupInfo) ||
-      (lockupInfo &&
-        (lockupInfo.unlock_second * 1000 > Date.now() ||
-          Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        lockdropEventInfoError ||
+        lockdropUserInfoError ||
+        (!lockdropEventInfoError &&
+          !lockdropUserInfo &&
+          lockdropUserInfo &&
+          !lockupInfo) ||
+        (lockupInfo &&
+          (lockupInfo.unlock_second * 1000 > Date.now() ||
+            Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     eventAddress,
     invalidPathModal,

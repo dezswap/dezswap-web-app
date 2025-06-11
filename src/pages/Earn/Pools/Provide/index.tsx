@@ -27,11 +27,11 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { generateAddLiquidityMsg } from "utils/dezswap";
+import { generateAddLiquidityMsg, hasChainPrefix } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -54,6 +54,7 @@ import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { useNavigate } from "hooks/useNavigate";
 import useNativeTokens from "hooks/useNativeTokens";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { Token } from "types/api";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -94,26 +95,41 @@ function ProvidePage() {
     [getPair, poolAddress],
   );
 
-  const [asset1, asset2] = useMemo(
-    () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
-    [getAsset, pair?.asset_addresses],
-  );
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1 || !asset2) {
+    const checkValidation = async () => {
+      if (!pair?.asset_addresses?.length) {
+        errorMessageModal.open();
+        return;
+      }
+
+      const [a1, a2] = await Promise.all([
+        getAsset(pair.asset_addresses[0]),
+        getAsset(pair.asset_addresses[1]),
+      ]);
+      setAsset1(a1);
+      setAsset2(a2);
+
+      const timerId = setTimeout(() => {
+        if (!a1 || !a2) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+      if (
+        poolAddress &&
+        !hasChainPrefix(poolAddress) &&
+        !errorMessageModal.isOpen
+      ) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+      return () => {
+        clearTimeout(timerId);
+      };
     };
+
+    checkValidation();
   }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
@@ -206,6 +222,7 @@ function ProvidePage() {
       poolAddress,
       slippageTolerance,
       txDeadlineMinutes,
+      getAsset,
     ],
   );
 

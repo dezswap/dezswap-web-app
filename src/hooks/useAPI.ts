@@ -7,6 +7,7 @@ import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
+  hasChainPrefix,
   parseJsonFromBinary,
 } from "utils/dezswap";
 import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
@@ -143,31 +144,37 @@ const useAPI = (version: ApiVersion = "v1") => {
     return res.block?.header.height ?? ("0" as unknown as string);
   }, [client]);
 
-  // unused func
-  // const getDecimal = useCallback(
-  //   async (denom: string) => {
-  //     const contractAddress = contractAddresses[chainName]?.factory;
-  //     if (!contractAddress || !denom) {
-  //       return undefined;
-  //     }
+  const getDecimal = useCallback(
+    async (denom: string) => {
+      const contractAddress = contractAddresses[chainName]?.factory;
+      if (!denom || !client || !contractAddress) {
+        return undefined;
+      }
 
-  //     const queryData = toBase64(
-  //       toUtf8(
-  //         JSON.stringify({
-  //           native_token_decimals: { denom },
-  //         }),
-  //       ),
-  //     )
+      const isNativeTokenAddress = hasChainPrefix(denom);
+      const queryData = getQueryData(
+        isNativeTokenAddress
+          ? { token_info: {} }
+          : { native_token_decimals: { denom } },
+      );
 
-  //     const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-  //       address: contractAddress,
-  //       queryData,
-  //     });
-  //     const tokenDecimals = parseJsonFromBinary(res) as unknown as Decimal;
-  //     return tokenDecimals.decimals;
-  //   },
-  //   [chainName, client],
-  // );
+      const targetAddress = isNativeTokenAddress ? denom : contractAddress;
+
+      try {
+        const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+          address: targetAddress,
+          queryData,
+        });
+
+        const parsed = parseJsonFromBinary(res);
+        return isNativeTokenAddress ? { a: parsed.decimals } : parsed.decimals;
+      } catch (e) {
+        console.log(e);
+        return undefined;
+      }
+    },
+    [chainName, client],
+  );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
@@ -345,7 +352,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      // getDecimal,
+      getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
@@ -365,7 +372,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      // getDecimal,
+      getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import styled from "@emotion/styled";
 import { useTheme, css } from "@emotion/react";
@@ -22,6 +22,7 @@ import useBalance from "hooks/useBalance";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import ImportAssetModal from "./ImportAssetModal";
 import AssetFormButton from "./AssetFormButton";
+import { Token } from "types/api";
 
 type AssetFormAddress = string | undefined;
 
@@ -73,10 +74,27 @@ function AssetSelector({
 
   const [selectedAddress1, selectedAddress2] = addresses || [];
 
-  const [asset1, asset2] = useMemo(() => {
-    return [selectedAddress1, selectedAddress2].map((address) => {
-      return address ? getAsset(address) : undefined;
-    });
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>(undefined);
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>(undefined);
+
+  useEffect(() => {
+    async function fetchAssets() {
+      if (selectedAddress1) {
+        const asset = await getAsset(selectedAddress1);
+        setAsset1(asset);
+      } else {
+        setAsset1(undefined);
+      }
+
+      if (selectedAddress2) {
+        const asset = await getAsset(selectedAddress2);
+        setAsset2(asset);
+      } else {
+        setAsset2(undefined);
+      }
+    }
+
+    fetchAssets();
   }, [getAsset, selectedAddress1, selectedAddress2]);
 
   const balance1 = useBalance(asset1?.token);

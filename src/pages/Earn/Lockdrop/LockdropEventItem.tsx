@@ -26,7 +26,7 @@ import iconBadge from "assets/icons/icon-badge.svg";
 import useAssets from "hooks/useAssets";
 import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProgressBar from "components/ProgressBar";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
@@ -37,6 +37,7 @@ import Outlink from "components/Outlink";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Expand from "../Expand";
+import { Token } from "types/api";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`
   padding: 2px;
@@ -321,15 +322,35 @@ function LockdropEventItem({
     [findPairByLpAddress, lockdropEvent],
   );
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
-  const rewardAsset = useMemo(
-    () => getAsset(lockdropEvent.reward_token_addr),
-    [getAsset, lockdropEvent],
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>(undefined);
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>(undefined);
+  const [rewardAsset, setRewardAsset] = useState<Partial<Token> | undefined>(
+    undefined,
   );
 
+  useEffect(() => {
+    if (!pair?.asset_addresses) return;
+
+    const fetchAssets = async () => {
+      const [a1, a2] = await Promise.all([
+        getAsset(pair.asset_addresses[0]),
+        getAsset(pair.asset_addresses[1]),
+      ]);
+      setAsset1(a1);
+      setAsset2(a2);
+    };
+
+    fetchAssets();
+  }, [pair, getAsset]);
+
+  useEffect(() => {
+    const fetchRewardAsset = async () => {
+      const asset = await getAsset(lockdropEvent.reward_token_addr);
+      setRewardAsset(asset);
+    };
+
+    fetchRewardAsset();
+  }, [lockdropEvent.reward_token_addr, getAsset]);
   const isStakable = useMemo(() => {
     const startAt = new Date(lockdropEvent.start_at * 1000);
     const endAt = new Date(lockdropEvent.end_at * 1000);

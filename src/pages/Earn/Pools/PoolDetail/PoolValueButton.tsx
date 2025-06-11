@@ -4,7 +4,8 @@ import iconShift from "assets/icons/icon-shift.svg";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import useAssets from "hooks/useAssets";
 import usePool from "hooks/usePool";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Token } from "types/api";
 import { amountToValue, formatDecimals } from "utils";
 import { getAddressFromAssetInfo } from "utils/dezswap";
 
@@ -57,16 +58,25 @@ function PoolValueButton({ poolAddress }: PoolValueButtonProps) {
   const { getAsset } = useAssets();
   const [isOpposite, setIsOpposite] = useState(false);
 
-  const assets = useMemo(() => {
-    const res =
-      pool?.assets.map((asset) => {
-        const address = getAddressFromAssetInfo(asset.info);
-        return address ? getAsset(address) : undefined;
-      }) || [];
-    if (isOpposite) {
-      return res.toReversed();
+  const [assets, setAssets] = useState<(Partial<Token> | undefined)[]>([]);
+
+  useEffect(() => {
+    if (!pool?.assets?.length) {
+      setAssets([]);
+      return;
     }
-    return res;
+
+    const fetchAssets = async () => {
+      const results = await Promise.all(
+        pool.assets.map((asset) => {
+          const address = getAddressFromAssetInfo(asset.info);
+          return address ? getAsset(address) : Promise.resolve(undefined);
+        }),
+      );
+      setAssets(isOpposite ? results.reverse() : results);
+    };
+
+    fetchAssets();
   }, [getAsset, isOpposite, pool]);
 
   const ratio = useMemo(() => {

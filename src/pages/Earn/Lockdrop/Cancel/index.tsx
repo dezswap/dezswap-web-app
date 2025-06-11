@@ -4,7 +4,7 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
@@ -39,6 +39,7 @@ import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { Token } from "types/api";
 import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`
@@ -110,25 +111,34 @@ function CancelPage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
+  const [rewardAsset, setRewardAsset] = useState<Partial<Token> | undefined>();
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
+  useEffect(() => {
+    if (!pair?.asset_addresses) return;
+
+    (async () => {
+      const [a1, a2] = await Promise.all(pair.asset_addresses.map(getAsset));
+      setAsset1(a1);
+      setAsset2(a2);
+    })();
+  }, [pair, getAsset]);
+
+  useEffect(() => {
+    if (!lockdropEventInfo?.reward_token_addr) return;
+
+    (async () => {
+      const asset = await getAsset(lockdropEventInfo.reward_token_addr);
+      setRewardAsset(asset);
+    })();
+  }, [lockdropEventInfo, getAsset]);
 
   const lockupInfo = useMemo(() => {
     return lockdropUserInfo?.lockup_infos.find(
       (item) => item.duration === duration,
     );
   }, [duration, lockdropUserInfo]);
-
-  const rewardAsset = useMemo(
-    () =>
-      lockdropEventInfo
-        ? getAsset(lockdropEventInfo.reward_token_addr)
-        : undefined,
-    [getAsset, lockdropEventInfo],
-  );
 
   const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {

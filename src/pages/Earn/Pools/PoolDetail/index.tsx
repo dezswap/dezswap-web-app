@@ -7,7 +7,7 @@ import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
 
@@ -38,6 +38,7 @@ import Chart from "./Chart";
 import PoolSummary from "./PoolSummary";
 import PoolTransactions from "./PoolTransactions";
 import PoolValueButton from "./PoolValueButton";
+import { Token } from "types/api";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -71,10 +72,23 @@ function PoolDetailPage() {
 
   const { getAsset } = useAssets();
   const dashboardPoolData = useDashboardPoolDetail(poolAddress || "");
+  const [asset0, setAsset0] = useState<Partial<Token> | undefined>();
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
 
-  const [asset0, asset1] = useMemo(() => {
-    return pair?.asset_addresses.map((address) => getAsset(address)) || [];
-  }, [getAsset, pair]);
+  useEffect(() => {
+    if (!pair?.asset_addresses?.length) return;
+
+    const fetchAssets = async () => {
+      const [a0, a1] = await Promise.all([
+        getAsset(pair.asset_addresses[0]),
+        getAsset(pair.asset_addresses[1]),
+      ]);
+      setAsset0(a0);
+      setAsset1(a1);
+    };
+
+    fetchAssets();
+  }, [pair, getAsset]);
 
   const poolName = useMemo(() => {
     return [asset0?.name, asset1?.name].join("-");

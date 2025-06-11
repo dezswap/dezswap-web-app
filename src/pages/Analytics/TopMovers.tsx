@@ -16,7 +16,7 @@ import Link from "components/Link";
 
 function TopMovers({ whiteList }: { whiteList?: string[] }) {
   const screenClass = useScreenClass();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { tokens } = useDashboard();
   const topMovingTokens = useMemo(() => {
     const tokenList = whiteList
@@ -73,7 +73,7 @@ function TopMovers({ whiteList }: { whiteList?: string[] }) {
           `}
         >
           {topMovingTokens?.map((token) => {
-            const asset = getAsset(token.address);
+            const asset = assetInfos?.[token.address];
             if (!asset) {
               return null;
             }
