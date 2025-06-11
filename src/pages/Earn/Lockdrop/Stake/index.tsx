@@ -29,7 +29,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
@@ -40,10 +40,11 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import InputGroup from "./InputGroup";
-import useExpectedReward from "./useEstimatedReward";
 import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import InputGroup from "./InputGroup";
+import useExpectedReward from "./useEstimatedReward";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -65,6 +66,7 @@ function StakePage() {
   const [searchParams] = useSearchParams();
   const { walletAddress } = useConnectedWallet();
   const {
+    chainName,
     selectedChain: { chainId, explorers },
   } = useNetwork();
   const form = useForm<Record<FormKey, string>>({
@@ -159,8 +161,12 @@ function StakePage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -398,14 +404,16 @@ function StakePage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount
-                    ? `${formatNumber(
-                        cutDecimal(
-                          amountToValue(feeAmount) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      )} ${XPLA_SYMBOL}`
-                    : "",
+                  value: feeAmount ? (
+                    <AssetValueFormatter
+                      asset={{
+                        symbol: nativeTokens?.[chainName]?.[0].symbol,
+                      }}
+                      amount={feeAmount}
+                    />
+                  ) : (
+                    ""
+                  ),
                 },
                 {
                   key: "shareOfPool",

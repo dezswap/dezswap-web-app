@@ -1,7 +1,11 @@
 import styled from "@emotion/styled";
 import AssetIcon from "components/AssetIcon";
 import Modal from "components/Modal";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChain } from "constants/dezswap";
+import {
+  CHAIN_ICONS,
+  CHAIN_NAME_SEARCH_PARAM,
+  DefaultChains,
+} from "constants/dezswap";
 import {
   DEFAULT_GUTTER_WIDTH,
   GRID_MAX_WIDTH,
@@ -52,9 +56,12 @@ const ChainsWrapper = styled.button`
 `;
 function ChainModal(modalProps: ReactModal.Props) {
   const screenClass = useScreenClass();
-  const { chainName } = useNetwork();
-  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    chainName,
+    selectedChain: { networkType },
+  } = useNetwork();
+  const isTestnet = useMemo(() => networkType === "testnet", [chainName]);
+  const [searchParams] = useSearchParams();
 
   return modalProps.isOpen ? (
     <Overlay onClick={modalProps.onRequestClose}>
@@ -91,21 +98,29 @@ function ChainModal(modalProps: ReactModal.Props) {
               }
         }
       >
-        {DefaultChain.map((chain) => (
+        {DefaultChains.sort(
+          (a, b) => b.chainName.charCodeAt(0) - a.chainName.charCodeAt(0),
+        ).map((chain) => (
           <ChainsWrapper
-            onClick={(e) => {
+            onClick={() => {
               const newParams = new URLSearchParams(searchParams);
               newParams.set(CHAIN_NAME_SEARCH_PARAM, chain.chainName);
-              setSearchParams(newParams);
+              window.location.href = `?${newParams.toString()}`;
             }}
             type="button"
           >
             <AssetIcon
               asset={{
-                icon: chain.logoURIs?.svg ?? chain.logoURIs?.png,
+                icon:
+                  CHAIN_ICONS?.[chain.chainName] ??
+                  chain.logoURIs?.svg ??
+                  chain.logoURIs?.png,
               }}
             />
-            {chain.prettyName}
+            {
+              // FIXME:
+              chain.prettyName?.replace("Fetch.ai", "ASI")
+            }
           </ChainsWrapper>
         ))}
       </Modal>

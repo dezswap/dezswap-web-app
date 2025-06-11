@@ -16,6 +16,7 @@ import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
 import { BaseWallet, WalletState } from "@interchain-kit/core";
 import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
+import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
 
 const WalletButton = styled.button`
   width: auto;
@@ -64,7 +65,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
 
-  const buttons: WalletButtonProps[] = [
+  const xplaButtons: WalletButtonProps[] = [
     ...availableConnections
       .filter(({ type }) => type !== ConnectType.READONLY)
       .map(({ type, icon, name, identifier }) => ({
@@ -103,13 +104,25 @@ function ConnectWalletModal(props: ReactModal.Props) {
             ]
           : (p as WalletButtonProps),
       ),
+
+    ...availableInstallations
+      .filter(({ type }) => type !== ConnectType.READONLY)
+      .map(({ icon, name, url }) => ({
+        label: `${name}`,
+        iconSrc: icon,
+        onClick: () => {
+          window.open(url);
+        },
+      })),
+  ];
+  const interchainButtons: WalletButtonProps[] = [
     ...wm.wallets
       .filter(
-        (wallet: BaseWallet) =>
+        (wallet: StatefulWallet) =>
           !isMobile() &&
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: BaseWallet) => {
+      .map((wallet: StatefulWallet) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
 
         const iconSrc =
@@ -141,15 +154,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
           },
         } as WalletButtonProps;
       }),
-    ...availableInstallations
-      .filter(({ type }) => type !== ConnectType.READONLY)
-      .map(({ icon, name, url }) => ({
-        label: `${name}`,
-        iconSrc: icon,
-        onClick: () => {
-          window.open(url);
-        },
-      })),
   ];
 
   return (
@@ -183,7 +187,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
           height: "100%",
         }}
       >
-        {buttons.map((item) => (
+        {[
+          ...(chainName.includes("xpla") ? xplaButtons : []),
+          ...interchainButtons,
+        ].map((item) => (
           <Col
             xs={6}
             sm={4}
