@@ -33,7 +33,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { nativeTokens, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -184,6 +184,14 @@ function WithdrawPage() {
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
+
+  const feeAmount = useMemo(() => {
+    return (
+      fee?.amount
+        ?.get(nativeTokens?.[chainName]?.[0].token)
+        ?.amount.toString() || "0"
+    );
+  }, [chainName, fee?.amount]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -475,12 +483,10 @@ function WithdrawPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{ symbol: XPLA_SYMBOL }}
-                        amount={
-                          fee?.amount
-                            ?.get(nativeTokens?.[chainName]?.[0].token)
-                            ?.amount.toString() || "0"
-                        }
+                        asset={{
+                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                        }}
+                        amount={feeAmount}
                       />
                     ),
                   },
