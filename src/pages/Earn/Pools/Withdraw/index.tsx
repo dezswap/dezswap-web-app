@@ -1,4 +1,10 @@
-import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
+import {
+  FormEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Typography from "components/Typography";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import InputGroup from "pages/Earn/Pools/Withdraw/InputGroup";
@@ -28,10 +34,10 @@ import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
-import { generateWithdrawLiquidityMsg } from "utils/dezswap";
+import { generateWithdrawLiquidityMsg, hasChainPrefix } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { nativeTokens } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
@@ -48,6 +54,7 @@ import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { Token } from "types/api";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -85,33 +92,49 @@ function WithdrawPage() {
     [getPair, poolAddress],
   );
   const { getAsset } = useAssets();
-  const [asset1, asset2] = useMemo(
-    () =>
-      pair
-        ? pair.asset_addresses.map((address) => getAsset(address))
-        : [undefined, undefined],
-    [getAsset, pair],
-  );
+
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
 
   const dashboardToken1 = useDashboardTokenDetail(asset1?.token || "");
   const dashboardToken2 = useDashboardTokenDetail(asset2?.token || "");
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (!asset1?.token || !asset2?.token) {
+    const checkValidation = async () => {
+      if (!pair?.asset_addresses?.length) {
+        errorMessageModal.open();
+        return;
+      }
+
+      const [a1, a2] = await Promise.all([
+        getAsset(pair.asset_addresses[0]),
+        getAsset(pair.asset_addresses[1]),
+      ]);
+
+      setAsset1(a1);
+      setAsset2(a2);
+
+      const timerId = setTimeout(() => {
+        if (!a1 || !a2) {
+          errorMessageModal.open();
+        }
+      }, 1500);
+
+      if (
+        poolAddress &&
+        !hasChainPrefix(poolAddress) &&
+        !errorMessageModal.isOpen
+      ) {
         errorMessageModal.open();
       }
-    }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
-    }
-    return () => {
-      clearTimeout(timerId);
+
+      return () => {
+        clearTimeout(timerId);
+      };
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+
+    checkValidation();
+  }, [asset1, asset2, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -246,9 +269,7 @@ function WithdrawPage() {
             },
           }}
           lpToken={pair?.liquidity_token}
-          assets={
-            pair?.asset_addresses.map((address) => getAsset(address)) || []
-          }
+          assets={[asset1, asset2]}
           onBalanceClick={(value) => {
             form.setValue(FormKey.lpValue, value, {
               shouldValidate: true,

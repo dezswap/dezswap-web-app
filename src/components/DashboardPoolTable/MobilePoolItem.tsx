@@ -45,15 +45,15 @@ Value.defaultProps = {
 
 function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
   const expand = useModal();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [pool, getPair]);
 
   const assets = useMemo(() => {
     return pair?.asset_addresses.map((address) => {
-      return getAsset(address);
+      return assetInfos?.[address];
     });
-  }, [getAsset, pair]);
+  }, [assetInfos, pair]);
 
   return (
     <Expand

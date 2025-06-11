@@ -8,7 +8,7 @@ import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useAssets from "hooks/useAssets";
 import useBookmark from "hooks/useBookmark";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Col,
   Container,
@@ -42,6 +42,7 @@ import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
 import TokenPools from "./TokenPools";
 import Link from "components/Link";
+import { Token } from "types/api";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -68,8 +69,20 @@ function TokenDetailPage() {
 
   const { getAsset } = useAssets();
 
-  const asset = useMemo(() => {
-    return tokenAddress ? getAsset(tokenAddress) : undefined;
+  const [asset, setAsset] = useState<Partial<Token> | undefined>();
+
+  useEffect(() => {
+    if (!tokenAddress) {
+      setAsset(undefined);
+      return;
+    }
+
+    const fetch = async () => {
+      const result = await getAsset(tokenAddress);
+      setAsset(result);
+    };
+
+    fetch();
   }, [tokenAddress, getAsset]);
 
   const isBookmarked = useMemo(() => {

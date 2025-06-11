@@ -24,6 +24,7 @@ import {
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 import { EncodeObject } from "@xpla/xplajs/types";
 
+const CHAIN_PREFIXS = ["xpla1", "fetch1"];
 export type Amount = string | number;
 
 export const queryMessages = {
@@ -413,4 +414,11 @@ export const getValidChain = (inputChainName: string | null | undefined) => {
     chainName: isValidChain ? inputChainName : DefaultChainName,
     isValidChain,
   };
+};
+
+
+export const hasChainPrefix = (address: string) => {
+  return CHAIN_PREFIXS.some((prefix) =>
+    address.startsWith(prefix),
+  );
 };
