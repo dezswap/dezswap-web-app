@@ -14,19 +14,37 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import Link from "components/Link";
 
-function TopMovers() {
+function TopMovers({ whiteList }: { whiteList?: string[] }) {
   const screenClass = useScreenClass();
   const { getAsset } = useAssets();
   const { tokens } = useDashboard();
-  const topMovingTokens = useMemo(
-    () =>
-      tokens
-        ?.toSorted((a, b) => {
-          return Numeric.parse(b.volume24h).minus(a.volume24h).toNumber();
-        })
-        .slice(0, 10),
-    [tokens],
-  );
+  const topMovingTokens = useMemo(() => {
+    const tokenList = whiteList
+      ? tokens?.filter((token) => whiteList.includes(token.address))
+      : tokens;
+
+    const sortedTokens = tokenList?.toSorted((a, b) => {
+      return Numeric.parse(b.volume24h).minus(a.volume24h).toNumber();
+    });
+
+    if (!sortedTokens || sortedTokens.length === 0) {
+      return [];
+    }
+
+    if (sortedTokens.length < 10) {
+      const targetLength =
+        Math.ceil(10 / sortedTokens.length) * sortedTokens.length;
+
+      const result = Array.from(
+        { length: targetLength },
+        (_, i) => sortedTokens[i % sortedTokens.length],
+      );
+
+      return result;
+    }
+
+    return sortedTokens.slice(0, 10);
+  }, [tokens, whiteList]);
 
   return (
     <Panel shadow noPadding>

@@ -48,17 +48,21 @@ export const contractAddresses: {
     factory: string;
     router: string;
     lockdrop: string;
+    play3List: string;
   };
 } = {
   xpla: {
     factory: "xpla1j33xdql0h4kpgj2mhggy4vutw655u90z7nyj4afhxgj4v5urtadq44e3vd",
     router: "xpla1uv4dz7ngaqwymvxggrjp3rnz3gs33szwjsnrxqg0ylkykqf8r7ns9s3cg4",
     lockdrop: "",
+    play3List: "",
   },
   xplatestnet: {
     factory: "xpla1j4kgjl6h4rt96uddtzdxdu39h0mhn4vrtydufdrk4uxxnrpsnw2qug2yx2",
     router: "xpla1pr40depxf8w50y58swdyhc0s2yjptd2xtqgnyfvkz6k40ng53gqqnyftkm",
     lockdrop: "xpla1009jkfkfs6x484a9s34zq030dk4sa0ygk8z7hw6hegcupkadjpfs39e5du",
+    play3List:
+      "xpla1hylp38a8rwzzktq0esvsqnuaxvvf3uvtsex8du8wcpawaaqjczus4st6s0",
   },
   fetchhub: {
     factory: "fetch1slz6c85kxp4ek5ufmcakfhnscv9r2snlemxgwz6cjhklgh7v2hms8rgt5v",
