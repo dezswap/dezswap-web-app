@@ -1,5 +1,5 @@
 import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
@@ -9,16 +9,10 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatNumber,
-  getTokenLink,
-} from "utils";
+import { amountToValue, ellipsisCenter, getTokenLink } from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { nativeTokens, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
@@ -34,6 +28,7 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -211,14 +206,16 @@ function UnlockPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{
+                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                        }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                 ]}
               />

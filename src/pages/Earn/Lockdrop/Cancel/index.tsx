@@ -26,7 +26,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { nativeTokens, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
@@ -39,6 +39,7 @@ import { useNavigate } from "hooks/useNavigate";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
 import InputGroup from "../Stake/InputGroup";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 const Box = styled(box)`
   & > * {
@@ -308,14 +309,16 @@ function CancelPage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount
-                    ? `${formatNumber(
-                        cutDecimal(
-                          amountToValue(feeAmount) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      )} ${XPLA_SYMBOL}`
-                    : "",
+                  value: feeAmount ? (
+                    <AssetValueFormatter
+                      asset={{
+                        symbol: nativeTokens?.[chainName]?.[0].symbol,
+                      }}
+                      amount={feeAmount}
+                    />
+                  ) : (
+                    ""
+                  ),
                 },
                 {
                   key: "shareOfPool",

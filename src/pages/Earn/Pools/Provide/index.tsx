@@ -31,7 +31,7 @@ import { AccAddress, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { nativeTokens, XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
+import { nativeTokens, XPLA_ADDRESS } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
@@ -549,7 +549,9 @@ function ProvidePage() {
                           ),
                           value: feeAmount ? (
                             <AssetValueFormatter
-                              asset={{ symbol: XPLA_SYMBOL }}
+                              asset={{
+                                symbol: nativeTokens?.[chainName]?.[0].symbol,
+                              }}
                               amount={feeAmount}
                             />
                           ) : (
@@ -653,7 +655,9 @@ function ProvidePage() {
                           ),
                           value: feeAmount ? (
                             <AssetValueFormatter
-                              asset={{ symbol: XPLA_SYMBOL }}
+                              asset={{
+                                symbol: nativeTokens?.[chainName]?.[0].symbol,
+                              }}
                               amount={feeAmount}
                             />
                           ) : (
