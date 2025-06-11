@@ -4,7 +4,7 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
 import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import Slider from "components/Slider";
@@ -29,7 +29,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
@@ -43,6 +43,7 @@ import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import useNativeTokens from "hooks/useNativeTokens";
+import { Token } from "types/api";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -78,7 +79,7 @@ function StakePage() {
     },
   });
 
-  const { getAsset } = useAssets();
+  const { getAsset, validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -116,20 +117,28 @@ function StakePage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
+  const [rewardAsset, setRewardAsset] = useState<Partial<Token> | undefined>();
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
+  useEffect(() => {
+    if (!pair?.asset_addresses) return;
 
-  const rewardAsset = useMemo(
-    () =>
-      lockdropEventInfo
-        ? getAsset(lockdropEventInfo.reward_token_addr)
-        : undefined,
-    [getAsset, lockdropEventInfo],
-  );
+    (async () => {
+      const [a1, a2] = await Promise.all(pair.asset_addresses.map(getAsset));
+      setAsset1(a1);
+      setAsset2(a2);
+    })();
+  }, [getAsset, pair]);
 
+  useEffect(() => {
+    if (!lockdropEventInfo?.reward_token_addr) return;
+
+    (async () => {
+      const asset = await getAsset(lockdropEventInfo.reward_token_addr);
+      setRewardAsset(asset);
+    })();
+  }, [lockdropEventInfo, getAsset]);
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
     amount: valueToAmount(lpValue, LP_DECIMALS) || "0",
@@ -199,15 +208,19 @@ function StakePage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      (lockdropEventInfo &&
-        (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
-          lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
-      lockdropEventInfoError
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        (lockdropEventInfo &&
+          (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
+            lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
+        lockdropEventInfoError
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     lockdropEventInfo,
     lockdropEventInfoError,

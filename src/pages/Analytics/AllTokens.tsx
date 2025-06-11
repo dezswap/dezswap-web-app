@@ -34,7 +34,7 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
 
   const { tokens } = useDashboard();
 
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
 
   const filteredTokens = useMemo(() => {
     if (!tokens) return [];
@@ -44,12 +44,12 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
 
     return tokenList.filter((token) => {
       if (!searchKeyword) return true;
-      const asset = getAsset(token.address);
+      const asset = assetInfos?.[token.address];
       return [asset?.token, asset?.name, asset?.symbol].some((value) =>
         value?.toLowerCase().includes(searchKeyword.toLowerCase()),
       );
     });
-  }, [getAsset, searchKeyword, tokens, whiteList]);
+  }, [assetInfos, searchKeyword, tokens, whiteList]);
 
   const sortedTokens = useMemo(() => {
     if (!filteredTokens?.length) return [];
@@ -169,7 +169,7 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
                 width: 300,
                 hasSort: false,
                 render(address) {
-                  const asset = getAsset(`${address}`);
+                  const asset = assetInfos?.[`${address}`];
                   return (
                     <Row
                       justify="start"
