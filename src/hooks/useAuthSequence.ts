@@ -7,16 +7,25 @@ function useAuthSequence() {
   const api = useAPI();
   const [sequence, setSequence] = useState(0n);
   const { signingClient: client } = useSigningClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress, isInterchain } = useConnectedWallet();
 
   useEffect(() => {
     const fetchAuthInfo = async () => {
-      try {
-        const authSequence = await client?.getSequence(walletAddress);
+      if (isInterchain) {
+        try {
+          const authSequence = await client?.getSequence(walletAddress);
 
-        setSequence(authSequence || 0n);
-      } catch (error) {
-        console.error("Failed to fetch auth info:", error);
+          setSequence(authSequence || 0n);
+        } catch (error) {
+          console.error("Failed to fetch auth info:", error);
+        }
+      } else {
+        try {
+          const { sequence: authSequence } = (await api.getAuthInfo()) || {};
+          setSequence(authSequence || 0n);
+        } catch (error) {
+          console.error("Failed to fetch auth info:", error);
+        }
       }
     };
 
