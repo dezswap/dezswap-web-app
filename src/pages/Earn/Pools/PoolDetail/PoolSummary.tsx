@@ -15,6 +15,8 @@ import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import HoverUnderline from "components/utils/HoverUnderline";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import Link from "components/Link";
+import { useEffect, useState } from "react";
+import { Token } from "types/api";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -71,7 +73,25 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
 
   const dashboardPoolData = useDashboardPoolDetail(poolAddress);
   const pool = usePool(poolAddress);
+  const [assets, setAssets] = useState<(Partial<Token> | undefined)[]>([]);
 
+  useEffect(() => {
+    if (!pool?.assets?.length) {
+      setAssets([]);
+      return;
+    }
+
+    const fetchAssets = async () => {
+      const results = await Promise.all(
+        pool.assets.map((poolAsset) =>
+          getAsset(getAddressFromAssetInfo(poolAsset.info) || ""),
+        ),
+      );
+      setAssets(results);
+    };
+
+    fetchAssets();
+  }, [pool, getAsset]);
   return (
     <Panel shadow>
       <Wrapper>
@@ -93,10 +113,8 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
             gap: 10px;
           `}
         >
-          {pool?.assets?.map((poolAsset) => {
-            const asset = getAsset(
-              getAddressFromAssetInfo(poolAsset.info) || "",
-            );
+          {pool?.assets?.map((poolAsset, index) => {
+            const asset = assets[index];
             return (
               <Row justify="between" align="center" gutterWidth={4}>
                 <Col xs="content">

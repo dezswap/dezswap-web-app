@@ -33,6 +33,7 @@ import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import Expand from "../Expand";
+import { Token } from "types/api";
 
 const TableRow = styled(Box)`
   min-width: 100%;
@@ -202,6 +203,7 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
     screenClass,
   );
   const { getAsset } = useAssets();
+
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -209,11 +211,23 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
   const pair = useMemo(() => getPair(poolAddress), [getPair, poolAddress]);
   const lpBalance = useBalance(pair?.liquidity_token);
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
 
+  useEffect(() => {
+    if (!pair?.asset_addresses?.length) return;
+
+    const fetchAssets = async () => {
+      const [a1, a2] = await Promise.all([
+        getAsset(pair.asset_addresses[0]),
+        getAsset(pair.asset_addresses[1]),
+      ]);
+      setAsset1(a1);
+      setAsset2(a2);
+    };
+
+    fetchAssets();
+  }, [pair, getAsset]);
   const userShare = useMemo(() => {
     return (
       Numeric.parse(lpBalance || "0")

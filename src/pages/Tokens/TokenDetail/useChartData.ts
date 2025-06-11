@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAPI from "hooks/useAPI";
 import useAssets from "hooks/useAssets";
@@ -39,11 +39,16 @@ const useChartData = (address: string, type: ChartAPIParameters["type"]) => {
     useState<ChartAPIParameters["duration"]>("month");
 
   const { getAsset } = useAssets();
+  const [isAxlUSDC, setIsAxlUSDC] = useState(false);
 
-  // TODO: Remove this when we have a better solution
-  const isAxlUSDC = useMemo(() => {
-    const asset = getAsset(address);
-    return !!(asset?.verified && asset.symbol === "axlUSDC");
+  useEffect(() => {
+    const fetch = async () => {
+      const asset = await getAsset(address);
+      const result = !!(asset?.verified && asset.symbol === "axlUSDC");
+      setIsAxlUSDC(result);
+    };
+
+    if (address) fetch();
   }, [getAsset, address]);
 
   const { data } = useQuery({
