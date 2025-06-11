@@ -48,7 +48,7 @@ export const contractAddresses: {
     factory: string;
     router: string;
     lockdrop: string;
-    play3List: string;
+    play3List?: string;
   };
 } = {
   xpla: {
