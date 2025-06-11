@@ -59,6 +59,7 @@ import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
+import { Token } from "types/api";
 import useNetwork from "hooks/useNetwork";
 import useNativeTokens from "hooks/useNativeTokens";
 
@@ -189,14 +190,28 @@ function SwapPage() {
     },
   });
 
-  const asset1 = useMemo(
-    () => getAsset(asset1Address),
-    [asset1Address, getAsset],
-  );
-  const asset2 = useMemo(
-    () => getAsset(asset2Address),
-    [asset2Address, getAsset],
-  );
+  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
+  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (asset1Address) {
+        const a1 = await getAsset(asset1Address);
+        setAsset1(a1);
+      }
+    };
+    fetch();
+  }, [asset1Address, getAsset]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (asset2Address) {
+        const a2 = await getAsset(asset2Address);
+        setAsset2(a2);
+      }
+    };
+    fetch();
+  }, [asset2Address, getAsset]);
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);
   const dashboardToken2 = useDashboardTokenDetail(asset2Address);
