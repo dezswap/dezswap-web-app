@@ -91,7 +91,13 @@ function TopMovers({ whiteList }: { whiteList?: string[] }) {
                   `}
                 >
                   <Row justify="start" align="center" gutterWidth={10}>
-                    <Col xs="content">
+                    <Col
+                      xs="content"
+                      css={css`
+                        line-height: 1;
+                        font-size: 0;
+                      `}
+                    >
                       <AssetIcon asset={{ icon: asset?.icon }} />
                     </Col>
                     <Col
