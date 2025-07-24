@@ -9,7 +9,7 @@ import {
   getQueryData,
   parseJsonFromBinary,
 } from "utils/dezswap";
-import { VerifiedAssets, VerifiedIbcAssets } from "types/token";
+import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
 import { contractAddresses, GAS_INFO } from "constants/dezswap";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
@@ -18,6 +18,8 @@ import { EncodeObject } from "@xpla/xplajs/types";
 import { LockdropUserInfo } from "types/lockdrop";
 import useRPCClient from "./useRPCClient";
 import useConnectedWallet from "./useConnectedWallet";
+
+const PLAY3_LIST_SIZE = 20;
 
 const useAPI = (version: ApiVersion = "v1") => {
   const {
@@ -253,6 +255,42 @@ const useAPI = (version: ApiVersion = "v1") => {
     [client, walletAddress],
   );
 
+  const getPlay3List = useCallback(async () => {
+    const contractAddress = contractAddresses[chainName]?.play3List;
+    if (isLoading) return;
+    if (!client || !contractAddress) {
+      return undefined;
+    }
+    let res: WhiteList = [];
+    let lastAddress = "";
+
+    while (true) {
+      const queryData = getQueryData({
+        get_complete_meme_data_list: {
+          start_after: lastAddress,
+          limit: PLAY3_LIST_SIZE,
+        },
+      });
+      try {
+        const { data } =
+          (await client?.cosmwasm.wasm.v1.smartContractState({
+            address: contractAddress,
+            queryData,
+          })) || {};
+
+        const { data: parsed } = parseJsonFromBinary(data) ?? {};
+
+        if (!parsed || parsed.length === 0) break;
+        res = [...res, ...parsed];
+        lastAddress = res[res.length - 1].cont_addr;
+        if (parsed.length < PLAY3_LIST_SIZE) break;
+      } catch (e) {
+        return res;
+      }
+    }
+    return res;
+  }, [client]);
+
   const getAuthInfo = useCallback(async () => {
     if (!walletAddress || !client) {
       return undefined;
@@ -303,6 +341,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropEventInfo,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
+      getPlay3List,
       estimateFee,
       getAuthInfo,
       rpcEndpoint,
@@ -322,6 +361,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getLockdropEventInfo,
       getLockdropUserInfo,
       getEstimatedLockdropReward,
+      getPlay3List,
       estimateFee,
       getAuthInfo,
       rpcEndpoint,

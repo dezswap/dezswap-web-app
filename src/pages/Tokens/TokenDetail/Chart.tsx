@@ -33,9 +33,15 @@ const chartDurationOptions = ["Month", "Quarter", "Year", "All"].map(
   }),
 );
 
-function Chart({ tokenAddress }: { tokenAddress: string }) {
+function Chart({
+  tokenAddress,
+  defaultTabIndex = 0,
+}: {
+  tokenAddress: string;
+  defaultTabIndex?: number;
+}) {
   const screenClass = useScreenClass();
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(defaultTabIndex);
   const selectedTabValue = useMemo(() => {
     return chartTypeTabs[selectedTabIndex].value;
   }, [selectedTabIndex]);

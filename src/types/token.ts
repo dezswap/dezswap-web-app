@@ -18,6 +18,12 @@ export type VerifiedTokenInfo = {
   token: string;
 };
 
+export type WhiteList = {
+  cont_addr: string;
+  [key: string]: unknown;
+  // consuming only cont_addr; other values are effectively unknown.
+}[];
+
 export type VerifiedIbcTokenInfo = {
   decimals: number;
   icon: string;
