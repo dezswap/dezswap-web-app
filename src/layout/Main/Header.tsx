@@ -728,15 +728,6 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   connectedWallet.disconnect();
-                                  if (
-                                    connectedWallet.isInterchain &&
-                                    interchainWallet
-                                  ) {
-                                    interchainWallet.disconnect(chainId);
-                                  }
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 100);
                                 }}
                               >
                                 Disconnect
