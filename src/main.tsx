@@ -28,7 +28,7 @@ const defaultOption = {
   metadata: {
     name: "Dezswap",
     description: "Dezswap",
-    url: "#",
+    url: window.location.origin,
     icons: [
       "https://walletconnect.com/walletconnect-logo.png",
       "https://app.dezswap.io/favicon.svg",

@@ -42,6 +42,7 @@ WalletButton.defaultProps = {
 type WalletButtonProps = {
   label: string;
   iconSrc: string;
+  key: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   isInstalled?: boolean;
 };
@@ -118,6 +119,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
         type,
         iconSrc: icon,
         isInstalled: true,
+        key: `xpla-${name}`,
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           connect(type, identifier, false);
           if (props.onRequestClose) {
@@ -133,6 +135,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 label: `${p.label}\n(XPLA GAMES)`,
                 iconSrc: p.iconSrc,
                 isInstalled: true,
+                key: `${p.label}\n(XPLA GAMES)`,
                 onClick: (event) => {
                   try {
                     connect(p.type, p.identifier, true);
@@ -155,7 +158,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
       )
       .map((wallet: StatefulWallet) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
-
         const iconSrc =
           typeof wallet.info.logo === "string"
             ? wallet.info.logo
@@ -165,6 +167,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           label: wallet.info.prettyName,
           iconSrc,
           isInstalled,
+          key: `interchain-${wallet.info.name}`,
           onClick: async (event) => {
             try {
               if (!isInstalled) {
@@ -188,6 +191,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
       .map(({ icon, name, url }) => ({
         label: `${name}`,
         iconSrc: icon,
+        key: `xpla-${name}-install`,
         onClick: () => {
           window.open(url);
         },
@@ -240,7 +244,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
               <Col
                 xs={6}
                 sm={4}
-                key={item.label}
+                key={item.key}
                 style={{
                   marginTop:
                     screenClass === MOBILE_SCREEN_CLASS ? "15px" : "20px",

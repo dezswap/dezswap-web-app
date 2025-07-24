@@ -5,7 +5,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { useBlocker, useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation, useBlocker } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useWallet, WalletStatus } from "@xpla/wallet-provider";
 import { useFormatTo } from "hooks/useFormatTo";
@@ -131,6 +131,7 @@ function NavComponent() {
         return {
           to: formatTo({ to: navLink.path }),
           children,
+          key: navLink.path,
         };
       })}
     />
