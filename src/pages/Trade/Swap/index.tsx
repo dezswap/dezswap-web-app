@@ -59,9 +59,7 @@ import useSearchParamState from "hooks/useSearchParamState";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
-import useAPI from "hooks/useAPI";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -107,6 +105,7 @@ function SelectAssetDrawer({
       }
     };
   }, [isOpen]);
+
   return (
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
@@ -248,7 +247,15 @@ function SwapPage() {
       color: theme.colors.text.primary,
       message: undefined,
     };
-  }, [simulationResult, theme]);
+  }, [
+    asset2?.decimals,
+    asset2Value,
+    isReversed,
+    simulationResult,
+    theme.colors.danger,
+    theme.colors.text.primary,
+    theme.colors.warning,
+  ]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);
@@ -368,7 +375,7 @@ function SwapPage() {
       console.log(error);
     }
     return "Enter an amount";
-  }, [asset1, asset2, asset1BalanceMinusFee, asset1Value, asset2Value]);
+  }, [asset1, asset2, isPoolEmpty, asset1Value, asset1BalanceMinusFee]);
 
   const [shiftAssets, setShiftAssets] = useState(false);
 
@@ -393,7 +400,16 @@ function SwapPage() {
         },
       );
     }
-  }, [asset1BalanceMinusFee, asset1Value, form]);
+  }, [
+    asset1?.decimals,
+    asset1Address,
+    asset1BalanceMinusFee,
+    asset1Value,
+    balanceApplied,
+    form,
+    isReversed,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     setTimeout(() => {
