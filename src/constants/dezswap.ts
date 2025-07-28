@@ -9,10 +9,8 @@ export type SupportedChain = "dimension" | "cube";
 export const DefaultChainName = "xpla";
 const supportChainNames = ["xpla", "fetch"];
 
-export const DefaultChains = chains.filter(
-  (chain) =>
-    supportChainNames.some((keyword) => chain.chainName.includes(keyword)) ??
-    [],
+export const DefaultChains = chains.filter((chain) =>
+  supportChainNames.some((keyword) => chain.chainName.includes(keyword)),
 );
 export const getDefaultChain = (searchName: string) =>
   chains.filter((chain) => chain.chainName === searchName);
@@ -82,7 +80,7 @@ export const getGasInfo = (chainName: string) => ({
   multiplier: 1.2,
   gasPrice: {
     amount: new Decimal("280000000000"),
-    denom: nativeTokens?.[chainName]?.[0].token,
+    denom: nativeTokens[chainName]?.[0]?.token ?? "",
   },
 });
 export const LP_DECIMALS = 6;
