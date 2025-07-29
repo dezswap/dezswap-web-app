@@ -162,7 +162,7 @@ const useCustomAssets = () => {
         fetchAsset();
       }
     },
-    [fetchAsset, verifiedIbcAssets, fetchDecimal, hasChainPrefix],
+    [fetchAsset, verifiedIbcAssets, fetchDecimal],
   );
 
   const getAsset = useCallback(

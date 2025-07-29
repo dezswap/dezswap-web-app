@@ -3,7 +3,7 @@ import { Numeric } from "@xpla/xpla.js";
 import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import { LP_DECIMALS } from "constants/dezswap";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useBalance from "hooks/useBalance";
 import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -33,7 +33,6 @@ import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import Expand from "../Expand";
-import { Token } from "types/api";
 
 const TableRow = styled(Box)`
   min-width: 100%;
@@ -202,7 +201,6 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const { getAsset } = useAssets();
 
   const {
     selectedChain: { explorers },
@@ -211,23 +209,8 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
   const pair = useMemo(() => getPair(poolAddress), [getPair, poolAddress]);
   const lpBalance = useBalance(pair?.liquidity_token);
 
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
-
-  useEffect(() => {
-    if (!pair?.asset_addresses?.length) return;
-
-    const fetchAssets = async () => {
-      const [a1, a2] = await Promise.all([
-        getAsset(pair.asset_addresses[0]),
-        getAsset(pair.asset_addresses[1]),
-      ]);
-      setAsset1(a1);
-      setAsset2(a2);
-    };
-
-    fetchAssets();
-  }, [pair, getAsset]);
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
   const userShare = useMemo(() => {
     return (
       Numeric.parse(lpBalance || "0")
