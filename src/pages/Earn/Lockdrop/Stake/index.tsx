@@ -3,6 +3,7 @@ import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import box from "components/Box";
@@ -79,7 +80,7 @@ function StakePage() {
     },
   });
 
-  const { getAsset, validate } = useAssets();
+  const { validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -98,7 +99,7 @@ function StakePage() {
   const duration = form.watch(FormKey.duration);
   const lpBalance = useBalance(lockdropEventInfo?.lp_token_addr);
 
-  const { register, formState } = form;
+  const { register } = form;
 
   const screenClass = useScreenClass();
   const navigate = useNavigate();
@@ -117,28 +118,10 @@ function StakePage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
-  const [rewardAsset, setRewardAsset] = useState<Partial<Token> | undefined>();
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { data: rewardAsset } = useAsset(lockdropEventInfo?.reward_token_addr);
 
-  useEffect(() => {
-    if (!pair?.asset_addresses) return;
-
-    (async () => {
-      const [a1, a2] = await Promise.all(pair.asset_addresses.map(getAsset));
-      setAsset1(a1);
-      setAsset2(a2);
-    })();
-  }, [getAsset, pair]);
-
-  useEffect(() => {
-    if (!lockdropEventInfo?.reward_token_addr) return;
-
-    (async () => {
-      const asset = await getAsset(lockdropEventInfo.reward_token_addr);
-      setRewardAsset(asset);
-    })();
-  }, [lockdropEventInfo, getAsset]);
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
     amount: valueToAmount(lpValue, LP_DECIMALS) || "0",

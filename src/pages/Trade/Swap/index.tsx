@@ -10,7 +10,7 @@ import {
 import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import {
   amountToValue,
   cutDecimal,
@@ -59,7 +59,6 @@ import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import { Token } from "types/api";
 import useNetwork from "hooks/useNetwork";
 import useNativeTokens from "hooks/useNativeTokens";
 
@@ -145,7 +144,6 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
-  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
   const { nativeTokens } = useNativeTokens();
@@ -190,28 +188,8 @@ function SwapPage() {
     },
   });
 
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (asset1Address) {
-        const a1 = await getAsset(asset1Address);
-        setAsset1(a1);
-      }
-    };
-    fetch();
-  }, [asset1Address, getAsset]);
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (asset2Address) {
-        const a2 = await getAsset(asset2Address);
-        setAsset2(a2);
-      }
-    };
-    fetch();
-  }, [asset2Address, getAsset]);
+  const { data: asset1 } = useAsset(asset1Address);
+  const { data: asset2 } = useAsset(asset2Address);
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);
   const dashboardToken2 = useDashboardTokenDetail(asset2Address);

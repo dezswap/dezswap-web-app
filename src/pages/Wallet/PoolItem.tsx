@@ -1,14 +1,14 @@
 import { Numeric } from "@xpla/xpla.js";
 import Box from "components/Box";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { Pool, Token } from "types/api";
+import { Pool } from "types/api";
 
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
-import useAssets from "hooks/useAssets";
-import { useEffect, useMemo, useState } from "react";
+import useAsset from "hooks/useAsset";
+import { useMemo } from "react";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import Outlink from "components/Outlink";
@@ -115,24 +115,13 @@ function PoolItem({
     chainName,
     selectedChain: { explorers },
   } = useNetwork();
-  const { getAsset } = useAssets();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
   const lpBalance = useBalance(pair?.liquidity_token);
   const dashboardPoolDetail = useDashboardPoolDetail(pool.address);
 
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
-
-  useEffect(() => {
-    if (!pair?.asset_addresses) return;
-
-    (async () => {
-      const [a1, a2] = await Promise.all(pair.asset_addresses.map(getAsset));
-      setAsset1(a1);
-      setAsset2(a2);
-    })();
-  }, [getAsset, pair]);
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
   const userShare = useMemo(() => {
     return (

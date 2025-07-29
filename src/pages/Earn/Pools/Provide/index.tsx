@@ -8,7 +8,7 @@ import {
 import Modal from "components/Modal";
 import { useParams } from "react-router-dom";
 import usePairs from "hooks/usePairs";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { useForm } from "react-hook-form";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
@@ -54,7 +54,6 @@ import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { useNavigate } from "hooks/useNavigate";
 import useNativeTokens from "hooks/useNativeTokens";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { Token } from "types/api";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -73,7 +72,6 @@ function ProvidePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair } = usePairs();
-  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
@@ -95,41 +93,32 @@ function ProvidePage() {
     [getPair, poolAddress],
   );
 
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
   useEffect(() => {
-    const checkValidation = async () => {
-      if (!pair?.asset_addresses?.length) {
-        errorMessageModal.open();
-        return;
-      }
+    if (!pair?.asset_addresses?.length) {
+      errorMessageModal.open();
+      return;
+    }
 
-      const [a1, a2] = await Promise.all([
-        getAsset(pair.asset_addresses[0]),
-        getAsset(pair.asset_addresses[1]),
-      ]);
-      setAsset1(a1);
-      setAsset2(a2);
-
-      const timerId = setTimeout(() => {
-        if (!a1 || !a2) {
-          errorMessageModal.open();
-        }
-      }, 1500);
-      if (
-        poolAddress &&
-        !hasChainPrefix(poolAddress) &&
-        !errorMessageModal.isOpen
-      ) {
+    const timerId = setTimeout(() => {
+      if (!asset1 || !asset2) {
         errorMessageModal.open();
       }
-      return () => {
-        clearTimeout(timerId);
-      };
+    }, 1500);
+
+    if (
+      poolAddress &&
+      !hasChainPrefix(poolAddress) &&
+      !errorMessageModal.isOpen
+    ) {
+      errorMessageModal.open();
+    }
+
+    return () => {
+      clearTimeout(timerId);
     };
-
-    checkValidation();
   }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
@@ -222,7 +211,6 @@ function ProvidePage() {
       poolAddress,
       slippageTolerance,
       txDeadlineMinutes,
-      getAsset,
     ],
   );
 
