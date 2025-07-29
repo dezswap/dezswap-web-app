@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect, useState } from "react";
+import { useMemo, useCallback } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import styled from "@emotion/styled";
 import { useTheme, css } from "@emotion/react";
@@ -6,7 +6,7 @@ import Modal from "components/Modal";
 import SelectAssetForm from "components/SelectAssetForm";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePairs";
 import iconPlus from "assets/icons/icon-plus.svg";
@@ -22,7 +22,6 @@ import useBalance from "hooks/useBalance";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import ImportAssetModal from "./ImportAssetModal";
 import AssetFormButton from "./AssetFormButton";
-import { Token } from "types/api";
 
 type AssetFormAddress = string | undefined;
 
@@ -58,7 +57,7 @@ function AssetSelector({
   const theme = useTheme();
   const screenClass = useScreenClass();
 
-  const { availableAssetAddresses, findPair } = usePairs();
+  const { availableAssetAddresses } = usePairs();
   const {
     selectedChain: { chainName },
   } = useNetwork();
@@ -67,44 +66,16 @@ function AssetSelector({
     return customAssetStore[chainName]?.map((asset) => asset.token) || [];
   }, [customAssetStore, chainName]);
 
-  const { getAsset } = useAssets();
-
   const selectAsset1Modal = useHashModal("asset1");
   const selectAsset2Modal = useHashModal("asset2");
 
   const [selectedAddress1, selectedAddress2] = addresses || [];
 
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>(undefined);
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>(undefined);
-
-  useEffect(() => {
-    async function fetchAssets() {
-      if (selectedAddress1) {
-        const asset = await getAsset(selectedAddress1);
-        setAsset1(asset);
-      } else {
-        setAsset1(undefined);
-      }
-
-      if (selectedAddress2) {
-        const asset = await getAsset(selectedAddress2);
-        setAsset2(asset);
-      } else {
-        setAsset2(undefined);
-      }
-    }
-
-    fetchAssets();
-  }, [getAsset, selectedAddress1, selectedAddress2]);
+  const { data: asset1 } = useAsset(selectedAddress1);
+  const { data: asset2 } = useAsset(selectedAddress2);
 
   const balance1 = useBalance(asset1?.token);
   const balance2 = useBalance(asset2?.token);
-
-  const pair = useMemo(() => {
-    return selectedAddress1 && selectedAddress2
-      ? findPair([selectedAddress1, selectedAddress2])
-      : undefined;
-  }, [findPair, selectedAddress1, selectedAddress2]);
 
   const closeSelectAssetModals = useCallback(() => {
     selectAsset1Modal.close();
