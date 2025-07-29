@@ -6,9 +6,9 @@ import Hr from "components/Hr";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useBookmark from "hooks/useBookmark";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Col,
   Container,
@@ -38,7 +38,6 @@ import ScrollToTop from "components/ScrollToTop";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Link from "components/Link";
-import { Token } from "types/api";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
@@ -67,23 +66,7 @@ function TokenDetailPage() {
 
   const dashboardToken = useDashboardTokenDetail(tokenAddress);
 
-  const { getAsset } = useAssets();
-
-  const [asset, setAsset] = useState<Partial<Token> | undefined>();
-
-  useEffect(() => {
-    if (!tokenAddress) {
-      setAsset(undefined);
-      return;
-    }
-
-    const fetch = async () => {
-      const result = await getAsset(tokenAddress);
-      setAsset(result);
-    };
-
-    fetch();
-  }, [tokenAddress, getAsset]);
+  const { data: asset } = useAsset(tokenAddress);
 
   const isBookmarked = useMemo(() => {
     return tokenAddress ? bookmarks?.includes(tokenAddress) : false;

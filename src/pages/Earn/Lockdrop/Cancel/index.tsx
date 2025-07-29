@@ -2,9 +2,9 @@ import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import { css } from "@emotion/react";
@@ -35,11 +35,10 @@ import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import { Token } from "types/api";
 import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`
@@ -60,7 +59,6 @@ function CancelPage() {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
-  const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
   const { nativeTokens } = useNativeTokens();
@@ -111,28 +109,9 @@ function CancelPage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
-  const [asset1, setAsset1] = useState<Partial<Token> | undefined>();
-  const [asset2, setAsset2] = useState<Partial<Token> | undefined>();
-  const [rewardAsset, setRewardAsset] = useState<Partial<Token> | undefined>();
-
-  useEffect(() => {
-    if (!pair?.asset_addresses) return;
-
-    (async () => {
-      const [a1, a2] = await Promise.all(pair.asset_addresses.map(getAsset));
-      setAsset1(a1);
-      setAsset2(a2);
-    })();
-  }, [pair, getAsset]);
-
-  useEffect(() => {
-    if (!lockdropEventInfo?.reward_token_addr) return;
-
-    (async () => {
-      const asset = await getAsset(lockdropEventInfo.reward_token_addr);
-      setRewardAsset(asset);
-    })();
-  }, [lockdropEventInfo, getAsset]);
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { data: rewardAsset } = useAsset(lockdropEventInfo?.reward_token_addr);
 
   const lockupInfo = useMemo(() => {
     return lockdropUserInfo?.lockup_infos.find(

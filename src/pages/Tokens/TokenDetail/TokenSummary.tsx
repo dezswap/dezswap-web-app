@@ -6,12 +6,11 @@ import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useDashboard from "hooks/dashboard/useDashboard";
-import { type ComponentProps, useEffect, useMemo, useState } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { Row, Col } from "react-grid-system";
 import { formatDecimals, formatNumber } from "utils";
-import { Token } from "types/api";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -70,24 +69,12 @@ function PriceAndChangeRate({
 }
 
 function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
-  const { getAsset } = useAssets();
   const { tokens } = useDashboard();
-  const [asset, setAsset] = useState<Partial<Token> | undefined>();
+  const { data: asset } = useAsset(tokenAddress);
 
   const dashboardToken = useMemo(() => {
     return tokens?.find((token) => token.address === tokenAddress);
   }, [tokens, tokenAddress]);
-
-  useEffect(() => {
-    if (!tokenAddress) return;
-
-    const fetch = async () => {
-      const result = await getAsset(tokenAddress);
-      setAsset(result);
-    };
-
-    fetch();
-  }, [tokenAddress, getAsset]);
   return (
     <Panel shadow>
       <Wrapper>
