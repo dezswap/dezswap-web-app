@@ -106,6 +106,7 @@ function SelectAssetDrawer({
       }
     };
   }, [isOpen]);
+
   return (
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
@@ -247,7 +248,15 @@ function SwapPage() {
       color: theme.colors.text.primary,
       message: undefined,
     };
-  }, [simulationResult, theme]);
+  }, [
+    asset2?.decimals,
+    asset2Value,
+    isReversed,
+    simulationResult,
+    theme.colors.danger,
+    theme.colors.text.primary,
+    theme.colors.warning,
+  ]);
 
   const asset1Balance = useBalance(asset1Address);
   const asset2Balance = useBalance(asset2Address);

@@ -6,27 +6,25 @@ import { WalletState } from "@interchain-kit/core";
 import useNetwork from "./useNetwork";
 
 function useSigningClient() {
-  const {
-    currentChainName,
-    currentWalletName,
-    getChainWalletState,
-    isReady,
-    getSigningClient,
-  } = useWalletManager();
+  const wm = useWalletManager();
+  const { currentChainName, currentWalletName, getChainWalletState, isReady } =
+    wm;
   const { chainName } = useNetwork();
   const { walletState } =
     getChainWalletState(currentWalletName, chainName) ?? {};
   const { data: signingClient } = useQuery({
     queryKey: [
       "signingClient",
+      chainName,
       currentWalletName,
-      walletState,
+      `${isReady}_${walletState}`,
       currentChainName,
-      isReady,
     ],
     queryFn: async () => {
       try {
-        const client = await getSigningClient(currentWalletName, chainName);
+        const client = await wm.getSigningClient(currentWalletName, chainName);
+        if (!client) throw new Error("User not found");
+
         client.addEncoders(toEncoders(MsgExecuteContract));
         return client;
       } catch (err) {
@@ -34,7 +32,10 @@ function useSigningClient() {
         throw err;
       }
     },
-    enabled: isReady && walletState === WalletState.Connected,
+    enabled:
+      isReady &&
+      walletState === WalletState.Connected &&
+      chainName === currentChainName,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });

@@ -311,7 +311,7 @@ function Header() {
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers, chainId, logoURIs, prettyName, networkType },
+    selectedChain: { explorers, logoURIs, prettyName, networkType },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
@@ -732,15 +732,7 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   connectedWallet.disconnect();
-                                  if (
-                                    connectedWallet.isInterchain &&
-                                    interchainWallet
-                                  ) {
-                                    interchainWallet.disconnect(chainId);
-                                  }
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 100);
+                                  walletPopover.close();
                                 }}
                               >
                                 Disconnect

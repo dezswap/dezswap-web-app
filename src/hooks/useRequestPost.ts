@@ -1,9 +1,15 @@
-import { ConnectType, CreateTxFailed, TxResult } from "@xpla/wallet-provider";
+import {
+  ConnectType,
+  CreateTxFailed,
+  TxFailed,
+  TxResult,
+} from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { DeliverTxResponse } from "@xpla/xplajs/types";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 import useConnectedWallet from "./useConnectedWallet";
@@ -40,8 +46,23 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
             signingClient,
           );
           if (connectedWallet.isInterchain && result) {
-            const { transactionHash } = result as DeliverTxResponse;
-            setTxHash(transactionHash);
+            const { transactionHash, code, rawLog } =
+              result as DeliverTxResponse;
+            if (code !== 0) {
+              setTxError(
+                new TxFailed(
+                  {
+                    ...createTxOptions,
+                    ...convertProtoToAminoMsg(createTxOptions.msgs),
+                  },
+                  transactionHash,
+                  rawLog || "",
+                  rawLog,
+                ),
+              );
+            } else {
+              setTxHash(transactionHash);
+            }
           } else {
             const { result: res } = (result as TxResult) ?? {};
             setTxHash(res?.txhash);
@@ -127,7 +148,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
       confirmationModal.open();
     },
-    [confirmationModal, postTx],
+    [confirmationModal, connectedWallet.isInterchain, postTx],
   );
 
   return { requestPost };
