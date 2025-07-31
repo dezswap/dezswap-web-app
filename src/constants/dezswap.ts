@@ -78,13 +78,17 @@ export const contractAddresses: {
   },
 };
 
-export const getGasInfo = (chainName: string) => ({
-  multiplier: 1.2,
-  gasPrice: {
-    amount: new Decimal("280000000000"),
-    denom: nativeTokens[chainName]?.[0]?.token ?? "",
-  },
-});
+export const getGasInfo = (chainName: string) => {
+  if (chainName.includes("xpla"))
+    return {
+      multiplier: 1.2,
+      gasPrice: {
+        amount: new Decimal("280000000000"),
+        denom: nativeTokens[chainName]?.[0]?.token ?? "",
+      },
+    };
+  return undefined;
+};
 export const LP_DECIMALS = 6;
 export const LOCKED_LP_SUPPLY = 1_000;
 
