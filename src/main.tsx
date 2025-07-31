@@ -16,7 +16,6 @@ import {
   CHAIN_NAME_SEARCH_PARAM,
   getAssetList,
   DefaultChainName,
-  getRpcEndpoint,
   getChain,
 } from "constants/dezswap";
 import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
@@ -47,14 +46,8 @@ const interchainOptions = {
       };
     },
   },
-  endpointOptions: {
-    endpoints: {
-      injective: {
-        rpc: [getRpcEndpoint(chainName)],
-      },
-    },
-  },
 };
+
 getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>
