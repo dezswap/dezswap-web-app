@@ -1,4 +1,9 @@
-import { ConnectType, CreateTxFailed, TxResult } from "@xpla/wallet-provider";
+import {
+  ConnectType,
+  CreateTxFailed,
+  TxFailed,
+  TxResult,
+} from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { DeliverTxResponse } from "@xpla/xplajs/types";
@@ -36,8 +41,23 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
             msgs: createTxOptions.msgs,
           });
           if (connectedWallet.isInterchain && result) {
-            const { transactionHash } = result as DeliverTxResponse;
-            setTxHash(transactionHash);
+            const { transactionHash, code, rawLog } =
+              result as DeliverTxResponse;
+            if (code !== 0) {
+              setTxError(
+                new TxFailed(
+                  {
+                    ...createTxOptions,
+                    ...convertProtoToAminoMsg(createTxOptions.msgs),
+                  },
+                  transactionHash,
+                  rawLog || "",
+                  rawLog,
+                ),
+              );
+            } else {
+              setTxHash(transactionHash);
+            }
           } else {
             const { result: res } = result as TxResult;
             setTxHash(res.txhash);
@@ -57,7 +77,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         }
       }
     },
-    [connectedWallet.walletAddress, txBroadcastModal],
+    [connectedWallet, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {
@@ -119,7 +139,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
       confirmationModal.open();
     },
-    [confirmationModal, postTx],
+    [confirmationModal, connectedWallet.isInterchain, postTx],
   );
 
   return { requestPost };

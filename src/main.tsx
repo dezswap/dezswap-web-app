@@ -17,23 +17,38 @@ import {
   DefaultChain,
   DefaultRpcEndpoint,
 } from "constants/dezswap";
+import { WCWallet } from "@interchain-kit/core";
 
 window.ResizeObserver = ResizeObserver;
 
 const queryClient = new QueryClient();
+const defaultOption = {
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  relayUrl: "wss://relay.walletconnect.org",
+  metadata: {
+    name: "Dezswap",
+    description: "Dezswap",
+    url: window.location.origin,
+    icons: [
+      "https://walletconnect.com/walletconnect-logo.png",
+      "https://app.dezswap.io/favicon.svg",
+    ],
+  },
+};
+const walletConnect = new WCWallet(undefined, defaultOption);
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+
 const interchainOptions = {
   chains: DefaultChain,
   assetLists: DefaultAssetList,
-  wallets: [keplrWallet, cosmostationWallet],
+  wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
     signing: () => {
       return {
         signerOptions: defaultSignerOptions.Cosmos,
         broadcast: {
           checkTx: true,
-          deliverTx: true,
         },
       };
     },
@@ -50,8 +65,6 @@ getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>
       <ChainProvider {...interchainOptions}>
-        {/* TODO fix type error */}
-        {/* @ts-ignore */}
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
             <App />

@@ -58,7 +58,7 @@ function InputGroup({
   const screenClass = useScreenClass();
   const theme = useTheme();
   const balance = useBalance(asset?.token);
-  const dashboardToken = useDashboardTokenDetail(asset?.token || "");
+  const dashboardToken = useDashboardTokenDetail(asset?.token);
 
   const expectedUsdValue = useMemo(() => {
     try {

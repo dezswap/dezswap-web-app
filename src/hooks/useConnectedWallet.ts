@@ -13,11 +13,28 @@ import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
+import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 
 const resetWalletValue = {
   walletAddress: "",
   isInterchain: false,
 };
+
+// FIXME: remove this temporary function once the type error in signAndBroadcastSync is fixed
+function base64ToUint8Array(data: string | Uint8Array) {
+  if (typeof data !== "string") return data;
+  const binaryString = atob(data);
+
+  const len = binaryString.length;
+
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i += 1) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
+}
 
 const useConnectedWallet = () => {
   const { signingClient } = useSigningClient();
@@ -76,14 +93,17 @@ const useConnectedWallet = () => {
   const prevDataString = useRef("");
 
   const post = useCallback(
-    (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
+    async (tx: NewMsgTxOptions, walletApp?: WalletApp | boolean) => {
       if (walletInfo.isInterchain) {
         const { executeContract } = MessageComposer.fromPartial;
         const messages = tx.msgs.map((txOption) => executeContract(txOption));
         if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
           throw new Error("PostError: Fee Not Found");
         }
-        return signingClient?.signAndBroadcastSync(
+        if (!signingClient) {
+          throw new Error("signingClient is not found");
+        }
+        const signResult = await signingClient.sign(
           walletInfo.walletAddress,
           messages,
           {
@@ -97,7 +117,20 @@ const useConnectedWallet = () => {
             ],
             gas: tx.fee.gas_limit.toString(),
           },
+          "",
         );
+
+        const txRaw = {
+          ...signResult,
+          authInfoBytes: base64ToUint8Array(signResult.authInfoBytes),
+          bodyBytes: base64ToUint8Array(signResult.bodyBytes),
+          signatures: signResult.signatures,
+        };
+
+        const txBytes = TxRaw.encode(txRaw).finish();
+        return signingClient.broadcastTxSync(txBytes);
+        // Temporarily using this method due to type mismatch between base64 and Uint8Array
+        // TODO: Use signAndBroadcastSync after InterchainKit update fixes the issue
       }
       return connectedXplaWallet?.post(
         { ...tx, ...convertProtoToAminoMsg(tx.msgs) },
@@ -132,14 +165,15 @@ const useConnectedWallet = () => {
   );
 
   const disconnect = useCallback(async () => {
-    wallet.disconnect();
-
     if (walletInfo.isInterchain && wm.currentWalletName) {
       await wm.disconnect(wm.currentWalletName, chainName);
+    } else {
+      wallet.disconnect();
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
   }, [chainName, wallet, walletInfo.isInterchain, wm]);
 
   useEffect(() => {

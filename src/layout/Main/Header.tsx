@@ -312,7 +312,7 @@ function Header() {
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers, chainId, logoURIs, prettyName },
+    selectedChain: { explorers, logoURIs, prettyName },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
@@ -721,15 +721,7 @@ function Header() {
                                 `}
                                 onClick={() => {
                                   connectedWallet.disconnect();
-                                  if (
-                                    connectedWallet.isInterchain &&
-                                    interchainWallet
-                                  ) {
-                                    interchainWallet.disconnect(chainId);
-                                  }
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 100);
+                                  walletPopover.close();
                                 }}
                               >
                                 Disconnect
