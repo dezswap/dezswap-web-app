@@ -4,7 +4,7 @@ import Modal from "components/Modal";
 import {
   CHAIN_ICONS,
   CHAIN_NAME_SEARCH_PARAM,
-  DefaultChains,
+  SupportedChains,
 } from "constants/dezswap";
 import {
   DEFAULT_GUTTER_WIDTH,
@@ -98,7 +98,7 @@ function ChainModal(modalProps: ReactModal.Props) {
               }
         }
       >
-        {DefaultChains.sort(
+        {SupportedChains.sort(
           (a, b) => b.chainName.charCodeAt(0) - a.chainName.charCodeAt(0),
         ).map((chain) => (
           <ChainsWrapper

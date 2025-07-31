@@ -4,7 +4,7 @@ import Hr from "components/Hr";
 import Modal from "components/Modal";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
-import { SupportedChain, supportedChains } from "constants/dezswap";
+import { XplaChainNames, xplaChains } from "constants/dezswap";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useNotifications from "hooks/useNotifications";
 import { useEffect, useRef, useState } from "react";
@@ -149,8 +149,7 @@ function NotificationModal(modalProps: ReactModal.Props) {
         <>
           {!!notifications?.length &&
             notifications.map((notification) => {
-              const chain =
-                supportedChains[notification.chain as SupportedChain];
+              const chain = xplaChains[notification.chain as XplaChainNames];
               return (
                 <NotificationItem
                   key={notification.id}
