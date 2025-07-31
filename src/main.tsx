@@ -4,10 +4,7 @@ import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  defaultSignerOptions,
-  defaultSignerOptions as xplaSignerOptions,
-} from "@xpla/xpla/defaults";
+import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -17,12 +14,13 @@ import "simplebar/dist/simplebar.css";
 import "utils/overrideXplaNumeric";
 import {
   CHAIN_NAME_SEARCH_PARAM,
-  getDefaultAssetList,
+  getAssetList,
   DefaultChainName,
-  getDefaultRpcEndpoint,
-  getDefaultChain,
+  getRpcEndpoint,
+  getChain,
 } from "constants/dezswap";
 import { WCWallet } from "@interchain-kit/core";
+import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
 
 window.ResizeObserver = ResizeObserver;
 
@@ -48,8 +46,8 @@ const walletConnect = new WCWallet(undefined, defaultOption);
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 const interchainOptions = {
-  chains: getDefaultChain(chainName),
-  assetLists: getDefaultAssetList(chainName),
+  chains: getChain(chainName),
+  assetLists: getAssetList(chainName),
   wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
     signing: () => {
@@ -66,7 +64,7 @@ const interchainOptions = {
   endpointOptions: {
     endpoints: {
       injective: {
-        rpc: [getDefaultRpcEndpoint(chainName)],
+        rpc: [getRpcEndpoint(chainName)],
       },
     },
   },

@@ -5,25 +5,25 @@ import iconXplaGray from "assets/icons/icon-chain-xpla-gray-32px.svg";
 import iconASI from "assets/icons/icon-chain-asi-32px.svg";
 import { nativeTokens } from "./network";
 
-export type SupportedChain = "dimension" | "cube";
+export type XplaChainNames = "dimension" | "cube";
 export const DefaultChainName = "xpla";
 const supportChainNames = ["xpla", "fetch"];
 
-export const DefaultChains = chains.filter((chain) =>
+export const SupportedChains = chains.filter((chain) =>
   supportChainNames.some((keyword) => chain.chainName.includes(keyword)),
 );
-export const getDefaultChain = (searchName: string) =>
+export const getChain = (searchName: string) =>
   chains.filter((chain) => chain.chainName === searchName);
 
-export const getDefaultRpcEndpoint = (searchName: string) =>
+export const getRpcEndpoint = (searchName: string) =>
   chains.filter((chain) => chain.chainName === searchName)[0]?.apis?.rpc?.[0]
     ?.address || "";
 
-export const getDefaultAssetList = (searchName: string) =>
+export const getAssetList = (searchName: string) =>
   assetLists.filter((assetList) => assetList.chainName === searchName);
 
-export const supportedChains: {
-  [K in SupportedChain]: {
+export const xplaChains: {
+  [K in XplaChainNames]: {
     network: string;
     name: string;
     isMainnet: boolean;
