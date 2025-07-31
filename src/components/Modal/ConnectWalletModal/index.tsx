@@ -72,7 +72,7 @@ function QrModalContent({ uri }: { uri: string }) {
       }}
     >
       <Typography color={theme.colors.primary} size={16} weight={400}>
-        Please scan the QR code below with your Keplr to connect with Dezswap.
+        Please scan the QR code below with your wallet to connect with Dezswap.
       </Typography>
       <div
         style={{
