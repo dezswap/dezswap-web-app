@@ -4853,7 +4853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xpla/xplajs@npm:^1.7.0, @xpla/xplajs@npm:^1.7.0-beta.12":
+"@xpla/xplajs@npm:^1.7.0":
   version: 1.7.0
   resolution: "@xpla/xplajs@npm:1.7.0"
   dependencies:
@@ -6341,7 +6341,7 @@ __metadata:
     "@xpla/wallet-provider": "npm:^0.4.1"
     "@xpla/xpla": "npm:^1.7.0"
     "@xpla/xpla.js": "npm:^0.3.1"
-    "@xpla/xplajs": "npm:^1.7.0-beta.12"
+    "@xpla/xplajs": "npm:^1.7.0"
     axios: "npm:^1.1.3"
     buffer: "npm:^6.0.3"
     cosmjs-types: "npm:^0.7.2"

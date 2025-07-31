@@ -23,7 +23,7 @@ window.ResizeObserver = ResizeObserver;
 
 const queryClient = new QueryClient();
 const defaultOption = {
-  projectId: "bb7c346a9734b19a12c5d5828fa48eb8",
+  projectId: import.meta.env.VITE_PROJECT_ID,
   relayUrl: "wss://relay.walletconnect.org",
   metadata: {
     name: "Dezswap",
@@ -49,7 +49,6 @@ const interchainOptions = {
         signerOptions: defaultSignerOptions.Cosmos,
         broadcast: {
           checkTx: true,
-          deliverTx: true,
         },
       };
     },
