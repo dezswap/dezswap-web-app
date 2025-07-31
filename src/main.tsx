@@ -14,10 +14,10 @@ import "simplebar/dist/simplebar.css";
 import "utils/overrideXplaNumeric";
 import {
   CHAIN_NAME_SEARCH_PARAM,
-  getDefaultAssetList,
+  getAssetList,
   DefaultChainName,
-  getDefaultRpcEndpoint,
-  getDefaultChain,
+  getRpcEndpoint,
+  getChain,
 } from "constants/dezswap";
 import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
 
@@ -30,8 +30,8 @@ const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 const interchainOptions = {
-  chains: getDefaultChain(chainName),
-  assetLists: getDefaultAssetList(chainName),
+  chains: getChain(chainName),
+  assetLists: getAssetList(chainName),
   walletModal: InterchainWalletModal,
   wallets: [keplrWallet, cosmostationWallet],
   signerOptions: {
@@ -50,7 +50,7 @@ const interchainOptions = {
   endpointOptions: {
     endpoints: {
       injective: {
-        rpc: [getDefaultRpcEndpoint(chainName)],
+        rpc: [getRpcEndpoint(chainName)],
       },
     },
   },
