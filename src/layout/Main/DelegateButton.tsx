@@ -25,7 +25,7 @@ const Button = styled.a`
   }
 
   &:hover * {
-    animation: none;
+    animation: none !important;
     animation-play-state: paused !important;
   }
 `;

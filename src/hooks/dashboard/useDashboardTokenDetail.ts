@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAPI from "hooks/useAPI";
 import useNetwork from "hooks/useNetwork";
 
-const useDashboardTokenDetail = (tokenAddress: string) => {
+const useDashboardTokenDetail = (tokenAddress?: string) => {
   const {
     selectedChain: { chainId },
   } = useNetwork();
@@ -11,6 +11,8 @@ const useDashboardTokenDetail = (tokenAddress: string) => {
   const { data } = useQuery({
     queryKey: ["dashboard", "token", tokenAddress, chainId],
     queryFn: async () => {
+      if (!tokenAddress) throw new Error("tokenAddress is undefined");
+
       try {
         const res = await api.dashboard.getTokenDetail(tokenAddress);
         return res;
@@ -18,6 +20,8 @@ const useDashboardTokenDetail = (tokenAddress: string) => {
         return null;
       }
     },
+    enabled: !!tokenAddress,
+    staleTime: 1000 * 60 * 5,
   });
 
   return data;

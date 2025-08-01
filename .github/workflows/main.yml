@@ -30,6 +30,8 @@ jobs:
         run: yarn
 
       - name: Build
+        env:
+          VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
         run: CI=false yarn build
 
       - name: Transfer to S3 for serving static

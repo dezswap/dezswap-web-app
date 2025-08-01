@@ -40,12 +40,17 @@ interface MarqueeProps extends React.PropsWithChildren {
 
 function Marquee({ children, duration, direction = "left" }: MarqueeProps) {
   const animationDirection = direction === "left" ? "normal" : "reverse";
+  let animationDuration = "1000ms";
+  if (duration) {
+    animationDuration =
+      typeof duration === "number" ? `${duration}ms` : duration;
+  }
+
   return (
     <MarqueeContainer>
       <MarqueeContent
         style={{
-          animationDuration:
-            typeof duration === "number" ? `${duration}ms` : duration,
+          animationDuration,
           animationDirection,
         }}
       >

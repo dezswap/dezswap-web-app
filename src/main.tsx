@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { ChainProvider, InterchainWalletModal } from "@interchain-kit/react";
+import { ChainProvider } from "@interchain-kit/react";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
@@ -19,6 +19,7 @@ import {
   getChain,
 } from "constants/dezswap";
 import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
+import { WCWallet } from "@interchain-kit/core";
 
 window.ResizeObserver = ResizeObserver;
 
@@ -26,13 +27,27 @@ const params = new URLSearchParams(window.location.search);
 const chainName = params.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
 
 const queryClient = new QueryClient();
+const defaultOption = {
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  relayUrl: "wss://relay.walletconnect.org",
+  metadata: {
+    name: "Dezswap",
+    description: "Dezswap",
+    url: window.location.origin,
+    icons: [
+      "https://walletconnect.com/walletconnect-logo.png",
+      "https://app.dezswap.io/favicon.svg",
+    ],
+  },
+};
+const walletConnect = new WCWallet(undefined, defaultOption);
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+
 const interchainOptions = {
   chains: getChain(chainName),
   assetLists: getAssetList(chainName),
-  walletModal: InterchainWalletModal,
-  wallets: [keplrWallet, cosmostationWallet],
+  wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
     signing: () => {
       return {
@@ -41,7 +56,6 @@ const interchainOptions = {
           : defaultSignerOptions,
         broadcast: {
           checkTx: true,
-          deliverTx: true,
         },
       };
     },

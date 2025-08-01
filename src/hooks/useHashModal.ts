@@ -19,11 +19,11 @@ const useHashModal = (customId?: string) => {
     (flag = true) => {
       if (flag) {
         if (!isOpen) {
-          navigate({ ...location, hash: hookId });
+          navigate({ ...location, hash: hookId }, { replace: true });
         }
         return;
       }
-      navigate({ ...location, hash: undefined });
+      navigate({ ...location, hash: "" }, { replace: true });
     },
     [hookId, isOpen, location, navigate],
   );

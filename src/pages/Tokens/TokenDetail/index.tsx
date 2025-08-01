@@ -37,11 +37,11 @@ import useBalance from "hooks/useBalance";
 import ScrollToTop from "components/ScrollToTop";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import Link from "components/Link";
 import Chart from "./Chart";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
 import TokenPools from "./TokenPools";
-import Link from "components/Link";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -64,7 +64,7 @@ function TokenDetailPage() {
     },
   });
 
-  const dashboardToken = useDashboardTokenDetail(tokenAddress || "");
+  const dashboardToken = useDashboardTokenDetail(tokenAddress);
 
   const { getAsset } = useAssets();
 

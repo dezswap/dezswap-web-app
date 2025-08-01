@@ -93,8 +93,8 @@ function WithdrawPage() {
     [getAsset, pair],
   );
 
-  const dashboardToken1 = useDashboardTokenDetail(asset1?.token || "");
-  const dashboardToken2 = useDashboardTokenDetail(asset2?.token || "");
+  const dashboardToken1 = useDashboardTokenDetail(asset1?.token);
+  const dashboardToken2 = useDashboardTokenDetail(asset2?.token);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
