@@ -7,7 +7,7 @@ import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
@@ -115,16 +115,13 @@ function PoolItem({
     chainName,
     selectedChain: { explorers },
   } = useNetwork();
-  const { getAsset } = useAssets();
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
   const lpBalance = useBalance(pair?.liquidity_token);
   const dashboardPoolDetail = useDashboardPoolDetail(pool.address);
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
   const userShare = useMemo(() => {
     return (

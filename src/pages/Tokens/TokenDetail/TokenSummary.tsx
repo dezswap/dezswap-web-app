@@ -7,6 +7,7 @@ import Hr from "components/Hr";
 import Panel from "components/Panel";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { useMemo } from "react";
 import { Row, Col } from "react-grid-system";
@@ -63,17 +64,12 @@ function PriceAndChangeRate({
 }
 
 function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
-  const { getAsset } = useAssets();
   const { tokens } = useDashboard();
+  const { data: asset } = useAsset(tokenAddress);
 
   const dashboardToken = useMemo(() => {
     return tokens?.find((token) => token.address === tokenAddress);
   }, [tokens, tokenAddress]);
-
-  const asset = useMemo(() => {
-    return tokenAddress ? getAsset(tokenAddress) : undefined;
-  }, [tokenAddress, getAsset]);
-
   return (
     <Panel shadow>
       <Wrapper>

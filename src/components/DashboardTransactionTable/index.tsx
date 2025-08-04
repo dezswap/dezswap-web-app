@@ -61,7 +61,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
   const [selectedFilterTabIndex, setSelectedFilterTabIndex] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const [page, setPage] = useState(1);
 
   const [sortBy, setSortBy] =
@@ -72,8 +72,8 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
   const filteredData = useMemo(() => {
     return data.filter((item) => {
       if (searchKeyword) {
-        const asset0 = getAsset(item.asset0);
-        const asset1 = getAsset(item.asset1);
+        const asset0 = assetInfos?.[item.asset0];
+        const asset1 = assetInfos?.[item.asset1];
 
         if (
           ![
@@ -100,7 +100,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
       }
       return true;
     });
-  }, [data, selectedFilterTabIndex, searchKeyword, getAsset]);
+  }, [data, selectedFilterTabIndex, searchKeyword, assetInfos]);
 
   const sortedData = useMemo(() => {
     return filteredData.toSorted(getBasicSortFunction(sortBy, sortDirection));
@@ -256,7 +256,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               width: 185,
               hasSort: true,
               render(amount, row) {
-                const asset = getAsset(row.asset0);
+                const asset = assetInfos?.[row.asset0];
                 return (
                   amount && (
                     <AssetValueFormatter asset={asset} amount={amount} />
@@ -270,7 +270,7 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               width: 185,
               hasSort: true,
               render(amount, row) {
-                const asset = getAsset(row.asset1);
+                const asset = assetInfos?.[row.asset1];
                 return (
                   amount && (
                     <AssetValueFormatter asset={asset} amount={amount} />

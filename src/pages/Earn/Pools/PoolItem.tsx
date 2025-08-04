@@ -3,7 +3,7 @@ import { Numeric } from "@xpla/xpla.js";
 import IconButton from "components/IconButton";
 import Typography from "components/Typography";
 import { LP_DECIMALS } from "constants/dezswap";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useBalance from "hooks/useBalance";
 import useNetwork from "hooks/useNetwork";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -201,7 +201,7 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const { getAsset } = useAssets();
+
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -209,11 +209,8 @@ function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
   const pair = useMemo(() => getPair(poolAddress), [getPair, poolAddress]);
   const lpBalance = useBalance(pair?.liquidity_token);
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
-
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
   const userShare = useMemo(() => {
     return (
       Numeric.parse(lpBalance || "0")

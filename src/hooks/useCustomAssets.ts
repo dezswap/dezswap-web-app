@@ -7,10 +7,15 @@ import { getIbcTokenHash, isNativeTokenAddress } from "utils";
 import { nativeTokens } from "constants/network";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
-import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
+import {
+  getQueryData,
+  hasChainPrefix,
+  parseJsonFromBinary,
+} from "utils/dezswap";
 import useRPCClient from "./useRPCClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
+import usefetchDecimal from "./usefetchDecimal";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -18,18 +23,17 @@ const useCustomAssets = () => {
   const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
-
   const { client } = useRPCClient();
   const {
     chainName,
     selectedChain: { chainId },
   } = useNetwork();
+  const { fetchDecimal } = usefetchDecimal();
   const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
     xpla: [],
     xplatestnet: [],
   });
   const isFetching = useRef(false);
-
   const fetchAsset = useCallback(async () => {
     isFetching.current = true;
     try {
@@ -142,10 +146,13 @@ const useCustomAssets = () => {
   ]);
 
   const addFetchQueue = useCallback(
-    (address: string, networkName: string) => {
+    async (address: string, networkName: string) => {
+      const isValidate =
+        hasChainPrefix(address) && (await fetchDecimal(address)) !== undefined;
+
       if (
         nativeTokens[networkName]?.some((item) => item.token === address) ||
-        AccAddress.validate(address) ||
+        isValidate ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
@@ -156,11 +163,11 @@ const useCustomAssets = () => {
         fetchAsset();
       }
     },
-    [fetchAsset, verifiedIbcAssets],
+    [fetchAsset, verifiedIbcAssets, fetchDecimal],
   );
 
   const getAsset = useCallback(
-    (address: string): Partial<Token> | undefined => {
+    async (address: string): Promise<Partial<Token> | undefined> => {
       const asset = customAssetStore[chainName]?.find(
         (item) => item.token === address,
       );
@@ -168,7 +175,7 @@ const useCustomAssets = () => {
         return undefined;
       }
       if (window.navigator.onLine) {
-        addFetchQueue(asset.token, chainName);
+        await addFetchQueue(asset.token, chainName);
       }
       return asset;
     },
@@ -176,7 +183,7 @@ const useCustomAssets = () => {
   );
 
   const addCustomAsset = useCallback(
-    (asset: Token) => {
+    async (asset: Token) => {
       const store = customAssetStore[chainName] || [];
       const index = store.findIndex((item) => item.token === asset.token);
       if (index >= 0) {
@@ -188,7 +195,7 @@ const useCustomAssets = () => {
         ...current,
         [chainName]: store,
       }));
-      addFetchQueue(asset.token, chainName);
+      await addFetchQueue(asset.token, chainName);
     },
     [addFetchQueue, customAssetStore, chainName, setCustomAssetStore],
   );
