@@ -5,14 +5,14 @@ import useCustomAssets from "hooks/useCustomAssets";
 import { useQuery } from "@tanstack/react-query";
 import { Token } from "types/api";
 import useNativeTokens from "./useNativeTokens";
-import usefetchDecimal from "./usefetchDecimal";
+import useFetchDecimal from "./useFetchDecimal";
 
 const useAssets = () => {
   const api = useAPI();
   const { chainName } = useNetwork();
   const { nativeTokens } = useNativeTokens();
   const { getCustomAsset, customAssets } = useCustomAssets();
-  const { fetchDecimal } = usefetchDecimal();
+  const { fetchDecimal } = useFetchDecimal();
   const { data: assets } = useQuery({
     queryKey: ["assets", chainName],
     queryFn: async () => {
