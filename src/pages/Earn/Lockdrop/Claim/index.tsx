@@ -22,7 +22,6 @@ import {
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -31,6 +30,7 @@ import useAPI from "hooks/useAPI";
 import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
 import useConnectedWallet from "hooks/useConnectedWallet";
@@ -51,11 +51,10 @@ const Box = styled(box)`
 function ClaimPage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { chainName } = useNetwork();
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
 
@@ -64,7 +63,7 @@ function ClaimPage() {
 
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
-
+  const { nativeTokens } = useNativeTokens();
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -132,11 +131,9 @@ function ClaimPage() {
   const { fee } = useFee(createTxOptions);
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
+      fee?.amount?.get(fees?.feeTokens[0]?.denom)?.amount.toString() || "0"
     );
-  }, [chainName, fee?.amount]);
+  }, [fee?.amount, fees?.feeTokens[0]]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -278,7 +275,11 @@ function ClaimPage() {
                     value: feeAmount ? (
                       <AssetValueFormatter
                         asset={{
-                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
                         }}
                         amount={feeAmount}
                       />

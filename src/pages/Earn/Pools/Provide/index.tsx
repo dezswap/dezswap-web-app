@@ -31,7 +31,7 @@ import { AccAddress, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { XPLA_ADDRESS } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
@@ -53,6 +53,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { useNavigate } from "hooks/useNavigate";
+import useNativeTokens from "hooks/useNativeTokens";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 export enum FormKey {
@@ -76,12 +77,11 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
-    chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();
-
+  const { nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -206,12 +206,8 @@ function ProvidePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
-    );
-  }, [chainName, fee?.amount]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 
@@ -550,7 +546,11 @@ function ProvidePage() {
                           value: feeAmount ? (
                             <AssetValueFormatter
                               asset={{
-                                symbol: nativeTokens?.[chainName]?.[0].symbol,
+                                symbol:
+                                  nativeTokens.find(
+                                    (token) =>
+                                      token.token === fees.feeTokens[0]?.denom,
+                                  )?.symbol || "",
                               }}
                               amount={feeAmount}
                             />
@@ -656,7 +656,11 @@ function ProvidePage() {
                           value: feeAmount ? (
                             <AssetValueFormatter
                               asset={{
-                                symbol: nativeTokens?.[chainName]?.[0].symbol,
+                                symbol:
+                                  nativeTokens.find(
+                                    (token) =>
+                                      token.token === fees.feeTokens[0]?.denom,
+                                  )?.symbol || "",
                               }}
                               amount={feeAmount}
                             />

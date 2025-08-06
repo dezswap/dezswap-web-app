@@ -12,7 +12,6 @@ import useLockdropEvents from "hooks/useLockdropEvents";
 import { amountToValue, ellipsisCenter, getTokenLink } from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
@@ -26,9 +25,10 @@ import { useNavigate } from "hooks/useNavigate";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
-import InputGroup from "../Stake/InputGroup";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import iconLink from "assets/icons/icon-link.svg";
+import useNativeTokens from "hooks/useNativeTokens";
+import InputGroup from "../Stake/InputGroup";
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -36,13 +36,12 @@ function UnlockPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    chainName,
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
-
+  const { nativeTokens } = useNativeTokens();
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
 
@@ -108,12 +107,8 @@ function UnlockPage() {
   const { fee } = useFee(txOptions);
 
   const feeAmount = useMemo(() => {
-    return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
-    );
-  }, [chainName, fee?.amount]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -209,7 +204,11 @@ function UnlockPage() {
                     value: feeAmount ? (
                       <AssetValueFormatter
                         asset={{
-                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
                         }}
                         amount={feeAmount}
                       />

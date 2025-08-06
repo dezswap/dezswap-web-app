@@ -9,6 +9,7 @@ import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { DeliverTxResponse } from "@xpla/xplajs/types";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { TxError } from "types/common";
+import { convertProtoToAminoMsg } from "utils/dezswap";
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 import useConnectedWallet from "./useConnectedWallet";

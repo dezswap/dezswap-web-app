@@ -33,7 +33,6 @@ import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { nativeTokens } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -46,6 +45,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import useConnectedWallet from "hooks/useConnectedWallet";
+import useNativeTokens from "hooks/useNativeTokens";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
@@ -65,10 +65,9 @@ function WithdrawPage() {
   const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
-    chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
-
+  const { nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -111,7 +110,7 @@ function WithdrawPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -186,12 +185,8 @@ function WithdrawPage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
-    );
-  }, [chainName, fee?.amount]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -484,7 +479,11 @@ function WithdrawPage() {
                     value: (
                       <AssetValueFormatter
                         asset={{
-                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
                         }}
                         amount={feeAmount}
                       />

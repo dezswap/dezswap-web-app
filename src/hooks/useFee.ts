@@ -2,11 +2,13 @@ import { useDeferredValue, useEffect, useState } from "react";
 import { Coin, Fee } from "@xpla/xpla.js";
 import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
+import { valueToAmount, formatDecimals } from "utils";
 import { AxiosError } from "axios";
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
 import useAuthSequence from "./useAuthSequence";
+import useNetwork from "./useNetwork";
 
 const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const { walletAddress } = useConnectedWallet();
@@ -15,12 +17,12 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const api = useAPI();
-  const { sequence } = useAuthSequence();
+  const { sequence, isLoading: isSequenceLoading } = useAuthSequence();
   const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
   const { executeContract } = MessageComposer.encoded;
   const messages = deferredCreateTxOptions?.map((msg) => executeContract(msg));
-
+  const { chainName } = useNetwork();
   useEffect(() => {
     setIsLoading(true);
     setIsFailed(false);
@@ -28,7 +30,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!walletAddress || !deferredCreateTxOptions) {
+    if (!walletAddress || !deferredCreateTxOptions || isSequenceLoading) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -46,11 +48,20 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
         }
 
         const res = await api.estimateFee(messages, sequence);
-
         if (res && !isAborted) {
+          if (chainName.includes("xpla")) {
+            setFee(
+              new Fee(Number(res.gas), [
+                new Coin(res.amount[0].denom, res.amount[0].amount),
+              ]),
+            );
+          }
           setFee(
             new Fee(Number(res.gas), [
-              new Coin(res.amount[0].denom, res.amount[0].amount),
+              new Coin(
+                res.amount[0].denom,
+                valueToAmount(res.amount[0].amount, 8)?.toString() || "0",
+              ),
             ]),
           );
           setErrMsg("");

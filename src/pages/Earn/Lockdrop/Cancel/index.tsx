@@ -26,7 +26,6 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { nativeTokens } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
@@ -36,10 +35,11 @@ import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
+import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import InputGroup from "../Stake/InputGroup";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`
   & > * {
@@ -56,13 +56,13 @@ function CancelPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
-  const { chainName } = useNetwork();
+  const { nativeTokens } = useNativeTokens();
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -143,12 +143,8 @@ function CancelPage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
-    );
-  }, [chainName, fee?.amount]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const { requestPost } = useRequestPost(handleModalClose);
 
@@ -312,7 +308,10 @@ function CancelPage() {
                   value: feeAmount ? (
                     <AssetValueFormatter
                       asset={{
-                        symbol: nativeTokens?.[chainName]?.[0].symbol,
+                        symbol:
+                          nativeTokens.find(
+                            (token) => token.token === fees.feeTokens[0]?.denom,
+                          )?.symbol || "",
                       }}
                       amount={feeAmount}
                     />
