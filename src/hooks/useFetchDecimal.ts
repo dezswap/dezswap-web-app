@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import useAPI from "hooks/useAPI";
 import { useQueryClient } from "@tanstack/react-query";
 
-const usefetchDecimal = () => {
+const useFetchDecimal = () => {
   const api = useAPI();
   const queryClient = useQueryClient();
 
@@ -28,4 +28,4 @@ const usefetchDecimal = () => {
   );
 };
 
-export default usefetchDecimal;
+export default useFetchDecimal;
