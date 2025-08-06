@@ -15,6 +15,7 @@ import {
   DashboardTokensResponse,
   DashboardTransactionsResponse,
 } from "types/dashboard-api";
+import { isNativeToken } from "utils";
 
 export type ApiVersion = "v1";
 
@@ -59,6 +60,10 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
       async getToken(address: string) {
         const res = await apiClient.get<Token>(`/tokens/${address}`);
         return res.data;
+      },
+      async getNativeToken() {
+        const res = await apiClient.get<Token[]>(`/tokens`);
+        return res.data.filter((token) => isNativeToken(token.token));
       },
       async getNotices(params?: {
         chain?: string;

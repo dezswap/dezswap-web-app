@@ -1,38 +1,49 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import useAPI from "./useAPI";
+import useNetwork from "./useNetwork";
 import useSigningClient from "./useSigningClient";
 import useConnectedWallet from "./useConnectedWallet";
+import { useMemo } from "react";
 
 function useAuthSequence() {
   const api = useAPI();
-  const [sequence, setSequence] = useState(0n);
   const { signingClient: client } = useSigningClient();
-  const { walletAddress, isInterchain } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet();
+  const { chainName } = useNetwork();
+  const isXpla = useMemo(() => chainName.includes("xpla"), [chainName]);
 
-  useEffect(() => {
-    const fetchAuthInfo = async () => {
-      if (isInterchain) {
-        try {
-          const authSequence = await client?.getSequence(walletAddress);
-
-          setSequence(authSequence || 0n);
-        } catch (error) {
-          console.error("Failed to fetch auth info:", error);
-        }
-      } else {
-        try {
-          const { sequence: authSequence } = (await api.getAuthInfo()) || {};
-          setSequence(authSequence || 0n);
-        } catch (error) {
-          console.error("Failed to fetch auth info:", error);
-        }
+  const { data: sequence, isLoading } = useQuery({
+    queryKey: ["authSequence", walletAddress, chainName, isXpla, !!client],
+    queryFn: async (): Promise<bigint> => {
+      if (!walletAddress || !chainName) {
+        throw new Error("Wallet address or chain name is not available");
       }
-    };
 
-    fetchAuthInfo();
-  }, [api, client, walletAddress]);
+      try {
+        if (isXpla) {
+          const authInfo = await api.getAuthInfo();
+          const { sequence: authSequence } = authInfo || {};
+          return authSequence ?? 0n;
+        }
+        if (!client) {
+          throw new Error("Signing client is not available");
+        }
+        const clientSequence = await client.getSequence(walletAddress);
+        return clientSequence ?? 0n;
+      } catch (err) {
+        console.error("Failed to get auth sequence:", err);
+        throw err;
+      }
+    },
+    enabled: !api.isLoading && !!walletAddress && !!chainName,
+    retry: 3,
+    staleTime: 0,
+  });
 
-  return { sequence };
+  return {
+    sequence: sequence ?? 0n,
+    isLoading,
+  };
 }
 
 export default useAuthSequence;

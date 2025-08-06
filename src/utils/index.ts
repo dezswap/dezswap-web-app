@@ -1,5 +1,5 @@
 import { Numeric } from "@xpla/xpla.js";
-import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { IBC_PREFIX, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 import { DashboardChartItem } from "types/dashboard-api";
 
@@ -13,9 +13,6 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
-
-export const isNativeTokenAddress = (network: string, address: string) =>
-  nativeTokens[network].filter((n) => n.token === address).length > 0;
 
 export const ellipsisCenter = (text = "", letterCountPerSide = 6) => {
   if (text.length <= letterCountPerSide * 2 + 3) {
@@ -283,4 +280,11 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
   } catch (error) {
     return initialValue;
   }
+};
+
+export const isNativeToken = (denom: string): boolean => {
+  if (denom.startsWith("ibc/")) return false;
+  if (denom.startsWith("factory/")) return false;
+  if (/^[a-z]+1[0-9a-z]{10,}$/.test(denom)) return false;
+  return true;
 };

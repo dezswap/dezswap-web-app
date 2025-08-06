@@ -3,14 +3,14 @@ import { useAtom } from "jotai";
 import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
-import { getIbcTokenHash, isNativeTokenAddress } from "utils";
-import { nativeTokens } from "constants/network";
+import { getIbcTokenHash } from "utils";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
 import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
 import useRPCClient from "./useRPCClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
+import useNativeTokens from "./useNativeTokens";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -18,7 +18,7 @@ const useCustomAssets = () => {
   const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
-
+  const { nativeTokens } = useNativeTokens();
   const { client } = useRPCClient();
   const {
     chainName,
@@ -45,10 +45,8 @@ const useCustomAssets = () => {
               Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            if (isNativeTokenAddress(chainName, address)) {
-              const asset = nativeTokens[chainName]?.find(
-                (item) => item.token === address,
-              );
+            if (nativeTokens.some((item) => item.token === address)) {
+              const asset = nativeTokens.find((item) => item.token === address);
               if (asset) {
                 store[index] = {
                   ...asset,
@@ -144,7 +142,7 @@ const useCustomAssets = () => {
   const addFetchQueue = useCallback(
     (address: string, networkName: string) => {
       if (
-        nativeTokens[networkName]?.some((item) => item.token === address) ||
+        nativeTokens.some((item) => item.token === address) ||
         AccAddress.validate(address) ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {

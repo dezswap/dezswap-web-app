@@ -3,7 +3,6 @@ import Decimal from "decimal.js";
 import iconXpla from "assets/icons/icon-chain-xpla-32px.svg";
 import iconXplaGray from "assets/icons/icon-chain-xpla-gray-32px.svg";
 import iconASI from "assets/icons/icon-chain-asi-32px.svg";
-import { nativeTokens } from "./network";
 
 export type XplaChainNames = "dimension" | "cube";
 export const DefaultChainName = "xpla";
@@ -84,7 +83,7 @@ export const getGasInfo = (chainName: string) => {
       multiplier: 1.2,
       gasPrice: {
         amount: new Decimal("280000000000"),
-        denom: nativeTokens[chainName]?.[0]?.token ?? "",
+        denom: "axpla",
       },
     };
   return undefined;

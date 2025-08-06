@@ -50,7 +50,7 @@ import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useChain } from "hooks/useChain";
-import { nativeTokens } from "constants/network";
+import useNativeTokens from "hooks/useNativeTokens";
 import { CHAIN_ICONS } from "constants/dezswap";
 import NotificationModal from "./NotificationModal";
 import ChainModal from "./ChainModal";
@@ -317,12 +317,20 @@ function Header() {
   const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
   const { tokens: dashboardTokens } = useDashboard();
   const { wallet: interchainWallet } = useChain(chainName);
-
+  const { nativeTokens } = useNativeTokens();
   const {
     token: tokenAddress,
     symbol: tokenSymbol,
     icon: tokenIcon,
-  } = useMemo(() => nativeTokens?.[chainName][0], [chainName]);
+  } = useMemo(
+    () =>
+      nativeTokens[0] ?? {
+        token: "",
+        symbol: "",
+        icon: "",
+      },
+    [nativeTokens],
+  );
 
   const tokenBalance = useBalance(tokenAddress);
 

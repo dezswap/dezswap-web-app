@@ -31,7 +31,7 @@ import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { XPLA_ADDRESS } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -40,6 +40,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useNetwork from "hooks/useNetwork";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useNativeTokens from "hooks/useNativeTokens";
 import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
@@ -88,11 +89,12 @@ function CreatePage() {
   }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
+  const { nativeTokens } = useNativeTokens();
   const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({
@@ -195,12 +197,8 @@ function CreatePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return (
-      fee?.amount
-        ?.get(nativeTokens?.[chainName]?.[0].token)
-        ?.amount.toString() || "0"
-    );
-  }, [chainName, fee?.amount]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
@@ -492,7 +490,11 @@ function CreatePage() {
                     value: feeAmount ? (
                       <AssetValueFormatter
                         asset={{
-                          symbol: nativeTokens?.[chainName]?.[0].symbol,
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
                         }}
                         amount={feeAmount}
                       />
