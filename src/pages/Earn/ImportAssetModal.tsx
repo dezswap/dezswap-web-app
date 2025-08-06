@@ -65,13 +65,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   );
 
   useEffect(() => {
-    let isMounted = true;
-
     const checkValidity = async () => {
       const valid = await validate(address);
-      if (isMounted) {
-        setIsValidAddress(valid || isNativeToken || isIbcToken);
-      }
+      setIsValidAddress(valid || isNativeToken || isIbcToken);
     };
 
     if (address) {
@@ -79,10 +75,6 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     } else {
       setIsValidAddress(undefined);
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, [address, isNativeToken, isIbcToken]);
 
   const isDuplicated = useMemo(() => {
