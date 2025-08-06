@@ -15,7 +15,7 @@ import {
 import useRPCClient from "./useRPCClient";
 import usePairs from "./usePairs";
 import useVerifiedAssets from "./useVerifiedAssets";
-import usefetchDecimal from "./usefetchDecimal";
+import useFetchDecimal from "./useFetchDecimal";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
@@ -28,7 +28,7 @@ const useCustomAssets = () => {
     chainName,
     selectedChain: { chainId },
   } = useNetwork();
-  const { fetchDecimal } = usefetchDecimal();
+  const { fetchDecimal } = useFetchDecimal();
   const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
     xpla: [],
     xplatestnet: [],
@@ -147,12 +147,12 @@ const useCustomAssets = () => {
 
   const addFetchQueue = useCallback(
     async (address: string, networkName: string) => {
-      const isValidate =
+      const isValid =
         hasChainPrefix(address) && (await fetchDecimal(address)) !== undefined;
 
       if (
         nativeTokens[networkName]?.some((item) => item.token === address) ||
-        isValidate ||
+        isValid ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {

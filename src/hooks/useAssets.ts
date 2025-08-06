@@ -4,14 +4,14 @@ import useNetwork from "hooks/useNetwork";
 import { isNativeTokenAddress } from "utils";
 import useCustomAssets from "hooks/useCustomAssets";
 import { useQuery } from "@tanstack/react-query";
-import usefetchDecimal from "./usefetchDecimal";
+import useFetchDecimal from "./useFetchDecimal";
 import { Token } from "types/api";
 
 const useAssets = () => {
   const api = useAPI();
   const { chainName } = useNetwork();
   const { getCustomAsset, customAssets } = useCustomAssets();
-  const { fetchDecimal } = usefetchDecimal();
+  const { fetchDecimal } = useFetchDecimal();
   const { data: assets } = useQuery(
     ["assets", chainName],
     async () => {
