@@ -512,32 +512,40 @@ function CreatePage() {
               `}
             >
               <InfoTable
-                items={[asset1, asset2].map((asset) => ({
-                  key: asset?.token,
-                  label: `${asset?.symbol} Address`,
-                  value: (
-                    <>
-                      {ellipsisCenter(asset?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
-                    </>
-                  ),
-                }))}
+                items={[asset1, asset2].map((asset) => {
+                  const tokenLink = getTokenLink(
+                    asset?.token,
+                    explorers?.[0].url,
+                  );
+                  return {
+                    key: asset?.token,
+                    label: `${asset?.symbol} Address`,
+                    value: (
+                      <>
+                        {ellipsisCenter(asset?.token)}&nbsp;
+                        {tokenLink && (
+                          <a
+                            href={tokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
+                      </>
+                    ),
+                  };
+                })}
               />
             </div>
           </Expand>

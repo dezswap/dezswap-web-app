@@ -75,6 +75,10 @@ function ClaimPage() {
     },
   });
 
+  const tokenLink = useMemo(
+    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
+    [explorers, lockdropEventInfo?.lp_token_addr],
+  );
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -318,26 +322,25 @@ function ClaimPage() {
                       <span>
                         {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                         &nbsp;
-                        <a
-                          href={getTokenLink(
-                            lockdropEventInfo?.lp_token_addr,
-                            explorers?.[0].url,
-                          )}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {tokenLink && (
+                          <a
+                            href={tokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
