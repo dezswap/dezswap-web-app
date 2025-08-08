@@ -67,8 +67,6 @@ export const sanitizeNumberInput = (value: string, decimals = 18) => {
   }`;
 };
 
-const XPLA_MAINNET_EXPLORER = "https://explorer.xpla.io";
-// TODO: delete the hard-coded explorer link.
 export const getBlockLink = (height?: string, explorers?: string) => {
   if (explorers?.includes("xpla")) return `${explorers}/block/${height}`;
 
@@ -94,9 +92,11 @@ export const getTokenLink = (address?: string, explorers?: string) => {
     tokenAddress = `0x${secondPart}`;
   }
 
-  return `${explorers}/token/${
-    tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
-  }`;
+  return explorers?.includes("xpla")
+    ? `${explorers}/token/${
+        tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
+      }`
+    : null;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>
