@@ -294,23 +294,23 @@ __metadata:
   linkType: hard
 
 "@chain-registry/keplr@npm:^2.0.1":
-  version: 2.0.28
-  resolution: "@chain-registry/keplr@npm:2.0.28"
+  version: 2.0.38
+  resolution: "@chain-registry/keplr@npm:2.0.38"
   dependencies:
-    "@chain-registry/types": "npm:^2.0.28"
+    "@chain-registry/types": "npm:^2.0.38"
     "@keplr-wallet/cosmos": "npm:0.12.28"
     "@keplr-wallet/crypto": "npm:0.12.28"
     "@types/semver": "npm:^7.5.8"
-    chain-registry: "npm:^2.0.28"
+    chain-registry: "npm:^2.0.38"
     semver: "npm:^7.5.0"
-  checksum: 10c0/d78babcc49ee2498bc0f7b9f2e96bcfbd3d0f2287537ef10b9425d3e76e30e6ed6c678b0eb4f0117e5fd2798b88dd74e7d9b49db6f9010fc5d18b3396535986f
+  checksum: 10c0/cd5e658c503050ee5cb43b5ea3e1cd2f5ce2b3116229fd4c82f77ff084a6810439a4e9a72698541f2637322994a925bc41e0fdaef0baed23ce93b77c277a8084
   languageName: node
   linkType: hard
 
-"@chain-registry/types@npm:^2.0.1, @chain-registry/types@npm:^2.0.28":
-  version: 2.0.28
-  resolution: "@chain-registry/types@npm:2.0.28"
-  checksum: 10c0/cb53c1e85cef84f430a460856eb3fd9113a7afec164e852312154e97efd66f54c919ed879df4ba2982cd5831b21d1e6473637567f5ad86656ae3a50cc598417e
+"@chain-registry/types@npm:^2.0.1, @chain-registry/types@npm:^2.0.38":
+  version: 2.0.38
+  resolution: "@chain-registry/types@npm:2.0.38"
+  checksum: 10c0/2b3a296e1ea8c681178b688d523d3de84b5de34ebeed90bf9a8c498cfdb8fdbc5feced181b393e3821ad1a7e88d3546c5254466c626b5cb3485f78491849796b
   languageName: node
   linkType: hard
 
@@ -1179,9 +1179,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@interchain-kit/core@npm:0.3.42, @interchain-kit/core@npm:^0.3.42":
-  version: 0.3.42
-  resolution: "@interchain-kit/core@npm:0.3.42"
+"@interchain-kit/core@npm:0.3.44":
+  version: 0.3.44
+  resolution: "@interchain-kit/core@npm:0.3.44"
   dependencies:
     "@chain-registry/keplr": "npm:^2.0.1"
     "@chain-registry/types": "npm:^2.0.1"
@@ -1202,35 +1202,35 @@ __metadata:
     interchainjs: "npm:1.11.11"
     long: "npm:^5.2.3"
     pino-pretty: "npm:^7.6.0"
-  checksum: 10c0/df8298c156e04a17df39630405c3cbe322744bd7d5b702102e624db9d96e8d96a6ef95af479cf7c8cc35bac47e992b3f8be5c472b93472c3ff8de14746d5704c
+  checksum: 10c0/96850898850d9ece6d403a75b8ae42f6c39ea5fe72f9c12f46822cf1b091ea5d935f0573937925d3486c79df2b9a356c7bc6449d40343fa3f1c4656445d6c739
   languageName: node
   linkType: hard
 
-"@interchain-kit/cosmostation-extension@npm:^0.3.42":
-  version: 0.3.42
-  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.42"
+"@interchain-kit/cosmostation-extension@npm:0.3.44":
+  version: 0.3.44
+  resolution: "@interchain-kit/cosmostation-extension@npm:0.3.44"
   dependencies:
-    "@interchain-kit/core": "npm:0.3.42"
-  checksum: 10c0/b272d7884be7b05a183d8ce448138bfd60575068df14a2aa9d7ba2c215a0fff7d6abbe693836c1483d06c492349c086d48e3e157f06ecd7ebeeae09fe940e943
+    "@interchain-kit/core": "npm:0.3.44"
+  checksum: 10c0/9af06da430493d0178e3e97ab8ea9e2779ab003db17a1eb1e85942f786a9a5ce20b33be25bf98feff7a45534ce9a8597f87a46df4a2574d721e87a46d9c3a398
   languageName: node
   linkType: hard
 
-"@interchain-kit/keplr-extension@npm:^0.3.42":
-  version: 0.3.42
-  resolution: "@interchain-kit/keplr-extension@npm:0.3.42"
+"@interchain-kit/keplr-extension@npm:0.3.44":
+  version: 0.3.44
+  resolution: "@interchain-kit/keplr-extension@npm:0.3.44"
   dependencies:
-    "@interchain-kit/core": "npm:0.3.42"
+    "@interchain-kit/core": "npm:0.3.44"
     "@keplr-wallet/provider-extension": "npm:^0.12.102"
-  checksum: 10c0/123f00bc087fe883a64380de52b90ec7499a5f3397214e0502bf0f90a1682d9c19c55f49a63189870789b46c0624544fea44c7f0f0d636012e2cd64c14324591
+  checksum: 10c0/1147777a70f7147bdd7d9783f9aa14013927a02901894f37a76ea8afbd3291f3a4259482ee36029bb80e23b5be4f54599d5e07c5c04f80c4b918c31f61622890
   languageName: node
   linkType: hard
 
-"@interchain-kit/react@npm:^0.3.42":
-  version: 0.3.42
-  resolution: "@interchain-kit/react@npm:0.3.42"
+"@interchain-kit/react@npm:0.3.44":
+  version: 0.3.44
+  resolution: "@interchain-kit/react@npm:0.3.44"
   dependencies:
     "@chain-registry/types": "npm:^2.0.1"
-    "@interchain-kit/core": "npm:0.3.42"
+    "@interchain-kit/core": "npm:0.3.44"
     "@interchain-ui/react": "npm:^1.26.3"
     "@interchainjs/cosmos": "npm:1.11.11"
     "@interchainjs/cosmos-types": "npm:1.11.11"
@@ -1248,7 +1248,7 @@ __metadata:
     "@types/react-dom": ^19.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
-  checksum: 10c0/39d73f7775e1911583284d1dccff6b1da12249e5f608c924017474fe3e6b17b5d636727266388151cffc92bb3b482bc6eb412f6cd8bea1e261c29e9edcd0b540
+  checksum: 10c0/91b4c148d3fad6afa1e678f2f0a3e3e060b751ef4f1be0d5f0b5a78f7fa6cd2c9e3282a7106bc6bd5b938a68853f80d6262e857bfe5b5ce13caaead7d6ab286b
   languageName: node
   linkType: hard
 
@@ -5670,12 +5670,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chain-registry@npm:^2.0.1, chain-registry@npm:^2.0.28":
-  version: 2.0.28
-  resolution: "chain-registry@npm:2.0.28"
+"chain-registry@npm:^2.0.1, chain-registry@npm:^2.0.38":
+  version: 2.0.38
+  resolution: "chain-registry@npm:2.0.38"
   dependencies:
-    "@chain-registry/types": "npm:^2.0.28"
-  checksum: 10c0/aa094b443df5281b83d010847ada3267462015ef703fb5cd5b684ba0d9ddee5aeab990aeae62b6fb1b7a053450699721d48199c786d9aab9461ccb5a12b95e54
+    "@chain-registry/types": "npm:^2.0.38"
+  checksum: 10c0/31d7ab0d64f299ab6ef44c90844ff0924eeb6944cc66c2a77656b436c88ed5204b5b6e99b341397d2df1d8b4d5a73787a6f20508fe02deea6d207b38991692cd
   languageName: node
   linkType: hard
 
@@ -6320,10 +6320,10 @@ __metadata:
     "@emotion/babel-plugin": "npm:^11.10.2"
     "@emotion/react": "npm:^11.10.6"
     "@emotion/styled": "npm:^11.10.6"
-    "@interchain-kit/core": "npm:^0.3.42"
-    "@interchain-kit/cosmostation-extension": "npm:^0.3.42"
-    "@interchain-kit/keplr-extension": "npm:^0.3.42"
-    "@interchain-kit/react": "npm:^0.3.42"
+    "@interchain-kit/core": "npm:0.3.44"
+    "@interchain-kit/cosmostation-extension": "npm:0.3.44"
+    "@interchain-kit/keplr-extension": "npm:0.3.44"
+    "@interchain-kit/react": "npm:0.3.44"
     "@interchainjs/cosmos": "npm:^1.11.9"
     "@interchainjs/cosmos-types": "npm:^1.11.18"
     "@rollup/plugin-inject": "npm:^5.0.3"
@@ -7403,13 +7403,13 @@ __metadata:
   linkType: hard
 
 "fs-extra@npm:^11.0.0":
-  version: 11.3.0
-  resolution: "fs-extra@npm:11.3.0"
+  version: 11.3.1
+  resolution: "fs-extra@npm:11.3.1"
   dependencies:
     graceful-fs: "npm:^4.2.0"
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
-  checksum: 10c0/5f95e996186ff45463059feb115a22fb048bdaf7e487ecee8a8646c78ed8fdca63630e3077d4c16ce677051f5e60d3355a06f3cd61f3ca43f48cc58822a44d0a
+  checksum: 10c0/61e5b7285b1ca72c68dfe1058b2514294a922683afac2a80aa90540f9bd85370763d675e3b408ef500077d355956fece3bd24b546790e261c3d3015967e2b2d9
   languageName: node
   linkType: hard
 
@@ -11925,11 +11925,11 @@ __metadata:
   linkType: hard
 
 "yaml@npm:^2.4.2":
-  version: 2.8.0
-  resolution: "yaml@npm:2.8.0"
+  version: 2.8.1
+  resolution: "yaml@npm:2.8.1"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/f6f7310cf7264a8107e72c1376f4de37389945d2fb4656f8060eca83f01d2d703f9d1b925dd8f39852a57034fafefde6225409ddd9f22aebfda16c6141b71858
+  checksum: 10c0/7c587be00d9303d2ae1566e03bc5bc7fe978ba0d9bf39cc418c3139d37929dfcb93a230d9749f2cb578b6aa5d9ebebc322415e4b653cb83acd8bc0bc321707f3
   languageName: node
   linkType: hard
 
