@@ -61,9 +61,9 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
         const res = await apiClient.get<Token>(`/tokens/${address}`);
         return res.data;
       },
-      async getNativeToken() {
+      async getNativeToken(prefix: string) {
         const res = await apiClient.get<Token[]>(`/tokens`);
-        return res.data.filter((token) => isNativeToken(token.token));
+        return res.data.filter((token) => isNativeToken(token.token, prefix));
       },
       async getNotices(params?: {
         chain?: string;
