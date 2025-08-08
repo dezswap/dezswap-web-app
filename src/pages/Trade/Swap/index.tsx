@@ -25,7 +25,6 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import { generateSwapMsg } from "utils/dezswap";
 import useBalance from "hooks/useBalance";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS } from "constants/network";
 import useHashModal from "hooks/useHashModal";
 import { css, useTheme } from "@emotion/react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -389,7 +388,7 @@ function SwapPage() {
       walletAddress &&
       balanceApplied &&
       !isReversed &&
-      asset1Address === XPLA_ADDRESS &&
+      asset1Address === fees.feeTokens[0]?.denom &&
       Number(asset1Value) &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
@@ -450,7 +449,7 @@ function SwapPage() {
   );
 
   useEffect(() => {
-    if (asset1Address === XPLA_ADDRESS) {
+    if (asset1Address === fees.feeTokens[0]?.denom) {
       form.trigger(FormKey.asset1Value);
     }
   }, [form, asset1Address, asset2Address]);
