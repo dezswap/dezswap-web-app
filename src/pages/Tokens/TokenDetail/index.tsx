@@ -107,7 +107,10 @@ function TokenDetailPage() {
       clearTimeout(timerId);
     };
   }, [dashboardToken, invalidPathModal, chainName]);
-
+  const tokenLink = useMemo(
+    () => getTokenLink(tokenAddress, explorers?.[0].url),
+    [explorers, tokenAddress],
+  );
   const actionButtons = useMemo(
     () => (
       <Row justify="between" align="center" gutterWidth={10}>
@@ -211,10 +214,7 @@ function TokenDetailPage() {
                       </Typography>
                     </Col>
                     <Col xs="content">
-                      <Outlink
-                        iconSize={19}
-                        href={getTokenLink(tokenAddress, explorers?.[0].url)}
-                      />
+                      {tokenLink && <Outlink iconSize={19} href={tokenLink} />}
                     </Col>
                   </Row>
                 </Col>

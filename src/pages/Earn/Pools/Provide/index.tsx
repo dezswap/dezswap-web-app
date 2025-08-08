@@ -130,7 +130,18 @@ function ProvidePage() {
       Numeric.parse(pool.total_share).isZero(),
     [pool?.total_share],
   );
-
+  const lpTokenLink = useMemo(
+    () => getTokenLink(pair?.liquidity_token, explorers?.[0].url),
+    [explorers, pair?.liquidity_token],
+  );
+  const asset1TokenLink = useMemo(
+    () => getTokenLink(asset1?.token, explorers?.[0].url),
+    [explorers, asset1?.token],
+  );
+  const asset2TokenLink = useMemo(
+    () => getTokenLink(asset2?.token, explorers?.[0].url),
+    [explorers, asset2?.token],
+  );
   const simulationResult = useSimulate(
     isPoolEmpty
       ? {
@@ -686,26 +697,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(pair?.liquidity_token)}&nbsp;
-                        <a
-                          href={getTokenLink(
-                            pair?.liquidity_token,
-                            explorers?.[0].url,
-                          )}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {lpTokenLink && (
+                          <a
+                            href={lpTokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
@@ -715,23 +725,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(asset1?.token)}&nbsp;
-                        <a
-                          href={getTokenLink(asset1?.token, explorers?.[0].url)}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {asset1TokenLink && (
+                          <a
+                            href={asset1TokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
@@ -741,23 +753,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(asset2?.token)}&nbsp;
-                        <a
-                          href={getTokenLink(asset2?.token, explorers?.[0].url)}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {asset2TokenLink && (
+                          <a
+                            href={asset2TokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },

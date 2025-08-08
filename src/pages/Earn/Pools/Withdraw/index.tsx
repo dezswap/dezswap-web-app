@@ -183,7 +183,14 @@ function WithdrawPage() {
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
-
+  const asset1TokenLink = useMemo(
+    () => getTokenLink(asset1?.token, explorers?.[0].url),
+    [explorers, asset1?.token],
+  );
+  const asset2TokenLink = useMemo(
+    () => getTokenLink(asset2?.token, explorers?.[0].url),
+    [explorers, asset2?.token],
+  );
   const feeAmount = useMemo(() => {
     return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
   }, [fee?.amount, fees.feeTokens[0]]);
@@ -524,23 +531,25 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset1?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset1?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {asset1TokenLink && (
+                        <a
+                          href={asset1TokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </>
                   ),
                 },
@@ -550,23 +559,25 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset2?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset2?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {asset2TokenLink && (
+                        <a
+                          href={asset2TokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </>
                   ),
                 },
