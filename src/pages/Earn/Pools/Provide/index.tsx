@@ -31,7 +31,6 @@ import { AccAddress, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
@@ -304,7 +303,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
-      asset1?.token === XPLA_ADDRESS &&
+      asset1?.token === fees.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(
@@ -327,7 +326,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
-      asset2?.token === XPLA_ADDRESS &&
+      asset2?.token === fees.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(

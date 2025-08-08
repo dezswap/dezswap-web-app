@@ -1,16 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
-import { XPLA_ADDRESS } from "constants/network";
 import { amountToValue, valueToAmount } from "utils";
 import useBalance from "./useBalance";
+import useNetwork from "./useNetwork";
 
 const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
   const balance = useBalance(address);
   const [balanceMinusFee, setBalanceMinusFee] = useState(balance);
+  const { selectedChain } = useNetwork();
 
   useEffect(() => {
     if (balance) {
-      if (address === XPLA_ADDRESS && feeAmount !== undefined) {
+      if (
+        address === selectedChain.fees.feeTokens[0].denom &&
+        feeAmount !== undefined
+      ) {
         const res = Numeric.parse(amountToValue(balance) || 0).minus(
           amountToValue(feeAmount) || 0,
         );
@@ -22,7 +26,7 @@ const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
       setBalanceMinusFee("0");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [balance, feeAmount]);
+  }, [balance, feeAmount, selectedChain.fees.feeTokens[0].denom]);
 
   return useMemo(() => {
     return balanceMinusFee;

@@ -31,7 +31,6 @@ import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -207,7 +206,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset1?.token === XPLA_ADDRESS &&
+      asset1?.token === fees.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
@@ -235,7 +234,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset2?.token === XPLA_ADDRESS &&
+      asset2?.token === fees.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
