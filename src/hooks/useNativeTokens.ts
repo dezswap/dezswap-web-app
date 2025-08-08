@@ -9,8 +9,7 @@ function useNativeTokens() {
   const { data: nativeTokens, isLoading: isNativeTokensLoading } = useQuery({
     queryKey: ["nativeTokens", chainName],
     queryFn: () => {
-      console.log("chainName", selectedChain);
-      return api.getNativeToken();
+      return api.getNativeToken(selectedChain.bech32Prefix);
     },
     enabled: !!chainName && !api.isLoading,
     refetchOnReconnect: true,

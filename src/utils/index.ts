@@ -282,9 +282,7 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
   }
 };
 
-export const isNativeToken = (denom: string): boolean => {
-  if (denom.startsWith("ibc/")) return false;
-  if (denom.startsWith("factory/")) return false;
-  if (/^[a-z]+1[0-9a-z]{10,}$/.test(denom)) return false;
-  return true;
+export const isNativeToken = (denom: string, prefix: string): boolean => {
+  const expectedLength = prefix.length + 59;
+  return denom.length !== expectedLength || !denom.startsWith(`${prefix}1`);
 };
