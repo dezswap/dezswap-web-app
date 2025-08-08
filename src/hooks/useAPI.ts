@@ -10,7 +10,7 @@ import {
   parseJsonFromBinary,
 } from "utils/dezswap";
 import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
-import { contractAddresses, GAS_INFO } from "constants/dezswap";
+import { contractAddresses, getGasInfo } from "constants/dezswap";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
@@ -316,7 +316,7 @@ const useAPI = (version: ApiVersion = "v1") => {
 
       const fee = await calculateFee(
         { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
+        getGasInfo(chainName),
         () => Promise.resolve(chainId),
       );
 

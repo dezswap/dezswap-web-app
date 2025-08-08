@@ -29,9 +29,7 @@ import {
   getAddressLink,
 } from "utils";
 import useBalance from "hooks/useBalance";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
-import iconXpla from "assets/icons/icon-xpla-24px.svg";
 import iconLink from "assets/icons/icon-link.svg";
 import { Popover } from "react-tiny-popover";
 import Panel from "components/Panel";
@@ -52,6 +50,8 @@ import { Numeric } from "@xpla/xpla.js";
 import useNotifications from "hooks/useNotifications";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useChain } from "hooks/useChain";
+import useNativeTokens from "hooks/useNativeTokens";
+import { CHAIN_ICONS } from "constants/dezswap";
 import NotificationModal from "./NotificationModal";
 import ChainModal from "./ChainModal";
 
@@ -304,7 +304,6 @@ function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
   const connectedWallet = useConnectedWallet();
-  const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const notificationModal = useHashModal("notifications");
   const chainModal = useHashModal("chains");
@@ -312,19 +311,35 @@ function Header() {
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers, logoURIs, prettyName },
+    selectedChain: { explorers, logoURIs, prettyName, networkType },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
-  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
+  const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
   const { tokens: dashboardTokens } = useDashboard();
   const { wallet: interchainWallet } = useChain(chainName);
+  const { nativeTokens } = useNativeTokens();
+  const {
+    token: tokenAddress,
+    symbol: tokenSymbol,
+    icon: tokenIcon,
+  } = useMemo(
+    () =>
+      nativeTokens[0] ?? {
+        token: "",
+        symbol: "",
+        icon: "",
+      },
+    [nativeTokens],
+  );
 
-  const xplaPrice = useMemo(() => {
+  const tokenBalance = useBalance(tokenAddress);
+
+  const tokenPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
-      (item) => item.address === XPLA_ADDRESS,
+      (item) => item.address === tokenAddress,
     );
     return dashboardToken?.price;
-  }, [dashboardTokens]);
+  }, [dashboardTokens, tokenAddress]);
 
   const { walletName, logo } = useMemo(() => {
     if (connectedWallet.isInterchain)
@@ -484,8 +499,12 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
-                      <img src={logoURIs.png} alt={prettyName} />
-                      {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
+                      <img
+                        src={CHAIN_ICONS?.[chainName] ?? logoURIs?.png}
+                        alt={prettyName}
+                      />
+                      {screenClass !== MOBILE_SCREEN_CLASS &&
+                        prettyName.replace("Fetch.ai", "ASI")}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
@@ -532,10 +551,10 @@ function Header() {
                                   connectedWallet.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
-                                    amountToValue(xplaBalance) || 0,
+                                    amountToValue(tokenBalance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
-                                )} ${XPLA_SYMBOL}`}
+                                )} ${tokenSymbol}`}
                             <img
                               src={iconDropdown}
                               width={22}
@@ -661,7 +680,7 @@ function Header() {
                                 <Col width="auto">
                                   <IconButton
                                     size={24}
-                                    icons={{ default: iconXpla }}
+                                    icons={{ default: tokenIcon }}
                                   />
                                 </Col>
                                 <Col style={{ paddingLeft: "4px" }}>
@@ -670,7 +689,7 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {XPLA_SYMBOL}
+                                    {tokenSymbol}
                                   </Typography>
                                 </Col>
                               </Row>
@@ -690,7 +709,7 @@ function Header() {
                                   weight="bold"
                                 >
                                   {formatNumber(
-                                    amountToValue(xplaBalance) || 0,
+                                    amountToValue(tokenBalance) || 0,
                                   )}
                                 </Typography>
                                 <Typography
@@ -698,11 +717,11 @@ function Header() {
                                   weight="normal"
                                 >
                                   =&nbsp;
-                                  {xplaPrice &&
+                                  {tokenPrice &&
                                     `$${formatNumber(
                                       formatDecimals(
-                                        Numeric.parse(xplaPrice).mul(
-                                          amountToValue(xplaBalance) || 0,
+                                        Numeric.parse(tokenPrice).mul(
+                                          amountToValue(tokenBalance) || 0,
                                         ),
                                         2,
                                       ),
