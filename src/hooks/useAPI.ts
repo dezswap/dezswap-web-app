@@ -15,9 +15,11 @@ import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
 import { EncodeObject } from "@xpla/xplajs/types";
+import { EthAccount, BaseAccount } from "@interchainjs/cosmos-types";
 import { LockdropUserInfo } from "types/lockdrop";
 import useRPCClient from "./useRPCClient";
 import useConnectedWallet from "./useConnectedWallet";
+import { Any } from "@xpla/xplajs/google/protobuf/any";
 
 const PLAY3_LIST_SIZE = 20;
 
@@ -295,11 +297,18 @@ const useAPI = (version: ApiVersion = "v1") => {
     if (!walletAddress || !client) {
       return undefined;
     }
-    const { info } =
-      (await client?.cosmos.auth.v1beta1.accountInfo({
+    const { account } =
+      ((await client?.cosmos.auth.v1beta1.account({
         address: walletAddress,
-      })) || {};
-    return info;
+      })) as { account: Any }) || {};
+    if (account?.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
+      return BaseAccount.decode(account?.value);
+    }
+    if (account?.typeUrl === "/ethermint.types.v1.EthAccount") {
+      const { baseAccount } = EthAccount.decode(account?.value);
+      return baseAccount;
+    }
+    return undefined;
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
