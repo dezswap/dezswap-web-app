@@ -11,8 +11,11 @@ const supportChainNames = ["xpla", "fetch"];
 export const SupportedChains = chains.filter((chain) =>
   supportChainNames.some((keyword) => chain.chainName.includes(keyword)),
 );
-export const getChain = (searchName: string) =>
-  chains.filter((chain) => chain.chainName === searchName);
+export const getChain = (searchName: string) => {
+  if (!supportChainNames.includes(searchName))
+    return chains.filter((chain) => chain.chainName === DefaultChainName);
+  return chains.filter((chain) => chain.chainName === searchName);
+};
 
 export const getRpcEndpoint = (searchName: string) =>
   chains.filter((chain) => chain.chainName === searchName)[0]?.apis?.rpc?.[0]
