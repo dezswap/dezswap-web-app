@@ -6,10 +6,10 @@ import iconASI from "assets/icons/icon-chain-asi-32px.svg";
 
 export type XplaChainNames = "dimension" | "cube";
 export const DefaultChainName = "xpla";
-const supportChainNames = ["xpla", "fetch"];
+const supportChainNames = ["xpla", "fetchhub"];
 
 export const SupportedChains = chains.filter((chain) =>
-  supportChainNames.some((keyword) => chain.chainName.includes(keyword)),
+  supportChainNames.some((keyword) => chain.chainName === keyword),
 );
 export const getChain = (searchName: string) =>
   chains.filter((chain) => chain.chainName === searchName);
