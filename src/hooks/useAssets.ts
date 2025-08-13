@@ -4,12 +4,13 @@ import useNetwork from "hooks/useNetwork";
 import { AccAddress } from "@xpla/xpla.js";
 import useCustomAssets from "hooks/useCustomAssets";
 import { useQuery } from "@tanstack/react-query";
+import { Token } from "types/api";
 import useNativeTokens from "./useNativeTokens";
 
 const useAssets = () => {
   const api = useAPI();
   const { chainName } = useNetwork();
-  const { getCustomAsset } = useCustomAssets();
+  const { getCustomAsset, customAssets } = useCustomAssets();
   const { nativeTokens } = useNativeTokens();
   const { data: assets } = useQuery(
     ["assets", chainName],
@@ -26,14 +27,25 @@ const useAssets = () => {
     },
   );
   const getAsset = useCallback(
-    (address: string) => {
+    async (address: string) => {
       const asset = assets?.find((item) => item.token === address);
       if (!asset?.token) {
-        return getCustomAsset(address);
+        return await getCustomAsset(address);
       }
       return asset;
     },
     [assets, getCustomAsset],
+  );
+
+  const assetInfos = useMemo(
+    () =>
+      [...(assets ?? []), ...(customAssets ?? [])]?.reduce((acc, token) => {
+        if (token.token) {
+          acc[token.token] = token;
+        }
+        return acc;
+      }, {} as Record<string, Token>),
+    [assets, customAssets],
   );
 
   const validate = useCallback(
@@ -49,8 +61,9 @@ const useAssets = () => {
     () => ({
       getAsset,
       validate,
+      assetInfos,
     }),
-    [getAsset, validate],
+    [getAsset, validate, assetInfos],
   );
 };
 
