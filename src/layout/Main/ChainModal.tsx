@@ -57,11 +57,30 @@ const ChainsWrapper = styled.button`
 function ChainModal(modalProps: ReactModal.Props) {
   const screenClass = useScreenClass();
   const {
-    chainName,
     selectedChain: { networkType },
   } = useNetwork();
-  const isTestnet = useMemo(() => networkType === "testnet", [chainName]);
+  const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
   const [searchParams] = useSearchParams();
+
+  const handleChainSelect = (selectedChainName: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(CHAIN_NAME_SEARCH_PARAM, selectedChainName);
+
+    const currentPath = window.location.pathname;
+    const queryString = newParams.toString();
+
+    const getRedirectUrl = () => {
+      if (currentPath.includes("/earn/pools")) {
+        return `${window.location.origin}/earn/pools?${queryString}`;
+      }
+      if (currentPath.includes("/tokens")) {
+        return `${window.location.origin}?${queryString}`;
+      }
+      return `?${queryString}`;
+    };
+
+    window.location.href = getRedirectUrl();
+  };
 
   return modalProps.isOpen ? (
     <Overlay onClick={modalProps.onRequestClose}>
@@ -102,11 +121,7 @@ function ChainModal(modalProps: ReactModal.Props) {
           (a, b) => b.chainName.charCodeAt(0) - a.chainName.charCodeAt(0),
         ).map((chain) => (
           <ChainsWrapper
-            onClick={() => {
-              const newParams = new URLSearchParams(searchParams);
-              newParams.set(CHAIN_NAME_SEARCH_PARAM, chain.chainName);
-              window.location.href = `?${newParams.toString()}`;
-            }}
+            onClick={() => handleChainSelect(chain.chainName)}
             type="button"
           >
             <AssetIcon
