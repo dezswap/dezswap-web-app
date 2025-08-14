@@ -167,20 +167,21 @@ function MainLayout({ children }: PropsWithChildren) {
   }, [isValidChain, open, paramChainName]);
 
   useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
     if (wallet.status === WalletStatus.WALLET_CONNECTED && isValidChain) {
-      const newParams = new URLSearchParams(searchParams);
       const walletChain =
         wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
 
       if (paramChainName === walletChain) return;
       newParams.set(CHAIN_NAME_SEARCH_PARAM, walletChain);
       setSearchParams(newParams);
+      window.location.href = `?${newParams.toString()}`;
     }
 
     if (!paramChainName) {
-      const newParams = new URLSearchParams(searchParams);
       newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
       setSearchParams(newParams);
+      window.location.href = `?${newParams.toString()}`;
     }
   }, [
     chainName,

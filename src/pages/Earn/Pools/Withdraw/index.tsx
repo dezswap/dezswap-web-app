@@ -33,7 +33,6 @@ import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
@@ -46,6 +45,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import useConnectedWallet from "hooks/useConnectedWallet";
+import useNativeTokens from "hooks/useNativeTokens";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
@@ -65,10 +65,9 @@ function WithdrawPage() {
   const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
-    chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
-
+  const { nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -111,7 +110,7 @@ function WithdrawPage() {
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
@@ -184,6 +183,17 @@ function WithdrawPage() {
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
+  const asset1TokenLink = useMemo(
+    () => getTokenLink(asset1?.token, explorers?.[0].url),
+    [explorers, asset1?.token],
+  );
+  const asset2TokenLink = useMemo(
+    () => getTokenLink(asset2?.token, explorers?.[0].url),
+    [explorers, asset2?.token],
+  );
+  const feeAmount = useMemo(() => {
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -475,10 +485,14 @@ function WithdrawPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{ symbol: XPLA_SYMBOL }}
-                        amount={fee?.amount
-                          ?.get(XPLA_ADDRESS)
-                          ?.amount.toString()}
+                        asset={{
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
+                        }}
+                        amount={feeAmount}
                       />
                     ),
                   },
@@ -517,23 +531,25 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset1?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset1?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {asset1TokenLink && (
+                        <a
+                          href={asset1TokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </>
                   ),
                 },
@@ -543,23 +559,25 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset2?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset2?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {asset2TokenLink && (
+                        <a
+                          href={asset2TokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </>
                   ),
                 },
