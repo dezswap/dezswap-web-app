@@ -117,27 +117,27 @@ function ChainModal(modalProps: ReactModal.Props) {
               }
         }
       >
-        {SupportedChains.sort(
-          (a, b) => b.chainName.charCodeAt(0) - a.chainName.charCodeAt(0),
-        ).map((chain) => (
-          <ChainsWrapper
-            onClick={() => handleChainSelect(chain.chainName)}
-            type="button"
-          >
-            <AssetIcon
-              asset={{
-                icon:
-                  CHAIN_ICONS?.[chain.chainName] ??
-                  chain.logoURIs?.svg ??
-                  chain.logoURIs?.png,
-              }}
-            />
-            {
-              // FIXME:
-              chain.prettyName?.replace("Fetch.ai", "ASI")
-            }
-          </ChainsWrapper>
-        ))}
+        {SupportedChains.filter((chain) => chain.networkType !== "testnet")
+          .sort((a, b) => b.chainName.charCodeAt(0) - a.chainName.charCodeAt(0))
+          .map((chain) => (
+            <ChainsWrapper
+              onClick={() => handleChainSelect(chain.chainName)}
+              type="button"
+            >
+              <AssetIcon
+                asset={{
+                  icon:
+                    CHAIN_ICONS?.[chain.chainName] ??
+                    chain.logoURIs?.svg ??
+                    chain.logoURIs?.png,
+                }}
+              />
+              {
+                // FIXME:
+                chain.prettyName?.replace("Fetch.ai", "ASI")
+              }
+            </ChainsWrapper>
+          ))}
       </Modal>
     </Overlay>
   ) : null;
