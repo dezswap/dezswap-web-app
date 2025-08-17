@@ -94,6 +94,24 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const [tabIdx, setTabIdx] = useState(0);
   const { nativeTokens } = useNativeTokens();
   const divRef = useRef<HTMLDivElement>(null);
+  const [assets, setAssets] = useState<Record<string, Partial<Token>> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!addressList || assets !== null) return;
+    (async () => {
+      const entries = (await Promise.all(
+        addressList
+          .map(async (address) => {
+            const asset = await getAsset(address);
+            return asset ? ([address, asset] as const) : null;
+          })
+          .filter((asset) => asset !== null),
+      )) as [string, Partial<Token>][];
+      setAssets(Object.fromEntries(entries));
+    })();
+  }, [addressList]);
 
   const assetList = useMemo(() => {
     const isBookmark = tabs[tabIdx].value === "bookmark";
@@ -122,7 +140,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     }
 
     const items = filteredList?.map((address) => {
-      const asset = getAsset(address);
+      const asset = assets?.[address];
       const isVerified =
         asset?.verified || nativeTokens?.some((n) => n.token === address);
       return (
@@ -166,7 +184,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   }, [
     bookmarks,
     deferredSearchKeyword,
-    getAsset,
+    assets !== null,
     handleSelect,
     addressList,
     selectedAssetAddress,

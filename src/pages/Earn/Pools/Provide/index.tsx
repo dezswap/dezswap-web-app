@@ -8,7 +8,7 @@ import {
 import Modal from "components/Modal";
 import { useParams } from "react-router-dom";
 import usePairs from "hooks/usePairs";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { useForm } from "react-hook-form";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
@@ -27,11 +27,11 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { generateAddLiquidityMsg } from "utils/dezswap";
+import { generateAddLiquidityMsg, hasChainPrefix } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -72,7 +72,6 @@ function ProvidePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair } = usePairs();
-  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
@@ -94,23 +93,29 @@ function ProvidePage() {
     [getPair, poolAddress],
   );
 
-  const [asset1, asset2] = useMemo(
-    () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
-    [getAsset, pair?.asset_addresses],
-  );
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
   useEffect(() => {
+    if (!pair?.asset_addresses?.length) {
+      errorMessageModal.open();
+      return;
+    }
+
     const timerId = setTimeout(() => {
       if (!asset1 || !asset2) {
         errorMessageModal.open();
       }
     }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
+
+    if (
+      poolAddress &&
+      !hasChainPrefix(poolAddress) &&
+      !errorMessageModal.isOpen
+    ) {
       errorMessageModal.open();
     }
+
     return () => {
       clearTimeout(timerId);
     };
