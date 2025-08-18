@@ -35,7 +35,6 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: Number(env.port) || undefined,
-      https: true,
     },
     optimizeDeps: {},
     build: {
