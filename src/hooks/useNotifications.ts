@@ -24,9 +24,10 @@ const useNotifications = () => {
       });
       return res;
     },
+    initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) => {
-      const lastItem = lastPage[lastPage.length - 1];
-      return lastItem?.id;
+      const lastItem = lastPage.at(-1);
+      return lastItem?.id ? +lastItem.id : undefined;
     },
   });
 

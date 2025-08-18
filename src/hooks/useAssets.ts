@@ -10,20 +10,18 @@ const useAssets = () => {
   const api = useAPI();
   const { chainName } = useNetwork();
   const { getCustomAsset } = useCustomAssets();
-  const { data: assets } = useQuery(
-    ["assets", chainName],
-    async () => {
+  const { data: assets } = useQuery({
+    queryKey: ["assets", chainName],
+    queryFn: async () => {
       const res = await api.getTokens();
       return res;
     },
-    {
-      enabled: !!chainName,
-      refetchOnReconnect: true,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
-    },
-  );
+    enabled: !!chainName,
+    refetchOnReconnect: true,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+  });
 
   const getAsset = useCallback(
     (address: string) => {
