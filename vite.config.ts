@@ -38,5 +38,23 @@ export default defineConfig(({ mode }) => {
       https: true,
     },
     optimizeDeps: {},
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "xpla-vendor": [
+              "@xpla/xpla",
+              "@xpla/wallet-provider",
+              "@xpla/wallet-controller",
+              "@xpla/xpla.js",
+            ],
+            "interchain-kit-vendor": [
+              "@interchain-kit/react",
+              "@interchain-kit/core",
+            ],
+          },
+        },
+      },
+    },
   };
 });
