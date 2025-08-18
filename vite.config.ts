@@ -38,6 +38,7 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {},
     build: {
+      assetsInlineLimit: 0, // This is important for inlining SVGs
       rollupOptions: {
         output: {
           manualChunks: {
