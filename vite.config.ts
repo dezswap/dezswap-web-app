@@ -35,8 +35,26 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: Number(env.port) || undefined,
-      https: true,
     },
     optimizeDeps: {},
+    build: {
+      assetsInlineLimit: 0, // This is important for inlining SVGs
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "xpla-vendor": [
+              "@xpla/xpla",
+              "@xpla/wallet-provider",
+              "@xpla/wallet-controller",
+              "@xpla/xpla.js",
+            ],
+            "interchain-kit-vendor": [
+              "@interchain-kit/react",
+              "@interchain-kit/core",
+            ],
+          },
+        },
+      },
+    },
   };
 });
