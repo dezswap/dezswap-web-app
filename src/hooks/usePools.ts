@@ -5,9 +5,12 @@ import useAPI from "./useAPI";
 const usePools = () => {
   const { chainName } = useNetwork();
   const api = useAPI();
-  const { data: pools } = useQuery(["pools", chainName], async () => {
-    const res = await api.getPools();
-    return res;
+  const { data: pools } = useQuery({
+    queryKey: ["pools", chainName],
+    queryFn: async () => {
+      const res = await api.getPools();
+      return res;
+    },
   });
 
   return { pools };
