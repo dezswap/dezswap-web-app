@@ -10,10 +10,10 @@ import {
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { convertProtoToAminoMsg } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
+import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
-import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 
 const resetWalletValue = {
   walletAddress: "",
@@ -100,10 +100,12 @@ const useConnectedWallet = () => {
         if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
           throw new Error("PostError: Fee Not Found");
         }
+
+        console.log(signingClient);
         if (!signingClient) {
           throw new Error("signingClient is not found");
         }
-        const signResult = await signingClient.sign(
+        return signingClient.signAndBroadcast(
           walletInfo.walletAddress,
           messages,
           {
@@ -119,21 +121,11 @@ const useConnectedWallet = () => {
           },
           "",
         );
-
-        const txRaw = {
-          ...signResult,
-          authInfoBytes: base64ToUint8Array(signResult.authInfoBytes),
-          bodyBytes: base64ToUint8Array(signResult.bodyBytes),
-          signatures: signResult.signatures,
-        };
-
-        const txBytes = TxRaw.encode(txRaw).finish();
-        return signingClient.broadcastTxSync(txBytes);
-        // Temporarily using this method due to type mismatch between base64 and Uint8Array
-        // TODO: Use signAndBroadcastSync after InterchainKit update fixes the issue
       }
       return connectedXplaWallet?.post(
-        { ...tx, ...convertProtoToAminoMsg(tx.msgs) },
+        { ...tx, ...convertProtoToAminoMsg(tx.msgs) } as unknown as Parameters<
+          NonNullable<typeof connectedXplaWallet.post>
+        >[0],
         walletApp,
       );
     },

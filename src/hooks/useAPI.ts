@@ -11,11 +11,11 @@ import {
 } from "utils/dezswap";
 import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
 import { contractAddresses, GAS_INFO } from "constants/dezswap";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import useNetwork from "hooks/useNetwork";
 import api, { ApiVersion } from "api";
 import { EncodeObject } from "@xpla/xplajs/types";
 import { LockdropUserInfo } from "types/lockdrop";
+import { Decimal } from "decimal.js";
 import useRPCClient from "./useRPCClient";
 import useConnectedWallet from "./useConnectedWallet";
 
@@ -257,39 +257,55 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const getPlay3List = useCallback(async () => {
     const contractAddress = contractAddresses[chainName]?.play3List;
-    if (isLoading) return;
+    if (isLoading) return undefined;
     if (!client || !contractAddress) {
       return undefined;
     }
-    let res: WhiteList = [];
-    let lastAddress = "";
 
-    while (true) {
+    const fetchBatch = async (startAfter = ""): Promise<WhiteList> => {
       const queryData = getQueryData({
         get_complete_meme_data_list: {
-          start_after: lastAddress,
+          start_after: startAfter,
           limit: PLAY3_LIST_SIZE,
         },
       });
+
       try {
         const { data } =
-          (await client?.cosmwasm.wasm.v1.smartContractState({
+          (await client.cosmwasm.wasm.v1.smartContractState({
             address: contractAddress,
             queryData,
           })) || {};
 
         const { data: parsed } = parseJsonFromBinary(data) ?? {};
-
-        if (!parsed || parsed.length === 0) break;
-        res = [...res, ...parsed];
-        lastAddress = res[res.length - 1].cont_addr;
-        if (parsed.length < PLAY3_LIST_SIZE) break;
+        return parsed || [];
       } catch (e) {
-        return res;
+        return [];
       }
-    }
-    return res;
-  }, [client]);
+    };
+
+    const fetchAllData = async (
+      startAfter = "",
+      accumulatedResults: WhiteList = [],
+    ): Promise<WhiteList> => {
+      const batch = await fetchBatch(startAfter);
+
+      if (batch.length === 0) {
+        return accumulatedResults;
+      }
+
+      const newResults = [...accumulatedResults, ...batch];
+      const lastAddress = batch[batch.length - 1].cont_addr;
+
+      if (batch.length < PLAY3_LIST_SIZE) {
+        return newResults;
+      }
+
+      return fetchAllData(lastAddress, newResults);
+    };
+
+    return fetchAllData();
+  }, [client, chainName, isLoading]);
 
   const getAuthInfo = useCallback(async () => {
     if (!walletAddress || !client) {
@@ -314,11 +330,18 @@ const useAPI = (version: ApiVersion = "v1") => {
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
-        () => Promise.resolve(chainId),
-      );
+      const gasUsed = res?.gasInfo?.gasUsed?.toString() || "0";
+      const gas = new Decimal(gasUsed).mul(GAS_INFO.multiplier);
+
+      const fee = {
+        gas: gas.toFixed(0).toString(),
+        amount: [
+          {
+            denom: GAS_INFO.gasPrice.denom,
+            amount: gas.mul(GAS_INFO.gasPrice.amount).toFixed(0).toString(),
+          },
+        ],
+      };
 
       return fee;
     },

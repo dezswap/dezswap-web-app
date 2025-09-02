@@ -23,6 +23,7 @@ import {
 } from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 import { EncodeObject } from "@xpla/xplajs/types";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 
 export type Amount = string | number;
 

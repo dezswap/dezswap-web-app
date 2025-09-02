@@ -41,23 +41,23 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
             msgs: createTxOptions.msgs,
           });
           if (connectedWallet.isInterchain && result) {
-            const { transactionHash, code, rawLog } =
-              result as DeliverTxResponse;
-            if (code !== 0) {
-              setTxError(
-                new TxFailed(
-                  {
-                    ...createTxOptions,
-                    ...convertProtoToAminoMsg(createTxOptions.msgs),
-                  },
-                  transactionHash,
-                  rawLog || "",
-                  rawLog,
-                ),
-              );
-            } else {
-              setTxHash(transactionHash);
-            }
+            // const { transactionHash, code, rawLog } =
+            //   result as DeliverTxResponse;
+            // if (code !== 0) {
+            //   setTxError(
+            //     new TxFailed(
+            //       {
+            //         ...createTxOptions,
+            //         ...convertProtoToAminoMsg(createTxOptions.msgs),
+            //       },
+            //       transactionHash,
+            //       rawLog || "",
+            //       rawLog,
+            //     ),
+            //   );
+            // } else {
+            //   setTxHash(transactionHash);
+            // }
           } else {
             const { result: res } = result as TxResult;
             setTxHash(res.txhash);

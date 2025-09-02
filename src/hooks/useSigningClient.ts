@@ -25,7 +25,7 @@ function useSigningClient() {
         const client = await wm.getSigningClient(currentWalletName, chainName);
         if (!client) throw new Error("User not found");
 
-        client.addEncoders(toEncoders(MsgExecuteContract));
+        client.addEncoders?.(toEncoders(MsgExecuteContract));
         return client;
       } catch (err) {
         console.error("Signing client Error:", err);
@@ -33,9 +33,8 @@ function useSigningClient() {
       }
     },
     enabled:
-      isReady &&
-      walletState === WalletState.Connected &&
-      chainName === currentChainName,
+      // isReady &&
+      walletState === WalletState.Connected && chainName === currentChainName,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
