@@ -84,14 +84,21 @@ export const contractAddresses: {
     play3List: "",
   },
 };
-
 export const getGasInfo = (chainName: string) => {
-  if (chainName.includes("xpla"))
+  if (chainName === "fetchhub")
+    return {
+      multiplier: 1,
+      gasPrice: {
+        amount: new Decimal("0"),
+        denom: "afet",
+      },
+    };
+  if (chainName === "fetchhubtestnet")
     return {
       multiplier: 1.2,
       gasPrice: {
-        amount: new Decimal("280000000000"),
-        denom: "axpla",
+        amount: new Decimal("1000000000"),
+        denom: "atestfet",
       },
     };
   return undefined;
