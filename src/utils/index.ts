@@ -91,11 +91,18 @@ export const getTransactionLink = (txHash?: string, explorers?: string) => {
 };
 
 export const getTokenLink = (address?: string, explorers?: string) => {
+  let tokenAddress = address || "";
+  const [, secondPart] = tokenAddress.split(":");
+  if (secondPart) {
+    tokenAddress = `0x${secondPart}`;
+  }
   if (explorers === XPLA_MAINNET_EXPLORER)
     return `${explorers}/mainnet/token/${
-      address === XPLA_ADDRESS ? "xpla" : address
+      tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
     }`;
-  return `${explorers}/token/${address === XPLA_ADDRESS ? "xpla" : address}`;
+  return `${explorers}/token/${
+    tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
+  }`;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>
