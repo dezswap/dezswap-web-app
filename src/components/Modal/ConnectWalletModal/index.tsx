@@ -5,7 +5,7 @@ import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -15,10 +15,11 @@ import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { useWalletManager } from "@interchain-kit/react";
 import useNetwork from "hooks/useNetwork";
 import { WalletState } from "@interchain-kit/core";
-import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
+import { WalletStore } from "@interchain-kit/store";
 import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
 import Box from "components/Box";
 import QRCode from "react-qr-code";
+import { useQueryClient } from "@tanstack/react-query";
 
 const WalletButton = styled.button`
   width: auto;
@@ -102,8 +103,8 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
   const [wcUri, setWcUri] = useState("");
+  const queryClient = useQueryClient();
   const currentWallet = wm.getWalletByName(wm.currentWalletName);
-
   useEffect(() => {
     if (wm?.walletConnectQRCodeUri) {
       setWcUri(wm?.walletConnectQRCodeUri);
@@ -153,10 +154,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
       ),
     ...wm.wallets
       .filter(
-        (wallet: StatefulWallet) =>
+        (wallet: WalletStore) =>
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: StatefulWallet) => {
+      .map((wallet: WalletStore) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
         const iconSrc =
           typeof wallet.info.logo === "string"
@@ -176,7 +177,11 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 )?.link;
                 if (url) window.open(url);
               }
+              wm.setCurrentWalletName(wallet.info.name);
               await wm.connect(wallet.info.name, chainName);
+              queryClient.invalidateQueries({
+                queryKey: ["walletAddress"],
+              });
               if (props.onRequestClose) {
                 props.onRequestClose(event);
               }
