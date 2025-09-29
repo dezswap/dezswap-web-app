@@ -4,7 +4,6 @@ import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { defaultSignerOptions } from "@xpla/xpla/defaults";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -18,6 +17,8 @@ import {
   DefaultRpcEndpoint,
 } from "constants/dezswap";
 import { WCWallet } from "@interchain-kit/core";
+import { createCosmosQueryClient } from "@interchainjs/cosmos";
+import { DEFAULT_COSMOS_EVM_SIGNER_CONFIG } from "@xpla/xpla";
 
 window.ResizeObserver = ResizeObserver;
 
@@ -36,8 +37,16 @@ const defaultOption = {
   },
 };
 const walletConnect = new WCWallet(undefined, defaultOption);
-
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+const baseSignerConfig = {
+  queryClient: await createCosmosQueryClient("https://cube-rpc.xpla.io"),
+  chainId: "cube_47-5",
+  addressPrefix: "xpla",
+};
+const signerOptions = {
+  ...DEFAULT_COSMOS_EVM_SIGNER_CONFIG,
+  ...baseSignerConfig,
+};
 
 const interchainOptions = {
   chains: DefaultChain,
@@ -46,10 +55,8 @@ const interchainOptions = {
   signerOptions: {
     signing: () => {
       return {
-        signerOptions: defaultSignerOptions.Cosmos,
-        broadcast: {
-          checkTx: true,
-        },
+        cosmosSignerConfig: signerOptions,
+        checkTx: true,
       };
     },
   },
@@ -61,7 +68,9 @@ const interchainOptions = {
     },
   },
 };
+console.log("hello");
 getChainOptions().then((chainOptions) => {
+  console.log(chainOptions, interchainOptions);
   root.render(
     <WalletProvider {...chainOptions}>
       <ChainProvider {...interchainOptions}>

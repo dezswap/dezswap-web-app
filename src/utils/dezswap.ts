@@ -4,6 +4,7 @@ import {
   Coins,
   MsgExecuteContract as BeforeMsgExecuteContract,
   Numeric,
+  CreateTxOptions,
 } from "@xpla/xpla.js";
 import { Asset, NativeAsset } from "types/pair";
 import {
@@ -23,6 +24,7 @@ import {
 } from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 import { EncodeObject } from "@xpla/xplajs/types";
+import { NewMsgTxOptions } from "hooks/useRequestPost";
 
 export type Amount = string | number;
 
@@ -87,9 +89,10 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
 const createEncodedMessage = (msg: Record<string, unknown>) =>
   window.btoa(JSON.stringify(msg));
 
-export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
+export const convertProtoToAmino = (tx: NewMsgTxOptions) => {
   return {
-    msgs: protoMsgs.map(
+    ...tx,
+    msgs: tx.msgs.map(
       (protoMsg) =>
         new BeforeMsgExecuteContract(
           protoMsg.sender,
@@ -103,7 +106,7 @@ export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
           ),
         ),
     ),
-  };
+  } as CreateTxOptions;
 };
 
 const assetMsg = (asset: { address: string; amount: string }) => ({

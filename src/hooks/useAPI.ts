@@ -11,8 +11,9 @@ import {
 } from "utils/dezswap";
 import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
 import { contractAddresses, GAS_INFO } from "constants/dezswap";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
+import { calculateFee } from "@interchainjs/cosmos";
 import useNetwork from "hooks/useNetwork";
+import Decimal from "decimal.js";
 import api, { ApiVersion } from "api";
 import { EncodeObject } from "@xpla/xplajs/types";
 import { LockdropUserInfo } from "types/lockdrop";
@@ -22,10 +23,7 @@ import useConnectedWallet from "./useConnectedWallet";
 const PLAY3_LIST_SIZE = 20;
 
 const useAPI = (version: ApiVersion = "v1") => {
-  const {
-    chainName,
-    selectedChain: { chainId },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
   const { walletAddress } = useConnectedWallet();
   const apiClient = useMemo(
@@ -314,15 +312,16 @@ const useAPI = (version: ApiVersion = "v1") => {
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
-        () => Promise.resolve(chainId),
-      );
+      if (!res?.gasInfo?.gasUsed) {
+        throw new Error("Gas used not found");
+      }
 
+      const gasLimit = BigInt(
+        Math.ceil(Number(res.gasInfo.gasUsed) * GAS_INFO.multiplier),
+      );
+      const fee = await calculateFee(gasLimit, GAS_INFO.gasPrice);
       return fee;
     },
-
     [client],
   );
 

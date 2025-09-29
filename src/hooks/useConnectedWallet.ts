@@ -1,40 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWalletManager } from "@interchain-kit/react";
 import { WalletState } from "@interchain-kit/core";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useConnectedWallet as useConnectedXplaWallet,
   useWallet,
   WalletApp,
 } from "@xpla/wallet-provider";
 import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { convertProtoToAminoMsg } from "utils/dezswap";
+import { convertProtoToAmino } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
-import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 
 const resetWalletValue = {
   walletAddress: "",
   isInterchain: false,
 };
-
-// FIXME: remove this temporary function once the type error in signAndBroadcastSync is fixed
-function base64ToUint8Array(data: string | Uint8Array) {
-  if (typeof data !== "string") return data;
-  const binaryString = atob(data);
-
-  const len = binaryString.length;
-
-  const bytes = new Uint8Array(len);
-
-  for (let i = 0; i < len; i += 1) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  return bytes;
-}
 
 const useConnectedWallet = () => {
   const { signingClient } = useSigningClient();
@@ -43,6 +26,8 @@ const useConnectedWallet = () => {
   const connectedXplaWallet = useConnectedXplaWallet();
   const [walletInfo, setWalletInfo] = useState(resetWalletValue);
   const wallet = useWallet();
+  const queryClient = useQueryClient();
+
   const fetchWalletAddress = useCallback(async () => {
     if (wm.isReady && wm.currentChainName !== chainName) {
       const { walletState } =
@@ -79,7 +64,6 @@ const useConnectedWallet = () => {
       "walletAddress",
       chainName,
       wm.currentWalletName,
-      wm.chainWalletState,
       connectedXplaWallet?.connectType,
     ],
     queryFn: () => {
@@ -103,7 +87,8 @@ const useConnectedWallet = () => {
         if (!signingClient) {
           throw new Error("signingClient is not found");
         }
-        const signResult = await signingClient.sign(
+
+        return signingClient.signAndBroadcast(
           walletInfo.walletAddress,
           messages,
           {
@@ -117,32 +102,11 @@ const useConnectedWallet = () => {
             ],
             gas: tx.fee.gas_limit.toString(),
           },
-          "",
         );
-
-        const txRaw = {
-          ...signResult,
-          authInfoBytes: base64ToUint8Array(signResult.authInfoBytes),
-          bodyBytes: base64ToUint8Array(signResult.bodyBytes),
-          signatures: signResult.signatures,
-        };
-
-        const txBytes = TxRaw.encode(txRaw).finish();
-        return signingClient.broadcastTxSync(txBytes);
-        // Temporarily using this method due to type mismatch between base64 and Uint8Array
-        // TODO: Use signAndBroadcastSync after InterchainKit update fixes the issue
       }
-      return connectedXplaWallet?.post(
-        { ...tx, ...convertProtoToAminoMsg(tx.msgs) },
-        walletApp,
-      );
+      return connectedXplaWallet?.post(convertProtoToAmino(tx), walletApp);
     },
-    [
-      connectedXplaWallet,
-      signingClient,
-      walletInfo.isInterchain,
-      walletInfo.walletAddress,
-    ],
+    [connectedXplaWallet, walletInfo.isInterchain, walletInfo.walletAddress],
   );
 
   const availablePost = useMemo(
@@ -167,14 +131,16 @@ const useConnectedWallet = () => {
   const disconnect = useCallback(async () => {
     if (walletInfo.isInterchain && wm.currentWalletName) {
       await wm.disconnect(wm.currentWalletName, chainName);
+      queryClient.invalidateQueries({
+        queryKey: ["walletAddress"],
+      });
     } else {
       wallet.disconnect();
-
       setTimeout(() => {
         window.location.reload();
       }, 100);
     }
-  }, [chainName, wallet, walletInfo.isInterchain, wm]);
+  }, [chainName, wallet, walletInfo.isInterchain, wm, queryClient]);
 
   useEffect(() => {
     if (prevDataString.current !== JSON.stringify(walletAddressResult)) {
