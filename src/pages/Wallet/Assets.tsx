@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
@@ -48,7 +48,7 @@ function Assets() {
     screenClass,
   );
   const { availableAssetAddresses } = usePairs();
-  const { getAsset } = useAssets();
+  const { getAsset, assetInfos } = useAssets();
   const { tokens: dashboardTokens } = useDashboard();
 
   const balances = useBalances(availableAssetAddresses);
@@ -57,26 +57,38 @@ function Assets() {
   const [sortBy, setSortBy] = useState<keyof TokenWithBalanceAndValue>("value");
   const [sortDirection, setSortDirection] =
     useState<TableSortDirection>("desc");
+  const [assets, setAssets] = useState<TokenWithBalanceAndValue[]>([]);
 
-  const assets = useMemo<TokenWithBalanceAndValue[]>(() => {
-    return balances
-      .filter(
-        (item): item is Exclude<typeof item, undefined | null> =>
-          !!item?.address,
-      )
-      .map((balance) => {
-        const asset = getAsset(balance.address);
+  useEffect(() => {
+    if (!balances?.length) return;
+
+    const fetch = async () => {
+      const results: TokenWithBalanceAndValue[] = [];
+
+      for (const balance of balances) {
+        if (!balance?.address) continue;
+
+        const asset = await getAsset(balance.address);
+
         const dashboardToken = dashboardTokens?.find(
           (item) => item?.address === balance.address,
         );
-        return {
+
+        const value = Numeric.parse(dashboardToken?.price || 0)
+          .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
+          .toString();
+
+        results.push({
           ...asset,
-          balance: balance?.balance,
-          value: Numeric.parse(dashboardToken?.price || 0)
-            .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
-            .toString(),
-        };
-      });
+          balance: balance.balance,
+          value,
+        });
+      }
+
+      setAssets(results);
+    };
+
+    fetch();
   }, [balances, dashboardTokens, getAsset]);
 
   const userAssets = useMemo(() => {

@@ -6,7 +6,7 @@ import Modal from "components/Modal";
 import SelectAssetForm from "components/SelectAssetForm";
 import Typography from "components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useHashModal from "hooks/useHashModal";
 import usePairs from "hooks/usePairs";
 import iconPlus from "assets/icons/icon-plus.svg";
@@ -57,7 +57,7 @@ function AssetSelector({
   const theme = useTheme();
   const screenClass = useScreenClass();
 
-  const { availableAssetAddresses, findPair } = usePairs();
+  const { availableAssetAddresses } = usePairs();
   const {
     selectedChain: { chainName },
   } = useNetwork();
@@ -66,27 +66,16 @@ function AssetSelector({
     return customAssetStore[chainName]?.map((asset) => asset.token) || [];
   }, [customAssetStore, chainName]);
 
-  const { getAsset } = useAssets();
-
   const selectAsset1Modal = useHashModal("asset1");
   const selectAsset2Modal = useHashModal("asset2");
 
   const [selectedAddress1, selectedAddress2] = addresses || [];
 
-  const [asset1, asset2] = useMemo(() => {
-    return [selectedAddress1, selectedAddress2].map((address) => {
-      return address ? getAsset(address) : undefined;
-    });
-  }, [getAsset, selectedAddress1, selectedAddress2]);
+  const { data: asset1 } = useAsset(selectedAddress1);
+  const { data: asset2 } = useAsset(selectedAddress2);
 
   const balance1 = useBalance(asset1?.token);
   const balance2 = useBalance(asset2?.token);
-
-  const pair = useMemo(() => {
-    return selectedAddress1 && selectedAddress2
-      ? findPair([selectedAddress1, selectedAddress2])
-      : undefined;
-  }, [findPair, selectedAddress1, selectedAddress2]);
 
   const closeSelectAssetModals = useCallback(() => {
     selectAsset1Modal.close();

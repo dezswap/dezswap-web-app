@@ -23,7 +23,7 @@ import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import iconBadge from "assets/icons/icon-badge.svg";
 
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
 import { useMemo } from "react";
@@ -311,7 +311,6 @@ function LockdropEventItem({
     screenClass,
   );
 
-  const { getAsset } = useAssets();
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -321,15 +320,9 @@ function LockdropEventItem({
     [findPairByLpAddress, lockdropEvent],
   );
 
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
-  const rewardAsset = useMemo(
-    () => getAsset(lockdropEvent.reward_token_addr),
-    [getAsset, lockdropEvent],
-  );
-
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { data: rewardAsset } = useAsset(lockdropEvent.reward_token_addr);
   const isStakable = useMemo(() => {
     const startAt = new Date(lockdropEvent.start_at * 1000);
     const endAt = new Date(lockdropEvent.end_at * 1000);

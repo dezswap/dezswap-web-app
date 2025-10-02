@@ -6,7 +6,7 @@ import Hr from "components/Hr";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import useBookmark from "hooks/useBookmark";
 import { useEffect, useMemo } from "react";
 import {
@@ -66,11 +66,7 @@ function TokenDetailPage() {
 
   const dashboardToken = useDashboardTokenDetail(tokenAddress);
 
-  const { getAsset } = useAssets();
-
-  const asset = useMemo(() => {
-    return tokenAddress ? getAsset(tokenAddress) : undefined;
-  }, [tokenAddress, getAsset]);
+  const { data: asset } = useAsset(tokenAddress);
 
   const isBookmarked = useMemo(() => {
     return tokenAddress ? bookmarks?.includes(tokenAddress) : false;

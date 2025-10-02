@@ -10,7 +10,7 @@ import {
 import Typography from "components/Typography";
 import { useForm, useWatch } from "react-hook-form";
 import useSimulate from "pages/Trade/Swap/useSimulate";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import {
   amountToValue,
   cutDecimal,
@@ -144,7 +144,6 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
-  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
   const { nativeTokens } = useNativeTokens();
@@ -189,14 +188,8 @@ function SwapPage() {
     },
   });
 
-  const asset1 = useMemo(
-    () => getAsset(asset1Address),
-    [asset1Address, getAsset],
-  );
-  const asset2 = useMemo(
-    () => getAsset(asset2Address),
-    [asset2Address, getAsset],
-  );
+  const { data: asset1 } = useAsset(asset1Address);
+  const { data: asset2 } = useAsset(asset2Address);
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);
   const dashboardToken2 = useDashboardTokenDetail(asset2Address);

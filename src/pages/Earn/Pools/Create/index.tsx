@@ -8,6 +8,7 @@ import {
 import Modal from "components/Modal";
 import { useParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { useForm } from "react-hook-form";
 import { useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
@@ -89,7 +90,7 @@ function CreatePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { nativeTokens } = useNativeTokens();
-  const { getAsset, validate } = useAssets();
+  const { validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     chainName,
@@ -115,45 +116,39 @@ function CreatePage() {
     onReturnClick: handleModalClose,
   });
 
-  const [asset1, asset2] = useMemo(() => {
-    const assets =
-      asset1Address && asset2Address
-        ? [asset1Address, asset2Address].map(
-            (address) => getAsset(address) || null,
-          )
-        : [undefined, undefined];
-    return assets;
-  }, [asset1Address, asset2Address, getAsset]);
+  const { data: asset1 } = useAsset(asset1Address);
+  const { data: asset2 } = useAsset(asset2Address);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (asset1 === null || asset2 === null) {
+      if (!asset1 || !asset2) {
         errorMessageModal.open();
       }
     }, 1500);
+
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
 
-    if (
-      !validate(asset1Address) ||
-      !validate(asset2Address) ||
-      asset1Address === asset2Address
-    ) {
-      errorMessageModal.open();
+    if (asset1 && asset2) {
+      const checkValidation = async () => {
+        const isValid1 = await validate(asset1Address);
+        const isValid2 = await validate(asset2Address);
+
+        if (isValid1 && isValid2) return;
+
+        if (!isValid1 || !isValid2 || asset1Address === asset2Address) {
+          errorMessageModal.open();
+        }
+      };
+
+      checkValidation();
     }
+
     return () => {
       clearTimeout(timerId);
     };
-  }, [
-    asset1,
-    asset1Address,
-    asset2,
-    asset2Address,
-    errorMessageModal,
-    chainName,
-    validate,
-  ]);
+  }, [asset1, asset1Address, asset2, asset2Address, chainName, validate]);
 
   const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
     () =>

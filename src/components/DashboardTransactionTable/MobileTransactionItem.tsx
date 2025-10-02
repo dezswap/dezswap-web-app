@@ -49,13 +49,13 @@ function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
     selectedChain: { explorers },
   } = useNetwork();
   const expand = useModal();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
 
   const [asset0, asset1] = useMemo(() => {
     return [transaction.asset0, transaction.asset1].map((address) => {
-      return getAsset(address);
+      return assetInfos?.[address];
     });
-  }, [getAsset, transaction.asset0, transaction.asset1]);
+  }, [assetInfos, transaction.asset0, transaction.asset1]);
 
   return (
     <Expand

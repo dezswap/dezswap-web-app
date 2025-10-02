@@ -39,7 +39,7 @@ function DashboardPoolTable({
 
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { getPair } = usePairs();
   const [page, setPage] = useState(1);
 
@@ -53,7 +53,7 @@ function DashboardPoolTable({
       if (searchKeyword) {
         const pair = getPair(item.address);
         const [asset0, asset1] =
-          pair?.asset_addresses.map((address) => getAsset(address)) || [];
+          pair?.asset_addresses.map((address) => assetInfos?.[address]) || [];
 
         if (
           ![
@@ -74,7 +74,7 @@ function DashboardPoolTable({
 
       return true;
     });
-  }, [dashboardPools, getAsset, getPair, searchKeyword]);
+  }, [dashboardPools, assetInfos, getPair, searchKeyword]);
 
   const sortedData = useMemo(() => {
     return filteredData.toSorted(getBasicSortFunction(sortBy, sortDirection));
@@ -176,8 +176,8 @@ function DashboardPoolTable({
               width: 300,
               render(address) {
                 const pair = getPair(`${address}`);
-                const assets = pair?.asset_addresses.map((assetAddress) =>
-                  getAsset(assetAddress),
+                const assets = pair?.asset_addresses.map(
+                  (assetAddress) => assetInfos?.[assetAddress],
                 );
                 return (
                   <Row
