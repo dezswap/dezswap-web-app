@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn tsc --skipLibCheck --noEmit
-yarn lint-staged
+pnpm tsc --skipLibCheck --noEmit
+pnpm lint-staged

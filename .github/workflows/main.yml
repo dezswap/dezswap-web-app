@@ -15,24 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Install yarn
-        run: npm install --location=global yarn
-
-      - name: Enable Corepack
-        run: corepack enable
+          cache: "pnpm"
 
       - name: Package install
-        run: yarn
+        run: pnpm install
 
       - name: Build
         env:
           VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
-        run: CI=false yarn build
+        run: CI=false pnpm build
 
       - name: Transfer to S3 for serving static
         uses: jakejarvis/s3-sync-action@master
