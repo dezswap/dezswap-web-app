@@ -10,7 +10,6 @@ import ReactDOM from "react-dom/client";
 import ResizeObserver from "resize-observer-polyfill";
 import "simplebar";
 import "simplebar/dist/simplebar.css";
-import "utils/overrideXplaNumeric";
 
 import {
   DefaultAssetList,
@@ -19,6 +18,8 @@ import {
 } from "~/constants/dezswap";
 
 import theme from "~/styles/theme";
+
+import "~/utils/overrideXplaNumeric";
 
 import App from "./App";
 
