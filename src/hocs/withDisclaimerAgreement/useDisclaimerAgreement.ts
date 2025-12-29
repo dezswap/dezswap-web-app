@@ -1,5 +1,6 @@
-import useLocalStorage from "hooks/useLocalStorage";
 import { useMemo } from "react";
+
+import useLocalStorage from "~/hooks/useLocalStorage";
 
 const useDisclaimerAgreement = () => {
   const [disclaimerLastSeen, setDisclaimerLastSeen] = useLocalStorage(

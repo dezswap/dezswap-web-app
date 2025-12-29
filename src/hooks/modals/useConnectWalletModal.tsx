@@ -1,7 +1,9 @@
-import ConnectWalletModal from "components/Modal/ConnectWalletModal";
 import { useMemo } from "react";
-import useGlobalElement from "hooks/useGlobalElement";
-import useHashModal from "hooks/useHashModal";
+
+import ConnectWalletModal from "~/components/Modal/ConnectWalletModal";
+
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useHashModal from "~/hooks/useHashModal";
 
 const useConnectWalletModal = () => {
   const modal = useHashModal();

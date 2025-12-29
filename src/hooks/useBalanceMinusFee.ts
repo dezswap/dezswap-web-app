@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
-import { XPLA_ADDRESS } from "constants/network";
-import { amountToValue, valueToAmount } from "utils";
+import { useEffect, useMemo, useState } from "react";
+
+import { XPLA_ADDRESS } from "~/constants/network";
+
+import { amountToValue, valueToAmount } from "~/utils";
+
 import useBalance from "./useBalance";
 
 const useBalanceMinusFee = (address?: string, feeAmount?: string) => {

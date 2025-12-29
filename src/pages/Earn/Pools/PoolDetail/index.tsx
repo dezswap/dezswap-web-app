@@ -1,39 +1,44 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import Breadcrumb from "components/Breadcrumb";
-import Hr from "components/Hr";
-import IconButton from "components/IconButton";
-import Panel from "components/Panel";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useAssets from "hooks/useAssets";
 import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
 
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import AssetIcon from "components/AssetIcon";
-import Typography from "components/Typography";
-import Outlink from "components/Outlink";
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+
+import AssetIcon from "~/components/AssetIcon";
+import Breadcrumb from "~/components/Breadcrumb";
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Outlink from "~/components/Outlink";
+import Panel from "~/components/Panel";
+import ScrollToTop from "~/components/ScrollToTop";
+import Typography from "~/components/Typography";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairBookmark from "~/hooks/usePairBookmark";
+import usePairs from "~/hooks/usePairs";
+import usePool from "~/hooks/usePool";
+
 import {
   amountToValue,
   formatDecimals,
   formatNumber,
   getAddressLink,
-} from "utils";
-import useNetwork from "hooks/useNetwork";
-import Link from "components/Link";
-import Button from "components/Button";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useBalance from "hooks/useBalance";
-import usePairBookmark from "hooks/usePairBookmark";
-import usePairs from "hooks/usePairs";
-import { LP_DECIMALS } from "constants/dezswap";
-import { useNavigate } from "hooks/useNavigate";
-import usePool from "hooks/usePool";
-import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import ScrollToTop from "components/ScrollToTop";
+} from "~/utils";
+
 import Chart from "./Chart";
 import PoolSummary from "./PoolSummary";
 import PoolTransactions from "./PoolTransactions";

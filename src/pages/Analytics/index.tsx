@@ -1,14 +1,16 @@
 import { css } from "@emotion/react";
-import Hr from "components/Hr";
-import Typography from "components/Typography";
 import { Container } from "react-grid-system";
-import ScrollToTop from "components/ScrollToTop";
-import Charts from "./Charts";
-import TopMovers from "./TopMovers";
+
+import Hr from "~/components/Hr";
+import ScrollToTop from "~/components/ScrollToTop";
+import Typography from "~/components/Typography";
+
 import AllTokens from "./AllTokens";
-import Recent from "./Recent";
-import Transactions from "./Transactions";
+import Charts from "./Charts";
 import Pools from "./Pools";
+import Recent from "./Recent";
+import TopMovers from "./TopMovers";
+import Transactions from "./Transactions";
 
 function AnalyticsPage() {
   return (

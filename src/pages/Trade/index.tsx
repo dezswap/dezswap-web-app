@@ -1,18 +1,22 @@
-import { Outlet } from "react-router-dom";
-import TabButton from "components/TabButton";
-import { Col, Container, Row } from "react-grid-system";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Panel from "components/Panel";
-import IconButton from "components/IconButton";
-import iconOverview from "assets/icons/icon-overview-disabled.svg";
-import iconOverviewHover from "assets/icons/icon-overview-disabled-hover.svg";
-import iconSetting from "assets/icons/icon-setting.svg";
-import iconSettingHover from "assets/icons/icon-setting-hover.svg";
-import useSettingsModal from "hooks/modals/useSettingsModal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Tooltip from "components/Tooltip";
-import ScrollToTop from "components/ScrollToTop";
+import { Col, Container, Row } from "react-grid-system";
+import { Outlet } from "react-router-dom";
+
+import iconOverviewHover from "~/assets/icons/icon-overview-disabled-hover.svg";
+import iconOverview from "~/assets/icons/icon-overview-disabled.svg";
+import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
+import iconSetting from "~/assets/icons/icon-setting.svg";
+
+import IconButton from "~/components/IconButton";
+import Panel from "~/components/Panel";
+import ScrollToTop from "~/components/ScrollToTop";
+import TabButton from "~/components/TabButton";
+import Tooltip from "~/components/Tooltip";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useSettingsModal from "~/hooks/modals/useSettingsModal";
 
 const Wrapper = styled.div`
   width: 100%;

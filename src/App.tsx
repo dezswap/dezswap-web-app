@@ -1,13 +1,16 @@
-import { RouterProvider } from "react-router-dom";
-import routes from "routes";
 import { useEffect } from "react";
-import GlobalStyles from "styles/GlobalStyles";
 import {
   ScreenClassProvider,
   setConfiguration as setGridConfiguration,
   useScreenClass,
 } from "react-grid-system";
-import { gridConfiguration, SCREEN_CLASSES } from "constants/layout";
+import { RouterProvider } from "react-router-dom";
+
+import { SCREEN_CLASSES, gridConfiguration } from "~/constants/layout";
+
+import GlobalStyles from "~/styles/GlobalStyles";
+
+import routes from "./routes";
 
 setGridConfiguration(gridConfiguration);
 

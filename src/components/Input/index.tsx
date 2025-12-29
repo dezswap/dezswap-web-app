@@ -1,9 +1,11 @@
-import { forwardRef, useCallback, useRef } from "react";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { sanitizeNumberInput } from "utils";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
+import { forwardRef, useCallback, useRef } from "react";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import { sanitizeNumberInput } from "~/utils";
 
 type InputVariant = "default" | "base" | "primary";
 type InputSize = "default" | "large";

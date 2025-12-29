@@ -1,10 +1,12 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useMemo, type ComponentProps } from "react";
 
-import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
-import Typography from "components/Typography";
-import { css } from "@emotion/react";
-import useModal from "hooks/useModal";
+import iconDropdown from "~/assets/icons/icon-dropdown-arrow.svg";
+
+import Typography from "~/components/Typography";
+
+import useModal from "~/hooks/useModal";
 
 type Value = string | number;
 
@@ -14,8 +16,10 @@ interface Option {
   value?: Value;
 }
 
-interface SelectProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
+interface SelectProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "onChange"
+> {
   options?: Option[];
   onChange?(value: Value, option: Option): void;
   outline?: boolean;

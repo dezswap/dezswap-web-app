@@ -1,10 +1,14 @@
-import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
-
 import { css } from "@emotion/react";
-import useLockdropBookmark from "hooks/useLockdropBookmark";
-import Typography from "components/Typography";
 import styled from "@emotion/styled";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useLockdropBookmark from "~/hooks/useLockdropBookmark";
+
+import { LockdropEvent, LockdropUserInfo } from "~/types/lockdrop";
+
 import LockdropEventItem from "./LockdropEventItem";
 
 const Wrapper = styled.div`

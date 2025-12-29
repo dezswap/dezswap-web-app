@@ -1,7 +1,6 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import Tooltip from "components/Tooltip";
 import Decimal from "decimal.js";
 import React, {
   useCallback,
@@ -12,8 +11,12 @@ import React, {
   useState,
 } from "react";
 
-export interface LineChartProps
-  extends Omit<React.SVGProps<SVGSVGElement>, "strokeWidth" | "height"> {
+import Tooltip from "~/components/Tooltip";
+
+export interface LineChartProps extends Omit<
+  React.SVGProps<SVGSVGElement>,
+  "strokeWidth" | "height"
+> {
   data: Numeric.Input[];
   height: Exclude<React.CSSProperties["height"], undefined>;
   strokeWidth?: number;

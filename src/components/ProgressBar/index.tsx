@@ -1,7 +1,8 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import Typography from "components/Typography";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import Typography from "~/components/Typography";
 
 interface ProgressBarProps {
   value: number;

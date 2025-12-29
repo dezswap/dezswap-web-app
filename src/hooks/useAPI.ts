@@ -1,6 +1,20 @@
+import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
+import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
-
 import { useCallback, useMemo } from "react";
+
+import api, { ApiVersion } from "~/api";
+
+import { GAS_INFO, contractAddresses } from "~/constants/dezswap";
+
+import useNetwork from "~/hooks/useNetwork";
+
+import { LockdropUserInfo } from "~/types/lockdrop";
+import type {
+  VerifiedAssets,
+  VerifiedIbcAssets,
+  WhiteList,
+} from "~/types/token";
 
 import {
   createEncodedTx,
@@ -8,16 +22,10 @@ import {
   generateSimulationMsg,
   getQueryData,
   parseJsonFromBinary,
-} from "utils/dezswap";
-import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
-import { contractAddresses, GAS_INFO } from "constants/dezswap";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
-import useNetwork from "hooks/useNetwork";
-import api, { ApiVersion } from "api";
-import { EncodeObject } from "@xpla/xplajs/types";
-import { LockdropUserInfo } from "types/lockdrop";
-import useRPCClient from "./useRPCClient";
+} from "~/utils/dezswap";
+
 import useConnectedWallet from "./useConnectedWallet";
+import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;
 
@@ -259,6 +267,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     const contractAddress = contractAddresses[chainName]?.play3List;
     if (isLoading) return;
     if (!client || !contractAddress) {
+      // eslint-disable-next-line consistent-return
       return undefined;
     }
     let res: WhiteList = [];
@@ -273,6 +282,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       });
       try {
         const { data } =
+          // eslint-disable-next-line no-await-in-loop
           (await client?.cosmwasm.wasm.v1.smartContractState({
             address: contractAddress,
             queryData,
@@ -285,9 +295,11 @@ const useAPI = (version: ApiVersion = "v1") => {
         lastAddress = res[res.length - 1].cont_addr;
         if (parsed.length < PLAY3_LIST_SIZE) break;
       } catch (e) {
+        // eslint-disable-next-line consistent-return
         return res;
       }
     }
+    // eslint-disable-next-line consistent-return
     return res;
   }, [client]);
 

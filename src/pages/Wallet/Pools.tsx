@@ -1,17 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
 import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
-import Panel from "components/Panel";
-import TabButton from "components/TabButton";
-import Table from "components/Table";
-import useBalances from "hooks/useBalances";
-import usePairBookmark from "hooks/usePairBookmark";
-import usePairs from "hooks/usePairs";
-import usePools from "hooks/usePools";
-import { Pool } from "types/api";
-import Pagination from "components/Pagination";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
+
+import Pagination from "~/components/Pagination";
+import Panel from "~/components/Panel";
+import TabButton from "~/components/TabButton";
+import Table from "~/components/Table";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useBalances from "~/hooks/useBalances";
+import usePairBookmark from "~/hooks/usePairBookmark";
+import usePairs from "~/hooks/usePairs";
+import usePools from "~/hooks/usePools";
+
+import { Pool } from "~/types/api";
+
 import PoolItem from "./PoolItem";
 
 type PoolWithBalance = Pool & {

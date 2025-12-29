@@ -1,13 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import Breadcrumb from "components/Breadcrumb";
-import Hr from "components/Hr";
-import IconButton from "components/IconButton";
-import Panel from "components/Panel";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useAssets from "hooks/useAssets";
-import useBookmark from "hooks/useBookmark";
 import { useEffect, useMemo } from "react";
 import {
   Col,
@@ -19,29 +12,41 @@ import {
 } from "react-grid-system";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import AssetIcon from "components/AssetIcon";
-import Typography from "components/Typography";
-import Outlink from "components/Outlink";
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+
+import AssetIcon from "~/components/AssetIcon";
+import Breadcrumb from "~/components/Breadcrumb";
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Outlink from "~/components/Outlink";
+import Panel from "~/components/Panel";
+import ScrollToTop from "~/components/ScrollToTop";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import useBookmark from "~/hooks/useBookmark";
+import useNetwork from "~/hooks/useNetwork";
+
 import {
   amountToValue,
   formatDecimals,
   formatNumber,
   getTokenLink,
-} from "utils";
-import useNetwork from "hooks/useNetwork";
-import Button from "components/Button";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import useBalance from "hooks/useBalance";
-import ScrollToTop from "components/ScrollToTop";
-import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import Link from "components/Link";
+} from "~/utils";
+
 import Chart from "./Chart";
+import TokenPools from "./TokenPools";
 import TokenSummary from "./TokenSummary";
 import TokenTransactions from "./TokenTransactions";
-import TokenPools from "./TokenPools";
 
 const Wrapper = styled.div`
   width: 100%;

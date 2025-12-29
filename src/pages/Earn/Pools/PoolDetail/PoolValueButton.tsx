@@ -1,12 +1,16 @@
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import iconShift from "assets/icons/icon-shift.svg";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
-import usePool from "hooks/usePool";
 import { useMemo, useState } from "react";
-import { amountToValue, formatDecimals } from "utils";
-import { getAddressFromAssetInfo } from "utils/dezswap";
+
+import iconShift from "~/assets/icons/icon-shift.svg";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import usePool from "~/hooks/usePool";
+
+import { amountToValue, formatDecimals } from "~/utils";
+import { getAddressFromAssetInfo } from "~/utils/dezswap";
 
 interface PoolValueButtonProps {
   poolAddress: string;

@@ -1,7 +1,9 @@
 import styled from "@emotion/styled";
 import { Container } from "react-grid-system";
-import Typography from "components/Typography";
-import Box from "components/Box";
+
+import Box from "~/components/Box";
+import Typography from "~/components/Typography";
+
 import DelegateButton from "./DelegateButton";
 
 const Wrapper = styled.div`

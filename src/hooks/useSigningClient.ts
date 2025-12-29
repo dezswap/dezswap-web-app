@@ -1,8 +1,9 @@
+import { WalletState } from "@interchain-kit/core";
 import { useWalletManager } from "@interchain-kit/react";
 import { toEncoders } from "@interchainjs/cosmos/utils";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useQuery } from "@tanstack/react-query";
-import { WalletState } from "@interchain-kit/core";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+
 import useNetwork from "./useNetwork";
 
 function useSigningClient() {

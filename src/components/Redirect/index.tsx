@@ -1,5 +1,6 @@
-import { useFormatTo } from "hooks/useFormatTo";
 import { Navigate, type To } from "react-router-dom";
+
+import { useFormatTo } from "~/hooks/useFormatTo";
 
 export interface RedirectProps {
   to: To;

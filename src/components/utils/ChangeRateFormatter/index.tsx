@@ -1,6 +1,7 @@
 import { css, useTheme } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
 import { useMemo } from "react";
+
 import PercentageFormatter from "../PercentageFormatter";
 
 interface ChangeRateFormatterProps {

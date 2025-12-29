@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import iconCaution from "assets/icons/icon-caution.svg";
+
+import iconCaution from "~/assets/icons/icon-caution.svg";
 
 type MessageProps = React.PropsWithChildren<{
   variant?: "guide" | "error" | "warning"; // TODO: "default" | "success" | "error" | "warning";

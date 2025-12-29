@@ -1,20 +1,25 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import IconButton from "components/IconButton";
-import Tooltip from "components/Tooltip";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import useBalance from "hooks/useBalance";
-import useIsInViewport from "hooks/useIsInViewport";
 import { useRef } from "react";
-import { Token } from "types/api";
-import { ellipsisCenter } from "utils";
 
-import iconToken from "assets/icons/icon-default-token.svg";
-import iconVerified from "assets/icons/icon-verified.svg";
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+import iconToken from "~/assets/icons/icon-default-token.svg";
+import iconVerified from "~/assets/icons/icon-verified.svg";
+
+import IconButton from "~/components/IconButton";
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useBalance from "~/hooks/useBalance";
+import useIsInViewport from "~/hooks/useIsInViewport";
+
+import { Token } from "~/types/api";
+
+import { ellipsisCenter } from "~/utils";
 
 interface WrapperProps {
   selected?: boolean;

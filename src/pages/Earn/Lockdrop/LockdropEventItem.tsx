@@ -1,41 +1,46 @@
-import Box from "components/Box";
-import styled from "@emotion/styled";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { Col, Hidden, Row, Visible, useScreenClass } from "react-grid-system";
-import Button from "components/Button";
 import { css } from "@emotion/react";
-import Tooltip from "components/Tooltip";
-import Typography from "components/Typography";
-import { LP_DECIMALS } from "constants/dezswap";
+import styled from "@emotion/styled";
+import { Numeric } from "@xpla/xpla.js";
+import { type ComponentProps, useMemo } from "react";
+import { Col, Hidden, Row, Visible, useScreenClass } from "react-grid-system";
+
+import iconAlarm from "~/assets/icons/icon-alarm.svg";
+import iconBadge from "~/assets/icons/icon-badge.svg";
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+import iconVerified from "~/assets/icons/icon-verified.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Outlink from "~/components/Outlink";
+import ProgressBar from "~/components/ProgressBar";
+import Tooltip from "~/components/Tooltip";
+import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+
+import { LockdropEvent, LockdropUserInfo } from "~/types/lockdrop";
+
 import {
-  formatNumber,
-  formatDecimals,
   amountToValue,
   formatDateTime,
-  getRemainDays,
+  formatDecimals,
+  formatNumber,
   getAddressLink,
-} from "utils";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import iconVerified from "assets/icons/icon-verified.svg";
-import iconAlarm from "assets/icons/icon-alarm.svg";
+  getRemainDays,
+} from "~/utils";
 
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import iconBadge from "assets/icons/icon-badge.svg";
-
-import useAssets from "hooks/useAssets";
-import useNetwork from "hooks/useNetwork";
-import usePairs from "hooks/usePairs";
-import { type ComponentProps, useMemo } from "react";
-import ProgressBar from "components/ProgressBar";
-import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
-import IconButton from "components/IconButton";
-import Hr from "components/Hr";
-import { Numeric } from "@xpla/xpla.js";
-import Link from "components/Link";
-import Outlink from "components/Outlink";
-import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import Expand from "../Expand";
 
 const Wrapper = styled(Box)<{ isNeedAction?: boolean }>`

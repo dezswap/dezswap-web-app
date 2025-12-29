@@ -1,10 +1,11 @@
 import { useAtom } from "jotai";
 import { useMemo } from "react";
+
 import {
-  selectedSlippagePresetAtom,
-  customSlippageToleranceAtom,
   DEFAULT_SLIPPAGE_TOLERANCE,
-} from "stores/settings";
+  customSlippageToleranceAtom,
+  selectedSlippagePresetAtom,
+} from "~/stores/settings";
 
 const useSlippageTolerance = () => {
   const [selectedPreset, setSelectedPreset] = useAtom(

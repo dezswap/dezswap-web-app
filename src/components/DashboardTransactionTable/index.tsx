@@ -1,28 +1,35 @@
 import { css } from "@emotion/react";
-import HoverUnderline from "components/utils/HoverUnderline";
-import Input from "components/Input";
-import Pagination from "components/Pagination";
-import Panel from "components/Panel";
-import TabButton from "components/TabButton";
-import Table, { TableSortDirection } from "components/Table";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
-import useNetwork from "hooks/useNetwork";
-import Select from "pages/Earn/Pools/Select";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { DashboardTransaction } from "types/dashboard-api";
+
+import Input from "~/components/Input";
+import Pagination from "~/components/Pagination";
+import Panel from "~/components/Panel";
+import TabButton from "~/components/TabButton";
+import Table, { TableSortDirection } from "~/components/Table";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import OverflowTooltip from "~/components/utils/OverflowTooltip";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import useNetwork from "~/hooks/useNetwork";
+
+import Select from "~/pages/Earn/Pools/Select";
+
+import { DashboardTransaction } from "~/types/dashboard-api";
+
 import {
   ellipsisCenter,
   getAddressLink,
   getFromNow,
   getTransactionLink,
-} from "utils";
-import { getBasicSortFunction } from "utils/table";
-import OverflowTooltip from "components/utils/OverflowTooltip";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+} from "~/utils";
+import { getBasicSortFunction } from "~/utils/table";
+
 import MobileTransactionItem from "./MobileTransactionItem";
 
 interface DashboardTransactionTableProps {

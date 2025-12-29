@@ -1,11 +1,6 @@
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import IconButton from "components/IconButton";
-import Typography from "components/Typography";
-import { LP_DECIMALS } from "constants/dezswap";
-import useAssets from "hooks/useAssets";
-import useBalance from "hooks/useBalance";
-import useNetwork from "hooks/useNetwork";
 import {
   type ComponentProps,
   useEffect,
@@ -13,31 +8,42 @@ import {
   useRef,
   useState,
 } from "react";
-import { Row, Col, useScreenClass, Hidden } from "react-grid-system";
-import { formatNumber, formatDecimals, getAddressLink } from "utils";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import styled from "@emotion/styled";
-import Box from "components/Box";
-import Button from "components/Button";
+import { Col, Hidden, Row, useScreenClass } from "react-grid-system";
+
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Outlink from "~/components/Outlink";
+import SimplePieChart from "~/components/SimplePieChart";
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
 import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
   TABLET_SCREEN_CLASS,
-} from "constants/layout";
-import Link from "components/Link";
-import Tooltip from "components/Tooltip";
-import usePairs from "hooks/usePairs";
-import Outlink from "components/Outlink";
-import SimplePieChart from "components/SimplePieChart";
-import HoverUnderline from "components/utils/HoverUnderline";
-import usePool from "hooks/usePool";
-import useDashboard from "hooks/dashboard/useDashboard";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import PercentageFormatter from "components/utils/PercentageFormatter";
+} from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import usePool from "~/hooks/usePool";
+
+import { formatDecimals, formatNumber, getAddressLink } from "~/utils";
+
 import Expand from "../Expand";
 
 const TableRow = styled(Box)`

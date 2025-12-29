@@ -1,12 +1,15 @@
-import { MouseEventHandler } from "react";
 import { css, useTheme } from "@emotion/react";
-import Modal from "components/Modal";
-import Failed from "assets/images/failed.svg";
-import Typography from "components/Typography";
-import Panel from "components/Panel";
-import Button from "components/Button";
+import { MouseEventHandler } from "react";
 import { useScreenClass } from "react-grid-system";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+
+import Failed from "~/assets/images/failed.svg";
+
+import Button from "~/components/Button";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 interface InvalidPathModalProps {
   onReturnClick?: MouseEventHandler<HTMLButtonElement>;

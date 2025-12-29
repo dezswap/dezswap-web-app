@@ -1,17 +1,21 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import IconButton from "components/IconButton";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
+import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import { Container, useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
-
-import iconClose from "assets/icons/icon-close-28px.svg";
-import iconBack from "assets/icons/icon-back.svg";
-import { type ComponentProps, useEffect, useMemo, useState } from "react";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
-
 import SimpleBar from "simplebar";
+
+import iconBack from "~/assets/icons/icon-back.svg";
+import iconClose from "~/assets/icons/icon-close-28px.svg";
+
+import IconButton from "~/components/IconButton";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+
+import {
+  MOBILE_SCREEN_CLASS,
+  MODAL_CLOSE_TIMEOUT_MS,
+} from "~/constants/layout";
 
 ReactModal.setAppElement("#root");
 

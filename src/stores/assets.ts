@@ -1,5 +1,6 @@
 import { atomWithStorage } from "jotai/utils";
-import { Token } from "types/api";
+
+import { Token } from "~/types/api";
 
 interface CustomToken extends Token {
   updatedAt?: Date;

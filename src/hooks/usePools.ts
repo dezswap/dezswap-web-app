@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import useNetwork from "./useNetwork";
+
 import useAPI from "./useAPI";
+import useNetwork from "./useNetwork";
 
 const usePools = () => {
   const { chainName } = useNetwork();
