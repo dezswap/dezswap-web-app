@@ -24,7 +24,7 @@ import { XPLA_SYMBOL } from "~/constants/network";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAssets from "~/hooks/useAssets";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNavigate } from "~/hooks/useNavigate";
@@ -61,7 +61,7 @@ function ClaimPage() {
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
 
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();

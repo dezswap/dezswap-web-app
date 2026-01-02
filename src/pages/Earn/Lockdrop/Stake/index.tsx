@@ -28,7 +28,7 @@ import { XPLA_SYMBOL } from "~/constants/network";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNavigate } from "~/hooks/useNavigate";
@@ -69,7 +69,7 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();

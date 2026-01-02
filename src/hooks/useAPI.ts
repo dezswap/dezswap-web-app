@@ -24,7 +24,7 @@ import {
 } from "~/utils/dezswap";
 import { calculateFeeWithGasInfo } from "~/utils/fee";
 
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;
@@ -35,7 +35,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     selectedChain: { chainId },
   } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const apiClient = useMemo(
     () => api(chainName, version),
     [chainName, version],
