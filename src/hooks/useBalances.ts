@@ -2,13 +2,13 @@ import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import useAPI from "./useAPI";
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useNetwork from "./useNetwork";
 
 const UPDATE_INTERVAL = 30000;
 
 const useBalances = (addresses: string[]) => {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { chainName } = useNetwork();
   const api = useAPI();
 

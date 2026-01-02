@@ -17,7 +17,7 @@ import Typography from "~/components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 
@@ -34,7 +34,7 @@ const Wrapper = styled.div`
 
 function WalletPage() {
   const navigate = useNavigate();
-  const { walletAddress, disconnect } = useConnectedWallet();
+  const { walletAddress, disconnect } = useConnectedWallet() ?? {};
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -46,7 +46,7 @@ function WalletPage() {
   const isModalOpened = useRef(false);
 
   const handleDisconnectClick = () => {
-    disconnect();
+    disconnect?.();
   };
 
   useEffect(() => {

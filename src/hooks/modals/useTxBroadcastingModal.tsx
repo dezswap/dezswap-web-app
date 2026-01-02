@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import TxBroadcastingModal from "~/components/Modal/TxBroadcastingModal";
 
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useGlobalElement from "~/hooks/useGlobalElement";
 import useModal from "~/hooks/useModal";
 
@@ -20,7 +20,7 @@ const useTxBroadcastingModal = ({
 }) => {
   const modal = useModal();
   const queryClient = useQueryClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const element = useMemo(
     () => (
       <TxBroadcastingModal

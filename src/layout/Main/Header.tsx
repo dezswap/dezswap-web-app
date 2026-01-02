@@ -41,8 +41,7 @@ import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
 import useDashboard from "~/hooks/dashboard/useDashboard";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useBalance from "~/hooks/useBalance";
-import { useChain } from "~/hooks/useChain";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
 import useNetwork from "~/hooks/useNetwork";
@@ -322,7 +321,6 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const { wallet: interchainWallet } = useChain(chainName);
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -330,23 +328,6 @@ function Header() {
     );
     return dashboardToken?.price;
   }, [dashboardTokens]);
-
-  const { walletName, logo } = useMemo(() => {
-    if (connectedWallet.isInterchain)
-      return {
-        walletName: interchainWallet.info.prettyName,
-        logo: interchainWallet.info.logo?.toString(),
-      };
-    return {
-      walletName: connectedWallet?.connection?.name,
-      logo: connectedWallet?.connection?.icon,
-    };
-  }, [
-    connectedWallet?.connection?.name,
-    connectedWallet?.connection?.icon,
-    connectedWallet.isInterchain,
-    interchainWallet,
-  ]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -489,13 +470,13 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
-                      <img src={logoURIs.png} alt={prettyName} />
+                      <img src={logoURIs?.png} alt={prettyName} />
                       {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet.walletAddress ? (
+                    {connectedWallet?.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -584,7 +565,7 @@ function Header() {
                                   <IconButton
                                     size={24}
                                     icons={{
-                                      default: logo,
+                                      default: connectedWallet.connection.icon,
                                     }}
                                   />
                                 </Col>
@@ -594,7 +575,7 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {walletName}
+                                    {connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">

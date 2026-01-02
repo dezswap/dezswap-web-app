@@ -32,7 +32,7 @@ import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
 import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
@@ -69,7 +69,7 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const navigate = useNavigate();
   const {
     chainName,

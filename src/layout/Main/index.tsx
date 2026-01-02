@@ -24,7 +24,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import { useFormatTo } from "~/hooks/useFormatTo";
 import useNetwork from "~/hooks/useNetwork";
 
@@ -151,7 +151,7 @@ function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
   const { chainName } = useNetwork();
   const globalElements = useAtomValue(globalElementsAtom);
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
