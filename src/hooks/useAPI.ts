@@ -1,13 +1,10 @@
-import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
-import { Any } from "@xpla/xplajs/google/protobuf/any";
 import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
 import api, { ApiVersion } from "~/api";
 
-import { contractAddresses, getGasInfo } from "~/constants/dezswap";
+import { contractAddresses } from "~/constants/dezswap";
 
 import useNetwork from "~/hooks/useNetwork";
 
@@ -23,9 +20,9 @@ import {
   generateReverseSimulationMsg,
   generateSimulationMsg,
   getQueryData,
-  hasChainPrefix,
   parseJsonFromBinary,
 } from "~/utils/dezswap";
+import { calculateFeeWithGasInfo } from "~/utils/fee";
 
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
@@ -152,37 +149,31 @@ const useAPI = (version: ApiVersion = "v1") => {
     return res.block?.header.height ?? ("0" as unknown as string);
   }, [client]);
 
-  const getDecimal = useCallback(
-    async (denom: string) => {
-      const contractAddress = contractAddresses[chainName]?.factory;
-      if (!denom || !client || !contractAddress) {
-        return undefined;
-      }
+  // unused func
+  // const getDecimal = useCallback(
+  //   async (denom: string) => {
+  //     const contractAddress = contractAddresses[chainName]?.factory;
+  //     if (!contractAddress || !denom) {
+  //       return undefined;
+  //     }
 
-      const isNativeTokenAddress = hasChainPrefix(denom);
-      const queryData = getQueryData(
-        isNativeTokenAddress
-          ? { token_info: {} }
-          : { native_token_decimals: { denom } },
-      );
+  //     const queryData = toBase64(
+  //       toUtf8(
+  //         JSON.stringify({
+  //           native_token_decimals: { denom },
+  //         }),
+  //       ),
+  //     )
 
-      const targetAddress = isNativeTokenAddress ? denom : contractAddress;
-
-      try {
-        const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-          address: targetAddress,
-          queryData,
-        });
-
-        const parsed = parseJsonFromBinary(res);
-        return isNativeTokenAddress ? { a: parsed.decimals } : parsed.decimals;
-      } catch (e) {
-        console.log(e);
-        return undefined;
-      }
-    },
-    [chainName, client],
-  );
+  //     const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+  //       address: contractAddress,
+  //       queryData,
+  //     });
+  //     const tokenDecimals = parseJsonFromBinary(res) as unknown as Decimal;
+  //     return tokenDecimals.decimals;
+  //   },
+  //   [chainName, client],
+  // );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
@@ -276,6 +267,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     const contractAddress = contractAddresses[chainName]?.play3List;
     if (isLoading) return;
     if (!client || !contractAddress) {
+      // eslint-disable-next-line consistent-return
       return undefined;
     }
     let res: WhiteList = [];
@@ -290,6 +282,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       });
       try {
         const { data } =
+          // eslint-disable-next-line no-await-in-loop
           (await client?.cosmwasm.wasm.v1.smartContractState({
             address: contractAddress,
             queryData,
@@ -302,9 +295,11 @@ const useAPI = (version: ApiVersion = "v1") => {
         lastAddress = res[res.length - 1].cont_addr;
         if (parsed.length < PLAY3_LIST_SIZE) break;
       } catch (e) {
+        // eslint-disable-next-line consistent-return
         return res;
       }
     }
+    // eslint-disable-next-line consistent-return
     return res;
   }, [client]);
 
@@ -312,18 +307,11 @@ const useAPI = (version: ApiVersion = "v1") => {
     if (!walletAddress || !client) {
       return undefined;
     }
-    const { account } =
-      ((await client?.cosmos.auth.v1beta1.account({
+    const { info } =
+      (await client?.cosmos.auth.v1beta1.accountInfo({
         address: walletAddress,
-      })) as { account: Any }) || {};
-    if (account?.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
-      return BaseAccount.decode(account?.value);
-    }
-    if (account?.typeUrl === "/ethermint.types.v1.EthAccount") {
-      const { baseAccount } = EthAccount.decode(account?.value);
-      return baseAccount;
-    }
-    return undefined;
+      })) || {};
+    return info;
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
@@ -338,15 +326,8 @@ const useAPI = (version: ApiVersion = "v1") => {
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        getGasInfo(chainName),
-        () => Promise.resolve(chainId),
-      );
-
-      return fee;
+      return calculateFeeWithGasInfo(res?.gasInfo?.gasUsed ?? 0n);
     },
-
     [client],
   );
 
@@ -360,7 +341,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      getDecimal,
+      // getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
@@ -380,7 +361,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      getDecimal,
+      // getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,

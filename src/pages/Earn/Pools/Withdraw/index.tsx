@@ -1,5 +1,5 @@
 import { css, useTheme } from "@emotion/react";
-import { Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -24,16 +24,16 @@ import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
-import useAsset from "~/hooks/useAsset";
+import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -53,7 +53,8 @@ import {
   getTokenLink,
   valueToAmount,
 } from "~/utils";
-import { generateWithdrawLiquidityMsg, hasChainPrefix } from "~/utils/dezswap";
+import { generateWithdrawLiquidityMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -71,9 +72,10 @@ function WithdrawPage() {
   const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
-    selectedChain: { explorers, fees },
+    chainName,
+    selectedChain: { explorers },
   } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -89,42 +91,40 @@ function WithdrawPage() {
     () => (poolAddress ? getPair(poolAddress) : undefined),
     [getPair, poolAddress],
   );
-
-  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
-  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { getAsset } = useAssets();
+  const [asset1, asset2] = useMemo(
+    () =>
+      pair
+        ? pair.asset_addresses.map((address) => getAsset(address))
+        : [undefined, undefined],
+    [getAsset, pair],
+  );
 
   const dashboardToken1 = useDashboardTokenDetail(asset1?.token);
   const dashboardToken2 = useDashboardTokenDetail(asset2?.token);
 
   useEffect(() => {
-    if (!pair?.asset_addresses?.length) {
-      errorMessageModal.open();
-      return;
-    }
-
     const timerId = setTimeout(() => {
-      if (!asset1 || !asset2) {
+      if (!asset1?.token || !asset2?.token) {
         errorMessageModal.open();
       }
     }, 1500);
-
-    if (
-      poolAddress &&
-      !hasChainPrefix(poolAddress) &&
-      !errorMessageModal.isOpen
-    ) {
+    if (asset1 && asset2) {
+      errorMessageModal.close();
+    }
+    if (poolAddress && !AccAddress.validate(poolAddress)) {
       errorMessageModal.open();
     }
-
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, chainName, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
   });
+  const { register } = form;
 
   const { lpValue } = form.watch();
 
@@ -191,17 +191,6 @@ function WithdrawPage() {
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
-  const asset1TokenLink = useMemo(
-    () => getTokenLink(asset1?.token, explorers?.[0].url),
-    [explorers, asset1?.token],
-  );
-  const asset2TokenLink = useMemo(
-    () => getTokenLink(asset2?.token, explorers?.[0].url),
-    [explorers, asset2?.token],
-  );
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -256,7 +245,9 @@ function WithdrawPage() {
             },
           }}
           lpToken={pair?.liquidity_token}
-          assets={[asset1, asset2]}
+          assets={
+            pair?.asset_addresses.map((address) => getAsset(address)) || []
+          }
           onBalanceClick={(value) => {
             form.setValue(FormKey.lpValue, value, {
               shouldValidate: true,
@@ -491,14 +482,8 @@ function WithdrawPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
-                        amount={feeAmount}
+                        asset={{ symbol: XPLA_SYMBOL }}
+                        amount={getXplaFeeAmount(fee)}
                       />
                     ),
                   },
@@ -537,25 +522,23 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset1?.token)}&nbsp;
-                      {asset1TokenLink && (
-                        <a
-                          href={asset1TokenLink}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
-                      )}
+                      <a
+                        href={getTokenLink(asset1?.token, explorers?.[0].url)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
                     </>
                   ),
                 },
@@ -565,25 +548,23 @@ function WithdrawPage() {
                   value: (
                     <>
                       {ellipsisCenter(asset2?.token)}&nbsp;
-                      {asset2TokenLink && (
-                        <a
-                          href={asset2TokenLink}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
-                      )}
+                      <a
+                        href={getTokenLink(asset2?.token, explorers?.[0].url)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
                     </>
                   ),
                 },

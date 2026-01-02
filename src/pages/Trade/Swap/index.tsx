@@ -39,18 +39,17 @@ import {
   MOBILE_SCREEN_CLASS,
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
 
 import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useFirstProvideModal from "~/hooks/modals/useFirstProvideModal";
-import useAsset from "~/hooks/useAsset";
+import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useHashModal from "~/hooks/useHashModal";
-import useNativeTokens from "~/hooks/useNativeTokens";
-import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
@@ -71,6 +70,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateSwapMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -154,9 +154,9 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
+  const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
-  const { nativeTokens } = useNativeTokens();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
@@ -168,9 +168,7 @@ function SwapPage() {
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
   );
-  const {
-    selectedChain: { fees },
-  } = useNetwork();
+
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -198,8 +196,14 @@ function SwapPage() {
     },
   });
 
-  const { data: asset1 } = useAsset(asset1Address);
-  const { data: asset2 } = useAsset(asset2Address);
+  const asset1 = useMemo(
+    () => getAsset(asset1Address),
+    [asset1Address, getAsset],
+  );
+  const asset2 = useMemo(
+    () => getAsset(asset2Address),
+    [asset2Address, getAsset],
+  );
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);
   const dashboardToken2 = useDashboardTokenDetail(asset2Address);
@@ -352,9 +356,7 @@ function SwapPage() {
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
@@ -391,7 +393,7 @@ function SwapPage() {
       walletAddress &&
       balanceApplied &&
       !isReversed &&
-      asset1Address === fees.feeTokens[0]?.denom &&
+      asset1Address === XPLA_ADDRESS &&
       Number(asset1Value) &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
@@ -452,7 +454,7 @@ function SwapPage() {
   );
 
   useEffect(() => {
-    if (asset1Address === fees.feeTokens[0]?.denom) {
+    if (asset1Address === XPLA_ADDRESS) {
       form.trigger(FormKey.asset1Value);
     }
   }, [form, asset1Address, asset2Address]);
@@ -1036,13 +1038,7 @@ function SwapPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
+                        asset={{ symbol: XPLA_SYMBOL }}
                         amount={feeAmount}
                       />
                     ),
