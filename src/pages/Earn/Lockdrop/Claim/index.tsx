@@ -2,7 +2,6 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -120,20 +119,18 @@ function ClaimPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const claimLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateClaimLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateClaimLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(createTxOptions);
+  const { fee } = useFee(claimLockdropMsg);
 
   const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
@@ -150,16 +147,16 @@ function ClaimPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!createTxOptions || !fee) {
+      if (!claimLockdropMsg || !fee) {
         return;
       }
       requestPost({
-        txOptions: { msgs: createTxOptions },
+        messages: claimLockdropMsg,
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, claimLockdropMsg],
   );
 
   useEffect(() => {
@@ -347,7 +344,7 @@ function ClaimPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !createTxOptions}
+          disabled={!fee || !claimLockdropMsg}
         >
           Claim
         </Button>

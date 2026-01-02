@@ -20,11 +20,11 @@ import {
   MOBILE_SCREEN_CLASS,
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
+import { nativeTokens } from "~/constants/network";
 
-import useAssets from "~/hooks/useAssets";
+import useAPI from "~/hooks/useAPI";
 import useBalance from "~/hooks/useBalance";
 import useCustomAssets from "~/hooks/useCustomAssets";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRPCClient from "~/hooks/useRPCClient";
@@ -33,8 +33,8 @@ import useVerifiedAssets from "~/hooks/useVerifiedAssets";
 import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
-import { getIbcTokenHash } from "~/utils";
-import { getQueryData, parseJsonFromBinary } from "~/utils/dezswap";
+import { getIbcTokenHash, isNativeTokenAddress } from "~/utils";
+import { parseJsonFromUtf8, toUtf8 } from "~/utils/encode";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -46,44 +46,30 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const [address, setAddress] = useState("");
   const [page, setPage] = useState<"form" | "confirm" | "complete">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
-  const { validate } = useAssets();
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const {
-    selectedChain: { chainId },
+    selectedChain: { chainName, chainId },
   } = useNetwork();
   const { client } = useRPCClient();
-  const { nativeTokens } = useNativeTokens();
+
+  const api = useAPI();
 
   const balance = useBalance(address);
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
-  const [isValidAddress, setIsValidAddress] = useState<boolean | undefined>(
-    undefined,
-  );
-
   const isNativeToken = useMemo(
-    () => nativeTokens.some((item) => item.token === address),
-    [address, nativeTokens],
+    () => isNativeTokenAddress(chainName, address),
+    [chainName, address],
   );
   const isIbcToken = useMemo(
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
     [address, verifiedIbcAssets],
   );
-
-  useEffect(() => {
-    const checkValidity = async () => {
-      const valid = await validate(address);
-      setIsValidAddress(valid || isNativeToken || isIbcToken);
-    };
-
-    if (address) {
-      checkValidity();
-    } else {
-      setIsValidAddress(undefined);
-    }
-  }, [address, isNativeToken, isIbcToken]);
-
+  const isValidAddress = useMemo(
+    () => AccAddress.validate(address) || isNativeToken || isIbcToken,
+    [address, isNativeToken, isIbcToken],
+  );
   const isDuplicated = useMemo(() => {
     return (
       customAssets?.some((item) => item.token === address) ||
@@ -118,7 +104,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens.find(
+        const asset = nativeTokens[chainName]?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
@@ -136,7 +122,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isValidAddress && client) {
         try {
-          const queryData = getQueryData({
+          const queryData = toUtf8({
             token_info: {},
           });
 
@@ -147,7 +133,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             });
 
           if (!isAborted) {
-            setTokenInfo(parseJsonFromBinary(res) as unknown as TokenInfo);
+            setTokenInfo(parseJsonFromUtf8(res) as unknown as TokenInfo);
           }
         } catch (error) {
           console.log(error);
@@ -163,11 +149,13 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
       isAborted = true;
     };
   }, [
+    api,
     deferredAddress,
     isValidAddress,
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
+    chainName,
     client,
     address,
   ]);
@@ -183,7 +171,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -198,7 +186,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,

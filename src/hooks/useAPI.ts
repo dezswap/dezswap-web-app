@@ -1,4 +1,4 @@
-import { EncodeObject } from "@xpla/xplajs/types";
+import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
@@ -16,12 +16,10 @@ import type {
 } from "~/types/token";
 
 import {
-  createEncodedTx,
   generateReverseSimulationMsg,
   generateSimulationMsg,
-  getQueryData,
-  parseJsonFromBinary,
 } from "~/utils/dezswap";
+import { encodeTx, parseJsonFromUtf8, toAny, toUtf8 } from "~/utils/encode";
 import { calculateFeeWithGasInfo } from "~/utils/fee";
 
 import { useConnectedWallet } from "./useConnectedWallet";
@@ -30,10 +28,7 @@ import useRPCClient from "./useRPCClient";
 const PLAY3_LIST_SIZE = 20;
 
 const useAPI = (version: ApiVersion = "v1") => {
-  const {
-    chainName,
-    selectedChain: { chainId },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
   const { walletAddress } = useConnectedWallet() ?? {};
   const apiClient = useMemo(
@@ -44,13 +39,13 @@ const useAPI = (version: ApiVersion = "v1") => {
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
       if (!client) return undefined;
-      const queryData = getQueryData(generateSimulationMsg(offerAsset, amount));
+      const queryData = toUtf8(generateSimulationMsg(offerAsset, amount));
       const { data } = await client.cosmwasm.wasm.v1.smartContractState({
         address: contractAddress,
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromUtf8(data);
     },
     [client],
   );
@@ -59,16 +54,14 @@ const useAPI = (version: ApiVersion = "v1") => {
     async (contractAddress: string, askAsset: string, amount: string) => {
       if (!client) return undefined;
 
-      const queryData = getQueryData(
-        generateReverseSimulationMsg(askAsset, amount),
-      );
+      const queryData = toUtf8(generateReverseSimulationMsg(askAsset, amount));
 
       const { data } = await client.cosmwasm.wasm.v1.smartContractState({
         address: contractAddress,
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromUtf8(data);
     },
     [client],
   );
@@ -99,7 +92,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         balance: { address: walletAddress },
       });
 
@@ -108,7 +101,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      const res = parseJsonFromBinary(data);
+      const res = parseJsonFromUtf8(data);
 
       return res.balance;
     },
@@ -177,12 +170,12 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
-      const contractAddress = contractAddresses?.[chainName]?.lockdrop;
+      const contractAddress = contractAddresses[chainName]?.lockdrop;
       if (!contractAddress || !client) {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         events_by_end: { start_after: startAfter },
       });
 
@@ -191,7 +184,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromUtf8(data);
     },
     [client, chainName],
   );
@@ -200,7 +193,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     async (lockdropEventAddress: string) => {
       if (!client) return undefined;
 
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         event_info: {},
       });
 
@@ -209,7 +202,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromUtf8(data);
     },
     [client],
   );
@@ -220,7 +213,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         user_info: {
           addr: walletAddress,
         },
@@ -231,7 +224,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      return parseJsonFromBinary(data) as LockdropUserInfo;
+      return parseJsonFromUtf8(data) as LockdropUserInfo;
     },
     [client, walletAddress],
   );
@@ -246,7 +239,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         estimate: {
           amount: `${amount}`,
           duration,
@@ -258,7 +251,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return parseJsonFromUtf8(data);
     },
     [client, walletAddress],
   );
@@ -274,7 +267,7 @@ const useAPI = (version: ApiVersion = "v1") => {
     let lastAddress = "";
 
     while (true) {
-      const queryData = getQueryData({
+      const queryData = toUtf8({
         get_complete_meme_data_list: {
           start_after: lastAddress,
           limit: PLAY3_LIST_SIZE,
@@ -288,7 +281,7 @@ const useAPI = (version: ApiVersion = "v1") => {
             queryData,
           })) || {};
 
-        const { data: parsed } = parseJsonFromBinary(data) ?? {};
+        const { data: parsed } = parseJsonFromUtf8(data) ?? {};
 
         if (!parsed || parsed.length === 0) break;
         res = [...res, ...parsed];
@@ -315,12 +308,12 @@ const useAPI = (version: ApiVersion = "v1") => {
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
-    async (msg: EncodeObject[], authSequence: bigint) => {
-      if (!msg || !client) {
+    async (msgs: MsgExecuteContract[], authSequence: bigint) => {
+      if (!msgs || !client) {
         return undefined;
       }
 
-      const txBytes = createEncodedTx(msg, authSequence);
+      const txBytes = encodeTx(toAny(msgs), authSequence);
 
       const res = await client?.cosmos.tx.v1beta1.simulate({
         txBytes,

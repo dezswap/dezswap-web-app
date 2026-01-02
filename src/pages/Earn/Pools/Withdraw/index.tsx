@@ -1,6 +1,5 @@
 import { css, useTheme } from "@emotion/react";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm } from "react-hook-form";
@@ -157,31 +156,29 @@ function WithdrawPage() {
     [lpValue, balance],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const withdrawLiquidityMsg = useMemo(
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
       walletAddress &&
       isLpPayable
-        ? [
-            generateWithdrawLiquidityMsg(
-              walletAddress || "",
-              poolAddress || "",
-              pair?.liquidity_token || "",
-              valueToAmount(lpValue, LP_DECIMALS) || "0",
-              [asset1?.token, asset2?.token].map((address) => ({
-                address: address || "",
-                amount: Numeric.parse(
-                  simulationResult?.estimatedAmount?.find(
-                    (a) => a.address === address,
-                  )?.amount || "0",
-                )
-                  .mul(Numeric.parse((1 - slippageTolerance / 100).toString()))
-                  .toFixed(0),
-              })),
-              txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-            ),
-          ]
+        ? generateWithdrawLiquidityMsg(
+            walletAddress || "",
+            poolAddress || "",
+            pair?.liquidity_token || "",
+            valueToAmount(lpValue, LP_DECIMALS) || "0",
+            [asset1?.token, asset2?.token].map((address) => ({
+              address: address || "",
+              amount: Numeric.parse(
+                simulationResult?.estimatedAmount?.find(
+                  (a) => a.address === address,
+                )?.amount || "0",
+              )
+                .mul(Numeric.parse((1 - slippageTolerance / 100).toString()))
+                .toFixed(0),
+            })),
+            txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+          )
         : undefined,
     [walletAddress, simulationResult, lpValue],
   );
@@ -190,20 +187,20 @@ function WithdrawPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(withdrawLiquidityMsg);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && withdrawLiquidityMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: withdrawLiquidityMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [withdrawLiquidityMsg, fee, requestPost],
   );
 
   const buttonMsg = useMemo(() => {
