@@ -1,11 +1,10 @@
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
 import api, { ApiVersion } from "~/api";
 
-import { GAS_INFO, contractAddresses } from "~/constants/dezswap";
+import { contractAddresses } from "~/constants/dezswap";
 
 import useNetwork from "~/hooks/useNetwork";
 
@@ -23,6 +22,7 @@ import {
   getQueryData,
   parseJsonFromBinary,
 } from "~/utils/dezswap";
+import { calculateFeeWithGasInfo } from "~/utils/fee";
 
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
@@ -326,15 +326,8 @@ const useAPI = (version: ApiVersion = "v1") => {
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        GAS_INFO,
-        () => Promise.resolve(chainId),
-      );
-
-      return fee;
+      return calculateFeeWithGasInfo(res?.gasInfo?.gasUsed ?? 0n);
     },
-
     [client],
   );
 

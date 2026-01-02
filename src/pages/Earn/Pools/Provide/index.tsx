@@ -60,6 +60,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateAddLiquidityMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 export enum FormKey {
   asset1Value = "asset1Value",
@@ -205,9 +206,7 @@ function ProvidePage() {
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 

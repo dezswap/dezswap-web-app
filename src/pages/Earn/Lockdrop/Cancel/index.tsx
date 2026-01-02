@@ -21,7 +21,7 @@ import Typography from "~/components/Typography";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
@@ -43,6 +43,7 @@ import {
   getTokenLink,
 } from "~/utils";
 import { generateCancelLockdropMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 import InputGroup from "../Stake/InputGroup";
 
@@ -145,11 +146,8 @@ function CancelPage() {
     ];
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(createTxOptions);
-
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const { fee } = useFee(cancelLockdropMsg);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const { requestPost } = useRequestPost(handleModalClose);
 

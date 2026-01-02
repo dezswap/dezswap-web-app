@@ -17,7 +17,7 @@ import Typography from "~/components/Typography";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
@@ -38,6 +38,7 @@ import {
   getTokenLink,
 } from "~/utils";
 import { generateUnstakeLockdropMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 import InputGroup from "../Stake/InputGroup";
 
@@ -116,10 +117,7 @@ function UnlockPage() {
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(txOptions);
-
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });

@@ -70,6 +70,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateSwapMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -355,9 +356,7 @@ function SwapPage() {
     isFailed: isFeeFailed,
   } = useFee(createTxOptions);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 

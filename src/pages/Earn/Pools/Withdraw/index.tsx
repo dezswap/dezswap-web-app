@@ -24,7 +24,7 @@ import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
@@ -54,6 +54,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateWithdrawLiquidityMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -482,9 +483,7 @@ function WithdrawPage() {
                     value: (
                       <AssetValueFormatter
                         asset={{ symbol: XPLA_SYMBOL }}
-                        amount={fee?.amount
-                          ?.get(XPLA_ADDRESS)
-                          ?.amount.toString()}
+                        amount={getXplaFeeAmount(fee)}
                       />
                     ),
                   },
