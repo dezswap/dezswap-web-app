@@ -2,7 +2,6 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { Controller, useForm } from "react-hook-form";
@@ -47,6 +46,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateIncreaseLockupContractMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
@@ -147,22 +147,20 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const increaseLockupContractMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
-    return [
-      generateIncreaseLockupContractMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-        amount: valueToAmount(lpValue, LP_DECIMALS),
-        duration: Number(duration),
-      }),
-    ];
+    return generateIncreaseLockupContractMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      lpTokenAddress: lockdropEventInfo?.lp_token_addr,
+      amount: valueToAmount(lpValue, LP_DECIMALS),
+      duration: Number(duration),
+    });
   }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
-  const { fee } = useFee(createTxOptions);
+  const { fee } = useFee(increaseLockupContractMsg);
 
   const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
@@ -189,15 +187,15 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-      if (createTxOptions && fee) {
+      if (increaseLockupContractMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: increaseLockupContractMsg,
           fee,
           formElement: event.currentTarget,
         });
       }
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, increaseLockupContractMsg],
   );
 
   useEffect(() => {

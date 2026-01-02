@@ -1,7 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import {
   FormEventHandler,
   useCallback,
@@ -160,7 +159,7 @@ function CreatePage() {
     validate,
   ]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const createPoolMsg = useMemo(
     () =>
       walletAddress &&
       asset1?.token &&
@@ -189,7 +188,7 @@ function CreatePage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(createPoolMsg);
 
   const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
@@ -239,15 +238,15 @@ function CreatePage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && createPoolMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createPoolMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [createPoolMsg, fee, requestPost],
   );
 
   const ratio = useMemo(() => {

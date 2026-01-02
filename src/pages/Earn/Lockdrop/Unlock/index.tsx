@@ -1,7 +1,6 @@
 import { css } from "@emotion/react";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -103,20 +102,18 @@ function UnlockPage() {
     );
   }, [duration, lockdropUserInfo]);
 
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const unstakeLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateUnstakeLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateUnstakeLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
+  const { fee } = useFee(unstakeLockdropMsg);
   const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const handleModalClose = useCallback(() => {
@@ -132,16 +129,16 @@ function UnlockPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!txOptions || !fee) {
+      if (!unstakeLockdropMsg || !fee) {
         return;
       }
       requestPost({
-        txOptions: { msgs: txOptions },
+        messages: unstakeLockdropMsg,
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, unstakeLockdropMsg],
   );
 
   useEffect(() => {
@@ -270,7 +267,7 @@ function UnlockPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !txOptions}
+          disabled={!fee || !unstakeLockdropMsg}
         >
           Unlock
         </Button>

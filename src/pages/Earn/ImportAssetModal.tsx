@@ -34,7 +34,7 @@ import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
 import { getIbcTokenHash, isNativeTokenAddress } from "~/utils";
-import { getQueryData, parseJsonFromBinary } from "~/utils/dezswap";
+import { parseJsonFromUtf8, toUtf8 } from "~/utils/encode";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -122,7 +122,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isValidAddress && client) {
         try {
-          const queryData = getQueryData({
+          const queryData = toUtf8({
             token_info: {},
           });
 
@@ -133,7 +133,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             });
 
           if (!isAborted) {
-            setTokenInfo(parseJsonFromBinary(res) as unknown as TokenInfo);
+            setTokenInfo(parseJsonFromUtf8(res) as unknown as TokenInfo);
           }
         } catch (error) {
           console.log(error);
@@ -171,7 +171,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -186,7 +186,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,

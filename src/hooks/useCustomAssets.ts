@@ -12,7 +12,7 @@ import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
 import { getIbcTokenHash, isNativeTokenAddress } from "~/utils";
-import { getQueryData, parseJsonFromBinary } from "~/utils/dezswap";
+import { parseJsonFromUtf8, toUtf8 } from "~/utils/encode";
 
 import usePairs from "./usePairs";
 import useRPCClient from "./useRPCClient";
@@ -84,7 +84,7 @@ const useCustomAssets = () => {
                 }));
               }
             } else {
-              const queryData = getQueryData({
+              const queryData = toUtf8({
                 token_info: {},
               });
               if (!client) {
@@ -99,7 +99,7 @@ const useCustomAssets = () => {
                 },
               );
 
-              const token = parseJsonFromBinary(data) as unknown as TokenInfo;
+              const token = parseJsonFromUtf8(data) as unknown as TokenInfo;
 
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];

@@ -2,7 +2,6 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -133,17 +132,15 @@ function CancelPage() {
     [getAsset, lockdropEventInfo],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const cancelLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateCancelLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateCancelLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(cancelLockdropMsg);
@@ -154,15 +151,15 @@ function CancelPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (createTxOptions && fee) {
+      if (cancelLockdropMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: cancelLockdropMsg,
           fee,
           skipConfirmation: true,
         });
       }
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, cancelLockdropMsg],
   );
 
   useEffect(() => {

@@ -311,7 +311,7 @@ function SwapPage() {
     asset2?.decimals,
   ]);
 
-  const createTxOptions = useMemo(() => {
+  const swagMsg = useMemo(() => {
     if (
       !simulationResult?.estimatedAmount ||
       simulationResult?.isLoading ||
@@ -325,19 +325,15 @@ function SwapPage() {
       return undefined;
     }
 
-    const swapMsg = [
-      generateSwapMsg(
-        walletAddress,
-        selectedPair.contract_addr,
-        asset1.token,
-        valueToAmount(asset1Value, asset1?.decimals) || "",
-        beliefPrice || "",
-        `${slippageTolerance}`,
-        txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-      ),
-    ];
-
-    return swapMsg;
+    return generateSwapMsg(
+      walletAddress,
+      selectedPair.contract_addr,
+      asset1.token,
+      valueToAmount(asset1Value, asset1?.decimals) || "",
+      beliefPrice || "",
+      `${slippageTolerance}`,
+      txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+    );
   }, [
     simulationResult,
     walletAddress,
@@ -354,7 +350,7 @@ function SwapPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(swagMsg);
 
   const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
@@ -442,15 +438,15 @@ function SwapPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && swagMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: swagMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [swagMsg, fee, requestPost],
   );
 
   useEffect(() => {
