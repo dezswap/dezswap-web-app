@@ -1,3 +1,5 @@
+import type { Chain } from "@chain-registry/types";
+import type { HttpEndpoint } from "@interchainjs/types";
 import {
   CreateTxFailed,
   SignBytesFailed,
@@ -11,9 +13,8 @@ import { Pair } from "~/types/pair";
 
 export interface NetworkInfo {
   chainName: string;
-  // TODO: resolve Chain, HttpEndpoint types
   selectedChain: Chain;
-  rpcUrl: string | HttpEndpoint;
+  rpcUrl?: string | HttpEndpoint;
 }
 
 export type TxError =
