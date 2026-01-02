@@ -2,7 +2,6 @@ import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { WalletState } from "@interchain-kit/core";
 import { useWalletManager } from "@interchain-kit/react";
-import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
 import React, {
@@ -141,7 +140,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
       .flatMap((p) =>
         isMobile() && p.label === "Wallet Connect"
           ? [
-              p as WalletButtonProps,
+              p satisfies WalletButtonProps,
               {
                 label: `${p.label}\n(XPLA GAMES)`,
                 iconSrc: p.iconSrc,
@@ -158,16 +157,16 @@ function ConnectWalletModal(props: ReactModal.Props) {
                     props.onRequestClose(event);
                   }
                 },
-              } as WalletButtonProps,
+              } satisfies WalletButtonProps,
             ]
-          : (p as WalletButtonProps),
+          : (p satisfies WalletButtonProps),
       ),
     ...wm.wallets
       .filter(
-        (wallet: StatefulWallet) =>
+        (wallet) =>
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: StatefulWallet) => {
+      .map((wallet) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
         const iconSrc =
           typeof wallet.info.logo === "string"
@@ -195,7 +194,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
               console.log(error);
             }
           },
-        } as WalletButtonProps;
+        } satisfies WalletButtonProps;
       }),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
