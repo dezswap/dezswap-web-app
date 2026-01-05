@@ -48,7 +48,7 @@ importers:
         specifier: 1.18.1
         version: 1.18.1
       '@interchainjs/ethereum':
-        specifier: ^1.19.1
+        specifier: 1.19.1
         version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/math':
         specifier: 1.18.1
