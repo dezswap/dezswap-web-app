@@ -1,6 +1,6 @@
 import type { CosmosSignArgs } from "@interchainjs/cosmos";
 import type { StdFee } from "@interchainjs/types";
-import { ConnectType, CreateTxFailed } from "@xpla/wallet-provider";
+import { CreateTxFailed } from "@xpla/wallet-provider";
 import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
@@ -13,7 +13,7 @@ import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
 import { useConnectedWallet } from "./useConnectedWallet";
 
 const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
-  const { post, connectType } = useConnectedWallet() ?? {};
+  const { post } = useConnectedWallet() ?? {};
   const [signArgs, setSignArgs] = useState<CosmosSignArgs>();
   const [txHash, setTxHash] = useState<string>();
   const [txError, setTxError] = useState<TxError>();
@@ -31,16 +31,13 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         try {
           txBroadcastModal.open();
           const { result } = await post(_signArgs);
-          if (result.raw_log !== "") {
-            // TODO: error ?
-          }
+          // TODO: handle error from wallet post response?
+          // we don't use success from wallet post response
+          // since we query the tx result by tx hash anyway in TxBroadcastingModal
           setTxHash(result.txhash);
         } catch (error) {
           console.log(error);
-          if (
-            error instanceof CreateTxFailed &&
-            connectType === ConnectType.WALLETCONNECT
-          ) {
+          if (error instanceof CreateTxFailed) {
             error.message =
               "Transaction creation failed, please check the details in your wallet and try again";
           }
@@ -50,7 +47,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         }
       }
     },
-    [post, connectType, txBroadcastModal],
+    [post, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {
