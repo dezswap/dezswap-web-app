@@ -24,6 +24,7 @@ import useDashboard from "hooks/dashboard/useDashboard";
 import { getBasicSortFunction } from "utils/table";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import HoverUnderline from "components/utils/HoverUnderline";
 import MobileAssetItem from "./MobileAssetItem";
 
 export type TokenWithBalanceAndValue = Partial<Token> & {
@@ -172,44 +173,54 @@ function Assets() {
                         }}
                       />
                     </Col>
-                    <Col xs="content">
+                    <Col
+                      xs="content"
+                      css={css`
+                        line-height: 1;
+                        font-size: 0;
+                      `}
+                    >
                       <AssetIcon asset={row} />
                     </Col>
                     <Col width={200}>
-                      <div
-                        css={css`
-                          display: flex;
-                          justify-content: flex-start;
-                          align-items: center;
-                        `}
-                      >
+                      <HoverUnderline>
                         <Link
                           to={`/tokens/${encodeURIComponent(`${row.token}`)}`}
                         >
                           <div
                             css={css`
-                              white-space: nowrap;
-                              word-break: break-all;
-                              text-overflow: ellipsis;
-                              overflow: hidden;
+                              display: inline-flex;
+                              justify-content: flex-start;
+                              align-items: center;
+                              line-height: normal;
                             `}
                           >
-                            {name}&nbsp;
+                            <div
+                              css={css`
+                                white-space: nowrap;
+                                word-break: break-all;
+                                text-overflow: ellipsis;
+                                overflow: hidden;
+                              `}
+                            >
+                              {name}&nbsp;
+                            </div>
+                            {row.symbol && (
+                              <Typography
+                                size={16}
+                                weight={500}
+                                css={css`
+                                  opacity: 0.7;
+                                  display: inline-block;
+                                  line-height: inherit;
+                                `}
+                              >
+                                ({row.symbol})
+                              </Typography>
+                            )}
                           </div>
                         </Link>
-                        {row.symbol && (
-                          <Typography
-                            size={16}
-                            weight={500}
-                            css={css`
-                              opacity: 0.7;
-                              display: inline-block;
-                            `}
-                          >
-                            ({row.symbol})
-                          </Typography>
-                        )}
-                      </div>
+                      </HoverUnderline>
                     </Col>
                   </Row>
                 );

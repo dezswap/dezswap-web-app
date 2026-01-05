@@ -198,7 +198,13 @@ function TokenDetailPage() {
                     <Hidden xs>
                       <Col xs="content">{bookmarkButton}</Col>
                     </Hidden>
-                    <Col xs="content">
+                    <Col
+                      xs="content"
+                      css={css`
+                        line-height: 1;
+                        font-size: 0;
+                      `}
+                    >
                       <AssetIcon asset={{ icon: asset?.icon }} />
                     </Col>
                     <Col xs="content">

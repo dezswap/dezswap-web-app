@@ -18,7 +18,7 @@ const Wrapper = styled(Box)`
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  padding: 20px;
+  padding: 20px 20px;
   gap: 20px;
 
   ${({ onClick }) =>
@@ -40,6 +40,7 @@ const DefaultTableCell = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  line-height: 32px;
 `;
 
 function TableRow<R extends object>({

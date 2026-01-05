@@ -81,7 +81,13 @@ function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
         <Row justify="between" align="center" gutterWidth={4}>
           <Col xs="content">
             <Row justify="start" align="center" gutterWidth={5}>
-              <Col xs="content">
+              <Col
+                xs="content"
+                css={css`
+                  line-height: 1;
+                  font-size: 0;
+                `}
+              >
                 <AssetIcon asset={{ icon: asset?.icon }} size={24} />
               </Col>
               <Col xs="content">

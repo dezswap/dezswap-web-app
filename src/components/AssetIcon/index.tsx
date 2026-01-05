@@ -29,6 +29,8 @@ const Wrapper = styled.div<Pick<AssetIconProps, "size">>`
   background-size: contain;
   background-position: 50% 50%;
   background-repeat: no-repeat;
+  line-height: 1;
+  font-size: 0;
 `;
 
 function AssetIcon({

@@ -221,9 +221,6 @@ function DashboardTransactionTable({ data }: DashboardTransactionTableProps) {
               key: "actionDisplay",
               label: "Transaction",
               width: 230,
-              cellStyle: {
-                padding: "8.5px 0",
-              },
               render(actionDisplay, row) {
                 return (
                   <OverflowTooltip content={actionDisplay}>

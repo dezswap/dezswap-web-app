@@ -68,6 +68,7 @@ function MobileAssetItem({
               <Col
                 xs="content"
                 css={css`
+                  line-height: 1;
                   font-size: 0;
                 `}
               >
@@ -84,6 +85,7 @@ function MobileAssetItem({
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
+                    line-height: 32px;
                   `}
                 >
                   <Link to={`/tokens/${encodeURIComponent(`${asset.token}`)}`}>
