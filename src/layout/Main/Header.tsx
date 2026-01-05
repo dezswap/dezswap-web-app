@@ -45,7 +45,7 @@ import Banner from "components/Banner";
 import Link from "components/Link";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
 import Tooltip from "components/Tooltip";
-import SimpleBar from "simplebar/dist";
+import SimpleBar from "simplebar";
 import useHashModal from "hooks/useHashModal";
 import useDashboard from "hooks/dashboard/useDashboard";
 import { Numeric } from "@xpla/xpla.js";

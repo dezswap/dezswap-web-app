@@ -11,7 +11,7 @@ import iconBack from "assets/icons/icon-back.svg";
 import { useEffect, useMemo, useState } from "react";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
-import SimpleBar from "simplebar/dist";
+import SimpleBar from "simplebar";
 
 ReactModal.setAppElement("#root");
 

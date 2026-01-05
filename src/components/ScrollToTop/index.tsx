@@ -1,5 +1,5 @@
 import { PropsWithChildren, useEffect } from "react";
-import SimpleBar from "simplebar/dist";
+import SimpleBar from "simplebar";
 
 function ScrollToTop({ children }: PropsWithChildren) {
   useEffect(() => {
