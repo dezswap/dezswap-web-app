@@ -1,5 +1,5 @@
 import { Numeric } from "@xpla/xpla.js";
-import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { IBC_PREFIX, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 import { DashboardChartItem } from "types/dashboard-api";
 
@@ -13,9 +13,6 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
-
-export const isNativeTokenAddress = (network: string, address: string) =>
-  nativeTokens[network].filter((n) => n.token === address).length > 0;
 
 export const ellipsisCenter = (text = "", letterCountPerSide = 6) => {
   if (text.length <= letterCountPerSide * 2 + 3) {
@@ -70,24 +67,22 @@ export const sanitizeNumberInput = (value: string, decimals = 18) => {
   }`;
 };
 
-const XPLA_MAINNET_EXPLORER = "https://explorer.xpla.io";
-// TODO: delete the hard-coded explorer link.
 export const getBlockLink = (height?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/block/${height}`;
-  return `${explorers}/block/${height}`;
+  if (explorers?.includes("xpla")) return `${explorers}/block/${height}`;
+
+  return `${explorers}/blocks/${height}`;
 };
 
 export const getAddressLink = (address?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/address/${address}`;
-  return `${explorers}/address/${address}`;
+  if (explorers?.includes("xpla")) return `${explorers}/address/${address}`;
+
+  return `${explorers}/accounts/${address}`;
 };
 
 export const getTransactionLink = (txHash?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/tx/${txHash}`;
-  return `${explorers}/tx/${txHash}`;
+  if (explorers?.includes("xpla")) return `${explorers}/tx/${txHash}`;
+
+  return `${explorers}/transactions/${txHash}`;
 };
 
 export const getTokenLink = (address?: string, explorers?: string) => {
@@ -96,13 +91,12 @@ export const getTokenLink = (address?: string, explorers?: string) => {
   if (secondPart) {
     tokenAddress = `0x${secondPart}`;
   }
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/token/${
-      tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
-    }`;
-  return `${explorers}/token/${
-    tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
-  }`;
+
+  return explorers?.includes("xpla")
+    ? `${explorers}/token/${
+        tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
+      }`
+    : null;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>
@@ -286,4 +280,9 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
   } catch (error) {
     return initialValue;
   }
+};
+
+export const isNativeToken = (denom: string, prefix: string): boolean => {
+  const expectedLength = prefix.length + 59;
+  return denom.length !== expectedLength || !denom.startsWith(`${prefix}1`);
 };

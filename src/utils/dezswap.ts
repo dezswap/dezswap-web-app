@@ -8,7 +8,7 @@ import {
 import { Asset, NativeAsset } from "types/pair";
 import {
   contractAddresses,
-  DefaultChain,
+  SupportedChains,
   DefaultChainName,
 } from "constants/dezswap";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
@@ -406,7 +406,7 @@ export const getValidChain = (inputChainName: string | null | undefined) => {
       chainName: DefaultChainName,
       isValidChain: true,
     };
-  const isValidChain = DefaultChain.some(
+  const isValidChain = SupportedChains.some(
     (supportChain) => supportChain.chainName === inputChainName,
   );
   return {

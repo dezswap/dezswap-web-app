@@ -1,20 +1,36 @@
 import { assetLists, chains } from "@chain-registry/v2";
-import type { AssetList } from "@chain-registry/v2-types";
 import Decimal from "decimal.js";
+import iconXpla from "assets/icons/icon-chain-xpla-32px.svg";
+import iconXplaGray from "assets/icons/icon-chain-xpla-gray-32px.svg";
+import iconASI from "assets/icons/icon-chain-asi-32px.svg";
 
-export type SupportedChain = "dimension" | "cube";
+export type XplaChainNames = "dimension" | "cube";
 export const DefaultChainName = "xpla";
-export const DefaultChain =
-  chains.filter((chain) => chain.chainName.includes("xpla")) ?? [];
-export const DefaultRpcEndpoint = DefaultChain.map(
-  (chain) => chain?.apis?.rpc?.[0]?.address || "",
-);
-export const DefaultAssetList =
-  assetLists.filter((assetList) => assetList.chainName.includes("xpla")) ??
-  ({} as AssetList);
+const supportChainNames = [
+  "xpla",
+  "xplatestnet",
+  "fetchhub",
+  "fetchhubtestnet",
+];
 
-export const supportedChains: {
-  [K in SupportedChain]: {
+export const SupportedChains = chains.filter((chain) =>
+  supportChainNames.includes(chain.chainName),
+);
+export const getChain = (searchName: string) => {
+  if (!supportChainNames.includes(searchName))
+    return chains.filter((chain) => chain.chainName === DefaultChainName);
+  return chains.filter((chain) => chain.chainName === searchName);
+};
+
+export const getRpcEndpoint = (searchName: string) =>
+  chains.filter((chain) => chain.chainName === searchName)[0]?.apis?.rpc?.[0]
+    ?.address || "";
+
+export const getAssetList = (searchName: string) =>
+  assetLists.filter((assetList) => assetList.chainName === searchName);
+
+export const xplaChains: {
+  [K in XplaChainNames]: {
     network: string;
     name: string;
     isMainnet: boolean;
@@ -37,7 +53,7 @@ export const contractAddresses: {
     factory: string;
     router: string;
     lockdrop: string;
-    play3List: string;
+    play3List?: string;
   };
 } = {
   xpla: {
@@ -53,14 +69,39 @@ export const contractAddresses: {
     play3List:
       "xpla1hylp38a8rwzzktq0esvsqnuaxvvf3uvtsex8du8wcpawaaqjczus4st6s0",
   },
-};
-
-export const GAS_INFO = {
-  multiplier: 1.2,
-  gasPrice: {
-    amount: new Decimal("280000000000"),
-    denom: "axpla",
+  fetchhub: {
+    factory: "fetch1slz6c85kxp4ek5ufmcakfhnscv9r2snlemxgwz6cjhklgh7v2hms8rgt5v",
+    router: "fetch1slz6c85kxp4ek5ufmcakfhnscv9r2snlemxgwz6cjhklgh7v2hms8rgt5v",
+    lockdrop:
+      "fetch1slz6c85kxp4ek5ufmcakfhnscv9r2snlemxgwz6cjhklgh7v2hms8rgt5v",
+    play3List: "",
   },
+  fetchhubtestnet: {
+    factory: "fetch1kmag3937lrl6dtsv29mlfsedzngl9egv5c3apnr468q50gu04zrqea398u",
+    router: "fetch1kmag3937lrl6dtsv29mlfsedzngl9egv5c3apnr468q50gu04zrqea398u",
+    lockdrop:
+      "fetch1kmag3937lrl6dtsv29mlfsedzngl9egv5c3apnr468q50gu04zrqea398u",
+    play3List: "",
+  },
+};
+export const getGasInfo = (chainName: string) => {
+  if (chainName === "fetchhub")
+    return {
+      multiplier: 1,
+      gasPrice: {
+        amount: new Decimal("0"),
+        denom: "afet",
+      },
+    };
+  if (chainName === "fetchhubtestnet")
+    return {
+      multiplier: 1.2,
+      gasPrice: {
+        amount: new Decimal("1000000000"),
+        denom: "atestfet",
+      },
+    };
+  return undefined;
 };
 export const LP_DECIMALS = 6;
 export const LOCKED_LP_SUPPLY = 1_000;
@@ -76,6 +117,21 @@ export const apiAddresses: {
   xplatestnet: {
     baseUrl: "https://cube-api.dezswap.io",
   },
+  fetchhub: {
+    baseUrl: "https://fetchhub-api.dezswap.io",
+  },
+  fetchhubtestnet: {
+    baseUrl: " https://dorado-api.dezswap.io",
+  },
+};
+
+export const CHAIN_ICONS: {
+  [K in string]: string;
+} = {
+  xpla: iconXpla,
+  xplatestnet: iconXplaGray,
+  fetchhub: iconASI,
+  fetchhubtestnet: iconASI,
 };
 
 export const CHAIN_NAME_SEARCH_PARAM = "chainname";
@@ -85,4 +141,6 @@ export const UNSUPPORT_WALLET_LIST: {
 } = {
   xpla: [],
   xplatestnet: ["cosmostation-extension"],
+  fetchhub: [],
+  fetchhubtestnet: [],
 };

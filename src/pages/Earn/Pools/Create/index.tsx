@@ -31,7 +31,6 @@ import { Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateCreatePoolMsg } from "utils/dezswap";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
 import IconButton from "components/IconButton";
@@ -40,6 +39,7 @@ import useRequestPost from "hooks/useRequestPost";
 import useNetwork from "hooks/useNetwork";
 import Message from "components/Message";
 import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
+import useNativeTokens from "hooks/useNativeTokens";
 import InfoTable from "components/InfoTable";
 import iconSetting from "assets/icons/icon-setting.svg";
 import iconSettingHover from "assets/icons/icon-setting-hover.svg";
@@ -51,6 +51,7 @@ import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import styled from "@emotion/styled";
 import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -87,11 +88,12 @@ function CreatePage() {
   }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
+  const { nativeTokens } = useNativeTokens();
   const { getAsset, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     chainName,
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({
@@ -175,7 +177,16 @@ function CreatePage() {
             },
           ])
         : undefined,
-    [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
+    [
+      walletAddress,
+      asset1?.token,
+      asset1?.decimals,
+      formData.asset1Value,
+      formData.asset2Value,
+      asset2?.token,
+      asset2?.decimals,
+      chainName,
+    ],
   );
 
   const {
@@ -185,8 +196,8 @@ function CreatePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
@@ -195,7 +206,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset1?.token === XPLA_ADDRESS &&
+      asset1?.token === fees.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
@@ -209,13 +220,21 @@ function CreatePage() {
         },
       );
     }
-  }, [asset1Balance, formData.asset1Value, form]);
+  }, [
+    asset1Balance,
+    formData.asset1Value,
+    form,
+    walletAddress,
+    balanceApplied,
+    asset1?.token,
+    asset1?.decimals,
+  ]);
 
   useEffect(() => {
     if (
       walletAddress &&
       balanceApplied &&
-      asset2?.token === XPLA_ADDRESS &&
+      asset2?.token === fees.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
@@ -467,14 +486,20 @@ function CreatePage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
+                        }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                 ]}
               />
@@ -486,32 +511,40 @@ function CreatePage() {
               `}
             >
               <InfoTable
-                items={[asset1, asset2].map((asset) => ({
-                  key: asset?.token,
-                  label: `${asset?.symbol} Address`,
-                  value: (
-                    <>
-                      {ellipsisCenter(asset?.token)}&nbsp;
-                      <a
-                        href={getTokenLink(asset?.token, explorers?.[0].url)}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
-                    </>
-                  ),
-                }))}
+                items={[asset1, asset2].map((asset) => {
+                  const tokenLink = getTokenLink(
+                    asset?.token,
+                    explorers?.[0].url,
+                  );
+                  return {
+                    key: asset?.token,
+                    label: `${asset?.symbol} Address`,
+                    value: (
+                      <>
+                        {ellipsisCenter(asset?.token)}&nbsp;
+                        {tokenLink && (
+                          <a
+                            href={tokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
+                      </>
+                    ),
+                  };
+                })}
               />
             </div>
           </Expand>

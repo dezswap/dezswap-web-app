@@ -15,7 +15,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const api = useAPI();
-  const { sequence } = useAuthSequence();
+  const { sequence, isLoading: isSequenceLoading } = useAuthSequence();
   const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
   const { executeContract } = MessageComposer.encoded;
@@ -28,7 +28,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
 
   useEffect(() => {
     let isAborted = false;
-    if (!walletAddress || !deferredCreateTxOptions) {
+    if (!walletAddress || !deferredCreateTxOptions || isSequenceLoading) {
       setIsLoading(false);
       return () => {
         isAborted = true;
@@ -46,13 +46,13 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
         }
 
         const res = await api.estimateFee(messages, sequence);
-
         if (res && !isAborted) {
           setFee(
             new Fee(Number(res.gas), [
               new Coin(res.amount[0].denom, res.amount[0].amount),
             ]),
           );
+
           setErrMsg("");
           setIsLoading(false);
           setIsFailed(false);

@@ -26,7 +26,6 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
@@ -36,8 +35,10 @@ import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
+import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`
@@ -55,13 +56,13 @@ function CancelPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
   const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
-
+  const { nativeTokens } = useNativeTokens();
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -72,7 +73,10 @@ function CancelPage() {
       return res;
     },
   });
-
+  const tokenLink = useMemo(
+    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
+    [explorers, lockdropEventInfo?.lp_token_addr],
+  );
   const api = useAPI();
   const navigate = useNavigate();
   const handleModalClose = useCallback(() => {
@@ -142,8 +146,8 @@ function CancelPage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const { requestPost } = useRequestPost(handleModalClose);
 
@@ -304,14 +308,19 @@ function CancelPage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount
-                    ? `${formatNumber(
-                        cutDecimal(
-                          amountToValue(feeAmount) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      )} ${XPLA_SYMBOL}`
-                    : "",
+                  value: feeAmount ? (
+                    <AssetValueFormatter
+                      asset={{
+                        symbol:
+                          nativeTokens.find(
+                            (token) => token.token === fees.feeTokens[0]?.denom,
+                          )?.symbol || "",
+                      }}
+                      amount={feeAmount}
+                    />
+                  ) : (
+                    ""
+                  ),
                 },
                 {
                   key: "shareOfPool",
@@ -344,26 +353,25 @@ function CancelPage() {
                     <span>
                       {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                       &nbsp;
-                      <a
-                        href={getTokenLink(
-                          lockdropEventInfo?.lp_token_addr,
-                          explorers?.[0].url,
-                        )}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {tokenLink && (
+                        <a
+                          href={tokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </span>
                   ),
                 },

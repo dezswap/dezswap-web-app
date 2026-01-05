@@ -9,7 +9,6 @@ import React, {
   useState,
 } from "react";
 import Typography from "components/Typography";
-import { isNativeTokenAddress } from "utils";
 import Input from "components/Input";
 import Hr from "components/Hr";
 import TabButton from "components/TabButton";
@@ -17,7 +16,7 @@ import useAssets from "hooks/useAssets";
 import useBookmark from "hooks/useBookmark";
 import Panel from "components/Panel";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import useNetwork from "hooks/useNetwork";
+import useNativeTokens from "hooks/useNativeTokens";
 import { Token } from "types/api";
 import AssetItem from "./AssetItem";
 
@@ -92,8 +91,8 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const deferredSearchKeyword = useDeferredValue(searchKeyword.toLowerCase());
   const { getAsset } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
-  const { chainName } = useNetwork();
   const [tabIdx, setTabIdx] = useState(0);
+  const { nativeTokens } = useNativeTokens();
   const divRef = useRef<HTMLDivElement>(null);
 
   const assetList = useMemo(() => {
@@ -125,7 +124,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     const items = filteredList?.map((address) => {
       const asset = getAsset(address);
       const isVerified =
-        asset?.verified || isNativeTokenAddress(chainName, address);
+        asset?.verified || nativeTokens?.some((n) => n.token === address);
       return (
         <AssetItem
           key={address}
@@ -174,7 +173,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     tabIdx,
     theme,
     toggleBookmark,
-    chainName,
+    nativeTokens,
   ]);
 
   useEffect(() => {

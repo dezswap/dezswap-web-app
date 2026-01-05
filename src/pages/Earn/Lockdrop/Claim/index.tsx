@@ -1,5 +1,5 @@
 import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
@@ -22,7 +22,6 @@ import {
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -31,11 +30,13 @@ import useAPI from "hooks/useAPI";
 import Button from "components/Button";
 import useRequestPost from "hooks/useRequestPost";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
+import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import usePairs from "hooks/usePairs";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 
 const Box = styled(box)`
   & > * {
@@ -53,7 +54,7 @@ function ClaimPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
 
@@ -62,7 +63,7 @@ function ClaimPage() {
 
   const { findPairByLpAddress } = usePairs();
   const { getAsset } = useAssets();
-
+  const { nativeTokens } = useNativeTokens();
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -74,6 +75,10 @@ function ClaimPage() {
     },
   });
 
+  const tokenLink = useMemo(
+    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
+    [explorers, lockdropEventInfo?.lp_token_addr],
+  );
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -128,10 +133,11 @@ function ClaimPage() {
   }, [walletAddress, duration, eventAddress]);
 
   const { fee } = useFee(createTxOptions);
-
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom)?.amount.toString() || "0"
+    );
+  }, [fee?.amount, fees?.feeTokens[0]]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -270,14 +276,20 @@ function ClaimPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount
-                      ? `${formatNumber(
-                          cutDecimal(
-                            amountToValue(feeAmount) || "0",
-                            DISPLAY_DECIMAL,
-                          ),
-                        )} ${XPLA_SYMBOL}`
-                      : "",
+                    value: feeAmount ? (
+                      <AssetValueFormatter
+                        asset={{
+                          symbol:
+                            nativeTokens.find(
+                              (token) =>
+                                token.token === fees.feeTokens[0]?.denom,
+                            )?.symbol || "",
+                        }}
+                        amount={feeAmount}
+                      />
+                    ) : (
+                      ""
+                    ),
                   },
                   {
                     key: "shareOfPool",
@@ -310,26 +322,25 @@ function ClaimPage() {
                       <span>
                         {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                         &nbsp;
-                        <a
-                          href={getTokenLink(
-                            lockdropEventInfo?.lp_token_addr,
-                            explorers?.[0].url,
-                          )}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {tokenLink && (
+                          <a
+                            href={tokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
