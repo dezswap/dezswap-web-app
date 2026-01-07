@@ -11,6 +11,7 @@ import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
 import HoverUnderline from "components/utils/HoverUnderline";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import Link from "components/Link";
+import { type ComponentProps } from "react";
 
 interface MobileTokenItemProps {
   number: number;
@@ -24,21 +25,27 @@ const Content = styled.div`
   flex: 1;
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   margin-bottom: 6px;
 `;
-Label.defaultProps = {
-  color: "primary",
-  size: 14,
-  weight: 900,
-};
+function Label({
+  color = "primary",
+  size = 14,
+  weight = 900,
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel color={color} size={size} weight={weight} {...props} />;
+}
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  color: "primary",
-  size: 16,
-  weight: 500,
-};
+const StyledValue = styled(Typography)``;
+function Value({
+  color = "primary",
+  size = 16,
+  weight = 500,
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue color={color} size={size} weight={weight} {...props} />;
+}
 
 function MobileTokenItem({ number, token }: MobileTokenItemProps) {
   const { getAsset } = useAssets();

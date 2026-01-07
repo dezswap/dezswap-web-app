@@ -8,7 +8,7 @@ import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
 import usePairs from "hooks/usePairs";
 import Expand from "pages/Earn/Expand";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { Row, Col } from "react-grid-system";
 import { DashboardPool } from "types/dashboard-api";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
@@ -27,21 +27,29 @@ const Content = styled.div`
   flex: 1;
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   margin-bottom: 6px;
 `;
-Label.defaultProps = {
-  color: "primary",
-  size: 14,
-  weight: 900,
-};
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  color: "primary",
-  size: 16,
-  weight: 500,
-};
+function Label({
+  size = 14,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel size={size} weight={weight} color={color} {...props} />;
+}
+
+const StyledValue = styled(Typography)``;
+
+function Value({
+  color = "primary",
+  size = 16,
+  weight = 500,
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue color={color} size={size} weight={weight} {...props} />;
+}
 
 function MobilePoolItem({ pool, number }: MobilePoolItemProps) {
   const expand = useModal();

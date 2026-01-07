@@ -25,13 +25,24 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const Label = styled(Typography)``;
-Label.defaultProps = {
-  size: 16,
-  weight: 900,
-  color: "primary",
-  style: { display: "inline-block" },
-};
+const StyledLabel = styled(Typography)``;
+function Label({
+  size = 16,
+  weight = 900,
+  color = "primary",
+  style = { display: "inline-block" },
+  ...props
+}) {
+  return (
+    <StyledLabel
+      size={size}
+      weight={weight}
+      color={color}
+      style={style}
+      {...props}
+    />
+  );
+}
 
 const RadioGroup = styled.div`
   width: 100%;

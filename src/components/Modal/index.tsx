@@ -8,7 +8,7 @@ import ReactModal from "react-modal";
 
 import iconClose from "assets/icons/icon-close-28px.svg";
 import iconBack from "assets/icons/icon-back.svg";
-import { useEffect, useMemo, useState } from "react";
+import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 
 import SimpleBar from "simplebar";
@@ -55,7 +55,7 @@ const defaultOverlayStyle: React.CSSProperties = {
   height: "100%",
 };
 
-const ModalHeader = styled(Panel)`
+const StyledModalHeader = styled(Panel)`
   width: 100%;
   height: auto;
   position: sticky;
@@ -78,9 +78,12 @@ const ModalHeader = styled(Panel)`
   }
 `;
 
-ModalHeader.defaultProps = {
-  border: false,
-};
+function ModalHeader({
+  border = false,
+  ...props
+}: ComponentProps<typeof StyledModalHeader>) {
+  return <StyledModalHeader border={border} {...props} />;
+}
 
 const removeClassName = () => {
   if (!document.querySelector(".ReactModal__Content")) {

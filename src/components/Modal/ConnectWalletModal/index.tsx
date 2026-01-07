@@ -5,7 +5,13 @@ import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, {
+  MouseEventHandler,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
 import Typography from "components/Typography";
 import Hr from "components/Hr";
 import { MOBILE_SCREEN_CLASS } from "constants/layout";
@@ -20,7 +26,7 @@ import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
 import Box from "components/Box";
 import QRCode from "react-qr-code";
 
-const WalletButton = styled.button`
+const StyledWalletButton = styled.button`
   width: auto;
   height: 89px;
   position: relative;
@@ -35,9 +41,12 @@ const WalletButton = styled.button`
   cursor: pointer;
 `;
 
-WalletButton.defaultProps = {
-  type: "button",
-};
+function WalletButton({
+  type = "button",
+  ...props
+}: ComponentProps<typeof StyledWalletButton>) {
+  return <StyledWalletButton type={type} {...props} />;
+}
 
 type WalletButtonProps = {
   label: string;

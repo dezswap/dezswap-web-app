@@ -1,5 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import { type ComponentProps } from "react";
 
 interface IconButtonProps {
   size?: number;
@@ -10,7 +11,7 @@ interface IconButtonProps {
   };
 }
 
-const IconButton = styled.button<IconButtonProps>`
+const StyledIconButton = styled.button<IconButtonProps>`
   position: relative;
   width: ${({ size }) => `${size}px`};
   height: ${({ size }) => `${size}px`};
@@ -86,6 +87,11 @@ const IconButton = styled.button<IconButtonProps>`
     `}
 `;
 
-IconButton.defaultProps = { type: "button" };
+function IconButton({
+  type = "button",
+  ...props
+}: ComponentProps<typeof StyledIconButton>) {
+  return <StyledIconButton type={type} {...props} />;
+}
 
 export default IconButton;

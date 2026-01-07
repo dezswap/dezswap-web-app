@@ -3,7 +3,7 @@ import useModal from "hooks/useModal";
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import iconDropdownDisabled from "assets/icons/icon-dropdown-arrow-disabled.svg";
 import { css } from "@emotion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ComponentProps } from "react";
 
 type SelectValue = string | number;
 
@@ -40,7 +40,7 @@ const Wrapper = styled.div<WrapperProps>`
   position: relative;
 `;
 
-const Button = styled.button<WrapperProps & { isOpen?: boolean }>`
+const StyledButton = styled.button<WrapperProps & { isOpen?: boolean }>`
   ${({ block }) =>
     block
       ? css`
@@ -104,9 +104,12 @@ const Button = styled.button<WrapperProps & { isOpen?: boolean }>`
   }
 `;
 
-Button.defaultProps = {
-  type: "button",
-};
+function Button({
+  type = "button",
+  ...props
+}: ComponentProps<typeof StyledButton>) {
+  return <StyledButton type={type} {...props} />;
+}
 
 const OptionList = styled.div<{ isOpen?: boolean }>`
   position: absolute;
@@ -127,7 +130,7 @@ const OptionList = styled.div<{ isOpen?: boolean }>`
   z-index: 1;
 `;
 
-const OptionItem = styled.button`
+const StyledOptionItem = styled.button`
   min-width: 100%;
   width: auto;
   height: auto;
@@ -154,9 +157,12 @@ const OptionItem = styled.button`
   }
 `;
 
-OptionItem.defaultProps = {
-  type: "button",
-};
+function OptionItem({
+  type = "button",
+  ...props
+}: ComponentProps<typeof StyledOptionItem>) {
+  return <StyledOptionItem type={type} {...props} />;
+}
 
 function Select({
   value,

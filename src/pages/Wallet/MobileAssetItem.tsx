@@ -8,6 +8,7 @@ import { Col, Row } from "react-grid-system";
 import iconBookmark from "assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import styled from "@emotion/styled";
+import { type ComponentProps } from "react";
 import Link from "components/Link";
 import Button from "components/Button";
 import HoverUnderline from "components/utils/HoverUnderline";
@@ -28,21 +29,27 @@ const Content = styled.div`
   flex: 1;
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   margin-bottom: 6px;
 `;
-Label.defaultProps = {
-  color: "primary",
-  size: 14,
-  weight: 900,
-};
+function Label({
+  color = "primary",
+  size = 14,
+  weight = 900,
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel color={color} size={size} weight={weight} {...props} />;
+}
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  color: "primary",
-  size: 16,
-  weight: 500,
-};
+const StyledValue = styled(Typography)``;
+function Value({
+  color = "primary",
+  size = 16,
+  weight = 500,
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue color={color} size={size} weight={weight} {...props} />;
+}
 
 function MobileAssetItem({
   asset,
