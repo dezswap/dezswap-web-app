@@ -8,7 +8,7 @@ import Panel from "components/Panel";
 import Typography from "components/Typography";
 import useAssets from "hooks/useAssets";
 import useDashboard from "hooks/dashboard/useDashboard";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { Row, Col } from "react-grid-system";
 import { formatDecimals, formatNumber } from "utils";
 
@@ -21,19 +21,25 @@ const Wrapper = styled.div`
   gap: 8px;
 `;
 
-const Label = styled(Typography)``;
-Label.defaultProps = {
-  size: 16,
-  weight: 900,
-  color: "primary",
-};
+const StyledLabel = styled(Typography)``;
+function Label({
+  size = 16,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel size={size} weight={weight} color={color} {...props} />;
+}
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  size: 22,
-  weight: 900,
-  color: "primary",
-};
+const StyledValue = styled(Typography)``;
+function Value({
+  size = 22,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue size={size} weight={weight} color={color} {...props} />;
+}
 
 function ChangeRate({ value }: { value?: Numeric.Input }) {
   return value !== undefined ? (

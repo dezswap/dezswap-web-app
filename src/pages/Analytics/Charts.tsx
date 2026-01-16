@@ -21,33 +21,42 @@ import {
 import IconButton from "components/IconButton";
 import iconFullscreen from "assets/icons/icon-fullscreen.svg";
 import useHashModal from "hooks/useHashModal";
-import { useId, useMemo } from "react";
+import { type ComponentProps, useId, useMemo } from "react";
 import Modal from "components/Modal";
 import CurrencyFormatter from "components/utils/CurrencyFormatter";
 import useChartData from "./useChartData";
 
-const Label = styled(Typography)``;
-Label.defaultProps = {
-  size: 16,
-  weight: 900,
-  color: "primary",
-};
+const StyledLabel = styled(Typography)``;
+function Label({
+  size = 16,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel size={size} weight={weight} color={color} {...props} />;
+}
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  size: 32,
-  weight: 900,
-  color: "primary",
-};
+const StyledValue = styled(Typography)``;
+function Value({
+  size = 32,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue size={size} weight={weight} color={color} {...props} />;
+}
 
-const Caption = styled(Typography)`
+const StyledCaption = styled(Typography)`
   padding-bottom: 7px;
 `;
-Caption.defaultProps = {
-  size: 12,
-  weight: 400,
-  color: "text.primary",
-};
+function Caption({
+  size = 12,
+  weight = 400,
+  color = "text.primary",
+  ...props
+}) {
+  return <StyledCaption size={size} weight={weight} color={color} {...props} />;
+}
 
 const PanelWrapper = styled.div`
   display: flex;

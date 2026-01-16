@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 
 import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
 import Typography from "components/Typography";
@@ -28,7 +28,7 @@ interface WrapperProps {
   block?: boolean;
 }
 
-const Wrapper = styled.button<WrapperProps>`
+const StyledWrapper = styled.button<WrapperProps>`
   ${({ theme, outline, isOpen, block }) => {
     return css`
       display: inline-flex;
@@ -120,9 +120,12 @@ const Wrapper = styled.button<WrapperProps>`
   }}
 `;
 
-Wrapper.defaultProps = {
-  type: "button",
-};
+function Wrapper({
+  type = "button",
+  ...props
+}: ComponentProps<typeof StyledWrapper>) {
+  return <StyledWrapper type={type} {...props} />;
+}
 
 const OptionWrapper = styled.button`
   width: 100%;

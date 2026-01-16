@@ -6,7 +6,7 @@ import useAssets from "hooks/useAssets";
 import useModal from "hooks/useModal";
 import useNetwork from "hooks/useNetwork";
 import Expand from "pages/Earn/Expand";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { DashboardTransaction } from "types/dashboard-api";
 import {
   ellipsisCenter,
@@ -28,21 +28,29 @@ const Content = styled.div`
   flex: 1;
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   margin-bottom: 6px;
 `;
-Label.defaultProps = {
-  color: "primary",
-  size: 14,
-  weight: 900,
-};
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  color: "primary",
-  size: 16,
-  weight: 500,
-};
+function Label({
+  color = "primary",
+  size = 14,
+  weight = 900,
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel color={color} size={size} weight={weight} {...props} />;
+}
+
+const StyledValue = styled(Typography)``;
+
+function Value({
+  color = "primary",
+  size = 16,
+  weight = 500,
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue color={color} size={size} weight={weight} {...props} />;
+}
 
 function MobileTransactionItem({ transaction }: MobileTransactionItemProps) {
   const {

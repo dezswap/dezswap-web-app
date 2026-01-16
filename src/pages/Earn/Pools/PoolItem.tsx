@@ -6,7 +6,13 @@ import { LP_DECIMALS } from "constants/dezswap";
 import useAssets from "hooks/useAssets";
 import useBalance from "hooks/useBalance";
 import useNetwork from "hooks/useNetwork";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ComponentProps,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Row, Col, useScreenClass, Hidden } from "react-grid-system";
 import { formatNumber, formatDecimals, getAddressLink } from "utils";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
@@ -101,7 +107,7 @@ const AssetIcon = styled.div<{ src?: string }>`
   }
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   line-height: 1;
   white-space: nowrap;
   margin-bottom: 15px;
@@ -110,12 +116,14 @@ const Label = styled(Typography)`
     margin-bottom: 6px;
   }
 `;
-
-Label.defaultProps = {
-  size: 14,
-  weight: 900,
-  color: "primary",
-};
+function Label({
+  size = 14,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel size={size} weight={weight} color={color} {...props} />;
+}
 
 const BodyWrapper = styled.div`
   width: 100%;
