@@ -1,30 +1,32 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import ReactModal from "react-modal";
-import Modal from "components/Modal";
-
+import { WalletState } from "@interchain-kit/core";
+import { useWalletManager } from "@interchain-kit/react";
+import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
+import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { ConnectType, useWallet } from "@xpla/wallet-provider";
 import React, {
+  type ComponentProps,
   MouseEventHandler,
   useEffect,
-  useRef,
   useState,
-  type ComponentProps,
 } from "react";
-import Typography from "components/Typography";
-import Hr from "components/Hr";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import iconInstall from "assets/icons/icon-install.svg";
-import iconInstalled from "assets/icons/icon-installed.svg";
-import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
-import { useWalletManager } from "@interchain-kit/react";
-import useNetwork from "hooks/useNetwork";
-import { WalletState } from "@interchain-kit/core";
-import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
-import { UNSUPPORT_WALLET_LIST } from "constants/dezswap";
-import Box from "components/Box";
+import { Col, Row, useScreenClass } from "react-grid-system";
+import ReactModal from "react-modal";
 import QRCode from "react-qr-code";
+
+import iconInstall from "~/assets/icons/icon-install.svg";
+import iconInstalled from "~/assets/icons/icon-installed.svg";
+
+import Box from "~/components/Box";
+import Hr from "~/components/Hr";
+import Modal from "~/components/Modal";
+import Typography from "~/components/Typography";
+
+import { UNSUPPORT_WALLET_LIST } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useNetwork from "~/hooks/useNetwork";
 
 const StyledWalletButton = styled.button`
   width: auto;
@@ -170,7 +172,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
         const iconSrc =
           typeof wallet.info.logo === "string"
             ? wallet.info.logo
-            : wallet.info.logo?.major ?? "";
+            : (wallet.info.logo?.major ?? "");
 
         return {
           label: wallet.info.prettyName,

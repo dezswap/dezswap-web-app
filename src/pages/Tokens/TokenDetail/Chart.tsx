@@ -1,22 +1,34 @@
 import { css } from "@emotion/react";
-import LineChart, { LineChartProps } from "components/LineChart";
-import Panel from "components/Panel";
-import TabButton from "components/TabButton";
-import Typography from "components/Typography";
 import { useId, useMemo, useState } from "react";
-import { Row, Col, useScreenClass } from "react-grid-system";
+import { Col, Row, useScreenClass } from "react-grid-system";
+
+import iconFullscreen from "~/assets/icons/icon-fullscreen.svg";
+
+import IconButton from "~/components/IconButton";
+import LineChart, { LineChartProps } from "~/components/LineChart";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import TabButton from "~/components/TabButton";
+import Typography from "~/components/Typography";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useHashModal from "~/hooks/useHashModal";
+
+import Select from "~/pages/Earn/Pools/Select";
+
 import {
-  DashboardTokenChartType,
   DashboardChartDuration,
-} from "types/dashboard-api";
-import { formatDate, formatDateRange, getSumOfDashboardChartData } from "utils";
-import Select from "pages/Earn/Pools/Select";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import IconButton from "components/IconButton";
-import iconFullscreen from "assets/icons/icon-fullscreen.svg";
-import useHashModal from "hooks/useHashModal";
-import Modal from "components/Modal";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
+  DashboardTokenChartType,
+} from "~/types/dashboard-api";
+
+import {
+  formatDate,
+  formatDateRange,
+  getSumOfDashboardChartData,
+} from "~/utils";
+
 import useChartData from "./useChartData";
 
 const chartTypeTabs = ["Volume", "TVL", "Price"].map((label) => ({

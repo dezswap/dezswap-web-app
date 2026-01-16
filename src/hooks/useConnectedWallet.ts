@@ -1,19 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useWalletManager } from "@interchain-kit/react";
 import { WalletState } from "@interchain-kit/core";
+import { useWalletManager } from "@interchain-kit/react";
+import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 import { useQuery } from "@tanstack/react-query";
 import {
+  WalletApp,
   useConnectedWallet as useConnectedXplaWallet,
   useWallet,
-  WalletApp,
 } from "@xpla/wallet-provider";
-import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { convertProtoToAminoMsg } from "utils/dezswap";
 import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { convertProtoToAminoMsg } from "~/utils/dezswap";
+
 import useNetwork from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 import useSigningClient from "./useSigningClient";
-import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
 
 const resetWalletValue = {
   walletAddress: "",

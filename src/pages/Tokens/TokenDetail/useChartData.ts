@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import useAPI from "hooks/useAPI";
-import useAssets from "hooks/useAssets";
-import useNetwork from "hooks/useNetwork";
-import { DashboardChartResponse } from "types/dashboard-api";
+import { useMemo, useState } from "react";
+
+import useAPI from "~/hooks/useAPI";
+import useAssets from "~/hooks/useAssets";
+import useNetwork from "~/hooks/useNetwork";
+
+import { DashboardChartResponse } from "~/types/dashboard-api";
 
 type ChartAPIParameters = Parameters<
   ReturnType<typeof useAPI>["dashboard"]["getTokenChart"]

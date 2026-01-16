@@ -1,18 +1,21 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import IconButton from "components/IconButton";
-import Input, { NumberInput } from "components/Input";
-import RadioButton from "components/RadioButton";
-import Tooltip from "components/Tooltip";
-import Typography from "components/Typography";
-import { Col, Row } from "react-grid-system";
-import { slippagePresets } from "stores/settings";
-
-import iconQuestion from "assets/icons/icon-question.svg";
-import useSlippageTolerance from "hooks/useSlippageTolerance";
-import Switch from "components/Switch";
-import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import React, { useCallback } from "react";
+import { Col, Row } from "react-grid-system";
+
+import iconQuestion from "~/assets/icons/icon-question.svg";
+
+import IconButton from "~/components/IconButton";
+import Input, { NumberInput } from "~/components/Input";
+import RadioButton from "~/components/RadioButton";
+import Switch from "~/components/Switch";
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+
+import useSlippageTolerance from "~/hooks/useSlippageTolerance";
+import useTxDeadlineMinutes from "~/hooks/useTxDeadlineMinutes";
+
+import { slippagePresets } from "~/stores/settings";
 
 type SettingItemKey = "slippageTolerance" | "txDeadline" | "autoRouter";
 export interface SettingsFormProps {
@@ -128,7 +131,7 @@ function SettingsForm({
                   variant="default"
                   value={
                     slippageTolerance.selectedPreset === "custom"
-                      ? slippageTolerance.customValue ?? ""
+                      ? (slippageTolerance.customValue ?? "")
                       : ""
                   }
                   onFocus={() => slippageTolerance.setSelectedPreset("custom")}

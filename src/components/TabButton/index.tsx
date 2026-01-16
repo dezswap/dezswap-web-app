@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
-import Typography from "components/Typography";
 import { useId } from "react";
+
+import Typography from "~/components/Typography";
 
 interface TabButtonItem {
   label?: React.ReactNode;

@@ -1,30 +1,35 @@
-import Panel from "components/Panel";
-import Typography from "components/Typography";
+import { Global, css } from "@emotion/react";
+import { Numeric } from "@xpla/xpla.js";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet } from "react-router-dom";
 
-import { css, Global } from "@emotion/react";
-import Pagination from "components/Pagination";
-import TabButton from "components/TabButton";
-import Link from "components/Link";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import { useEffect, useMemo, useState } from "react";
-import usePairs from "hooks/usePairs";
-import usePairBookmark from "hooks/usePairBookmark";
-import { Numeric } from "@xpla/xpla.js";
-import ScrollToTop from "components/ScrollToTop";
-import { convertIbcTokenAddressForPath } from "utils";
-import useBalances from "hooks/useBalances";
-import useSearchParamState from "hooks/useSearchParamState";
-import useDashboard from "hooks/dashboard/useDashboard";
-import Table, { TableSortDirection } from "components/Table";
-import { getBasicSortFunction } from "utils/table";
-import usePools from "hooks/usePools";
-import { DashboardPool } from "types/dashboard-api";
-import Select from "./Select";
-import AssetSelector from "../AssetSelector";
+import Link from "~/components/Link";
+import Pagination from "~/components/Pagination";
+import Panel from "~/components/Panel";
+import ScrollToTop from "~/components/ScrollToTop";
+import TabButton from "~/components/TabButton";
+import Table, { TableSortDirection } from "~/components/Table";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useBalances from "~/hooks/useBalances";
+import usePairBookmark from "~/hooks/usePairBookmark";
+import usePairs from "~/hooks/usePairs";
+import usePools from "~/hooks/usePools";
+import useSearchParamState from "~/hooks/useSearchParamState";
+
+import { DashboardPool } from "~/types/dashboard-api";
+
+import { convertIbcTokenAddressForPath } from "~/utils";
+import { getBasicSortFunction } from "~/utils/table";
+
 import AssetFormButton from "../AssetFormButton";
+import AssetSelector from "../AssetSelector";
 import PoolItem from "./PoolItem";
+import Select from "./Select";
 
 const timeBaseOptions = ["24h", "7d", "1m"];
 const tabs = [

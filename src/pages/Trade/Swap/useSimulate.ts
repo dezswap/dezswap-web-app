@@ -1,10 +1,12 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
-import { ReverseSimulation, Simulation } from "types/pair";
-import usePairs from "hooks/usePairs";
-import useNetwork from "hooks/useNetwork";
-import useAPI from "hooks/useAPI";
-import useRPCClient from "hooks/useRPCClient";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+
+import useAPI from "~/hooks/useAPI";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRPCClient from "~/hooks/useRPCClient";
+
+import { ReverseSimulation, Simulation } from "~/types/pair";
 
 const useSimulate = ({
   fromAddress,

@@ -1,6 +1,7 @@
 import { useSetAtom } from "jotai";
 import React, { useEffect, useId } from "react";
-import globalElementsAtom from "stores/globalElements";
+
+import globalElementsAtom from "~/stores/globalElements";
 
 const useGlobalElement = (element: React.ReactNode) => {
   const id = useId();

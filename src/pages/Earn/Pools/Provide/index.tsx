@@ -1,3 +1,6 @@
+import { css } from "@emotion/react";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import {
   FormEventHandler,
   useCallback,
@@ -5,18 +8,48 @@ import {
   useMemo,
   useState,
 } from "react";
-import Modal from "components/Modal";
-import { useParams } from "react-router-dom";
-import usePairs from "hooks/usePairs";
-import useAssets from "hooks/useAssets";
-import { useForm } from "react-hook-form";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { css } from "@emotion/react";
-import iconProvide from "assets/icons/icon-provide.svg";
-import Expand from "components/Expanded";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Button from "components/Button";
-import useSimulate from "pages/Earn/Pools/Provide/useSimulate";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+import iconProvide from "~/assets/icons/icon-provide.svg";
+import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
+import iconSetting from "~/assets/icons/icon-setting.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Message from "~/components/Message";
+import Modal from "~/components/Modal";
+import ProgressBar from "~/components/ProgressBar";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useSettingsModal from "~/hooks/modals/useSettingsModal";
+import useAssets from "~/hooks/useAssets";
+import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
+import useConnectedWallet from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import usePool from "~/hooks/usePool";
+import useRequestPost from "~/hooks/useRequestPost";
+import useSlippageTolerance from "~/hooks/useSlippageTolerance";
+import useTxDeadlineMinutes from "~/hooks/useTxDeadlineMinutes";
+
+import InputGroup from "~/pages/Earn/Pools/Provide/InputGroup";
+import useSimulate from "~/pages/Earn/Pools/Provide/useSimulate";
+
 import {
   amountToValue,
   cutDecimal,
@@ -25,35 +58,8 @@ import {
   formatRatio,
   getTokenLink,
   valueToAmount,
-} from "utils";
-import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
-import Typography from "components/Typography";
-import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateAddLiquidityMsg } from "utils/dezswap";
-import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
-import useRequestPost from "hooks/useRequestPost";
-import useNetwork from "hooks/useNetwork";
-import usePool from "hooks/usePool";
-import Message from "components/Message";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import InfoTable from "components/InfoTable";
-import iconSetting from "assets/icons/icon-setting.svg";
-import iconSettingHover from "assets/icons/icon-setting-hover.svg";
-import useSettingsModal from "hooks/modals/useSettingsModal";
-import ProgressBar from "components/ProgressBar";
-import Box from "components/Box";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useSlippageTolerance from "hooks/useSlippageTolerance";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import { useNavigate } from "hooks/useNavigate";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+} from "~/utils";
+import { generateAddLiquidityMsg } from "~/utils/dezswap";
 
 export enum FormKey {
   asset1Value = "asset1Value",

@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import InvalidPathModal from "components/Modal/InvalidPathModal";
-import { useNavigate } from "hooks/useNavigate";
+
+import InvalidPathModal from "~/components/Modal/InvalidPathModal";
+
+import { useNavigate } from "~/hooks/useNavigate";
 
 function Error404() {
   const location = useLocation();

@@ -1,12 +1,15 @@
-import { Col, Container, Row } from "react-grid-system";
-import styled from "@emotion/styled";
-import ScrollToTop from "components/ScrollToTop";
-import { Outlet } from "react-router-dom";
-import TopMovers from "pages/Analytics/TopMovers";
-import AllTokens from "pages/Analytics/AllTokens";
-import Transactions from "pages/Analytics/Transactions";
-import usePlay3WhiteList from "hooks/usePlay3WhiteList";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { Col, Container, Row } from "react-grid-system";
+import { Outlet } from "react-router-dom";
+
+import ScrollToTop from "~/components/ScrollToTop";
+
+import usePlay3WhiteList from "~/hooks/usePlay3WhiteList";
+
+import AllTokens from "~/pages/Analytics/AllTokens";
+import TopMovers from "~/pages/Analytics/TopMovers";
+import Transactions from "~/pages/Analytics/Transactions";
 
 const Wrapper = styled(Container)`
   width: 100%;

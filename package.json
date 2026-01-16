@@ -16,8 +16,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint",
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "dependencies": {
@@ -68,6 +67,7 @@
   "devDependencies": {
     "@chain-registry/v2-types": "0.53.146",
     "@emotion/babel-plugin": "^11.10.2",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "^20.1.1",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
@@ -81,12 +81,12 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.0.4",
-    "prettier": "^2.7.1",
+    "prettier": "^3.7.4",
     "typescript": "^5.3.3",
     "vite": "^7.1.2",
     "vite-compatible-readable-stream": "^3.6.1",

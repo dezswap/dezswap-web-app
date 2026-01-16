@@ -1,4 +1,4 @@
-import { Token } from "types/api";
+import { Token } from "~/types/api";
 
 export type Network = {
   lcd: string;

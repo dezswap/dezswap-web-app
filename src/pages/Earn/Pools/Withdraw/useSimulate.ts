@@ -1,7 +1,8 @@
 import { Dec, Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
-import usePool from "hooks/usePool";
-import useNetwork from "hooks/useNetwork";
+
+import useNetwork from "~/hooks/useNetwork";
+import usePool from "~/hooks/usePool";
 
 export interface WithdrawSimulationResult {
   estimatedAmount: { address: string; amount: string }[];

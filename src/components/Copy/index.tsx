@@ -1,10 +1,12 @@
-import styled from "@emotion/styled";
-import iconCopy from "assets/icons/icon-copy.svg";
-import iconCopyHover from "assets/icons/icon-copy-hover.svg";
-import iconCopyDisabled from "assets/icons/icon-copy-disabled.svg";
-import { useCallback, useRef } from "react";
-import Tooltip from "components/Tooltip";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { useCallback, useRef } from "react";
+
+import iconCopyDisabled from "~/assets/icons/icon-copy-disabled.svg";
+import iconCopyHover from "~/assets/icons/icon-copy-hover.svg";
+import iconCopy from "~/assets/icons/icon-copy.svg";
+
+import Tooltip from "~/components/Tooltip";
 
 type CopyProps = React.PropsWithChildren<{
   value?: string;

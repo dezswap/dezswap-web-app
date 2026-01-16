@@ -1,19 +1,39 @@
-import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { useQuery } from "@tanstack/react-query";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
-import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
-import box from "components/Box";
-import Typography from "components/Typography";
-import { css } from "@emotion/react";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import Expand from "components/Expanded";
-import InfoTable from "components/InfoTable";
-import Button from "components/Button";
-import Message from "components/Message";
-import useLockdropEvents from "hooks/useLockdropEvents";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+
+import box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Message from "~/components/Message";
+import Modal from "~/components/Modal";
+import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
+import Typography from "~/components/Typography";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAPI from "~/hooks/useAPI";
+import useAssets from "~/hooks/useAssets";
+import useConnectedWallet from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import useLockdropEvents from "~/hooks/useLockdropEvents";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRequestPost from "~/hooks/useRequestPost";
+
 import {
   amountToValue,
   cutDecimal,
@@ -21,23 +41,9 @@ import {
   formatDateTime,
   formatNumber,
   getTokenLink,
-} from "utils";
-import { LP_DECIMALS } from "constants/dezswap";
-import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateCancelLockdropMsg } from "utils/dezswap";
-import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
-import useRequestPost from "hooks/useRequestPost";
-import styled from "@emotion/styled";
-import { useQuery } from "@tanstack/react-query";
-import useNetwork from "hooks/useNetwork";
-import useAPI from "hooks/useAPI";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import { useNavigate } from "hooks/useNavigate";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
+} from "~/utils";
+import { generateCancelLockdropMsg } from "~/utils/dezswap";
+
 import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`

@@ -1,29 +1,37 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import LineChart, { LineChartProps } from "components/LineChart";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import Select from "pages/Earn/Pools/Select";
-import { Row, Col, useScreenClass } from "react-grid-system";
-import {
-  formatBigNumber,
-  formatDate,
-  formatCurrency,
-  getSumOfDashboardChartData,
-  formatDateRange,
-} from "utils";
-import useDashboard from "hooks/dashboard/useDashboard";
+import { type ComponentProps, useId, useMemo } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
+
+import iconFullscreen from "~/assets/icons/icon-fullscreen.svg";
+
+import IconButton from "~/components/IconButton";
+import LineChart, { LineChartProps } from "~/components/LineChart";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useHashModal from "~/hooks/useHashModal";
+
+import Select from "~/pages/Earn/Pools/Select";
+
 import {
   DashboardChartDuration,
   DashboardChartItem,
-} from "types/dashboard-api";
-import IconButton from "components/IconButton";
-import iconFullscreen from "assets/icons/icon-fullscreen.svg";
-import useHashModal from "hooks/useHashModal";
-import { type ComponentProps, useId, useMemo } from "react";
-import Modal from "components/Modal";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
+} from "~/types/dashboard-api";
+
+import {
+  formatBigNumber,
+  formatCurrency,
+  formatDate,
+  formatDateRange,
+  getSumOfDashboardChartData,
+} from "~/utils";
+
 import useChartData from "./useChartData";
 
 const StyledLabel = styled(Typography)``;

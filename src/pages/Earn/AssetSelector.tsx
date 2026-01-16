@@ -1,27 +1,32 @@
-import { useMemo, useCallback } from "react";
-import { Row, Col, useScreenClass } from "react-grid-system";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useTheme, css } from "@emotion/react";
-import Modal from "components/Modal";
-import SelectAssetForm from "components/SelectAssetForm";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
-import useHashModal from "hooks/useHashModal";
-import usePairs from "hooks/usePairs";
-import iconPlus from "assets/icons/icon-plus.svg";
-import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
-import iconDefaultAsset from "assets/icons/icon-default-token.svg";
-
-import Button from "components/Button";
-import useModal from "hooks/useModal";
 import { useAtom } from "jotai";
-import useNetwork from "hooks/useNetwork";
-import { customAssetsAtom } from "stores/assets";
-import useBalance from "hooks/useBalance";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import ImportAssetModal from "./ImportAssetModal";
+import { useCallback, useMemo } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
+
+import iconDefaultAsset from "~/assets/icons/icon-default-token.svg";
+import iconDropdown from "~/assets/icons/icon-dropdown-arrow.svg";
+import iconPlus from "~/assets/icons/icon-plus.svg";
+
+import Button from "~/components/Button";
+import Modal from "~/components/Modal";
+import SelectAssetForm from "~/components/SelectAssetForm";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import useHashModal from "~/hooks/useHashModal";
+import useModal from "~/hooks/useModal";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+
+import { customAssetsAtom } from "~/stores/assets";
+
 import AssetFormButton from "./AssetFormButton";
+import ImportAssetModal from "./ImportAssetModal";
 
 type AssetFormAddress = string | undefined;
 

@@ -1,6 +1,5 @@
-import { Col, Row } from "react-grid-system";
-import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
+import styled from "@emotion/styled";
 import React, {
   useDeferredValue,
   useEffect,
@@ -8,17 +7,24 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Typography from "components/Typography";
-import { isNativeTokenAddress } from "utils";
-import Input from "components/Input";
-import Hr from "components/Hr";
-import TabButton from "components/TabButton";
-import useAssets from "hooks/useAssets";
-import useBookmark from "hooks/useBookmark";
-import Panel from "components/Panel";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import useNetwork from "hooks/useNetwork";
-import { Token } from "types/api";
+import { Col, Row } from "react-grid-system";
+
+import Hr from "~/components/Hr";
+import Input from "~/components/Input";
+import Panel from "~/components/Panel";
+import TabButton from "~/components/TabButton";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import useBookmark from "~/hooks/useBookmark";
+import useNetwork from "~/hooks/useNetwork";
+
+import { Token } from "~/types/api";
+
+import { isNativeTokenAddress } from "~/utils";
+
 import AssetItem from "./AssetItem";
 
 type Asset = Partial<Token & { disabled?: boolean }>;

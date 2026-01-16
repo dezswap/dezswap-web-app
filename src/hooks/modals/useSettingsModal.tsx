@@ -1,8 +1,10 @@
-import SettingsModal from "components/Modal/SettingsModal";
-import { SettingsFormProps } from "components/SettingsForm";
-import useGlobalElement from "hooks/useGlobalElement";
-import useHashModal from "hooks/useHashModal";
 import { useMemo, useState } from "react";
+
+import SettingsModal from "~/components/Modal/SettingsModal";
+import { SettingsFormProps } from "~/components/SettingsForm";
+
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useHashModal from "~/hooks/useHashModal";
 
 const useSettingsModal = (_options?: SettingsFormProps) => {
   const modal = useHashModal("settings");

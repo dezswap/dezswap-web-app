@@ -1,6 +1,8 @@
-import Box from "components/Box";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+
+import Box from "~/components/Box";
+
 import { TableColumn } from ".";
 
 interface TableRowProps<R extends object> {

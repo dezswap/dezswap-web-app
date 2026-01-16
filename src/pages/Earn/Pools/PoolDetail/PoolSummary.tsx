@@ -1,21 +1,24 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import AssetIcon from "components/AssetIcon";
-import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
-import Hr from "components/Hr";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
-import useAssets from "hooks/useAssets";
-import { Row, Col } from "react-grid-system";
-import { amountToValue, formatDecimals, formatNumber } from "utils";
-import usePool from "hooks/usePool";
-import { getAddressFromAssetInfo } from "utils/dezswap";
-import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import HoverUnderline from "components/utils/HoverUnderline";
-import PercentageFormatter from "components/utils/PercentageFormatter";
-import Link from "components/Link";
 import { ComponentProps } from "react";
+import { Col, Row } from "react-grid-system";
+
+import AssetIcon from "~/components/AssetIcon";
+import Hr from "~/components/Hr";
+import Link from "~/components/Link";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
+
+import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
+import useAssets from "~/hooks/useAssets";
+import usePool from "~/hooks/usePool";
+
+import { amountToValue, formatDecimals, formatNumber } from "~/utils";
+import { getAddressFromAssetInfo } from "~/utils/dezswap";
 
 const Wrapper = styled.div`
   width: 100%;

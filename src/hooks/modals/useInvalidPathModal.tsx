@@ -1,7 +1,9 @@
-import useModal from "hooks/useModal";
 import { useMemo } from "react";
-import useGlobalElement from "hooks/useGlobalElement";
-import InvalidPathModal from "components/Modal/InvalidPathModal";
+
+import InvalidPathModal from "~/components/Modal/InvalidPathModal";
+
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useModal from "~/hooks/useModal";
 
 const useInvalidPathModal = ({
   onReturnClick,

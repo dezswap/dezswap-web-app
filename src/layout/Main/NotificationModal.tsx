@@ -1,17 +1,25 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Hr from "components/Hr";
-import Modal from "components/Modal";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
-import { SupportedChain, supportedChains } from "constants/dezswap";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
-import useNotifications from "hooks/useNotifications";
 import { useEffect, useRef, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
-import { Notification } from "stores/notifications";
-import { formatDateTime } from "utils";
+
+import Hr from "~/components/Hr";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+
+import { SupportedChain, supportedChains } from "~/constants/dezswap";
+import {
+  MOBILE_SCREEN_CLASS,
+  MODAL_CLOSE_TIMEOUT_MS,
+} from "~/constants/layout";
+
+import useNotifications from "~/hooks/useNotifications";
+
+import { Notification } from "~/stores/notifications";
+
+import { formatDateTime } from "~/utils";
 
 const NotificationItem = styled.button`
   width: 100%;
