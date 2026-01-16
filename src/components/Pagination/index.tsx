@@ -1,8 +1,10 @@
-import styled from "@emotion/styled";
-import IconButton from "components/IconButton";
-import iconBack from "assets/icons/icon-back.svg";
 import { css } from "@emotion/react";
-import Typography from "components/Typography";
+import styled from "@emotion/styled";
+
+import iconBack from "~/assets/icons/icon-back.svg";
+
+import IconButton from "~/components/IconButton";
+import Typography from "~/components/Typography";
 
 interface PaginationProps {
   total: number;

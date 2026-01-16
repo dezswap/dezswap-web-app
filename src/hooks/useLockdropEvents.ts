@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { LockdropEvent } from "types/lockdrop";
+
+import { LockdropEvent } from "~/types/lockdrop";
+
 import useAPI from "./useAPI";
 import useNetwork from "./useNetwork";
 

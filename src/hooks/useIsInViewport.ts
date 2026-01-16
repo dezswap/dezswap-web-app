@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const useIsInViewport = (ref: React.RefObject<HTMLElement>) => {
   const [isIntersecting, setIsIntersecting] = useState(false);

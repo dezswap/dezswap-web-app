@@ -1,4 +1,5 @@
-import DashboardPoolTable from "components/DashboardPoolTable";
+import DashboardPoolTable from "~/components/DashboardPoolTable";
+
 import useDashboardPools from "./useDashboardPools";
 
 function TokenPools({ tokenAddress }: { tokenAddress: string }) {

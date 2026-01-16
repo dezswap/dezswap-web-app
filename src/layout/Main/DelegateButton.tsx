@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
-import imgDelegateUs from "assets/images/img-delegate-us.svg";
 import { forwardRef, useEffect, useState } from "react";
+
+import imgDelegateUs from "~/assets/images/img-delegate-us.svg";
 
 const Button = styled.a`
   pointer-events: all;
@@ -30,29 +31,28 @@ const Button = styled.a`
   }
 `;
 
-const DelegateButton = forwardRef<HTMLAnchorElement>(function DelegateButton(
-  props,
-  ref,
-) {
-  const [svg, setSvg] = useState("");
+const DelegateButton = forwardRef<HTMLAnchorElement>(
+  function DelegateButton(props, ref) {
+    const [svg, setSvg] = useState("");
 
-  useEffect(() => {
-    fetch(imgDelegateUs)
-      .then((res) => res.text())
-      .then((res) => {
-        setSvg(res);
-      });
-  }, []);
+    useEffect(() => {
+      fetch(imgDelegateUs)
+        .then((res) => res.text())
+        .then((res) => {
+          setSvg(res);
+        });
+    }, []);
 
-  return (
-    <Button
-      ref={ref}
-      href="https://vault.xpla.io/validator/xplavaloper1tple283l3vcaac7x0mqrwtvm3kfe8hlc2d40yl"
-      target="_blank"
-      rel="noopener noreferrer"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
-  );
-});
+    return (
+      <Button
+        ref={ref}
+        href="https://vault.xpla.io/validator/xplavaloper1tple283l3vcaac7x0mqrwtvm3kfe8hlc2d40yl"
+        target="_blank"
+        rel="noopener noreferrer"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+    );
+  },
+);
 
 export default DelegateButton;

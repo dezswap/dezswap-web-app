@@ -1,7 +1,9 @@
-import ConfirmationModal from "components/Modal/ConfirmationModal";
-import useGlobalElement from "hooks/useGlobalElement";
-import useModal from "hooks/useModal";
 import { useMemo } from "react";
+
+import ConfirmationModal from "~/components/Modal/ConfirmationModal";
+
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useModal from "~/hooks/useModal";
 
 const useConfirmationModal = ({
   node,

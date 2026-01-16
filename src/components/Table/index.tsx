@@ -1,10 +1,13 @@
-import React from "react";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import TableRow from "./TableRow";
+import styled from "@emotion/styled";
+import React from "react";
+
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
 import TableHeader from "./TableHeader";
+import TableRow from "./TableRow";
 
 export type TableColumn<R extends object, K extends keyof R = keyof R> = {
   key: K | "none";

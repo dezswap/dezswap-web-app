@@ -1,49 +1,55 @@
-import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
-import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
-import box from "components/Box";
-import Typography from "components/Typography";
-import Slider from "components/Slider";
 import { css } from "@emotion/react";
-import Expand from "components/Expanded";
-import InfoTable from "components/InfoTable";
-import Button from "components/Button";
-import Message from "components/Message";
-import useLockdropEvents from "hooks/useLockdropEvents";
+import styled from "@emotion/styled";
+import { useQuery } from "@tanstack/react-query";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { useCallback, useEffect, useMemo } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
+import { Controller, useForm } from "react-hook-form";
+import { useParams, useSearchParams } from "react-router-dom";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+
+import box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Message from "~/components/Message";
+import Modal from "~/components/Modal";
+import Slider from "~/components/Slider";
+import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
+import Typography from "~/components/Typography";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
+
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import useLockdropEvents from "~/hooks/useLockdropEvents";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRequestPost from "~/hooks/useRequestPost";
+
 import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
-  sanitizeNumberInput,
   formatDateTime,
   formatNumber,
   getTokenLink,
+  sanitizeNumberInput,
   valueToAmount,
-} from "utils";
-import { Controller, useForm } from "react-hook-form";
-import { LP_DECIMALS } from "constants/dezswap";
-import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateIncreaseLockupContractMsg } from "utils/dezswap";
-import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
-import useRequestPost from "hooks/useRequestPost";
-import useBalance from "hooks/useBalance";
-import styled from "@emotion/styled";
-import { useQuery } from "@tanstack/react-query";
-import useNetwork from "hooks/useNetwork";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
+} from "~/utils";
+import { generateIncreaseLockupContractMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
+
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
-import { useNavigate } from "hooks/useNavigate";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -63,7 +69,7 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
@@ -141,26 +147,22 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const increaseLockupContractMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
-    return [
-      generateIncreaseLockupContractMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-        amount: valueToAmount(lpValue, LP_DECIMALS),
-        duration: Number(duration),
-      }),
-    ];
+    return generateIncreaseLockupContractMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      lpTokenAddress: lockdropEventInfo?.lp_token_addr,
+      amount: valueToAmount(lpValue, LP_DECIMALS),
+      duration: Number(duration),
+    });
   }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
-  const { fee } = useFee(createTxOptions);
+  const { fee } = useFee(increaseLockupContractMsg);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -185,15 +187,15 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-      if (createTxOptions && fee) {
+      if (increaseLockupContractMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: increaseLockupContractMsg,
           fee,
           formElement: event.currentTarget,
         });
       }
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, increaseLockupContractMsg],
   );
 
   useEffect(() => {

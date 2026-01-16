@@ -18,47 +18,50 @@ importers:
         specifier: ^11.10.6
         version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1)
       '@interchain-kit/core':
-        specifier: 0.3.42
-        version: 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        specifier: 0.7.0
+        version: 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@interchain-kit/cosmostation-extension':
-        specifier: 0.3.42
-        version: 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        specifier: 0.7.0
+        version: 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@interchain-kit/keplr-extension':
-        specifier: 0.3.42
-        version: 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        specifier: 0.7.0
+        version: 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@interchain-kit/react':
-        specifier: 0.3.42
-        version: 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)
+        specifier: 0.7.1
+        version: 0.7.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)
       '@interchainjs/amino':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/auth':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/cosmos':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        specifier: 1.19.3
+        version: 1.19.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/cosmos-types':
-        specifier: 1.11.18
-        version: 1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/crypto':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/encoding':
-        specifier: 1.11.9
-        version: 1.11.9
+        specifier: 1.18.1
+        version: 1.18.1
+      '@interchainjs/ethereum':
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/math':
-        specifier: 1.11.9
-        version: 1.11.9
+        specifier: 1.18.1
+        version: 1.18.1
       '@interchainjs/pubkey':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/types':
-        specifier: 1.11.9
-        version: 1.11.9
+        specifier: 1.19.1
+        version: 1.19.1
       '@interchainjs/utils':
-        specifier: 1.11.9
-        version: 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        specifier: 1.19.1
+        version: 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@rollup/plugin-inject':
         specifier: ^5.0.3
         version: 5.0.5(rollup@4.54.0)
@@ -75,14 +78,14 @@ importers:
         specifier: 1.7.2
         version: 1.7.2(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@6.0.6)
       '@xpla/xpla':
-        specifier: 1.7.0
-        version: 1.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        specifier: 1.8.4
+        version: 1.8.4(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@xpla/xpla.js':
-        specifier: 1.7.0
-        version: 1.7.0
+        specifier: 1.8.0
+        version: 1.8.0
       '@xpla/xplajs':
-        specifier: 1.7.0
-        version: 1.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        specifier: 1.8.2
+        version: 1.8.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       axios:
         specifier: ^1.1.3
         version: 1.13.2
@@ -90,8 +93,8 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       cosmjs-types:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: 0.11.0
+        version: 0.11.0
       decimal.js:
         specifier: ^10.2.1
         version: 10.6.0
@@ -138,12 +141,18 @@ importers:
         specifier: ^6.3.7
         version: 6.3.7
     devDependencies:
+      '@chain-registry/types':
+        specifier: ^2.0.130
+        version: 2.0.130
       '@chain-registry/v2-types':
         specifier: 0.53.146
         version: 0.53.146
       '@emotion/babel-plugin':
         specifier: ^11.10.2
         version: 11.13.5
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       '@types/node':
         specifier: ^20.1.1
         version: 20.19.27
@@ -184,8 +193,8 @@ importers:
         specifier: ^6.6.1
         version: 6.10.2(eslint@8.57.1)
       eslint-plugin-prettier:
-        specifier: ^4.2.1
-        version: 4.2.5(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(prettier@2.8.8)
+        specifier: ^5.5.4
+        version: 5.5.4(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(prettier@3.7.4)
       eslint-plugin-react:
         specifier: ^7.31.8
         version: 7.37.5(eslint@8.57.1)
@@ -199,8 +208,8 @@ importers:
         specifier: ^13.0.4
         version: 13.3.0
       prettier:
-        specifier: ^2.7.1
-        version: 2.8.8
+        specifier: ^3.7.4
+        version: 3.7.4
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -703,22 +712,25 @@ packages:
     peerDependencies:
       google-protobuf: ^3.14.0
 
-  '@interchain-kit/core@0.3.42':
-    resolution: {integrity: sha512-q3Tkn454DGLQEro1dFGWn5Sl1TEUbLpjeb8rcfX6Mvudzfu8c6x1MKTLCAqCPQE3CyajzyKaT85NYn0TZSRoig==}
+  '@interchain-kit/core@0.7.0':
+    resolution: {integrity: sha512-7Oza+59DLTyhyDzijNyki9aSrgcq+zVsOSz/vFUqzF7ObZGjb6n5DsgDNDi0ZcL3Ta4S3yQCBYESLvqmJDRlEw==}
 
-  '@interchain-kit/cosmostation-extension@0.3.42':
-    resolution: {integrity: sha512-cUWozq4pKTo6kGoHS8oZHBdurgrzFMJEeGgQ3MyQbuFxCoHHKBmombFZ4Aavoc69px81AQ5MFfk+WhksWodeTg==}
+  '@interchain-kit/cosmostation-extension@0.7.0':
+    resolution: {integrity: sha512-Y+DGDoHZScNfqJhOkaffoHzoQcoGV8LZf40juUS1IeEnAdZvBZiqJfy9EiYYgGu59hgwtaWKer5Z44tKLoelhQ==}
 
-  '@interchain-kit/keplr-extension@0.3.42':
-    resolution: {integrity: sha512-l+ynwlDG4nAmQ9TAssqg+zHPJfiP+O0mcQLNuWTyploXMlh6du7TTSExDcgVrVR8c/E327w4/BweMjpfGDDU0Q==}
+  '@interchain-kit/keplr-extension@0.7.0':
+    resolution: {integrity: sha512-y7zRGST0AEqDJHjNCdBGAZE/TvZGkr9SMmmIA9BVFPkT19XQx2BO/om1q3FBhRKvfcsQnrpoeIMxIx+BtGK68w==}
 
-  '@interchain-kit/react@0.3.42':
-    resolution: {integrity: sha512-3QRPqXtOQ+qMww4kJVP9Mnd8NaJHFMLCaDc2ryLWPobc1+z3tgH4Go5AxX1LYgRcF7lddQm69v6xx2wiCRcZ/w==}
+  '@interchain-kit/react@0.7.1':
+    resolution: {integrity: sha512-G4NBdUelEb5M9qanm2DjOa4KkfGMsqYSu8RjTK93rEWmfPr5qN+vVhoA5DwgUVkZnpIDO85uI+Fy6joG9v6RAg==}
     peerDependencies:
       '@types/react': ^19.0.0
       '@types/react-dom': ^19.0.0
       react: ^19.0.0
       react-dom: ^19.0.0
+
+  '@interchain-kit/store@0.6.1':
+    resolution: {integrity: sha512-MRs/FQY4U7V3KYUKzaDn1rP2H8VP4r9upkN6oiHqHRh16IGxzV3pUElwUuRKP8AgBIWdDZ3iEIxpkGH/L4hmrA==}
 
   '@interchain-ui/react@1.26.3':
     resolution: {integrity: sha512-kvGOZaSDJLNxtxieiyPMHOzxBGkpHR/BCpg/UEMDl2l7nLoPrygB/Oux1QEv/cwkw8GvepOBM7pzfJf8xk1IbQ==}
@@ -726,113 +738,68 @@ packages:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@interchainjs/amino@1.11.11':
-    resolution: {integrity: sha512-ylGTAXv+/+2wG3HivR/8ap2Q2iuozjdxtyUz2d4rlJU8idEon5+TqequuaxoS4Q5HQwZIv4pxI4sgIWnkuGLtg==}
-
-  '@interchainjs/amino@1.11.9':
-    resolution: {integrity: sha512-LF8yNG7foctfEvWoI/mMU634kt6aGIPKuU22S4rwNrxSIf01tV0Bnve+Dg9yqwyf4LTeyQxf1mMzwN2/emLnsA==}
+  '@interchainjs/amino@1.17.3':
+    resolution: {integrity: sha512-o3QNUvqOpZ8P9cXrhxdW0jgfGb1sSCCW6PLFyZQVcgJZnK4W9VFj73FG6TnUEx8v7RDcNIv20XIukMK/RF9PAw==}
 
   '@interchainjs/amino@1.19.1':
     resolution: {integrity: sha512-YRGBl2DGivuwkQRoiOMai71vf8Pg94lzP2coPMg8yQIyPXn314apExJyJBKPbkhjdK9+ygVCQr30Wehb0q2w+w==}
 
-  '@interchainjs/auth@1.11.11':
-    resolution: {integrity: sha512-xPchPC7dzUnm0ywvxlHt3YLLrMVXx452cZKZubgmtpK2zFXj9DfxF0Gw7XaCVn5g7sgvcwjYjoBxy1iEd5zVAQ==}
-
-  '@interchainjs/auth@1.11.9':
-    resolution: {integrity: sha512-jCTqzDXUrn/npFmJ1X04Ad6FqC5gEYbNzL/TUidNQSPNDkELu6DE9XM/J3DCGWpgBLiUEaz0P2nquTs+QneKCw==}
+  '@interchainjs/auth@1.17.3':
+    resolution: {integrity: sha512-bpjZPWdgE46f+HWPD+jvFx3euBhcSbz3NE3qmL5gC2j1nMwjrHk/SsZHMjfDXhrfO3sjQiIMk4DcjCv7v+/6aw==}
 
   '@interchainjs/auth@1.19.1':
     resolution: {integrity: sha512-fqMZWu9CnH2tvhzbc74lDjN39P1UIyzBimEqQEsrH/ovnPVIM33nt6H3BHvR6/Aa3pECFuVmFSyhXNewO3ebhw==}
 
-  '@interchainjs/cosmos-types@1.11.11':
-    resolution: {integrity: sha512-squLZCnkB0LenrKfmT5G5N2sDdqnHjafQwoPow8AptwDgwYcBW0jHPYcufHHILenMajBZWuMxkgUa+ou8qKJMg==}
-
-  '@interchainjs/cosmos-types@1.11.18':
-    resolution: {integrity: sha512-g2FsXdL8o9RManyXEjvLfW1NjgCd5pNpETSZaSgpUYVQvila0D5DXqjQLl4e8H3sGJ0C823+2OY4sabcBjxtOA==}
-
-  '@interchainjs/cosmos-types@1.11.9':
-    resolution: {integrity: sha512-ckIHLjXZSaV8ckv1+rx5Znh1Oza+w4XM+TVqDiR4/S30Lx+3RqdyOKexqlI+YRArkd5E58lRFG2ZgLXNzBYIow==}
+  '@interchainjs/cosmos-types@1.17.3':
+    resolution: {integrity: sha512-lHQYzoa7haJfadieMTm9oe7LQq5trn9aoybyHvkj7Pt9k+mS0SmzJhzxXDTbj2pPfl6bnAflEOJ7PlC4x9IZHw==}
 
   '@interchainjs/cosmos-types@1.19.1':
     resolution: {integrity: sha512-GO9YaIwRt/k/dbyHo+NPI8WcVWYV4VXNwBWXngXWrQYVMgNrwgoJDn8Xn6RX/fL6eKuMbA37fTn78jj1Gp+Krw==}
 
-  '@interchainjs/cosmos@1.11.11':
-    resolution: {integrity: sha512-8xmtSB4vPlJLAZjqS8ADtF0P7vRnTAylghlWqsBHCkySWyV1JPX7gACLHyF1Oq8PKp/7iCpjsIxc9U7efp/r9w==}
+  '@interchainjs/cosmos@1.17.3':
+    resolution: {integrity: sha512-6ZwjLtIqDKcL7tvSgFJtLOSsKKv4DoQmKpBc7p1S3dzW10AtJ/TYD9ALdeD0+cwn+lnOAAquqkv1m7MQRjOtnw==}
 
-  '@interchainjs/cosmos@1.11.9':
-    resolution: {integrity: sha512-7qmv1wMp2ptDh1x/X5rszIgHYTLy7IHOzUPYEAGZShBLohb11sc0ZmmSnBBIEPTWwvDkm72pRNu7Lba7JRWO4Q==}
+  '@interchainjs/cosmos@1.19.3':
+    resolution: {integrity: sha512-s4OSnkJZdy1lI6lmYHqhEn5B1ugJatEg+9Hld5OfDstAd96UyUrgFQvJtjMiiZ5nXlarvMSqeJESjncmEXGdOQ==}
 
-  '@interchainjs/cosmos@1.19.2':
-    resolution: {integrity: sha512-bEFzsUu/jFcNr8HH4Ez/RWwHAC9kSUPTUaNpoUZcxkEV/3kPC/i99BMplx4gfQrJPyXXIW2Y7ijZiryiMAk4dw==}
-
-  '@interchainjs/crypto@1.11.11':
-    resolution: {integrity: sha512-u+wq3mW4cbCSEaGLS6i6HdrQVDves8RbElJRiUMgE2m1pP7MFayfJeNjp+IEz+/uZc4nCjqjZLpQNaCtcZOydg==}
-
-  '@interchainjs/crypto@1.11.9':
-    resolution: {integrity: sha512-xq01OS2MaHZLUS3rB38nRCKQGpmhuPMQOgZ/A6N4+JAT2kKzc24H0t22RZo59ElG4/E/G81pE3kv3KH9J1yuqA==}
+  '@interchainjs/crypto@1.17.3':
+    resolution: {integrity: sha512-Iyqmw2WAQUycb/HCTAnCNF5/huSUp1f8WU87yjOII/tcM7p6xDraijO0khnd8obqt0yJil2INx58W5U9xwiQ1w==}
 
   '@interchainjs/crypto@1.19.1':
     resolution: {integrity: sha512-+9VutT6VKvNSqHjQF96gKLyEOVFdPQ+iARc1+IZaksbPRcTkUg1ElnNoxbkV4NsMOFD3oedFZTDJdDekDoMQvQ==}
 
-  '@interchainjs/encoding@1.11.11':
-    resolution: {integrity: sha512-awViGtZx6RxwPMyVdfO7t0JPxnBeUKA1h1cT42MBpeIxT22MgogIXted0K+c9NdXOVNMeGwshSutaqEICUeJMA==}
-
-  '@interchainjs/encoding@1.11.9':
-    resolution: {integrity: sha512-4MuMqC1Tu3vCxSqJgrcQg1AiyUEcwq4iOlHnao7G9exKWC7VIyUo62yN0WssUTvWtEwHYxRbOpIPtsqhdCkznA==}
+  '@interchainjs/encoding@1.17.3':
+    resolution: {integrity: sha512-Z1wEggXfcLE2aqfOZFyHDtw8HIZYkHhYlP+9IKds58qnH4VUWJLhWZ9DVUfMjvs20PKbCaZO71BYkNiM+x392Q==}
 
   '@interchainjs/encoding@1.18.1':
     resolution: {integrity: sha512-DyCWRCz2wbzXEg9tLRpHG7GaIX9FBP2fGsTds2YzmrQ/yaeDoih2Q5eAWnQ4Wa+Tqg0ZSu1DJ4f/a31YIqEZbQ==}
 
+  '@interchainjs/ethereum@1.17.3':
+    resolution: {integrity: sha512-uVhG0SNP7JirRcsi1cCYKEcdvhL2crCHMf4k+SXfSz3kDHIKVndHWXSTIALBTwj7iTrVmkixGaFAqmRS59hvAw==}
+
   '@interchainjs/ethereum@1.19.1':
     resolution: {integrity: sha512-C4cXJT+lWnKpj86uebdHRCsHJCQqg+wV6QvmiEqSy6z+VmGjW771K4AgjN2FeO/EcClNRdZAg0+7gz+2sDwbPQ==}
 
-  '@interchainjs/math@1.11.11':
-    resolution: {integrity: sha512-sAfiNlxDuoffdxSbakfAMJ8PQA0gMSktLWiVoyjPePehimeN4bZnzNcYritCoWD7+YAPPgFKuYYCEc6+sJ6beA==}
-
-  '@interchainjs/math@1.11.18':
-    resolution: {integrity: sha512-RC3QkoX2zfklviSwV83AlAkKka/hKPsesu+WmASJPdjdkQLlnQjQgz/4MGHigJbrXTMliZjusKIX5VWAZY9kVw==}
-
-  '@interchainjs/math@1.11.9':
-    resolution: {integrity: sha512-wsbBRSeYbsinNlIaWRzqunQypFgaheV/UNbn/H+0qhajj8lDGeTvQtRFURd6rgWF6FznUbs5b07w+nJ7CDSOwA==}
+  '@interchainjs/math@1.17.3':
+    resolution: {integrity: sha512-IGxi8KkQPKReHgXbg053SowUr0+48GJC+EjQ4MWfG2KMtUMN4f4dIYDdXCpdLt3QSZjxi2KCbgOuJ+7NwIjBow==}
 
   '@interchainjs/math@1.18.1':
     resolution: {integrity: sha512-Taz3SUE+46uvTIhJ9VbDEQowmyxcSPInTsmWFk/BEB7XtTe4LyQm4yySSRLkZj03ZJrik+gGcnSlOn/jz5uUuQ==}
 
-  '@interchainjs/pubkey@1.11.11':
-    resolution: {integrity: sha512-Lhgk8XQMNQAUMLtSaaK/lfug/mAE8p7KK1vJdaMNP+31ldxIg4Xkpz7XS6SOOmLQnkWu+z1U1XU+6ENvT/aRyA==}
-
-  '@interchainjs/pubkey@1.11.9':
-    resolution: {integrity: sha512-IqNC/1xK64rkH4CBJQLG9VT677qOhjyEoU9fpLzuQlI1Xr6rS97el/6VgIJ/XT7EU6+qnUXevw6j8lsHRUoXEA==}
+  '@interchainjs/pubkey@1.17.3':
+    resolution: {integrity: sha512-lVL1q7Kzadu2o9z//SRwG0FmYvQVLZ1m6OWi29Nb9uMTRvYWVTm5bx36xaEjYGSMlygeVPqGv+FkgkI5jDhYng==}
 
   '@interchainjs/pubkey@1.19.1':
     resolution: {integrity: sha512-ZTvRekbehbk/goMwz/VAWdJAHapeYzfGQTgEDIxIZAGpeDg10cq27mnkTrD6muf/epAtzSkpVozpTQsTpnWtQQ==}
 
-  '@interchainjs/types@1.11.11':
-    resolution: {integrity: sha512-aRbzyPR4i1mKT/9JjLWty1qtDIZ5B1YnrfTNjuyufgksNSDRreWP6RxQh7nMtJMo2PzGy30I2tydyBAigqd+Jw==}
-
-  '@interchainjs/types@1.11.18':
-    resolution: {integrity: sha512-L6KiDwaBFBSgH/7yE/5gPIvYtaIg/dlTJnNXYEUTw3Rp3gyi0VKqR8WhrQGftUAQyGSVObHktFIAyyDa+AxEzw==}
-
-  '@interchainjs/types@1.11.9':
-    resolution: {integrity: sha512-5G546AwLkUjeYOV0lug3HI9eY4zlnCdMDvojQ2vmQMYsuN1WkE0rKWhektguGFx5YHA9tn8MqgD4gMOsHqqa4A==}
+  '@interchainjs/types@1.17.3':
+    resolution: {integrity: sha512-y4uihwvFRb16DVfvBCSXS7m45G6Mo6lgZq1F6Sut+hwhXBRV0Hvl59/7KhmMmH3sKffP1Lh/SmaeEvlUeQEI5A==}
 
   '@interchainjs/types@1.19.1':
     resolution: {integrity: sha512-5ZJqa22NDHgKjaQG3iuTfSxfG2N6uQsoQ+8OumzXt1HMBiGyJzceORa3FKHmwknxKgoOIStPGG5X91/ULIXzPw==}
 
-  '@interchainjs/utils@1.11.11':
-    resolution: {integrity: sha512-VtJEa2neDqbXdwViHzNx+2ToWDNz7VG3Lir3n6sWsrC5lt0XvW3yCnou69729CJs3cZP5ROToMgt433Pwyggyg==}
-    peerDependencies:
-      '@chain-registry/v2': ^1.71.186
-      '@chain-registry/v2-types': ^0.53.115
-
-  '@interchainjs/utils@1.11.18':
-    resolution: {integrity: sha512-MYbLkHTWyGuCY31Xil7hXVSl86xl4+hJWvPoN4K7gR6vAM6+iRwa7v14wo93bntXqc1GFnT1idKQnq9MdBkyLw==}
-    peerDependencies:
-      '@chain-registry/v2': ^1.71.186
-      '@chain-registry/v2-types': ^0.53.115
-
-  '@interchainjs/utils@1.11.9':
-    resolution: {integrity: sha512-dT/58D0yms9+Os8m+tOPiQisbAShvzoNCvlm02kf8oPwHKkD48O7X/eU0G8Uioi1QEU3PDI41/Up10WfUWwWAw==}
+  '@interchainjs/utils@1.17.3':
+    resolution: {integrity: sha512-WFzJhhOGK+DZFx8s5cwHXvcAG9DHo60U8+h97ufyTmexPKXMMzBHty2Lir4gNibXUJbchre1+Yl5ElXXdsMSBA==}
     peerDependencies:
       '@chain-registry/v2': ^1.71.186
       '@chain-registry/v2-types': ^0.53.115
@@ -946,6 +913,10 @@ packages:
     resolution: {integrity: sha512-j84kjAbzEnQHaSIhRPUmB3/eVXu2k3dKPl2LOrR8fSOIL+89U+7lV117EWHtq/GHM3ReGHM46iRBdZfpc4HRUQ==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/curves@1.8.2':
+    resolution: {integrity: sha512-vnI7V6lFNe0tLAuJMu+2sX+FcL14TaCWy1qiczg1VwRmPrpQCdq5ESXQMqUc2tluRNf6irBXrWbl1mGN8uaU/g==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@noble/curves@1.9.0':
     resolution: {integrity: sha512-7YDlXiNMdO1YZeH6t/kvopHHbIZzlxrCV9WLqCY6QhcXOoXiNCMDqJIglZ9Yjx5+w7Dz30TITFrlTjnRg7sKEg==}
     engines: {node: ^14.21.3 || >=16}
@@ -974,6 +945,10 @@ packages:
     resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/hashes@1.7.2':
+    resolution: {integrity: sha512-biZ0NUSxyjLLqo6KxEJ1b+C2NAx0wtDoFvCaXHGgUkeHzf3Xc1xKumFKREuT7f7DARNZ/slvYUwFG6B0f2b6hQ==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
@@ -992,6 +967,10 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@pkgr/core@0.2.9':
+    resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
+    engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -1713,14 +1692,46 @@ packages:
   '@scure/base@1.2.6':
     resolution: {integrity: sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==}
 
+  '@scure/bip32@1.6.2':
+    resolution: {integrity: sha512-t96EPDMbtGgtb7onKKqxRLfE5g05k7uHnHRM2xdE6BP/ZmxaLtPek4J4KfVn/90IQNrU1IOAqMgiDtUdtbe3nw==}
+
   '@scure/bip32@1.7.0':
     resolution: {integrity: sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==}
+
+  '@scure/bip39@1.5.4':
+    resolution: {integrity: sha512-TFM4ni0vKvCfBpohoh+/lY05i9gRbSwXWngAsF4CABQxoaOHijxuaZ2R6cStDQ5CHtHO9aGJTr4ksVJASRRyMA==}
 
   '@scure/bip39@1.6.0':
     resolution: {integrity: sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==}
 
   '@scure/starknet@1.1.0':
     resolution: {integrity: sha512-83g3M6Ix2qRsPN4wqLDqiRZ2GBNbjVWfboJE/9UjfG+MHr6oDSu/CWgy8hsBSJejr09DkkL+l0Ze4KVrlCIdtQ==}
+
+  '@solana/buffer-layout@4.0.1':
+    resolution: {integrity: sha512-E1ImOIAD1tBZFRdjeM4/pzTiTApC0AOBGwyAMS4fwIodCWArzJ3DWdoh8cKxeFM2fElkxBh2Aqts1BPC373rHA==}
+    engines: {node: '>=5.10'}
+
+  '@solana/codecs-core@2.3.0':
+    resolution: {integrity: sha512-oG+VZzN6YhBHIoSKgS5ESM9VIGzhWjEHEGNPSibiDTxFhsFWxNaz8LbMDPjBUE69r9wmdGLkrQ+wVPbnJcZPvw==}
+    engines: {node: '>=20.18.0'}
+    peerDependencies:
+      typescript: '>=5.3.3'
+
+  '@solana/codecs-numbers@2.3.0':
+    resolution: {integrity: sha512-jFvvwKJKffvG7Iz9dmN51OGB7JBcy2CJ6Xf3NqD/VP90xak66m/Lg48T01u5IQ/hc15mChVHiBm+HHuOFDUrQg==}
+    engines: {node: '>=20.18.0'}
+    peerDependencies:
+      typescript: '>=5.3.3'
+
+  '@solana/errors@2.3.0':
+    resolution: {integrity: sha512-66RI9MAbwYV0UtP7kGcTBVLxJgUxoZGm8Fbc0ah+lGiAw17Gugco6+9GrJCV83VyF2mDWyYnYM9qdI3yjgpnaQ==}
+    engines: {node: '>=20.18.0'}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.3.3'
+
+  '@solana/web3.js@1.98.4':
+    resolution: {integrity: sha512-vv9lfnvjUsRiq//+j5pBdXig0IQdtzA0BRZ3bXEP4KaIyF1CcaydWqgyzQgfZMNIsWNWmG+AUHwPy4AHOD6gpw==}
 
   '@starknet-io/types-js@0.8.4':
     resolution: {integrity: sha512-0RZ3TZHcLsUTQaq1JhDSCM8chnzO4/XNsSCozwDET64JK5bjFDIf2ZUkta+tl5Nlbf4usoU7uZiDI/Q57kt2SQ==}
@@ -1822,6 +1833,25 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
 
+  '@trivago/prettier-plugin-sort-imports@6.0.0':
+    resolution: {integrity: sha512-Xarx55ow0R8oC7ViL5fPmDsg1EBa1dVhyZFVbFXNtPPJyW2w9bJADIla8YFSaNG9N06XfcklA9O9vmw4noNxkQ==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@vue/compiler-sfc': 3.x
+      prettier: 2.x - 3.x
+      prettier-plugin-ember-template-tag: '>= 2.0.0'
+      prettier-plugin-svelte: 3.x
+      svelte: 4.x || 5.x
+    peerDependenciesMeta:
+      '@vue/compiler-sfc':
+        optional: true
+      prettier-plugin-ember-template-tag:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
+      svelte:
+        optional: true
+
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
 
@@ -1833,6 +1863,9 @@ packages:
 
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
+
+  '@types/connect@3.4.38':
+    resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -1848,6 +1881,9 @@ packages:
 
   '@types/node@10.12.18':
     resolution: {integrity: sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==}
+
+  '@types/node@12.20.55':
+    resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
   '@types/node@20.19.27':
     resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
@@ -1874,6 +1910,15 @@ packages:
 
   '@types/semver@7.7.1':
     resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
+
+  '@types/uuid@8.3.4':
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
+
+  '@types/ws@7.4.7':
+    resolution: {integrity: sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@typescript-eslint/eslint-plugin@5.62.0':
     resolution: {integrity: sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==}
@@ -2095,18 +2140,18 @@ packages:
     resolution: {integrity: sha512-eG2fFnzLX9PqCKm3/M2ZXuts3XmaB5JI1xe8qTZ8z5TX7l8R8uZ+kBa3t8en6SGgE35dOIoB5xoVdbpqv5K+Bg==}
     engines: {node: '>=16'}
 
-  '@xpla/xpla.js@1.7.0':
-    resolution: {integrity: sha512-enVA6txVkTUqA42GWBG+ObnqSPN9DlRPjqzvLwLU2nsUnt/vLLpvzBi11tVSuSPzjQqFt87pdx83K4OoVDwRlQ==}
+  '@xpla/xpla.js@1.8.0':
+    resolution: {integrity: sha512-xoBbjDP/Vpectmyc+JYQ0Ww/USmFKBH5mrqOtnohoCeXlgs1SJNZwKNsrM+jLG8rqGC6QWMNfDpx40nwapY+Kg==}
     engines: {node: '>=16'}
 
-  '@xpla/xpla.proto@1.7.0':
-    resolution: {integrity: sha512-oAkzRCbSO/zNSG0QflmYuMY+Bxu9uqM2nN36tVIO4yKNaJi3WiEbjng4+AmcYA6t31TgwXFo8Q8FbK7ER8f1YA==}
+  '@xpla/xpla.proto@1.8.0-beta.2':
+    resolution: {integrity: sha512-D66kn7r4feK3ZCGpytP3EG1a+ExaYgodp1uAcLKRPa0YoF8Mi9PTqCrtDNzDVEvva9j3PHzCy6sTq43F52FVVQ==}
 
-  '@xpla/xpla@1.7.0':
-    resolution: {integrity: sha512-HwVXSE3HicnHZo1qBIosQRDG3REhQjMAz9Zr7x2PDpPJZKaP7n3h5ygjOb3kbaFyW6Hq65RTd2lhVYZ156Sj6A==}
+  '@xpla/xpla@1.8.4':
+    resolution: {integrity: sha512-zQtqyskVpWgJwPholTUGs5mfCduNZRnmp/7d4CEIyp9njV8zOuboftdd7692Eb6npigtBvVAAo1onoCZ22zciA==}
 
-  '@xpla/xplajs@1.7.0':
-    resolution: {integrity: sha512-uNqLAASqd7oo9wL3t62zAYQRKydJaAqkXg8BZeps1c0sXe37TowKviL4ZDeN6FLKNocKLrzpcJXjP9yVZs8Kpg==}
+  '@xpla/xplajs@1.8.2':
+    resolution: {integrity: sha512-+Uh4TJ/id1/slsm46bNSj+4FgTI5PTSP6xCCVPpCvLbvYkKS+OcA/i8Rq0QojqxaYb0i29btTk8OzplT3txafA==}
 
   abi-wan-kanabi@2.2.4:
     resolution: {integrity: sha512-0aA81FScmJCPX+8UvkXLki3X1+yPQuWxEkqXBVKltgPAK79J+NB+Lp5DouMXa7L6f+zcRlIA/6XO7BN/q9fnvg==}
@@ -2135,6 +2180,10 @@ packages:
 
   aes-js@4.0.0-beta.5:
     resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
+
+  agentkeepalive@4.6.0:
+    resolution: {integrity: sha512-kja8j7PjmncONqaTsB8fQ+wE2mSU2DJ9D4XKoJ5PFWIdRMa6SLSN1ff4mOr4jCbfRSsxR4keIiySJU0N9T5hIQ==}
+    engines: {node: '>= 8.0.0'}
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -2321,10 +2370,6 @@ packages:
     resolution: {integrity: sha512-HpV5OMLLGTjSVblmrtYRfFFKuQB+GArM0+XP8HGWfJ5vxYBqo+DesvJwOdC2WJ3bCkZShGf0QIfoIpeomVzVdA==}
     engines: {node: '>=6.0.0'}
 
-  bip32@3.1.0:
-    resolution: {integrity: sha512-eoeajYEzJ4d6yyVtby8C+XkCeKItiC4Mx56a0M9VaqTMC73SWOm4xVZG7SaR8e/yp4eSyky2XcBpH3DApPdu7Q==}
-    engines: {node: '>=6.0.0'}
-
   bip39@3.1.0:
     resolution: {integrity: sha512-c9kiwdk45Do5GL0vJMe7tS95VjCii65mYAH7DfWl3uW8AVzXKQVUm64i3hzVybBDMp9r7j9iNxR85+ul8MdN/A==}
 
@@ -2340,11 +2385,17 @@ packages:
   bn.js@5.2.2:
     resolution: {integrity: sha512-v2YAxEmKaBLahNwE1mjp4WON6huMNeuDvagFZW+ASCuA/ku0bXR9hSMw0XpiqMoA3+rmnyck/tPRSFQkoC9Cuw==}
 
+  borsh@0.7.0:
+    resolution: {integrity: sha512-CLCsZGIBCFnPtkNnieW/a8wmreDmfUtjU2m9yHrzPXIlNbqVs0AQrSatSG6vdNYUqdc83tkQi2eHfF98ubzQLA==}
+
   bowser@2.13.1:
     resolution: {integrity: sha512-OHawaAbjwx6rqICCKgSG0SAnT05bzd7ppyKLVUITZpANBaaMFBAsaNkto3LoQ31tyFP5kNujE8Cdx85G9VzOkw==}
 
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
+
+  brace-expansion@2.0.2:
+    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -2459,6 +2510,10 @@ packages:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
@@ -2520,6 +2575,13 @@ packages:
     resolution: {integrity: sha512-9HMlXtt/BNoYr8ooyjjNRdIilOTkVJXB+GhxMTtOKwk0R4j4lS4NpjuqmRxroBfnfTSHQIHQB7wryHhXarNjmQ==}
     engines: {node: '>=16'}
 
+  commander@14.0.2:
+    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
+    engines: {node: '>=20'}
+
+  commander@2.20.3:
+    resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
+
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -2560,8 +2622,9 @@ packages:
       typescript:
         optional: true
 
-  cosmjs-types@0.7.2:
-    resolution: {integrity: sha512-vf2uLyktjr/XVAgEq0DjMxeAWh1yYREe7AMHDKd7EiHVqxBPCaBS+qEEQUkXbR9ndnckqr1sUG8BQhazh4X5lA==}
+  cosmjs-types@0.11.0:
+    resolution: {integrity: sha512-kDSkgHpRTrg1413jCNehT3P21+EBxZWFMBr9JEzVfmPiNdtuwAoLAkCYo7c7i/pTakAwyHsXbxOg8kkD+AN33w==}
+    engines: {node: '>=20.19'}
 
   cosmjs-types@0.9.0:
     resolution: {integrity: sha512-MN/yUe6mkJwHnCFfsNPeCfXVhyxHYW6c/xDUzrSbBycYzw++XvWDMJArXp2pLdgD6FQ8DW79vkPjeNKVrXaHeQ==}
@@ -2699,6 +2762,10 @@ packages:
     resolution: {integrity: sha512-aL3AhqtfhOlT/3ai6sWXeqwnw63ATNpnUiN4HL7x9q+My5QtHlO3OIkasmug9LKzpheLdmUKGRKnYXYAS7FQkQ==}
     engines: {node: '>=6'}
 
+  delay@5.0.0:
+    resolution: {integrity: sha512-ReEBKkIfe4ya47wlPYf/gu5ib6yUG0/Aez0JQZQz94kiWtRQvZIQbTiehsnwHvLSWJnQdhVeqYue7Id1dKr0qw==}
+    engines: {node: '>=10'}
+
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
@@ -2819,6 +2886,12 @@ packages:
   es-toolkit@1.39.3:
     resolution: {integrity: sha512-Qb/TCFCldgOy8lZ5uC7nLGdqJwSabkQiYQShmw4jyiPk1pZzaYWTwaYKYP7EgLccWYgZocMrtItrwh683voaww==}
 
+  es6-promise@4.2.8:
+    resolution: {integrity: sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==}
+
+  es6-promisify@5.0.0:
+    resolution: {integrity: sha512-C+d6UdsYDk0lMebHNR4S2NybQMMngAOnOwYBQjTOiv0MkoJMP0Myw2mgpDLBcpfCmRLxyFqYhS/CfOENq4SJhQ==}
+
   esbuild@0.27.2:
     resolution: {integrity: sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==}
     engines: {node: '>=18'}
@@ -2899,14 +2972,17 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9
 
-  eslint-plugin-prettier@4.2.5:
-    resolution: {integrity: sha512-9Ni+xgemM2IWLq6aXEpP2+V/V30GeA/46Ar629vcMqVPodFFWC9skHu/D1phvuqtS8bJCFnNf01/qcmqYEwNfg==}
-    engines: {node: '>=12.0.0'}
+  eslint-plugin-prettier@5.5.4:
+    resolution: {integrity: sha512-swNtI95SToIz05YINMA6Ox5R057IMAmWZ26GqPxusAp1TZzj+IdY9tXNWWD3vkF/wEqydCONcwjTFpxybBqZsg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      eslint: '>=7.28.0'
-      eslint-config-prettier: '*'
-      prettier: '>=2.0.0'
+      '@types/eslint': '>=8.0.0'
+      eslint: '>=8.0.0'
+      eslint-config-prettier: '>= 7.0.0 <10.0.0 || >=10.1.0'
+      prettier: '>=3.0.0'
     peerDependenciesMeta:
+      '@types/eslint':
+        optional: true
       eslint-config-prettier:
         optional: true
 
@@ -3000,6 +3076,10 @@ packages:
   exenv@1.2.2:
     resolution: {integrity: sha512-Z+ktTxTwv9ILfgKCk32OX3n/doe+OcLTRtqK9pcL+JsP3J1/VW8Uvl4ZjLlKqeW4rzK4oesDOGMEMRIZqtP4Iw==}
 
+  eyes@0.1.8:
+    resolution: {integrity: sha512-GipyPsXO1anza0AOZdy69Im7hGFCNB7Y/NGjDlZGJ3GJJLtwNSb2vrzYrTYJRrRloVx7pl+bhUaTB8yiccPvFQ==}
+    engines: {node: '> 0.1.90'}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -3021,6 +3101,9 @@ packages:
 
   fast-safe-stringify@2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
+
+  fast-stable-stringify@1.0.0:
+    resolution: {integrity: sha512-wpYMUmFu5f00Sm0cj2pfivpmawLZ0NKdviQ4w9zJeR8JVtOpOxHmLaJuj0vxvGqMJQWyP/COUkF75/57OKyRag==}
 
   fastq@1.20.1:
     resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
@@ -3232,6 +3315,9 @@ packages:
     resolution: {integrity: sha512-nZXjEF2nbo7lIw3mgYjItAfgQXog3OjJogSbKa2CQIIvSGWcKgeJnQlNXip6NglNzYH45nSRiEVimMvYL8DDqQ==}
     engines: {node: '>=14.18.0'}
 
+  humanize-ms@1.2.1:
+    resolution: {integrity: sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==}
+
   husky@8.0.3:
     resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
     engines: {node: '>=14'}
@@ -3265,8 +3351,8 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  interchainjs@1.11.11:
-    resolution: {integrity: sha512-YBpzehsWPlX94HPwQqUJTuBJgLmCFAvT8/xB0nxcn7qELWT/0yUS1iSKiFJEbr1GOhEfIIlc8Ayi6EaHUL3Bzg==}
+  interchainjs@1.17.3:
+    resolution: {integrity: sha512-dXWlouyywRMS2RaxIKAJnzbDBc3DhYaSN1p4gyVre+AVVQ29uoVzVsHTRemmA5K4CnDOoFlLSRWD95OdWGQd7Q==}
 
   interchainjs@1.19.2:
     resolution: {integrity: sha512-bfIykdkVa9WSQF5h6Xtne7t9vCdgRmgtKZlXF5iupdv36pCidTjlrGugqdoSlXf4kwo2td7hwklISVC36mT7sg==}
@@ -3437,6 +3523,14 @@ packages:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
 
+  javascript-natural-sort@0.7.1:
+    resolution: {integrity: sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==}
+
+  jayson@4.3.0:
+    resolution: {integrity: sha512-AauzHcUcqs8OBnCHOkJY280VaTiCm57AbuO7lqzcw7JapGj50BisE3xhksye4zlTSR1+1tAz67wLTl8tEH1obQ==}
+    engines: {node: '>=8'}
+    hasBin: true
+
   jest-transform-stub@2.0.0:
     resolution: {integrity: sha512-lspHaCRx/mBbnm3h4uMMS3R5aZzMwyNpNIJLXj4cEsV0mIUtS4IjYJLSoyjRCtnxb6RIGJ4NL2quZzfIeNhbkg==}
 
@@ -3488,6 +3582,9 @@ packages:
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+
+  json-stringify-safe@5.0.1:
+    resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
 
   json5@1.0.2:
     resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
@@ -3660,6 +3757,10 @@ packages:
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
+
+  minimatch@9.0.5:
+    resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
+    engines: {node: '>=16 || 14 >=14.17'}
 
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
@@ -3850,9 +3951,15 @@ packages:
     resolution: {integrity: sha512-fIYNuZ/HastSb80baGOuPRo1O9cf4baWw5WsAp7dBuUzeTD/BoaG8sVTdlPFksBE2lF21dN+A1AnrpIjSWqHHg==}
     engines: {node: '>= 0.10'}
 
+  parse-imports-exports@0.2.4:
+    resolution: {integrity: sha512-4s6vd6dx1AotCx/RCI2m7t7GCh5bDRUtGNvRfHSP2wbBQdMi67pPe7mtzmgwcaQ8VKK/6IB7Glfyu3qdZJPybQ==}
+
   parse-json@5.2.0:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
+
+  parse-statements@1.0.11:
+    resolution: {integrity: sha512-HlsyYdMBnbPQ9Jr/VgJ1YF4scnldvJpJxCVx6KgqPL4dxppsWrJHCIIxQXMJrqGnsRkNPATbeMJ8Yxu7JMsYcA==}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -3982,9 +4089,9 @@ packages:
     resolution: {integrity: sha512-SxToR7P8Y2lWmv/kTzVLC1t/GDI2WGjMwNhLLE9qtH8Q13C+aEmuRlzDst4Up4s0Wc8sF2M+J57iB3cMLqftfg==}
     engines: {node: '>=6.0.0'}
 
-  prettier@2.8.8:
-    resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
-    engines: {node: '>=10.13.0'}
+  prettier@3.7.4:
+    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
+    engines: {node: '>=14'}
     hasBin: true
 
   pretty-hrtime@1.0.3:
@@ -4245,6 +4352,9 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  rpc-websockets@9.3.2:
+    resolution: {integrity: sha512-VuW2xJDnl1k8n8kjbdRSWawPRkwaVqUQNjE1TdeTawf0y0abGhtVJFTXCLfgpgGDBkO/Fj6kny8Dc/nvOW78MA==}
+
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
@@ -4395,8 +4505,14 @@ packages:
   stream-browserify@3.0.0:
     resolution: {integrity: sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==}
 
+  stream-chain@2.2.5:
+    resolution: {integrity: sha512-1TJmBx6aSWqZ4tx7aTpBDXK0/e2hhcNSTV8+CbFJtDjbb+I1mZ8lHit0Grw9GRT+6JbIrrDd8esncgBi8aBXGA==}
+
   stream-http@3.2.0:
     resolution: {integrity: sha512-Oq1bLqisTyK3TSCXpPbT4sdeYNdmyZJv1LxpEm2vu1ZhK89kSE5YXwZc3cWk0MagGaKriBh9mCFbVGtO+vY29A==}
+
+  stream-json@1.9.1:
+    resolution: {integrity: sha512-uWkjJ+2Nt/LO9Z/JyKZbMusL8Dkh97uUBTv3AJQ74y07lVahLY4eEFsPsE97pxYBwr8nnjMAIch5eqI0gPShyw==}
 
   stream-shift@1.0.3:
     resolution: {integrity: sha512-76ORR0DO1o1hlKwTbi/DM3EXWGf3ZJYO8cXX5RJwnul2DEg2oyoZyjLNoQM8WsvZiFKCRfC1O0J7iCvie3RZmQ==}
@@ -4472,6 +4588,10 @@ packages:
   stylis@4.2.0:
     resolution: {integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==}
 
+  superstruct@2.0.2:
+    resolution: {integrity: sha512-uV+TFRZdXsqXTL2pRvujROjdZQ4RAlBUS5BTh9IGm+jTqQntYThciG/qu57Gs69yjnVUSqdxF9YLmSnpupBW9A==}
+    engines: {node: '>=14.0.0'}
+
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
@@ -4491,11 +4611,18 @@ packages:
     resolution: {integrity: sha512-sQV7phh2WCYAn81oAkakC5qjq2Ml0g8ozqz03wOGnx9dDlG1de6yrF+0RAzSJD8fPUow3PTSMf2SAbOGxb93BA==}
     engines: {node: '>=0.10'}
 
+  synckit@0.11.11:
+    resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+
   tabbable@6.3.0:
     resolution: {integrity: sha512-EIHvdY5bPLuWForiR/AN2Bxngzpuwn1is4asboytXtpTgsArc+WmSJKVLlhdh71u7jFcryDqB2A8lQvj78MkyQ==}
 
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
+
+  text-encoding-utf-8@1.0.2:
+    resolution: {integrity: sha512-8bw4MY9WjdsD2aMtO0OzOCY3pXGYNx2d2FfHRVUKkiCPDWjKuOlhLVASS+pD7VkLTVjW268LYJHwsnPFlBpbAg==}
 
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
@@ -4715,6 +4842,10 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  utf-8-validate@5.0.10:
+    resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
+    engines: {node: '>=6.14.2'}
+
   utf-8-validate@6.0.6:
     resolution: {integrity: sha512-q3l3P9UtEEiAHcsgsqTgf9PPjctrDWoIXW3NpOHFdRDbLvu4DLIcxHangJ4RLrWkBcKjmcs/6NkerI8T/rE4LA==}
     engines: {node: '>=6.14.2'}
@@ -4731,6 +4862,10 @@ packages:
 
   uuid@11.1.0:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
+  uuid@8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
   vite-compatible-readable-stream@3.6.1:
@@ -5585,25 +5720,27 @@ snapshots:
       browser-headers: 0.4.1
       google-protobuf: 3.21.4
 
-  '@interchain-kit/core@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@interchain-kit/core@0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
     dependencies:
       '@chain-registry/keplr': 2.0.130
       '@chain-registry/types': 2.0.130
-      '@interchainjs/cosmos': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/types': 1.11.11
+      '@interchainjs/cosmos': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/types': 1.17.3
       '@ledgerhq/hw-app-cosmos': 6.32.10
       '@ledgerhq/hw-transport': 6.31.14
       '@ledgerhq/hw-transport-webhid': 6.30.10
       '@ledgerhq/hw-transport-webusb': 6.29.14
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@walletconnect/sign-client': 2.23.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@walletconnect/types': 2.23.1
       '@walletconnect/universal-provider': 2.23.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       base64-js: 1.5.1
       bowser: 2.13.1
+      bs58: 6.0.0
       buffer: 6.0.3
       chain-registry: 2.0.130
-      interchainjs: 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      interchainjs: 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       long: 5.3.2
       pino-pretty: 7.6.1
     transitivePeerDependencies:
@@ -5634,9 +5771,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/cosmostation-extension@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@interchain-kit/cosmostation-extension@0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
     dependencies:
-      '@interchain-kit/core': 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@interchain-kit/core': 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -5665,9 +5802,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/keplr-extension@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@interchain-kit/keplr-extension@0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)':
     dependencies:
-      '@interchain-kit/core': 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@interchain-kit/core': 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@keplr-wallet/provider-extension': 0.12.307(starknet@8.9.2)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -5698,19 +5835,20 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/react@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)':
+  '@interchain-kit/react@0.7.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)':
     dependencies:
       '@chain-registry/types': 2.0.130
-      '@interchain-kit/core': 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@interchain-kit/core': 0.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@interchain-kit/store': 0.6.1
       '@interchain-ui/react': 1.26.3(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@interchainjs/cosmos': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/types': 1.11.11
+      '@interchainjs/cosmos': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/types': 1.17.3
       '@react-icons/all-files': 4.1.0(react@18.3.1)
       '@types/react': 18.3.27
       '@types/react-dom': 18.3.7(@types/react@18.3.27)
       '@walletconnect/types': 2.23.1
-      interchainjs: 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      interchainjs: 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       jest-transform-stub: 2.0.0
       postcss: 8.5.6
       postcss-cli: 11.0.1(postcss@8.5.6)
@@ -5751,6 +5889,8 @@ snapshots:
       - utf-8-validate
       - zod
 
+  '@interchain-kit/store@0.6.1': {}
+
   '@interchain-ui/react@1.26.3(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/core': 1.7.3
@@ -5785,22 +5925,12 @@ snapshots:
       - '@types/react'
       - babel-plugin-macros
 
-  '@interchainjs/amino@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/amino@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
-      '@interchainjs/crypto': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.11
-      '@interchainjs/math': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-
-  '@interchainjs/amino@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@interchainjs/crypto': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.9
-      '@interchainjs/math': 1.11.9
-      '@interchainjs/utils': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.17.3
+      '@interchainjs/math': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
@@ -5815,33 +5945,20 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/auth@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@interchainjs/auth@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
-      '@interchainjs/types': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/types': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      bech32: 2.0.0
+      elliptic: 6.6.1
+      libsodium-wrappers-sumo: 0.7.15
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
-      - bufferutil
-      - utf-8-validate
-
-  '@interchainjs/auth@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
-    dependencies:
-      '@interchainjs/types': 1.11.9
-      '@interchainjs/utils': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-      - bufferutil
-      - utf-8-validate
 
   '@interchainjs/auth@1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
@@ -5858,27 +5975,11 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/cosmos-types@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/cosmos-types@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
-      '@interchainjs/types': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-
-  '@interchainjs/cosmos-types@1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@interchainjs/math': 1.11.18
-      '@interchainjs/types': 1.11.18
-      '@interchainjs/utils': 1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-
-  '@interchainjs/cosmos-types@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@interchainjs/types': 1.11.9
-      '@interchainjs/utils': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/math': 1.17.3
+      '@interchainjs/types': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
@@ -5892,37 +5993,29 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/cosmos@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@interchainjs/cosmos@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
-      '@interchainjs/auth': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/types': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/auth': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos-types': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.17.3
+      '@interchainjs/types': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
+      bech32: 1.1.4
+      bignumber.js: 9.3.1
+      bip39: 3.1.0
       decimal.js: 10.6.0
+      deepmerge: 4.2.2
+      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
       - bufferutil
       - utf-8-validate
 
-  '@interchainjs/cosmos@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
-    dependencies:
-      '@interchainjs/auth': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/types': 1.11.9
-      '@interchainjs/utils': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      decimal.js: 10.6.0
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-      - bufferutil
-      - utf-8-validate
-
-  '@interchainjs/cosmos@1.19.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@interchainjs/cosmos@1.19.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
       '@interchainjs/amino': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/auth': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
@@ -5946,24 +6039,11 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@interchainjs/crypto@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/crypto@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
-      '@interchainjs/encoding': 1.11.11
-      '@interchainjs/math': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@noble/hashes': 1.8.0
-      bn.js: 5.2.2
-      elliptic: 6.6.1
-      libsodium-wrappers-sumo: 0.7.15
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-
-  '@interchainjs/crypto@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@interchainjs/encoding': 1.11.9
-      '@interchainjs/math': 1.11.9
-      '@interchainjs/utils': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.17.3
+      '@interchainjs/math': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/hashes': 1.8.0
       bn.js: 5.2.2
       elliptic: 6.6.1
@@ -5985,16 +6065,9 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/encoding@1.11.11':
+  '@interchainjs/encoding@1.17.3':
     dependencies:
-      '@interchainjs/math': 1.11.11
-      base64-js: 1.5.1
-      bech32: 1.1.4
-      readonly-date: 1.0.0
-
-  '@interchainjs/encoding@1.11.9':
-    dependencies:
-      '@interchainjs/math': 1.11.9
+      '@interchainjs/math': 1.17.3
       base64-js: 1.5.1
       bech32: 1.1.4
       readonly-date: 1.0.0
@@ -6005,6 +6078,25 @@ snapshots:
       base64-js: 1.5.1
       bech32: 1.1.4
       readonly-date: 1.0.0
+
+  '@interchainjs/ethereum@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+    dependencies:
+      '@ethersproject/bignumber': 5.8.0
+      '@ethersproject/bytes': 5.8.0
+      '@ethersproject/hash': 5.8.0
+      '@ethersproject/transactions': 5.8.0
+      '@interchainjs/auth': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/types': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@noble/curves': 1.9.7
+      '@noble/hashes': 1.8.0
+      bip39: 3.1.0
+      deepmerge: 4.2.2
+      ethereum-cryptography: 3.2.0
+      rlp: 3.0.0
+    transitivePeerDependencies:
+      - '@chain-registry/v2'
+      - '@chain-registry/v2-types'
 
   '@interchainjs/ethereum@1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
@@ -6025,15 +6117,7 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/math@1.11.11':
-    dependencies:
-      bn.js: 5.2.2
-
-  '@interchainjs/math@1.11.18':
-    dependencies:
-      bn.js: 5.2.2
-
-  '@interchainjs/math@1.11.9':
+  '@interchainjs/math@1.17.3':
     dependencies:
       bn.js: 5.2.2
 
@@ -6041,24 +6125,13 @@ snapshots:
     dependencies:
       bn.js: 5.2.2
 
-  '@interchainjs/pubkey@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/pubkey@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
-      '@interchainjs/amino': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.11
-      '@interchainjs/math': 1.11.11
-      '@interchainjs/types': 1.11.11
-    transitivePeerDependencies:
-      - '@chain-registry/v2'
-      - '@chain-registry/v2-types'
-
-  '@interchainjs/pubkey@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@interchainjs/amino': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos-types': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.9
-      '@interchainjs/math': 1.11.9
-      '@interchainjs/types': 1.11.9
+      '@interchainjs/amino': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos-types': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.17.3
+      '@interchainjs/math': 1.17.3
+      '@interchainjs/types': 1.17.3
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
@@ -6074,15 +6147,7 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/types@1.11.11':
-    dependencies:
-      decimal.js: 10.6.0
-
-  '@interchainjs/types@1.11.18':
-    dependencies:
-      decimal.js: 10.6.0
-
-  '@interchainjs/types@1.11.9':
+  '@interchainjs/types@1.17.3':
     dependencies:
       decimal.js: 10.6.0
 
@@ -6090,27 +6155,11 @@ snapshots:
     dependencies:
       decimal.js: 10.6.0
 
-  '@interchainjs/utils@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/utils@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
     dependencies:
       '@chain-registry/v2': 1.71.237
       '@chain-registry/v2-types': 0.53.146
-      '@interchainjs/types': 1.11.11
-      bech32: 2.0.0
-      decimal.js: 10.6.0
-
-  '@interchainjs/utils@1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@chain-registry/v2': 1.71.237
-      '@chain-registry/v2-types': 0.53.146
-      '@interchainjs/types': 1.11.18
-      bech32: 2.0.0
-      decimal.js: 10.6.0
-
-  '@interchainjs/utils@1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
-    dependencies:
-      '@chain-registry/v2': 1.71.237
-      '@chain-registry/v2-types': 0.53.146
-      '@interchainjs/types': 1.11.9
+      '@interchainjs/types': 1.17.3
       bech32: 2.0.0
       decimal.js: 10.6.0
 
@@ -6277,6 +6326,10 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.0
 
+  '@noble/curves@1.8.2':
+    dependencies:
+      '@noble/hashes': 1.7.2
+
   '@noble/curves@1.9.0':
     dependencies:
       '@noble/hashes': 1.8.0
@@ -6297,6 +6350,8 @@ snapshots:
 
   '@noble/hashes@1.7.0': {}
 
+  '@noble/hashes@1.7.2': {}
+
   '@noble/hashes@1.8.0': {}
 
   '@noble/secp256k1@1.7.1': {}
@@ -6312,6 +6367,8 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
+
+  '@pkgr/core@0.2.9': {}
 
   '@popperjs/core@2.11.8': {}
 
@@ -7395,10 +7452,21 @@ snapshots:
 
   '@scure/base@1.2.6': {}
 
+  '@scure/bip32@1.6.2':
+    dependencies:
+      '@noble/curves': 1.8.2
+      '@noble/hashes': 1.7.2
+      '@scure/base': 1.2.6
+
   '@scure/bip32@1.7.0':
     dependencies:
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
+      '@scure/base': 1.2.6
+
+  '@scure/bip39@1.5.4':
+    dependencies:
+      '@noble/hashes': 1.7.2
       '@scure/base': 1.2.6
 
   '@scure/bip39@1.6.0':
@@ -7410,6 +7478,50 @@ snapshots:
     dependencies:
       '@noble/curves': 1.7.0
       '@noble/hashes': 1.6.1
+
+  '@solana/buffer-layout@4.0.1':
+    dependencies:
+      buffer: 6.0.3
+
+  '@solana/codecs-core@2.3.0(typescript@5.9.3)':
+    dependencies:
+      '@solana/errors': 2.3.0(typescript@5.9.3)
+      typescript: 5.9.3
+
+  '@solana/codecs-numbers@2.3.0(typescript@5.9.3)':
+    dependencies:
+      '@solana/codecs-core': 2.3.0(typescript@5.9.3)
+      '@solana/errors': 2.3.0(typescript@5.9.3)
+      typescript: 5.9.3
+
+  '@solana/errors@2.3.0(typescript@5.9.3)':
+    dependencies:
+      chalk: 5.6.2
+      commander: 14.0.2
+      typescript: 5.9.3
+
+  '@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+    dependencies:
+      '@babel/runtime': 7.28.4
+      '@noble/curves': 1.9.7
+      '@noble/hashes': 1.8.0
+      '@solana/buffer-layout': 4.0.1
+      '@solana/codecs-numbers': 2.3.0(typescript@5.9.3)
+      agentkeepalive: 4.6.0
+      bn.js: 5.2.2
+      borsh: 0.7.0
+      bs58: 4.0.1
+      buffer: 6.0.3
+      fast-stable-stringify: 1.0.0
+      jayson: 4.3.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      node-fetch: 2.7.0
+      rpc-websockets: 9.3.2
+      superstruct: 2.0.2
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
 
   '@starknet-io/types-js@0.8.4': {}
 
@@ -7510,6 +7622,20 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tippy.js: 6.3.7
 
+  '@trivago/prettier-plugin-sort-imports@6.0.0(prettier@3.7.4)':
+    dependencies:
+      '@babel/generator': 7.28.5
+      '@babel/parser': 7.28.5
+      '@babel/traverse': 7.28.5
+      '@babel/types': 7.28.5
+      javascript-natural-sort: 0.7.1
+      lodash-es: 4.17.22
+      minimatch: 9.0.5
+      parse-imports-exports: 0.2.4
+      prettier: 3.7.4
+    transitivePeerDependencies:
+      - supports-color
+
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.28.5
@@ -7531,6 +7657,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.28.5
 
+  '@types/connect@3.4.38':
+    dependencies:
+      '@types/node': 20.19.27
+
   '@types/estree@1.0.8': {}
 
   '@types/json-schema@7.0.15': {}
@@ -7540,6 +7670,8 @@ snapshots:
   '@types/long@4.0.2': {}
 
   '@types/node@10.12.18': {}
+
+  '@types/node@12.20.55': {}
 
   '@types/node@20.19.27':
     dependencies:
@@ -7567,6 +7699,16 @@ snapshots:
       csstype: 3.2.3
 
   '@types/semver@7.7.1': {}
+
+  '@types/uuid@8.3.4': {}
+
+  '@types/ws@7.4.7':
+    dependencies:
+      '@types/node': 20.19.27
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 20.19.27
 
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
@@ -8080,7 +8222,7 @@ snapshots:
   '@xpla/use-wallet@1.7.2(react@18.3.1)':
     dependencies:
       '@xpla/wallet-types': 1.7.2
-      '@xpla/xpla.js': 1.7.0
+      '@xpla/xpla.js': 1.8.0
       react: 18.3.1
     transitivePeerDependencies:
       - bare-abort-controller
@@ -8097,7 +8239,7 @@ snapshots:
       '@walletconnect/utils': 1.8.0
       '@xpla/wallet-types': 1.7.2
       '@xpla/web-extension-interface': 1.7.2
-      '@xpla/xpla.js': 1.7.0
+      '@xpla/xpla.js': 1.8.0
       bowser: 2.13.1
       fast-deep-equal: 3.1.3
       mobile-detect: 1.4.5
@@ -8126,7 +8268,7 @@ snapshots:
 
   '@xpla/wallet-types@1.7.2':
     dependencies:
-      '@xpla/xpla.js': 1.7.0
+      '@xpla/xpla.js': 1.8.0
     transitivePeerDependencies:
       - bare-abort-controller
       - debug
@@ -8134,23 +8276,23 @@ snapshots:
 
   '@xpla/web-extension-interface@1.7.2':
     dependencies:
-      '@xpla/xpla.js': 1.7.0
+      '@xpla/xpla.js': 1.8.0
       rxjs: 7.8.2
     transitivePeerDependencies:
       - bare-abort-controller
       - debug
       - react-native-b4a
 
-  '@xpla/xpla.js@1.7.0':
+  '@xpla/xpla.js@1.8.0':
     dependencies:
       '@bitcoinerlab/secp256k1': 1.2.0
       '@noble/hashes': 1.8.0
       '@noble/secp256k1': 1.7.1
-      '@xpla/xpla.proto': 1.7.0
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
+      '@xpla/xpla.proto': 1.8.0-beta.2
       axios: 1.13.2
       bech32: 2.0.0
-      bip32: 3.1.0
-      bip39: 3.1.0
       bufferutil: 4.1.0
       decimal.js: 10.6.0
       eip55: 2.1.1
@@ -8164,25 +8306,30 @@ snapshots:
       - debug
       - react-native-b4a
 
-  '@xpla/xpla.proto@1.7.0':
+  '@xpla/xpla.proto@1.8.0-beta.2':
     dependencies:
       '@improbable-eng/grpc-web': 0.15.0(google-protobuf@3.21.4)
       browser-headers: 0.4.1
       google-protobuf: 3.21.4
       protobufjs: 7.5.4
 
-  '@xpla/xpla@1.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xpla/xpla@1.8.4(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
       '@ethersproject/transactions': 5.8.0
       '@interchainjs/auth': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.19.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/ethereum': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/types': 1.19.1
       '@interchainjs/utils': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/hashes': 1.8.0
-      '@xpla/xplajs': 1.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xpla/xplajs': 1.8.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      bech32: 2.0.0
+      bignumber.js: 9.3.1
+      bip39: 3.1.0
       decimal.js: 10.6.0
+      deepmerge: 4.2.2
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       interchainjs: 1.19.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - '@chain-registry/v2'
@@ -8191,14 +8338,14 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@xpla/xplajs@1.7.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xpla/xplajs@1.8.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
       '@cosmjs/stargate': 0.33.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@cosmology/lcd': 0.14.5
-      '@interchainjs/cosmos': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.18(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.9
-      '@interchainjs/pubkey': 1.11.9(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.19.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.18.1
+      '@interchainjs/pubkey': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/types': 1.19.1
       '@interchainjs/utils': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/hashes': 1.8.0
@@ -8228,6 +8375,10 @@ snapshots:
   acorn@8.15.0: {}
 
   aes-js@4.0.0-beta.5: {}
+
+  agentkeepalive@4.6.0:
+    dependencies:
+      humanize-ms: 1.2.1
 
   ajv@6.12.6:
     dependencies:
@@ -8437,15 +8588,6 @@ snapshots:
       typeforce: 1.18.0
       wif: 2.0.6
 
-  bip32@3.1.0:
-    dependencies:
-      bs58check: 2.1.2
-      create-hash: 1.2.0
-      create-hmac: 1.1.7
-      ripemd160: 2.0.3
-      typeforce: 1.18.0
-      wif: 2.0.6
-
   bip39@3.1.0:
     dependencies:
       '@noble/hashes': 1.8.0
@@ -8458,12 +8600,22 @@ snapshots:
 
   bn.js@5.2.2: {}
 
+  borsh@0.7.0:
+    dependencies:
+      bn.js: 5.2.2
+      bs58: 4.0.1
+      text-encoding-utf-8: 1.0.2
+
   bowser@2.13.1: {}
 
   brace-expansion@1.1.12:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
+
+  brace-expansion@2.0.2:
+    dependencies:
+      balanced-match: 1.0.2
 
   braces@3.0.3:
     dependencies:
@@ -8610,6 +8762,8 @@ snapshots:
 
   chalk@5.3.0: {}
 
+  chalk@5.6.2: {}
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -8679,6 +8833,10 @@ snapshots:
 
   commander@11.0.0: {}
 
+  commander@14.0.2: {}
+
+  commander@2.20.3: {}
+
   concat-map@0.0.1: {}
 
   confusing-browser-globals@1.0.11: {}
@@ -8716,10 +8874,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  cosmjs-types@0.7.2:
-    dependencies:
-      long: 4.0.0
-      protobufjs: 6.11.4
+  cosmjs-types@0.11.0: {}
 
   cosmjs-types@0.9.0: {}
 
@@ -8853,6 +9008,8 @@ snapshots:
   defu@6.1.4: {}
 
   delay@4.4.1: {}
+
+  delay@5.0.0: {}
 
   delayed-stream@1.0.0: {}
 
@@ -9048,6 +9205,12 @@ snapshots:
 
   es-toolkit@1.39.3: {}
 
+  es6-promise@4.2.8: {}
+
+  es6-promisify@5.0.0:
+    dependencies:
+      es6-promise: 4.2.8
+
   esbuild@0.27.2:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.27.2
@@ -9173,11 +9336,12 @@ snapshots:
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
 
-  eslint-plugin-prettier@4.2.5(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(prettier@2.8.8):
+  eslint-plugin-prettier@5.5.4(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(prettier@3.7.4):
     dependencies:
       eslint: 8.57.1
-      prettier: 2.8.8
+      prettier: 3.7.4
       prettier-linter-helpers: 1.0.1
+      synckit: 0.11.11
     optionalDependencies:
       eslint-config-prettier: 8.10.2(eslint@8.57.1)
 
@@ -9336,6 +9500,8 @@ snapshots:
 
   exenv@1.2.2: {}
 
+  eyes@0.1.8: {}
+
   fast-deep-equal@3.1.3: {}
 
   fast-diff@1.3.0: {}
@@ -9355,6 +9521,8 @@ snapshots:
   fast-levenshtein@2.0.6: {}
 
   fast-safe-stringify@2.1.1: {}
+
+  fast-stable-stringify@1.0.0: {}
 
   fastq@1.20.1:
     dependencies:
@@ -9582,6 +9750,10 @@ snapshots:
 
   human-signals@4.3.1: {}
 
+  humanize-ms@1.2.1:
+    dependencies:
+      ms: 2.1.3
+
   husky@8.0.3: {}
 
   idb-keyval@6.2.2: {}
@@ -9606,14 +9778,17 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  interchainjs@1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  interchainjs@1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     dependencies:
-      '@interchainjs/cosmos': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/encoding': 1.11.11
-      '@interchainjs/pubkey': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/types': 1.11.11
-      '@interchainjs/utils': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/encoding': 1.17.3
+      '@interchainjs/ethereum': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/math': 1.17.3
+      '@interchainjs/pubkey': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/types': 1.17.3
+      '@interchainjs/utils': 1.17.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@noble/hashes': 1.8.0
       decimal.js: 10.6.0
     transitivePeerDependencies:
@@ -9624,7 +9799,7 @@ snapshots:
 
   interchainjs@1.19.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     dependencies:
-      '@interchainjs/cosmos': 1.19.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos': 1.19.3(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/cosmos-types': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/crypto': 1.19.1(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/encoding': 1.18.1
@@ -9811,6 +9986,26 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
+  javascript-natural-sort@0.7.1: {}
+
+  jayson@4.3.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+    dependencies:
+      '@types/connect': 3.4.38
+      '@types/node': 12.20.55
+      '@types/ws': 7.4.7
+      commander: 2.20.3
+      delay: 5.0.0
+      es6-promisify: 5.0.0
+      eyes: 0.1.8
+      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      json-stringify-safe: 5.0.1
+      stream-json: 1.9.1
+      uuid: 8.3.2
+      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   jest-transform-stub@2.0.0: {}
 
   jotai@2.16.1(@babel/core@7.28.5)(@babel/template@7.27.2)(@types/react@18.3.27)(react@18.3.1):
@@ -9839,6 +10034,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  json-stringify-safe@5.0.1: {}
 
   json5@1.0.2:
     dependencies:
@@ -10015,6 +10212,10 @@ snapshots:
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.12
+
+  minimatch@9.0.5:
+    dependencies:
+      brace-expansion: 2.0.2
 
   minimist@1.2.8: {}
 
@@ -10230,12 +10431,18 @@ snapshots:
       pbkdf2: 3.1.5
       safe-buffer: 5.2.1
 
+  parse-imports-exports@0.2.4:
+    dependencies:
+      parse-statements: 1.0.11
+
   parse-json@5.2.0:
     dependencies:
       '@babel/code-frame': 7.27.1
       error-ex: 1.3.4
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
+
+  parse-statements@1.0.11: {}
 
   path-browserify@1.0.1: {}
 
@@ -10371,7 +10578,7 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier@2.8.8: {}
+  prettier@3.7.4: {}
 
   pretty-hrtime@1.0.3: {}
 
@@ -10751,6 +10958,19 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.54.0
       fsevents: 2.3.3
 
+  rpc-websockets@9.3.2:
+    dependencies:
+      '@swc/helpers': 0.5.18
+      '@types/uuid': 8.3.4
+      '@types/ws': 8.18.1
+      buffer: 6.0.3
+      eventemitter3: 5.0.1
+      uuid: 8.3.2
+      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    optionalDependencies:
+      bufferutil: 4.1.0
+      utf-8-validate: 5.0.10
+
   run-parallel@1.2.0:
     dependencies:
       queue-microtask: 1.2.3
@@ -10926,12 +11146,18 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
+  stream-chain@2.2.5: {}
+
   stream-http@3.2.0:
     dependencies:
       builtin-status-codes: 3.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
       xtend: 4.0.2
+
+  stream-json@1.9.1:
+    dependencies:
+      stream-chain: 2.2.5
 
   stream-shift@1.0.3: {}
 
@@ -11034,6 +11260,8 @@ snapshots:
 
   stylis@4.2.0: {}
 
+  superstruct@2.0.2: {}
+
   supports-color@5.5.0:
     dependencies:
       has-flag: 3.0.0
@@ -11048,6 +11276,10 @@ snapshots:
 
   symbol-observable@2.0.3: {}
 
+  synckit@0.11.11:
+    dependencies:
+      '@pkgr/core': 0.2.9
+
   tabbable@6.3.0: {}
 
   text-decoder@1.2.3:
@@ -11055,6 +11287,8 @@ snapshots:
       b4a: 1.7.3
     transitivePeerDependencies:
       - react-native-b4a
+
+  text-encoding-utf-8@1.0.2: {}
 
   text-table@0.2.0: {}
 
@@ -11229,6 +11463,11 @@ snapshots:
     dependencies:
       react: 18.3.1
 
+  utf-8-validate@5.0.10:
+    dependencies:
+      node-gyp-build: 4.8.4
+    optional: true
+
   utf-8-validate@6.0.6:
     dependencies:
       node-gyp-build: 4.8.4
@@ -11246,6 +11485,8 @@ snapshots:
   utility-types@3.11.0: {}
 
   uuid@11.1.0: {}
+
+  uuid@8.3.2: {}
 
   vite-compatible-readable-stream@3.6.1:
     dependencies:
@@ -11396,6 +11637,11 @@ snapshots:
     optionalDependencies:
       bufferutil: 4.1.0
       utf-8-validate: 6.0.6
+
+  ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.1.0
+      utf-8-validate: 5.0.10
 
   ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     optionalDependencies:

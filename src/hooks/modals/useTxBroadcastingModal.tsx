@@ -1,10 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
-import TxBroadcastingModal from "components/Modal/TxBroadcastingModal";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import useGlobalElement from "hooks/useGlobalElement";
-import useModal from "hooks/useModal";
 import { useMemo } from "react";
-import { TxError } from "types/common";
+
+import TxBroadcastingModal from "~/components/Modal/TxBroadcastingModal";
+
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useModal from "~/hooks/useModal";
+
+import { TxError } from "~/types/common";
 
 const useTxBroadcastingModal = ({
   txHash,
@@ -17,7 +20,7 @@ const useTxBroadcastingModal = ({
 }) => {
   const modal = useModal();
   const queryClient = useQueryClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const element = useMemo(
     () => (
       <TxBroadcastingModal

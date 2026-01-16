@@ -1,25 +1,52 @@
-import { useEffect, useMemo, useRef } from "react";
+import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Numeric } from "@xpla/xpla.js";
+import { useEffect, useMemo, useRef } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
+import { Popover } from "react-tiny-popover";
+import SimpleBar from "simplebar";
 
-import imgLogo from "assets/images/logo.svg";
-import imgSymbol from "assets/images/symbol.svg";
-import iconNotification from "assets/icons/icon-notification.svg";
-import iconNotificationHover from "assets/icons/icon-notification-hover.svg";
-import iconNotificationWithBadge from "assets/icons/icon-notification-with-badge.svg";
-import iconNotificationWithBadgeHover from "assets/icons/icon-notification-with-badge-hover.svg";
-import iconArrowRight from "assets/icons/icon-arrow-right.svg";
-import Button from "components/Button";
-import IconButton from "components/IconButton";
-import NavBar from "components/NavBar";
-import Typography from "components/Typography";
+import iconArrowRight from "~/assets/icons/icon-arrow-right.svg";
+import iconDropdown from "~/assets/icons/icon-dropdown-arrow.svg";
+import iconLink from "~/assets/icons/icon-link.svg";
+import iconNotificationHover from "~/assets/icons/icon-notification-hover.svg";
+import iconNotificationWithBadgeHover from "~/assets/icons/icon-notification-with-badge-hover.svg";
+import iconNotificationWithBadge from "~/assets/icons/icon-notification-with-badge.svg";
+import iconNotification from "~/assets/icons/icon-notification.svg";
+import iconXpla from "~/assets/icons/icon-xpla-24px.svg";
+import imgLogo from "~/assets/images/logo.svg";
+import imgSymbol from "~/assets/images/symbol.svg";
+
+import Banner from "~/components/Banner";
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Copy from "~/components/Copy";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Modal from "~/components/Modal";
+import NavBar from "~/components/NavBar";
+import Panel from "~/components/Panel";
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+
 import {
   DISPLAY_DECIMAL,
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
-} from "constants/layout";
-import useModal from "hooks/useModal";
+} from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import useBalance from "~/hooks/useBalance";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useHashModal from "~/hooks/useHashModal";
+import useModal from "~/hooks/useModal";
+import useNetwork from "~/hooks/useNetwork";
+import useNotifications from "~/hooks/useNotifications";
+
 import {
   amountToValue,
   cutDecimal,
@@ -27,33 +54,10 @@ import {
   formatDecimals,
   formatNumber,
   getAddressLink,
-} from "utils";
-import useBalance from "hooks/useBalance";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import iconDropdown from "assets/icons/icon-dropdown-arrow.svg";
-import iconXpla from "assets/icons/icon-xpla-24px.svg";
-import iconLink from "assets/icons/icon-link.svg";
-import { Popover } from "react-tiny-popover";
-import Panel from "components/Panel";
-import { css, useTheme } from "@emotion/react";
-import Hr from "components/Hr";
-import useNetwork from "hooks/useNetwork";
-import Box from "components/Box";
-import Modal from "components/Modal";
-import Copy from "components/Copy";
-import Banner from "components/Banner";
-import Link from "components/Link";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import Tooltip from "components/Tooltip";
-import SimpleBar from "simplebar";
-import useHashModal from "hooks/useHashModal";
-import useDashboard from "hooks/dashboard/useDashboard";
-import { Numeric } from "@xpla/xpla.js";
-import useNotifications from "hooks/useNotifications";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import { useChain } from "hooks/useChain";
-import NotificationModal from "./NotificationModal";
+} from "~/utils";
+
 import ChainModal from "./ChainModal";
+import NotificationModal from "./NotificationModal";
 
 export const DEFAULT_HEADER_HEIGHT = 150;
 export const SCROLLED_HEADER_HEIGHT = 77;
@@ -317,7 +321,6 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const { wallet: interchainWallet } = useChain(chainName);
 
   const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
@@ -325,23 +328,6 @@ function Header() {
     );
     return dashboardToken?.price;
   }, [dashboardTokens]);
-
-  const { walletName, logo } = useMemo(() => {
-    if (connectedWallet.isInterchain)
-      return {
-        walletName: interchainWallet.info.prettyName,
-        logo: interchainWallet.info.logo?.toString(),
-      };
-    return {
-      walletName: connectedWallet?.connection?.name,
-      logo: connectedWallet?.connection?.icon,
-    };
-  }, [
-    connectedWallet?.connection?.name,
-    connectedWallet?.connection?.icon,
-    connectedWallet.isInterchain,
-    interchainWallet,
-  ]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -484,13 +470,13 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
-                      <img src={logoURIs.png} alt={prettyName} />
+                      <img src={logoURIs?.png} alt={prettyName} />
                       {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet.walletAddress ? (
+                    {connectedWallet?.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -579,7 +565,7 @@ function Header() {
                                   <IconButton
                                     size={24}
                                     icons={{
-                                      default: logo,
+                                      default: connectedWallet.connection.icon,
                                     }}
                                   />
                                 </Col>
@@ -589,7 +575,7 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {walletName}
+                                    {connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">

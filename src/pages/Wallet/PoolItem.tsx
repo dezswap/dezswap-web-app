@@ -1,33 +1,39 @@
-import { Numeric } from "@xpla/xpla.js";
-import Box from "components/Box";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import { Pool } from "types/api";
-
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import IconButton from "components/IconButton";
-import AssetIcon from "components/AssetIcon";
-import useAssets from "hooks/useAssets";
-import { type ComponentProps, useMemo } from "react";
 import { css } from "@emotion/react";
-import Hr from "components/Hr";
-import Outlink from "components/Outlink";
-import usePairs from "hooks/usePairs";
-import { formatDecimals, formatNumber, getAddressLink } from "utils";
-import useNetwork from "hooks/useNetwork";
 import styled from "@emotion/styled";
-import Button from "components/Button";
-import Typography from "components/Typography";
-import useBalance from "hooks/useBalance";
-import { LP_DECIMALS } from "constants/dezswap";
-import SimplePieChart from "components/SimplePieChart";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import Expand from "pages/Earn/Expand";
-import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
-import HoverUnderline from "components/utils/HoverUnderline";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import PercentageFormatter from "components/utils/PercentageFormatter";
-import Link from "components/Link";
+import { Numeric } from "@xpla/xpla.js";
+import { type ComponentProps, useMemo } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
+
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+
+import AssetIcon from "~/components/AssetIcon";
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Outlink from "~/components/Outlink";
+import SimplePieChart from "~/components/SimplePieChart";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+
+import Expand from "~/pages/Earn/Expand";
+
+import { Pool } from "~/types/api";
+
+import { formatDecimals, formatNumber, getAddressLink } from "~/utils";
 
 interface PoolItemProps {
   pool: Pool;

@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import HoverUnderline from "components/utils/HoverUnderline";
-import Typography from "components/Typography";
 import { LinkProps } from "react-router-dom";
-import Link from "components/Link";
+
+import Link from "~/components/Link";
+import Typography from "~/components/Typography";
+import HoverUnderline from "~/components/utils/HoverUnderline";
 
 interface BreadcrumbItem {
   label: string;

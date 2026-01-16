@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import usePool from "hooks/usePool";
 import { Numeric } from "@xpla/xpla.js";
+import { useEffect, useMemo, useState } from "react";
+
+import usePool from "~/hooks/usePool";
 
 export interface ProvideSimulationResult {
   estimatedAmount: string;

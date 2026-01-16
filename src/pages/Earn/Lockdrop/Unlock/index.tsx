@@ -1,38 +1,44 @@
-import Modal from "components/Modal";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
+import { css } from "@emotion/react";
+import { useQuery } from "@tanstack/react-query";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { useCallback, useEffect, useMemo } from "react";
 import { useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
-import { useCallback, useEffect, useMemo } from "react";
-import Typography from "components/Typography";
-import { css } from "@emotion/react";
-import Expand from "components/Expanded";
-import InfoTable from "components/InfoTable";
-import useLockdropEvents from "hooks/useLockdropEvents";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Modal from "~/components/Modal";
+import Typography from "~/components/Typography";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
+
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAPI from "~/hooks/useAPI";
+import useAssets from "~/hooks/useAssets";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import useLockdropEvents from "~/hooks/useLockdropEvents";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRequestPost from "~/hooks/useRequestPost";
+
 import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
   formatNumber,
   getTokenLink,
-} from "utils";
-import { generateUnstakeLockdropMsg } from "utils/dezswap";
-import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { useQuery } from "@tanstack/react-query";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import useNetwork from "hooks/useNetwork";
-import useAPI from "hooks/useAPI";
-import Button from "components/Button";
-import useRequestPost from "hooks/useRequestPost";
-import usePairs from "hooks/usePairs";
-import { LP_DECIMALS } from "constants/dezswap";
-import { useNavigate } from "hooks/useNavigate";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
+} from "~/utils";
+import { generateUnstakeLockdropMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
+
 import InputGroup from "../Stake/InputGroup";
 
 function UnlockPage() {
@@ -43,7 +49,7 @@ function UnlockPage() {
   const {
     selectedChain: { chainId, explorers },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
@@ -96,24 +102,19 @@ function UnlockPage() {
     );
   }, [duration, lockdropUserInfo]);
 
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const unstakeLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateUnstakeLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateUnstakeLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
-
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const { fee } = useFee(unstakeLockdropMsg);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -128,16 +129,16 @@ function UnlockPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!txOptions || !fee) {
+      if (!unstakeLockdropMsg || !fee) {
         return;
       }
       requestPost({
-        txOptions: { msgs: txOptions },
+        messages: unstakeLockdropMsg,
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, unstakeLockdropMsg],
   );
 
   useEffect(() => {
@@ -266,7 +267,7 @@ function UnlockPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !txOptions}
+          disabled={!fee || !unstakeLockdropMsg}
         >
           Unlock
         </Button>

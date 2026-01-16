@@ -1,21 +1,27 @@
 import { css } from "@emotion/react";
-import AssetIcon from "components/AssetIcon";
-import Input from "components/Input";
-import Pagination from "components/Pagination";
-import Panel from "components/Panel";
-import Table, { TableSortDirection } from "components/Table";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import useDashboard from "hooks/dashboard/useDashboard";
-import useAssets from "hooks/useAssets";
-import HoverUnderline from "components/utils/HoverUnderline";
-import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
-import { DashboardToken } from "types/dashboard-api";
-import { getBasicSortFunction } from "utils/table";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import Link from "components/Link";
+
+import AssetIcon from "~/components/AssetIcon";
+import Input from "~/components/Input";
+import Link from "~/components/Link";
+import Pagination from "~/components/Pagination";
+import Panel from "~/components/Panel";
+import Table, { TableSortDirection } from "~/components/Table";
+import Typography from "~/components/Typography";
+import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useAssets from "~/hooks/useAssets";
+
+import { DashboardToken } from "~/types/dashboard-api";
+
+import { getBasicSortFunction } from "~/utils/table";
+
 import MobileTokenItem from "./MobileTokenItem";
 
 function AllTokens({ whiteList }: { whiteList?: string[] }) {

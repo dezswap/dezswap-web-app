@@ -1,7 +1,10 @@
 import axios from "axios";
-import { apiAddresses } from "constants/dezswap";
-import { Notification } from "stores/notifications";
-import { Pair, Pairs, Pool, Token } from "types/api";
+
+import { apiAddresses } from "~/constants/dezswap";
+
+import { Notification } from "~/stores/notifications";
+
+import { Pair, Pairs, Pool, Token } from "~/types/api";
 import {
   DashboardChartDuration,
   DashboardChartResponse,
@@ -14,7 +17,7 @@ import {
   DashboardTokenDetailResponse,
   DashboardTokensResponse,
   DashboardTransactionsResponse,
-} from "types/dashboard-api";
+} from "~/types/dashboard-api";
 
 export type ApiVersion = "v1";
 
@@ -87,9 +90,8 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
           return res.data;
         },
         async getRecent() {
-          const res = await apiClient.get<DashboardRecentResponse>(
-            `/dashboard/recent`,
-          );
+          const res =
+            await apiClient.get<DashboardRecentResponse>(`/dashboard/recent`);
           return res.data;
         },
         async getChart({
@@ -142,9 +144,8 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
           return res.data;
         },
         async getTokens() {
-          const res = await apiClient.get<DashboardTokensResponse>(
-            `/dashboard/tokens`,
-          );
+          const res =
+            await apiClient.get<DashboardTokensResponse>(`/dashboard/tokens`);
           return res.data;
         },
         async getTokenDetail(address: string) {

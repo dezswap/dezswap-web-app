@@ -1,8 +1,11 @@
-import Decimal from "decimal.js";
-import { Token } from "types/api";
-import { amountToValue, formatDecimals, formatNumber } from "utils";
-import { Numeric } from "@xpla/xpla.js";
 import { css } from "@emotion/react";
+import { Numeric } from "@xpla/xpla.js";
+import Decimal from "decimal.js";
+
+import { Token } from "~/types/api";
+
+import { amountToValue, formatDecimals, formatNumber } from "~/utils";
+
 import OverflowTooltip from "../OverflowTooltip";
 
 interface AssetValueFormatterProps {

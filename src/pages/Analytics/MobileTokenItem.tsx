@@ -1,17 +1,20 @@
 import { css } from "@emotion/react";
-import AssetIcon from "components/AssetIcon";
-import Typography from "components/Typography";
-import Expand from "pages/Earn/Expand";
+import styled from "@emotion/styled";
+import { type ComponentProps } from "react";
 import { Col, Row } from "react-grid-system";
 
-import styled from "@emotion/styled";
-import { DashboardToken } from "types/dashboard-api";
-import useAssets from "hooks/useAssets";
-import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
-import HoverUnderline from "components/utils/HoverUnderline";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import Link from "components/Link";
-import { type ComponentProps } from "react";
+import AssetIcon from "~/components/AssetIcon";
+import Link from "~/components/Link";
+import Typography from "~/components/Typography";
+import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+
+import useAssets from "~/hooks/useAssets";
+
+import Expand from "~/pages/Earn/Expand";
+
+import { DashboardToken } from "~/types/dashboard-api";
 
 interface MobileTokenItemProps {
   number: number;

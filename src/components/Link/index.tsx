@@ -1,6 +1,7 @@
-import { Link as RRLink, LinkProps } from "react-router-dom";
-import { useFormatTo } from "hooks/useFormatTo";
 import React from "react";
+import { LinkProps, Link as RRLink } from "react-router-dom";
+
+import { useFormatTo } from "~/hooks/useFormatTo";
 
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ to, ...props }, ref) => {

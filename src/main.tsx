@@ -1,30 +1,38 @@
 import { ThemeProvider } from "@emotion/react";
-import { ChainProvider } from "@interchain-kit/react";
+import { WCCosmosWallet, WCWallet } from "@interchain-kit/core";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
-import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
+import { ChainProvider } from "@interchain-kit/react";
+import { createCosmosQueryClient } from "@interchainjs/cosmos";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { defaultSignerOptions } from "@xpla/xpla/defaults";
-import App from "App";
-import theme from "styles/theme";
-import ResizeObserver from "resize-observer-polyfill";
+import { WalletProvider, getChainOptions } from "@xpla/wallet-provider";
+import { DEFAULT_COSMOS_EVM_SIGNER_CONFIG } from "@xpla/xpla";
 import ReactDOM from "react-dom/client";
+import ResizeObserver from "resize-observer-polyfill";
 import "simplebar";
 import "simplebar/dist/simplebar.css";
-import "utils/overrideXplaNumeric";
+
 import {
   DefaultAssetList,
   DefaultChain,
   DefaultRpcEndpoint,
-} from "constants/dezswap";
-import { WCWallet } from "@interchain-kit/core";
+} from "~/constants/dezswap";
+
+import theme from "~/styles/theme";
+
+import "~/utils/overrideXplaNumeric";
+
+import App from "./App";
 
 window.ResizeObserver = ResizeObserver;
 
 const queryClient = new QueryClient();
+const cosmosQueryClient = await createCosmosQueryClient(
+  "https://cube-rpc.xpla.io",
+);
+
 const defaultOption = {
   projectId: import.meta.env.VITE_PROJECT_ID,
-  relayUrl: "wss://relay.walletconnect.org",
   metadata: {
     name: "Dezswap",
     description: "Dezswap",
@@ -36,6 +44,7 @@ const defaultOption = {
   },
 };
 const walletConnect = new WCWallet(undefined, defaultOption);
+walletConnect.setNetworkWallet("cosmos", new WCCosmosWallet());
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
@@ -44,14 +53,12 @@ const interchainOptions = {
   assetLists: DefaultAssetList,
   wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
-    signing: () => {
-      return {
-        signerOptions: defaultSignerOptions.Cosmos,
-        broadcast: {
-          checkTx: true,
-        },
-      };
-    },
+    signing: () => ({
+      cosmosSignerConfig: {
+        ...DEFAULT_COSMOS_EVM_SIGNER_CONFIG,
+        queryClient: cosmosQueryClient,
+      },
+    }),
   },
   endpointOptions: {
     endpoints: {
@@ -61,6 +68,7 @@ const interchainOptions = {
     },
   },
 };
+
 getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>

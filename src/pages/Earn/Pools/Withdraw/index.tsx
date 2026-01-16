@@ -1,7 +1,48 @@
+import { css, useTheme } from "@emotion/react";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { FormEventHandler, useCallback, useEffect, useMemo } from "react";
-import Typography from "components/Typography";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
-import InputGroup from "pages/Earn/Pools/Withdraw/InputGroup";
+import { Col, Row, useScreenClass } from "react-grid-system";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+import iconLink from "~/assets/icons/icon-link.svg";
+import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
+import iconSetting from "~/assets/icons/icon-setting.svg";
+import iconWithdraw from "~/assets/icons/icon-withdraw.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Modal from "~/components/Modal";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { LP_DECIMALS } from "~/constants/dezswap";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
+
+import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useSettingsModal from "~/hooks/modals/useSettingsModal";
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRequestPost from "~/hooks/useRequestPost";
+import useSlippageTolerance from "~/hooks/useSlippageTolerance";
+import useTxDeadlineMinutes from "~/hooks/useTxDeadlineMinutes";
+
+import InputGroup from "~/pages/Earn/Pools/Withdraw/InputGroup";
+import useSimulate from "~/pages/Earn/Pools/Withdraw/useSimulate";
+
 import {
   amountToValue,
   cutDecimal,
@@ -10,44 +51,9 @@ import {
   formatNumber,
   getTokenLink,
   valueToAmount,
-} from "utils";
-import iconWithdraw from "assets/icons/icon-withdraw.svg";
-import Expand from "components/Expanded";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
-import Button from "components/Button";
-import Modal from "components/Modal";
-import { useParams } from "react-router-dom";
-import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
-import usePairs from "hooks/usePairs";
-import useNetwork from "hooks/useNetwork";
-import { useForm } from "react-hook-form";
-import useAssets from "hooks/useAssets";
-import { css, useTheme } from "@emotion/react";
-import Box from "components/Box";
-import Hr from "components/Hr";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
-import useRequestPost from "hooks/useRequestPost";
-import useFee from "hooks/useFee";
-import { generateWithdrawLiquidityMsg } from "utils/dezswap";
-import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { LP_DECIMALS } from "constants/dezswap";
-import useBalance from "hooks/useBalance";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import InfoTable from "components/InfoTable";
-import iconSetting from "assets/icons/icon-setting.svg";
-import iconSettingHover from "assets/icons/icon-setting-hover.svg";
-import { useNavigate } from "hooks/useNavigate";
-import useSettingsModal from "hooks/modals/useSettingsModal";
-import useSlippageTolerance from "hooks/useSlippageTolerance";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+} from "~/utils";
+import { generateWithdrawLiquidityMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -62,7 +68,7 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const navigate = useNavigate();
   const {
     chainName,
@@ -150,31 +156,29 @@ function WithdrawPage() {
     [lpValue, balance],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const withdrawLiquidityMsg = useMemo(
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
       walletAddress &&
       isLpPayable
-        ? [
-            generateWithdrawLiquidityMsg(
-              walletAddress || "",
-              poolAddress || "",
-              pair?.liquidity_token || "",
-              valueToAmount(lpValue, LP_DECIMALS) || "0",
-              [asset1?.token, asset2?.token].map((address) => ({
-                address: address || "",
-                amount: Numeric.parse(
-                  simulationResult?.estimatedAmount?.find(
-                    (a) => a.address === address,
-                  )?.amount || "0",
-                )
-                  .mul(Numeric.parse((1 - slippageTolerance / 100).toString()))
-                  .toFixed(0),
-              })),
-              txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-            ),
-          ]
+        ? generateWithdrawLiquidityMsg(
+            walletAddress || "",
+            poolAddress || "",
+            pair?.liquidity_token || "",
+            valueToAmount(lpValue, LP_DECIMALS) || "0",
+            [asset1?.token, asset2?.token].map((address) => ({
+              address: address || "",
+              amount: Numeric.parse(
+                simulationResult?.estimatedAmount?.find(
+                  (a) => a.address === address,
+                )?.amount || "0",
+              )
+                .mul(Numeric.parse((1 - slippageTolerance / 100).toString()))
+                .toFixed(0),
+            })),
+            txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+          )
         : undefined,
     [walletAddress, simulationResult, lpValue],
   );
@@ -183,20 +187,20 @@ function WithdrawPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(withdrawLiquidityMsg);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && withdrawLiquidityMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: withdrawLiquidityMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [withdrawLiquidityMsg, fee, requestPost],
   );
 
   const buttonMsg = useMemo(() => {
@@ -476,9 +480,7 @@ function WithdrawPage() {
                     value: (
                       <AssetValueFormatter
                         asset={{ symbol: XPLA_SYMBOL }}
-                        amount={fee?.amount
-                          ?.get(XPLA_ADDRESS)
-                          ?.amount.toString()}
+                        amount={getXplaFeeAmount(fee)}
                       />
                     ),
                   },

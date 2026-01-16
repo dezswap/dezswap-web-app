@@ -1,12 +1,14 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
+
 import {
   notificationFirstSeenDateAtom,
   readNotificationIdsAtom,
-} from "stores/notifications";
-import useNetwork from "./useNetwork";
+} from "~/stores/notifications";
+
 import useAPI from "./useAPI";
+import useNetwork from "./useNetwork";
 
 const useNotifications = () => {
   const {

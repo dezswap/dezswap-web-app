@@ -1,7 +1,9 @@
 import { PropsOf, css } from "@emotion/react";
-import Button from "components/Button";
-import Panel from "components/Panel";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+
+import Button from "~/components/Button";
+import Panel from "~/components/Panel";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 type AssetFormButtonProps = Omit<PropsOf<typeof Button>, "size" | "block">;
 

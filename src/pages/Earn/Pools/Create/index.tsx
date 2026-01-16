@@ -1,3 +1,6 @@
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { Numeric } from "@xpla/xpla.js";
 import {
   FormEventHandler,
   useCallback,
@@ -5,52 +8,55 @@ import {
   useMemo,
   useState,
 } from "react";
-import Modal from "components/Modal";
-import { useParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
-import { useForm } from "react-hook-form";
 import { useScreenClass } from "react-grid-system";
-import { css } from "@emotion/react";
-import iconProvide from "assets/icons/icon-provide.svg";
-import Expand from "components/Expanded";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Button from "components/Button";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+import iconProvide from "~/assets/icons/icon-provide.svg";
+import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
+import iconSetting from "~/assets/icons/icon-setting.svg";
+
+import box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Message from "~/components/Message";
+import Modal from "~/components/Modal";
+import ProgressBar from "~/components/ProgressBar";
+import Typography from "~/components/Typography";
+
+import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
+
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useSettingsModal from "~/hooks/modals/useSettingsModal";
+import useAssets from "~/hooks/useAssets";
+import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import useRequestPost from "~/hooks/useRequestPost";
+
+import InputGroup from "~/pages/Earn/Pools/Provide/InputGroup";
+
 import {
   amountToValue,
   cutDecimal,
   ellipsisCenter,
   formatDecimals,
   formatNumber,
+  formatRatio,
   getTokenLink,
   revertIbcTokenAddressInPath,
-  formatRatio,
   valueToAmount,
-} from "utils";
-import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { Numeric } from "@xpla/xpla.js";
-import Typography from "components/Typography";
-import useBalanceMinusFee from "hooks/useBalanceMinusFee";
-import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
-import { generateCreatePoolMsg } from "utils/dezswap";
-import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
-import IconButton from "components/IconButton";
-import iconLink from "assets/icons/icon-link.svg";
-import useRequestPost from "hooks/useRequestPost";
-import useNetwork from "hooks/useNetwork";
-import Message from "components/Message";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import InfoTable from "components/InfoTable";
-import iconSetting from "assets/icons/icon-setting.svg";
-import iconSettingHover from "assets/icons/icon-setting-hover.svg";
-import useSettingsModal from "hooks/modals/useSettingsModal";
-import box from "components/Box";
-import ProgressBar from "components/ProgressBar";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import styled from "@emotion/styled";
-import { useNavigate } from "hooks/useNavigate";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+} from "~/utils";
+import { generateCreatePoolMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -70,7 +76,7 @@ const Box = styled(box)`
 `;
 
 function CreatePage() {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
@@ -153,7 +159,7 @@ function CreatePage() {
     validate,
   ]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const createPoolMsg = useMemo(
     () =>
       walletAddress &&
       asset1?.token &&
@@ -182,11 +188,9 @@ function CreatePage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(createPoolMsg);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
@@ -234,15 +238,15 @@ function CreatePage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && createPoolMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createPoolMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [createPoolMsg, fee, requestPost],
   );
 
   const ratio = useMemo(() => {

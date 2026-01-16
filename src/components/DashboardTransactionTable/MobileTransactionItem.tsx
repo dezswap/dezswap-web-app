@@ -1,21 +1,26 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import HoverUnderline from "components/utils/HoverUnderline";
-import Typography from "components/Typography";
-import useAssets from "hooks/useAssets";
-import useModal from "hooks/useModal";
-import useNetwork from "hooks/useNetwork";
-import Expand from "pages/Earn/Expand";
 import { type ComponentProps, useMemo } from "react";
-import { DashboardTransaction } from "types/dashboard-api";
+
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+
+import useAssets from "~/hooks/useAssets";
+import useModal from "~/hooks/useModal";
+import useNetwork from "~/hooks/useNetwork";
+
+import Expand from "~/pages/Earn/Expand";
+
+import { DashboardTransaction } from "~/types/dashboard-api";
+
 import {
   ellipsisCenter,
   getAddressLink,
   getFromNow,
   getTransactionLink,
-} from "utils";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+} from "~/utils";
 
 interface MobileTransactionItemProps {
   transaction: DashboardTransaction;

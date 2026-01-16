@@ -1,29 +1,35 @@
-import { useMemo, useState } from "react";
-import { Row, Col, useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
-import Button from "components/Button";
-import Panel from "components/Panel";
-import Table, { TableSortDirection } from "components/Table";
-import Typography from "components/Typography";
-import useAssets from "hooks/useAssets";
-import useBalances from "hooks/useBalances";
-import usePairs from "hooks/usePairs";
-import { amountToValue } from "utils";
-import { Token } from "types/api";
-import TabButton from "components/TabButton";
-import useBookmark from "hooks/useBookmark";
+import { useMemo, useState } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
 
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
-import Link from "components/Link";
-import IconButton from "components/IconButton";
-import AssetIcon from "components/AssetIcon";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useDashboard from "hooks/dashboard/useDashboard";
-import { getBasicSortFunction } from "utils/table";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+
+import AssetIcon from "~/components/AssetIcon";
+import Button from "~/components/Button";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Panel from "~/components/Panel";
+import TabButton from "~/components/TabButton";
+import Table, { TableSortDirection } from "~/components/Table";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useAssets from "~/hooks/useAssets";
+import useBalances from "~/hooks/useBalances";
+import useBookmark from "~/hooks/useBookmark";
+import usePairs from "~/hooks/usePairs";
+
+import { Token } from "~/types/api";
+
+import { amountToValue } from "~/utils";
+import { getBasicSortFunction } from "~/utils/table";
+
 import MobileAssetItem from "./MobileAssetItem";
 
 export type TokenWithBalanceAndValue = Partial<Token> & {

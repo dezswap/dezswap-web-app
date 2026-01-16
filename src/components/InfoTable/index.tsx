@@ -1,8 +1,10 @@
 import styled from "@emotion/styled";
 import { TippyProps } from "@tippyjs/react";
-import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { useScreenClass } from "react-grid-system";
+
+import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 interface SummaryItem {
   key?: React.Key;

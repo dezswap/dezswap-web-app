@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
 import { useMemo } from "react";
+
+import useAPI from "~/hooks/useAPI";
+import useNetwork from "~/hooks/useNetwork";
 
 const useExpectedReward = ({
   lockdropEventAddress,

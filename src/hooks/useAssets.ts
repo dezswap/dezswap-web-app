@@ -1,10 +1,12 @@
-import { useCallback, useMemo } from "react";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
-import { AccAddress } from "@xpla/xpla.js";
-import { isNativeTokenAddress } from "utils";
-import useCustomAssets from "hooks/useCustomAssets";
 import { useQuery } from "@tanstack/react-query";
+import { AccAddress } from "@xpla/xpla.js";
+import { useCallback, useMemo } from "react";
+
+import useAPI from "~/hooks/useAPI";
+import useCustomAssets from "~/hooks/useCustomAssets";
+import useNetwork from "~/hooks/useNetwork";
+
+import { isNativeTokenAddress } from "~/utils";
 
 const useAssets = () => {
   const api = useAPI();

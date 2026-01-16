@@ -2,77 +2,20 @@ import {
   AccAddress,
   Coin,
   Coins,
-  MsgExecuteContract as BeforeMsgExecuteContract,
+  MsgExecuteContract as LegacyMsgExecuteContract,
   Numeric,
 } from "@xpla/xpla.js";
-import { Asset, NativeAsset } from "types/pair";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+
 import {
-  contractAddresses,
   DefaultChain,
   DefaultChainName,
-} from "constants/dezswap";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { AssetInfo } from "types/api";
-import { Buffer } from "buffer";
-import {
-  TxBody,
-  SignerInfo,
-  Tx,
-  AuthInfo,
-  Fee,
-} from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
-import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
-import { EncodeObject } from "@xpla/xplajs/types";
+  contractAddresses,
+} from "~/constants/dezswap";
 
-export type Amount = string | number;
+import { AssetInfo } from "~/types/api";
 
-export const queryMessages = {
-  getPairs(
-    options: {
-      limit?: number;
-      start_after?: [Asset | NativeAsset, Asset | NativeAsset];
-    } = {},
-  ) {
-    return {
-      pairs: options,
-    };
-  },
-  getPool() {
-    return { pool: {} };
-  },
-};
-
-export const getQueryData = (query: object) => {
-  return new Uint8Array(Buffer.from(JSON.stringify(query)));
-};
-
-export const parseJsonFromBinary = (binaryData: Uint8Array) =>
-  JSON.parse(new TextDecoder().decode(binaryData));
-
-export const createEncodedTx = (
-  messages: EncodeObject[],
-  authSequence: bigint,
-): Uint8Array => {
-  const txBody = TxBody.fromPartial({
-    messages,
-  });
-
-  const signerInfo = SignerInfo.fromPartial({
-    sequence: authSequence,
-    modeInfo: { single: { mode: SignMode.SIGN_MODE_UNSPECIFIED } },
-  });
-
-  const tx = Tx.fromPartial({
-    body: txBody,
-    authInfo: AuthInfo.fromPartial({
-      signerInfos: [signerInfo],
-      fee: Fee.fromPartial({}),
-    }),
-    signatures: [new Uint8Array()],
-  });
-
-  return Tx.encode(tx).finish();
-};
+import { parseJsonFromUtf8, toBase64, toUtf8 } from "./encode";
 
 const getCoins = (assets: { address: string; amount: string }[]) =>
   new Coins(
@@ -84,17 +27,14 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
 
-const createEncodedMessage = (msg: Record<string, unknown>) =>
-  window.btoa(JSON.stringify(msg));
-
 export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
   return {
     msgs: protoMsgs.map(
       (protoMsg) =>
-        new BeforeMsgExecuteContract(
+        new LegacyMsgExecuteContract(
           protoMsg.sender,
           protoMsg.contract,
-          parseJsonFromBinary(protoMsg.msg),
+          parseJsonFromUtf8(protoMsg.msg),
           getCoins(
             protoMsg.funds?.map((fund) => ({
               address: fund.denom,
@@ -138,7 +78,7 @@ export const generateCreatePoolMsg = (
   networkName: string,
   sender: string,
   assets: { address: string; amount: string }[],
-) => [
+): MsgExecuteContract[] => [
   ...assets
     .filter(
       (a) => AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
@@ -147,7 +87,7 @@ export const generateCreatePoolMsg = (
       MsgExecuteContract.fromPartial({
         sender,
         contract: a.address,
-        msg: getQueryData({
+        msg: toUtf8({
           increase_allowance: {
             amount: a.amount,
             spender: contractAddresses[networkName]?.factory,
@@ -159,7 +99,7 @@ export const generateCreatePoolMsg = (
   MsgExecuteContract.fromPartial({
     sender,
     contract: contractAddresses[networkName]?.factory || "",
-    msg: getQueryData({
+    msg: toUtf8({
       create_pair: {
         assets: assets.map((a) => assetMsg(a)),
       },
@@ -177,14 +117,14 @@ export const generateAddLiquidityMsg = (
   assets: { address: string; amount: string }[],
   slippageTolerance: string,
   txDeadlineSeconds = 1200,
-) => [
+): MsgExecuteContract[] => [
   ...assets
     .filter((a) => AccAddress.validate(a.address))
     .map((a) =>
       MsgExecuteContract.fromPartial({
         sender,
         contract: a.address,
-        msg: getQueryData({
+        msg: toUtf8({
           increase_allowance: {
             amount: a.amount,
             spender: contractAddress,
@@ -196,7 +136,7 @@ export const generateAddLiquidityMsg = (
   MsgExecuteContract.fromPartial({
     sender,
     contract: contractAddress,
-    msg: getQueryData({
+    msg: toUtf8({
       provide_liquidity: {
         assets: assets.map((a) => assetMsg(a)),
         receiver: `${sender}`,
@@ -222,13 +162,13 @@ export const generateWithdrawLiquidityMsg = (
   amount: string,
   minAssets?: { address: string; amount: string }[],
   txDeadlineSeconds = 1200,
-) =>
+): MsgExecuteContract[] => [
   MsgExecuteContract.fromPartial({
     sender,
     contract: lpTokenAddress,
-    msg: getQueryData({
+    msg: toUtf8({
       send: {
-        msg: createEncodedMessage({
+        msg: toBase64({
           withdraw_liquidity: {
             min_assets: minAssets?.map((a) => assetMsg(a)),
             deadline: Number(
@@ -241,7 +181,8 @@ export const generateWithdrawLiquidityMsg = (
       },
     }),
     funds: [],
-  });
+  }),
+];
 
 export const generateSwapMsg = (
   sender: string,
@@ -251,12 +192,12 @@ export const generateSwapMsg = (
   beliefPrice: Numeric.Input,
   maxSpread = "0.1",
   txDeadlineSeconds = 1200,
-) => {
+): MsgExecuteContract[] => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
   const isCW20 = AccAddress.validate(fromAssetAddress);
 
   if (isCW20) {
-    const sendMsg = createEncodedMessage({
+    const sendMsg = toBase64({
       swap: {
         max_spread: `${maxSpreadFixed}`,
         belief_price: `${beliefPrice}`,
@@ -266,39 +207,43 @@ export const generateSwapMsg = (
       },
     });
 
-    return MsgExecuteContract.fromPartial({
+    return [
+      MsgExecuteContract.fromPartial({
+        sender,
+        contract: fromAssetAddress,
+        msg: toUtf8({
+          send: {
+            msg: sendMsg,
+            amount,
+            contract: contractAddress,
+          },
+        }),
+      }),
+    ];
+  }
+  return [
+    MsgExecuteContract.fromPartial({
       sender,
-      contract: fromAssetAddress,
-      msg: getQueryData({
-        send: {
-          msg: sendMsg,
-          amount,
-          contract: contractAddress,
+      contract: contractAddress,
+      msg: toUtf8({
+        swap: {
+          offer_asset: assetMsg({
+            address: fromAssetAddress,
+            amount,
+          }),
+          max_spread: `${maxSpreadFixed}`,
+          belief_price: `${beliefPrice}`,
+          deadline: Number(
+            Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
+          ),
         },
       }),
-    });
-  }
-  return MsgExecuteContract.fromPartial({
-    sender,
-    contract: contractAddress,
-    msg: getQueryData({
-      swap: {
-        offer_asset: assetMsg({
-          address: fromAssetAddress,
-          amount,
-        }),
-        max_spread: `${maxSpreadFixed}`,
-        belief_price: `${beliefPrice}`,
-        deadline: Number(
-          Number((Date.now() / 1000).toFixed(0)) + txDeadlineSeconds,
-        ),
-      },
+      funds: getCoins([{ address: fromAssetAddress, amount }]).map((coin) => ({
+        denom: coin.denom,
+        amount: coin.amount.toString(),
+      })),
     }),
-    funds: getCoins([{ address: fromAssetAddress, amount }]).map((coin) => ({
-      denom: coin.denom,
-      amount: coin.amount.toString(),
-    })),
-  });
+  ];
 };
 
 export const generateIncreaseLockupContractMsg = ({
@@ -313,20 +258,22 @@ export const generateIncreaseLockupContractMsg = ({
   lpTokenAddress: string;
   duration: number | string;
   amount?: number | string;
-}) => {
-  return MsgExecuteContract.fromPartial({
-    sender: senderAddress,
-    contract: lpTokenAddress,
-    msg: getQueryData({
-      send: {
-        msg: createEncodedMessage({
-          increase_lockup: { duration: Number(duration) },
-        }),
-        amount: `${amount}`,
-        contract: contractAddress,
-      },
+}): MsgExecuteContract[] => {
+  return [
+    MsgExecuteContract.fromPartial({
+      sender: senderAddress,
+      contract: lpTokenAddress,
+      msg: toUtf8({
+        send: {
+          msg: toBase64({
+            increase_lockup: { duration: Number(duration) },
+          }),
+          amount: `${amount}`,
+          contract: contractAddress,
+        },
+      }),
     }),
-  });
+  ];
 };
 
 export const generateCancelLockdropMsg = ({
@@ -337,16 +284,18 @@ export const generateCancelLockdropMsg = ({
   senderAddress: string;
   contractAddress: string;
   duration: number | string;
-}) => {
-  return MsgExecuteContract.fromPartial({
-    sender: senderAddress,
-    contract: contractAddress,
-    msg: getQueryData({
-      cancel: {
-        duration: Number(duration),
-      },
+}): MsgExecuteContract[] => {
+  return [
+    MsgExecuteContract.fromPartial({
+      sender: senderAddress,
+      contract: contractAddress,
+      msg: toUtf8({
+        cancel: {
+          duration: Number(duration),
+        },
+      }),
     }),
-  });
+  ];
 };
 
 export const generateClaimLockdropMsg = ({
@@ -357,16 +306,18 @@ export const generateClaimLockdropMsg = ({
   senderAddress: string;
   contractAddress: string;
   duration: number | string;
-}) => {
-  return MsgExecuteContract.fromPartial({
-    sender: senderAddress,
-    contract: contractAddress,
-    msg: getQueryData({
-      claim: {
-        duration: Number(duration),
-      },
+}): MsgExecuteContract[] => {
+  return [
+    MsgExecuteContract.fromPartial({
+      sender: senderAddress,
+      contract: contractAddress,
+      msg: toUtf8({
+        claim: {
+          duration: Number(duration),
+        },
+      }),
     }),
-  });
+  ];
 };
 
 export const generateUnstakeLockdropMsg = ({
@@ -377,16 +328,18 @@ export const generateUnstakeLockdropMsg = ({
   senderAddress: string;
   contractAddress: string;
   duration: number | string;
-}) => {
-  return MsgExecuteContract.fromPartial({
-    sender: senderAddress,
-    contract: contractAddress,
-    msg: getQueryData({
-      unlock: {
-        duration: Number(duration),
-      },
+}): MsgExecuteContract[] => {
+  return [
+    MsgExecuteContract.fromPartial({
+      sender: senderAddress,
+      contract: contractAddress,
+      msg: toUtf8({
+        unlock: {
+          duration: Number(duration),
+        },
+      }),
     }),
-  });
+  ];
 };
 
 export const getAddressFromAssetInfo = (assetInfo: AssetInfo) => {

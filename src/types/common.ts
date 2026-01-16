@@ -1,18 +1,20 @@
+import type { Chain } from "@chain-registry/types";
+import type { HttpEndpoint } from "@interchainjs/types";
 import {
-  UserDenied,
-  Timeout,
-  SignBytesFailed,
   CreateTxFailed,
+  SignBytesFailed,
+  Timeout,
   TxFailed,
   TxUnspecifiedError,
+  UserDenied,
 } from "@xpla/wallet-provider";
-import { Pair } from "types/pair";
+
+import { Pair } from "~/types/pair";
 
 export interface NetworkInfo {
   chainName: string;
-  // TODO: resolve Chain, HttpEndpoint types
   selectedChain: Chain;
-  rpcUrl: string | HttpEndpoint;
+  rpcUrl?: string | HttpEndpoint;
 }
 
 export type TxError =

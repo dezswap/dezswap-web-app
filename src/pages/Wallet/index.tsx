@@ -1,22 +1,28 @@
-import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Button from "components/Button";
-import Copy from "components/Copy";
-import Hr from "components/Hr";
-import IconButton from "components/IconButton";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
+import { useEffect, useRef } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
-import iconOutlink from "assets/icons/icon-link-28.svg";
-import { ellipsisCenter, getAddressLink } from "utils";
-import useNetwork from "hooks/useNetwork";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { Outlet } from "react-router-dom";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import { useNavigate } from "hooks/useNavigate";
-import ScrollToTop from "components/ScrollToTop";
+
+import iconOutlink from "~/assets/icons/icon-link-28.svg";
+
+import Button from "~/components/Button";
+import Copy from "~/components/Copy";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import Panel from "~/components/Panel";
+import ScrollToTop from "~/components/ScrollToTop";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+
+import { ellipsisCenter, getAddressLink } from "~/utils";
+
 import Assets from "./Assets";
 import Pools from "./Pools";
 
@@ -28,7 +34,7 @@ const Wrapper = styled.div`
 
 function WalletPage() {
   const navigate = useNavigate();
-  const { walletAddress, disconnect } = useConnectedWallet();
+  const { walletAddress, disconnect } = useConnectedWallet() ?? {};
   const {
     selectedChain: { explorers },
   } = useNetwork();
@@ -40,7 +46,7 @@ function WalletPage() {
   const isModalOpened = useRef(false);
 
   const handleDisconnectClick = () => {
-    disconnect();
+    disconnect?.();
   };
 
   useEffect(() => {

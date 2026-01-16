@@ -1,7 +1,8 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
 import { PropsWithChildren } from "react";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 interface StyledPanelProps {
   isPlay3?: boolean;

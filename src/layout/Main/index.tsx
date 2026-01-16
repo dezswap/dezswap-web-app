@@ -1,3 +1,6 @@
+import styled from "@emotion/styled";
+import { WalletStatus, useWallet } from "@xpla/wallet-provider";
+import { useAtomValue } from "jotai";
 import {
   Fragment,
   PropsWithChildren,
@@ -5,32 +8,37 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { useSearchParams, useLocation, useBlocker } from "react-router-dom";
-import styled from "@emotion/styled";
-import { useWallet, WalletStatus } from "@xpla/wallet-provider";
-import { useFormatTo } from "hooks/useFormatTo";
-import { useAtomValue } from "jotai";
-import globalElementsAtom from "stores/globalElements";
-import Header, {
-  DEFAULT_HEADER_HEIGHT,
-  BANNER_HEIGHT,
-} from "layout/Main/Header";
-import NavBar from "components/NavBar";
-import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "constants/dezswap";
-import Typography from "components/Typography";
-import iconOverview from "assets/icons/icon-overview-24px.svg";
-import iconTrade from "assets/icons/icon-trade.svg";
-import iconPool from "assets/icons/icon-pool.svg";
-import iconWallet from "assets/icons/icon-wallet.svg";
 import { useScreenClass } from "react-grid-system";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useNetwork from "hooks/useNetwork";
-import useConnectWalletModal from "hooks/modals/useConnectWalletModal";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import { getValidChain } from "utils/dezswap";
-import Footer from "./Footer";
+import { useBlocker, useLocation, useSearchParams } from "react-router-dom";
+
+import iconOverview from "~/assets/icons/icon-overview-24px.svg";
+import iconPool from "~/assets/icons/icon-pool.svg";
+import iconTrade from "~/assets/icons/icon-trade.svg";
+import iconWallet from "~/assets/icons/icon-wallet.svg";
+
+import NavBar from "~/components/NavBar";
+import Typography from "~/components/Typography";
+
+import { CHAIN_NAME_SEARCH_PARAM, DefaultChainName } from "~/constants/dezswap";
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
+import { useFormatTo } from "~/hooks/useFormatTo";
+import useNetwork from "~/hooks/useNetwork";
+
+import Header, {
+  BANNER_HEIGHT,
+  DEFAULT_HEADER_HEIGHT,
+} from "~/layout/Main/Header";
+
+import globalElementsAtom from "~/stores/globalElements";
+
+import { getValidChain } from "~/utils/dezswap";
+
 import BrowserDelegateButton from "./BrowserDelegateButton";
+import Footer from "./Footer";
 
 const Wrapper = styled.div<{ hasBanner?: boolean }>`
   position: relative;
@@ -143,7 +151,7 @@ function MainLayout({ children }: PropsWithChildren) {
   const screenClass = useScreenClass();
   const { chainName } = useNetwork();
   const globalElements = useAtomValue(globalElementsAtom);
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
