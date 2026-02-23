@@ -4,7 +4,7 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import Modal from "components/Modal";
 
-import { ConnectType, useWallet } from "@xpla/wallet-provider";
+import { ConnectType, useWallet, WalletApp } from "@xpla/wallet-provider";
 import React, {
   MouseEventHandler,
   useEffect,
@@ -147,7 +147,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 key: `${p.label}\n(XPLA GAMES)`,
                 onClick: (event) => {
                   try {
-                    connect(p.type, p.identifier, true);
+                    connect(p.type, p.identifier, WalletApp.XPLA_GAMES_NEW);
                   } catch (error) {
                     console.log(error);
                   }
