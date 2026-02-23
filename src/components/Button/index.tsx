@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { type ComponentProps } from "react";
+import { type ComponentProps, forwardRef } from "react";
 
 interface ButtonProps {
   size?: "default" | "large" | "xLarge";
@@ -142,11 +142,11 @@ const StyledButton = styled.button<ButtonProps>`
   }
 `;
 
-function Button({
-  type = "button",
-  ...props
-}: ComponentProps<typeof StyledButton>) {
-  return <StyledButton type={type} {...props} />;
-}
+const Button = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof StyledButton>
+>(function Button({ type = "button", ...props }, ref) {
+  return <StyledButton type={type} ref={ref} {...props} />;
+});
 
 export default Button;
