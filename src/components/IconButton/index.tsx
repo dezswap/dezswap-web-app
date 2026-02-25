@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { type ComponentProps } from "react";
+import { type ComponentProps, forwardRef } from "react";
 
 interface IconButtonProps {
   size?: number;
@@ -87,11 +87,11 @@ const StyledIconButton = styled.button<IconButtonProps>`
     `}
 `;
 
-function IconButton({
-  type = "button",
-  ...props
-}: ComponentProps<typeof StyledIconButton>) {
-  return <StyledIconButton type={type} {...props} />;
-}
+const IconButton = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof StyledIconButton>
+>(function IconButton({ type = "button", ...props }, ref) {
+  return <StyledIconButton type={type} ref={ref} {...props} />;
+});
 
 export default IconButton;
