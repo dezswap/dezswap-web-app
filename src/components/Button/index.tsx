@@ -1,5 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import { type ComponentProps, forwardRef } from "react";
 
 interface ButtonProps {
   size?: "default" | "large" | "xLarge";
@@ -7,7 +8,7 @@ interface ButtonProps {
   block?: boolean;
 }
 
-const Button = styled.button<ButtonProps>`
+const StyledButton = styled.button<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -141,6 +142,11 @@ const Button = styled.button<ButtonProps>`
   }
 `;
 
-Button.defaultProps = { type: "button" };
+const Button = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof StyledButton>
+>(function Button({ type = "button", ...props }, ref) {
+  return <StyledButton type={type} ref={ref} {...props} />;
+});
 
 export default Button;

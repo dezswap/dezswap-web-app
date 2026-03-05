@@ -15,6 +15,7 @@ import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import HoverUnderline from "components/utils/HoverUnderline";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import Link from "components/Link";
+import { ComponentProps } from "react";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -25,19 +26,25 @@ const Wrapper = styled.div`
   gap: 8px;
 `;
 
-const Label = styled(Typography)``;
-Label.defaultProps = {
-  size: 16,
-  weight: 900,
-  color: "primary",
-};
+const StyledLabel = styled(Typography)``;
+function Label({
+  size = 16,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel size={size} weight={weight} color={color} {...props} />;
+}
 
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  size: 22,
-  weight: 900,
-  color: "primary",
-};
+const StyledValue = styled(Typography)``;
+function Value({
+  size = 22,
+  weight = 900,
+  color = "primary",
+  ...props
+}: ComponentProps<typeof StyledValue>) {
+  return <StyledValue size={size} weight={weight} color={color} {...props} />;
+}
 
 function ChangeRate({ value }: { value?: Numeric.Input }) {
   return value !== undefined ? (

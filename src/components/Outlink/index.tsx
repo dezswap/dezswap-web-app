@@ -1,12 +1,13 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import iconOutlink from "assets/icons/icon-link.svg";
+import { type ComponentProps } from "react";
 
 interface OutlinkProps {
   iconSize?: number;
 }
 
-const Outlink = styled.a<OutlinkProps>`
+const StyledOutlink = styled.a<OutlinkProps>`
   display: inline-block;
   line-height: 19px;
   font-size: 14px;
@@ -36,9 +37,12 @@ const Outlink = styled.a<OutlinkProps>`
   }
 `;
 
-Outlink.defaultProps = {
-  target: "_blank",
-  rel: "noopener noreferrer",
-};
+function Outlink({
+  target = "_blank",
+  rel = "noopener noreferrer",
+  ...props
+}: ComponentProps<typeof StyledOutlink>) {
+  return <StyledOutlink target={target} rel={rel} {...props} />;
+}
 
 export default Outlink;

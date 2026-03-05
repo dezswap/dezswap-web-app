@@ -8,7 +8,7 @@ import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import IconButton from "components/IconButton";
 import AssetIcon from "components/AssetIcon";
 import useAssets from "hooks/useAssets";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { css } from "@emotion/react";
 import Hr from "components/Hr";
 import Outlink from "components/Outlink";
@@ -86,21 +86,17 @@ const InnerBox = styled(Box)`
   }
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   margin-bottom: 6px;
 `;
-Label.defaultProps = {
-  color: "primary",
-  size: 14,
-  weight: 900,
-};
-
-const Value = styled(Typography)``;
-Value.defaultProps = {
-  color: "primary",
-  size: 16,
-  weight: 500,
-};
+function Label({
+  color = "primary",
+  size = 14,
+  weight = 900,
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel color={color} size={size} weight={weight} {...props} />;
+}
 
 function PoolItem({
   pool,

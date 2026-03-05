@@ -26,7 +26,7 @@ import iconBadge from "assets/icons/icon-badge.svg";
 import useAssets from "hooks/useAssets";
 import useNetwork from "hooks/useNetwork";
 import usePairs from "hooks/usePairs";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import ProgressBar from "components/ProgressBar";
 import { LockdropEvent, LockdropUserInfo } from "types/lockdrop";
 import IconButton from "components/IconButton";
@@ -101,7 +101,7 @@ const TableRow = styled(Box)`
   }
 `;
 
-const Label = styled(Typography)`
+const StyledLabel = styled(Typography)`
   line-height: 1;
   white-space: nowrap;
   margin-bottom: 15px;
@@ -110,11 +110,13 @@ const Label = styled(Typography)`
     margin-bottom: 6px;
   }
 `;
-
-Label.defaultProps = {
-  color: "primary",
-  weight: 900,
-};
+function Label({
+  color = "primary",
+  weight = 900,
+  ...props
+}: ComponentProps<typeof StyledLabel>) {
+  return <StyledLabel color={color} weight={weight} {...props} />;
+}
 
 const AssetIcon = styled.div<{ src?: string }>`
   width: 32px;
