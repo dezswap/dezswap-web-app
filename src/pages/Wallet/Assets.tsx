@@ -48,7 +48,7 @@ function Assets() {
     screenClass,
   );
   const { availableAssetAddresses } = usePairs();
-  const { getAsset, assetInfos } = useAssets();
+  const { assetInfos } = useAssets();
   const { tokens: dashboardTokens } = useDashboard();
 
   const balances = useBalances(availableAssetAddresses);
@@ -62,14 +62,12 @@ function Assets() {
   useEffect(() => {
     if (!balances?.length) return;
 
-    const fetch = async () => {
-      const results: TokenWithBalanceAndValue[] = [];
-
-      for (const balance of balances) {
-        if (!balance?.address) continue;
-
-        const asset = await getAsset(balance.address);
-
+    const results: TokenWithBalanceAndValue[] = balances
+      .filter((balance): balance is { address: string; balance: string } =>
+        Boolean(balance?.address),
+      )
+      .map((balance) => {
+        const asset = assetInfos[balance.address];
         const dashboardToken = dashboardTokens?.find(
           (item) => item?.address === balance.address,
         );
@@ -78,18 +76,15 @@ function Assets() {
           .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
           .toString();
 
-        results.push({
+        return {
           ...asset,
           balance: balance.balance,
           value,
-        });
-      }
+        };
+      });
 
-      setAssets(results);
-    };
-
-    fetch();
-  }, [balances, dashboardTokens, getAsset]);
+    setAssets(results);
+  }, [balances, dashboardTokens, assetInfos]);
 
   const userAssets = useMemo(() => {
     return assets.filter(

@@ -1,13 +1,19 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAssets from "./useAssets";
 
 const useAsset = (assetAddress: string | undefined) => {
-  const { getAsset } = useAssets();
+  const { assetInfos, getAsset } = useAssets();
+  const asset = assetAddress ? assetInfos?.[assetAddress] : undefined;
+
+  useEffect(() => {
+    if (!assetAddress || asset) return;
+    getAsset(assetAddress).catch(() => undefined);
+  }, [assetAddress, asset, getAsset]);
 
   return useQuery({
-    queryKey: ["asset", assetAddress],
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assetAddress is not undefined
-    queryFn: () => getAsset(assetAddress!),
+    queryKey: ["asset", assetAddress, asset],
+    queryFn: () => asset,
     enabled: !!assetAddress,
   });
 };
