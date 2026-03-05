@@ -1,12 +1,23 @@
-name: deploy
+name: Prod Trigger
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Production Deployment Approval"
+        required: true
+        default: false
+        type: boolean
 
 jobs:
+  on-failure:
+    if: github.event.inputs.deploy == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'The triggering workflow failed'
+
   deploy:
+    if: github.event.inputs.deploy == 'true'
     name: Build, Deploy to S3 bucket
     runs-on: [ubuntu-latest]
     strategy:
