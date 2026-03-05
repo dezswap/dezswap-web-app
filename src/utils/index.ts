@@ -2,6 +2,7 @@ import { Numeric } from "@xpla/xpla.js";
 import { IBC_PREFIX, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 import { DashboardChartItem } from "types/dashboard-api";
+import { fromBech32 } from "@interchainjs/encoding";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
@@ -283,6 +284,11 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
 };
 
 export const isNativeToken = (denom: string, prefix: string): boolean => {
-  const expectedLength = prefix.length + 59;
-  return denom.length !== expectedLength || !denom.startsWith(`${prefix}1`);
+  try {
+    const decoded = fromBech32(denom);
+    return decoded.prefix !== prefix;
+  } catch (error) {
+    // If Bech32 parsing fails, treat it as a denom token (not a local contract-address token. e.g., ibc/, xerc20:, axpla, ...).
+    return true;
+  }
 };
