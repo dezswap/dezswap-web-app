@@ -28,7 +28,8 @@ import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
+import { fromBech32 } from "@interchainjs/encoding";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
@@ -65,7 +66,7 @@ function WithdrawPage() {
   const { walletAddress } = useConnectedWallet();
   const navigate = useNavigate();
   const {
-    selectedChain: { explorers, fees },
+    selectedChain: { explorers, fees, bech32Prefix },
   } = useNetwork();
   const { nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
@@ -104,13 +105,20 @@ function WithdrawPage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
+    if (poolAddress) {
+      try {
+        const decoded = fromBech32(poolAddress);
+        if (decoded.prefix !== bech32Prefix) {
+          errorMessageModal.open();
+        }
+      } catch {
+        errorMessageModal.open();
+      }
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress, bech32Prefix]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",

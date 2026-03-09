@@ -27,7 +27,8 @@ import {
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
+import { fromBech32 } from "@interchainjs/encoding";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
@@ -75,9 +76,8 @@ function ProvidePage() {
   const { getAsset } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const {
-    selectedChain: { explorers, fees },
-  } = useNetwork();
+  const { selectedChain } = useNetwork();
+  const { explorers, fees, bech32Prefix } = selectedChain;
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();
   const { nativeTokens } = useNativeTokens();
@@ -108,13 +108,20 @@ function ProvidePage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
-      errorMessageModal.open();
+    if (poolAddress) {
+      try {
+        const decoded = fromBech32(poolAddress);
+        if (decoded.prefix !== bech32Prefix) {
+          errorMessageModal.open();
+        }
+      } catch {
+        errorMessageModal.open();
+      }
     }
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, poolAddress]);
+  }, [asset1, asset2, errorMessageModal, poolAddress, bech32Prefix]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
