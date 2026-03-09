@@ -4,7 +4,7 @@ import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { defaultSignerOptions } from "@xpla/xpla/defaults";
+import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
 import App from "App";
 import theme from "styles/theme";
 import ResizeObserver from "resize-observer-polyfill";
@@ -13,13 +13,18 @@ import "simplebar";
 import "simplebar/dist/simplebar.css";
 import "utils/overrideXplaNumeric";
 import {
-  DefaultAssetList,
-  DefaultChain,
-  DefaultRpcEndpoint,
+  CHAIN_NAME_SEARCH_PARAM,
+  getAssetList,
+  DefaultChainName,
+  getChain,
 } from "constants/dezswap";
 import { WCWallet } from "@interchain-kit/core";
+import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
 
 window.ResizeObserver = ResizeObserver;
+
+const params = new URLSearchParams(window.location.search);
+const chainName = params.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
 
 const queryClient = new QueryClient();
 const defaultOption = {
@@ -40,27 +45,23 @@ const walletConnect = new WCWallet(undefined, defaultOption);
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 const interchainOptions = {
-  chains: DefaultChain,
-  assetLists: DefaultAssetList,
+  chains: getChain(chainName),
+  assetLists: getAssetList(chainName),
   wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
     signing: () => {
       return {
-        signerOptions: defaultSignerOptions.Cosmos,
+        signerOptions: chainName.includes("xpla")
+          ? xplaSignerOptions.Cosmos
+          : defaultSignerOptions,
         broadcast: {
           checkTx: true,
         },
       };
     },
   },
-  endpointOptions: {
-    endpoints: {
-      injective: {
-        rpc: DefaultRpcEndpoint,
-      },
-    },
-  },
 };
+
 getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>

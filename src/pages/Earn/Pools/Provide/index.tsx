@@ -31,7 +31,6 @@ import { AccAddress, Numeric } from "@xpla/xpla.js";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { generateAddLiquidityMsg } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import InputGroup from "pages/Earn/Pools/Provide/InputGroup";
@@ -53,6 +52,7 @@ import useSlippageTolerance from "hooks/useSlippageTolerance";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { useNavigate } from "hooks/useNavigate";
+import useNativeTokens from "hooks/useNativeTokens";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 export enum FormKey {
@@ -76,11 +76,11 @@ function ProvidePage() {
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
-    selectedChain: { explorers },
+    selectedChain: { explorers, fees },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();
-
+  const { nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -129,7 +129,18 @@ function ProvidePage() {
       Numeric.parse(pool.total_share).isZero(),
     [pool?.total_share],
   );
-
+  const lpTokenLink = useMemo(
+    () => getTokenLink(pair?.liquidity_token, explorers?.[0].url),
+    [explorers, pair?.liquidity_token],
+  );
+  const asset1TokenLink = useMemo(
+    () => getTokenLink(asset1?.token, explorers?.[0].url),
+    [explorers, asset1?.token],
+  );
+  const asset2TokenLink = useMemo(
+    () => getTokenLink(asset2?.token, explorers?.[0].url),
+    [explorers, asset2?.token],
+  );
   const simulationResult = useSimulate(
     isPoolEmpty
       ? {
@@ -183,13 +194,18 @@ function ProvidePage() {
           )
         : undefined,
     [
-      simulationResult,
+      simulationResult?.estimatedAmount,
+      simulationResult?.isLoading,
       walletAddress,
-      asset1,
-      isReversed,
-      asset2,
+      asset1?.token,
+      asset1?.decimals,
       formData.asset1Value,
       formData.asset2Value,
+      asset2?.token,
+      asset2?.decimals,
+      poolAddress,
+      slippageTolerance,
+      txDeadlineMinutes,
     ],
   );
 
@@ -200,8 +216,8 @@ function ProvidePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 
@@ -247,11 +263,14 @@ function ProvidePage() {
 
     return "Enter an amount";
   }, [
-    asset1,
-    asset2,
-    asset1BalanceMinusFee,
     formData.asset1Value,
     formData.asset2Value,
+    asset1BalanceMinusFee,
+    asset1?.decimals,
+    asset1?.symbol,
+    asset2BalanceMinusFee,
+    asset2?.decimals,
+    asset2?.symbol,
   ]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -284,7 +303,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
-      asset1?.token === XPLA_ADDRESS &&
+      asset1?.token === fees.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(
@@ -307,7 +326,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
-      asset2?.token === XPLA_ADDRESS &&
+      asset2?.token === fees.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
@@ -323,7 +342,17 @@ function ProvidePage() {
         },
       );
     }
-  }, [asset2BalanceMinusFee, formData.asset2Value, form]);
+  }, [
+    asset2BalanceMinusFee,
+    formData.asset2Value,
+    form,
+    walletAddress,
+    balanceApplied,
+    isReversed,
+    isPoolEmpty,
+    asset2?.token,
+    asset2?.decimals,
+  ]);
 
   useEffect(() => {
     if (!simulationResult?.isLoading && !isPoolEmpty) {
@@ -336,7 +365,14 @@ function ProvidePage() {
         { shouldValidate: true },
       );
     }
-  }, [simulationResult, isPoolEmpty]);
+  }, [
+    simulationResult,
+    isPoolEmpty,
+    form,
+    isReversed,
+    asset1?.decimals,
+    asset2?.decimals,
+  ]);
 
   return (
     <Modal
@@ -519,7 +555,13 @@ function ProvidePage() {
                           ),
                           value: feeAmount ? (
                             <AssetValueFormatter
-                              asset={{ symbol: XPLA_SYMBOL }}
+                              asset={{
+                                symbol:
+                                  nativeTokens.find(
+                                    (token) =>
+                                      token.token === fees.feeTokens[0]?.denom,
+                                  )?.symbol || "",
+                              }}
                               amount={feeAmount}
                             />
                           ) : (
@@ -623,7 +665,13 @@ function ProvidePage() {
                           ),
                           value: feeAmount ? (
                             <AssetValueFormatter
-                              asset={{ symbol: XPLA_SYMBOL }}
+                              asset={{
+                                symbol:
+                                  nativeTokens.find(
+                                    (token) =>
+                                      token.token === fees.feeTokens[0]?.denom,
+                                  )?.symbol || "",
+                              }}
                               amount={feeAmount}
                             />
                           ) : (
@@ -648,26 +696,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(pair?.liquidity_token)}&nbsp;
-                        <a
-                          href={getTokenLink(
-                            pair?.liquidity_token,
-                            explorers?.[0].url,
-                          )}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {lpTokenLink && (
+                          <a
+                            href={lpTokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
@@ -677,23 +724,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(asset1?.token)}&nbsp;
-                        <a
-                          href={getTokenLink(asset1?.token, explorers?.[0].url)}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {asset1TokenLink && (
+                          <a
+                            href={asset1TokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },
@@ -703,23 +752,25 @@ function ProvidePage() {
                     value: (
                       <span>
                         {ellipsisCenter(asset2?.token)}&nbsp;
-                        <a
-                          href={getTokenLink(asset2?.token, explorers?.[0].url)}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
+                        {asset2TokenLink && (
+                          <a
+                            href={asset2TokenLink}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            css={css`
+                              font-size: 0;
+                              vertical-align: middle;
+                              display: inline-block;
+                            `}
+                            title="Go to explorer"
+                          >
+                            <IconButton
+                              size={12}
+                              as="div"
+                              icons={{ default: iconLink }}
+                            />
+                          </a>
+                        )}
                       </span>
                     ),
                   },

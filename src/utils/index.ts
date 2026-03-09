@@ -1,7 +1,8 @@
 import { Numeric } from "@xpla/xpla.js";
-import { IBC_PREFIX, nativeTokens, XPLA_ADDRESS } from "constants/network";
+import { IBC_PREFIX, XPLA_ADDRESS } from "constants/network";
 import { Decimal } from "decimal.js";
 import { DashboardChartItem } from "types/dashboard-api";
+import { fromBech32 } from "@interchainjs/encoding";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();
@@ -13,9 +14,6 @@ export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
 
 export const cutDecimal = (value: Numeric.Input, decimals: number) =>
   Numeric.parse(value).toFixed(decimals, Decimal.ROUND_FLOOR);
-
-export const isNativeTokenAddress = (network: string, address: string) =>
-  nativeTokens[network].filter((n) => n.token === address).length > 0;
 
 export const ellipsisCenter = (text = "", letterCountPerSide = 6) => {
   if (text.length <= letterCountPerSide * 2 + 3) {
@@ -70,24 +68,22 @@ export const sanitizeNumberInput = (value: string, decimals = 18) => {
   }`;
 };
 
-const XPLA_MAINNET_EXPLORER = "https://explorer.xpla.io";
-// TODO: delete the hard-coded explorer link.
 export const getBlockLink = (height?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/block/${height}`;
-  return `${explorers}/block/${height}`;
+  if (explorers?.includes("xpla")) return `${explorers}/block/${height}`;
+
+  return `${explorers}/blocks/${height}`;
 };
 
 export const getAddressLink = (address?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/address/${address}`;
-  return `${explorers}/address/${address}`;
+  if (explorers?.includes("xpla")) return `${explorers}/address/${address}`;
+
+  return `${explorers}/accounts/${address}`;
 };
 
 export const getTransactionLink = (txHash?: string, explorers?: string) => {
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/tx/${txHash}`;
-  return `${explorers}/tx/${txHash}`;
+  if (explorers?.includes("xpla")) return `${explorers}/tx/${txHash}`;
+
+  return `${explorers}/transactions/${txHash}`;
 };
 
 export const getTokenLink = (address?: string, explorers?: string) => {
@@ -96,13 +92,12 @@ export const getTokenLink = (address?: string, explorers?: string) => {
   if (secondPart) {
     tokenAddress = `0x${secondPart}`;
   }
-  if (explorers === XPLA_MAINNET_EXPLORER)
-    return `${explorers}/mainnet/token/${
-      tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
-    }`;
-  return `${explorers}/token/${
-    tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
-  }`;
+
+  return explorers?.includes("xpla")
+    ? `${explorers}/token/${
+        tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
+      }`
+    : null;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>
@@ -285,5 +280,15 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
       .toString();
   } catch (error) {
     return initialValue;
+  }
+};
+
+export const isNativeToken = (denom: string, prefix: string): boolean => {
+  try {
+    const decoded = fromBech32(denom);
+    return decoded.prefix !== prefix;
+  } catch (error) {
+    // If Bech32 parsing fails, treat it as a denom token (not a local contract-address token. e.g., ibc/, xerc20:, axpla, ...).
+    return true;
   }
 };

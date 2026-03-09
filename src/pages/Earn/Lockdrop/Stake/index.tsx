@@ -29,7 +29,6 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { XPLA_ADDRESS, XPLA_SYMBOL } from "constants/network";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
@@ -40,10 +39,12 @@ import useConnectedWallet from "hooks/useConnectedWallet";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import InputGroup from "./InputGroup";
-import useExpectedReward from "./useEstimatedReward";
 import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import useNativeTokens from "hooks/useNativeTokens";
+import InputGroup from "./InputGroup";
+import useExpectedReward from "./useEstimatedReward";
 
 enum FormKey {
   lpValue = "lpValue",
@@ -65,8 +66,9 @@ function StakePage() {
   const [searchParams] = useSearchParams();
   const { walletAddress } = useConnectedWallet();
   const {
-    selectedChain: { chainId, explorers },
+    selectedChain: { chainId, explorers, fees },
   } = useNetwork();
+  const { nativeTokens } = useNativeTokens();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -159,8 +161,8 @@ function StakePage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(XPLA_ADDRESS)?.amount.toString() || "0";
-  }, [fee]);
+    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
+  }, [fee?.amount, fees.feeTokens[0]]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -212,7 +214,10 @@ function StakePage() {
     invalidPathModal,
     eventAddress,
   ]);
-
+  const tokenLink = useMemo(
+    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
+    [explorers, lockdropEventInfo?.lp_token_addr],
+  );
   useEffect(() => {
     if (Number(duration) > (lockdropEventInfo?.max_lock_duration || 52)) {
       form.setValue(
@@ -398,14 +403,19 @@ function StakePage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount
-                    ? `${formatNumber(
-                        cutDecimal(
-                          amountToValue(feeAmount) || "0",
-                          DISPLAY_DECIMAL,
-                        ),
-                      )} ${XPLA_SYMBOL}`
-                    : "",
+                  value: feeAmount ? (
+                    <AssetValueFormatter
+                      asset={{
+                        symbol:
+                          nativeTokens.find(
+                            (token) => token.token === fees.feeTokens[0]?.denom,
+                          )?.symbol || "",
+                      }}
+                      amount={feeAmount}
+                    />
+                  ) : (
+                    ""
+                  ),
                 },
                 {
                   key: "shareOfPool",
@@ -438,26 +448,25 @@ function StakePage() {
                     <span>
                       {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                       &nbsp;
-                      <a
-                        href={getTokenLink(
-                          lockdropEventInfo?.lp_token_addr,
-                          explorers?.[0].url,
-                        )}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        css={css`
-                          font-size: 0;
-                          vertical-align: middle;
-                          display: inline-block;
-                        `}
-                        title="Go to explorer"
-                      >
-                        <IconButton
-                          size={12}
-                          as="div"
-                          icons={{ default: iconLink }}
-                        />
-                      </a>
+                      {tokenLink && (
+                        <a
+                          href={tokenLink}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
+                      )}
                     </span>
                   ),
                 },
