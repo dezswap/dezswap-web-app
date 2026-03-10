@@ -1,8 +1,7 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
-import { Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -17,17 +16,16 @@ import InfoTable from "~/components/InfoTable";
 import Modal from "~/components/Modal";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
-import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
-import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAssets from "~/hooks/useAssets";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -42,6 +40,7 @@ import {
   getTokenLink,
 } from "~/utils";
 import { generateClaimLockdropMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 const Box = styled(box)`
   & > * {
@@ -59,16 +58,15 @@ function ClaimPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
 
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
-  const { nativeTokens } = useNativeTokens();
-  const { assetInfos, validate } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -81,10 +79,6 @@ function ClaimPage() {
     },
   });
 
-  const tokenLink = useMemo(
-    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
-    [explorers, lockdropEventInfo?.lp_token_addr],
-  );
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
@@ -125,25 +119,20 @@ function ClaimPage() {
     [assetInfos, lockdropEventInfo],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const claimLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateClaimLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateClaimLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(createTxOptions);
-  const feeAmount = useMemo(() => {
-    return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom)?.amount.toString() || "0"
-    );
-  }, [fee?.amount, fees?.feeTokens[0]]);
+  const { fee } = useFee(claimLockdropMsg);
+
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -158,35 +147,31 @@ function ClaimPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!createTxOptions || !fee) {
+      if (!claimLockdropMsg || !fee) {
         return;
       }
       requestPost({
-        txOptions: { msgs: createTxOptions },
+        messages: claimLockdropMsg,
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, claimLockdropMsg],
   );
 
   useEffect(() => {
-    const checkValidation = async () => {
-      if (
-        !(await validate(eventAddress || "")) ||
-        lockdropEventInfoError ||
-        lockdropUserInfoError ||
-        (!lockdropEventInfoError &&
-          !lockdropUserInfoError &&
-          lockdropUserInfo &&
-          !lockupInfo) ||
-        (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
-      ) {
-        invalidPathModal.open();
-      }
-    };
-
-    checkValidation();
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      lockdropEventInfoError ||
+      lockdropUserInfoError ||
+      (!lockdropEventInfoError &&
+        !lockdropUserInfoError &&
+        lockdropUserInfo &&
+        !lockupInfo) ||
+      (lockupInfo && Numeric.parse(lockupInfo?.claimable).lte(0))
+    ) {
+      invalidPathModal.open();
+    }
   }, [
     eventAddress,
     invalidPathModal,
@@ -286,20 +271,14 @@ function ClaimPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount ? (
-                      <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
-                        amount={feeAmount}
-                      />
-                    ) : (
-                      ""
-                    ),
+                    value: feeAmount
+                      ? `${formatNumber(
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
+                      : "",
                   },
                   {
                     key: "shareOfPool",
@@ -332,25 +311,26 @@ function ClaimPage() {
                       <span>
                         {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                         &nbsp;
-                        {tokenLink && (
-                          <a
-                            href={tokenLink}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            css={css`
-                              font-size: 0;
-                              vertical-align: middle;
-                              display: inline-block;
-                            `}
-                            title="Go to explorer"
-                          >
-                            <IconButton
-                              size={12}
-                              as="div"
-                              icons={{ default: iconLink }}
-                            />
-                          </a>
-                        )}
+                        <a
+                          href={getTokenLink(
+                            lockdropEventInfo?.lp_token_addr,
+                            explorers?.[0].url,
+                          )}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
                       </span>
                     ),
                   },
@@ -364,7 +344,7 @@ function ClaimPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !createTxOptions}
+          disabled={!fee || !claimLockdropMsg}
         >
           Claim
         </Button>

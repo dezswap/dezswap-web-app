@@ -13,6 +13,7 @@ import iconNotificationHover from "~/assets/icons/icon-notification-hover.svg";
 import iconNotificationWithBadgeHover from "~/assets/icons/icon-notification-with-badge-hover.svg";
 import iconNotificationWithBadge from "~/assets/icons/icon-notification-with-badge.svg";
 import iconNotification from "~/assets/icons/icon-notification.svg";
+import iconXpla from "~/assets/icons/icon-xpla-24px.svg";
 import imgLogo from "~/assets/images/logo.svg";
 import imgSymbol from "~/assets/images/symbol.svg";
 
@@ -29,22 +30,20 @@ import Panel from "~/components/Panel";
 import Tooltip from "~/components/Tooltip";
 import Typography from "~/components/Typography";
 
-import { CHAIN_ICONS } from "~/constants/dezswap";
 import {
   DISPLAY_DECIMAL,
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
 } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
 
 import useDashboard from "~/hooks/dashboard/useDashboard";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useBalance from "~/hooks/useBalance";
-import { useChain } from "~/hooks/useChain";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import useNetwork from "~/hooks/useNetwork";
 import useNotifications from "~/hooks/useNotifications";
 
@@ -309,6 +308,7 @@ function Header() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const screenClass = useScreenClass();
   const connectedWallet = useConnectedWallet();
+  const xplaBalance = useBalance(XPLA_ADDRESS);
   const walletPopover = useModal();
   const notificationModal = useHashModal("notifications");
   const chainModal = useHashModal("chains");
@@ -316,52 +316,18 @@ function Header() {
   const theme = useTheme();
   const {
     chainName,
-    selectedChain: { explorers, logoURIs, prettyName, networkType },
+    selectedChain: { explorers, logoURIs, prettyName },
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
-  const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
+  const isTestnet = useMemo(() => chainName !== "xpla", [chainName]);
   const { tokens: dashboardTokens } = useDashboard();
-  const { wallet: interchainWallet } = useChain(chainName);
-  const { nativeTokens } = useNativeTokens();
-  const {
-    token: tokenAddress,
-    symbol: tokenSymbol,
-    icon: tokenIcon,
-  } = useMemo(
-    () =>
-      nativeTokens[0] ?? {
-        token: "",
-        symbol: "",
-        icon: "",
-      },
-    [nativeTokens],
-  );
 
-  const tokenBalance = useBalance(tokenAddress);
-
-  const tokenPrice = useMemo(() => {
+  const xplaPrice = useMemo(() => {
     const dashboardToken = dashboardTokens?.find(
-      (item) => item.address === tokenAddress,
+      (item) => item.address === XPLA_ADDRESS,
     );
     return dashboardToken?.price;
-  }, [dashboardTokens, tokenAddress]);
-
-  const { walletName, logo } = useMemo(() => {
-    if (connectedWallet.isInterchain)
-      return {
-        walletName: interchainWallet.info.prettyName,
-        logo: interchainWallet.info.logo?.toString(),
-      };
-    return {
-      walletName: connectedWallet?.connection?.name,
-      logo: connectedWallet?.connection?.icon,
-    };
-  }, [
-    connectedWallet?.connection?.name,
-    connectedWallet?.connection?.icon,
-    connectedWallet.isInterchain,
-    interchainWallet,
-  ]);
+  }, [dashboardTokens]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -504,17 +470,13 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     <ChainButton onClick={() => chainModal.open()}>
-                      <img
-                        src={CHAIN_ICONS?.[chainName] ?? logoURIs?.png}
-                        alt={prettyName}
-                      />
-                      {screenClass !== MOBILE_SCREEN_CLASS &&
-                        prettyName.replace("Fetch.ai", "ASI")}
+                      <img src={logoURIs?.png} alt={prettyName} />
+                      {screenClass !== MOBILE_SCREEN_CLASS && prettyName}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet.walletAddress ? (
+                    {connectedWallet?.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -556,10 +518,10 @@ function Header() {
                                   connectedWallet.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
-                                    amountToValue(tokenBalance) || 0,
+                                    amountToValue(xplaBalance) || 0,
                                     DISPLAY_DECIMAL,
                                   ),
-                                )} ${tokenSymbol}`}
+                                )} ${XPLA_SYMBOL}`}
                             <img
                               src={iconDropdown}
                               width={22}
@@ -603,7 +565,7 @@ function Header() {
                                   <IconButton
                                     size={24}
                                     icons={{
-                                      default: logo,
+                                      default: connectedWallet.connection.icon,
                                     }}
                                   />
                                 </Col>
@@ -613,7 +575,7 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {walletName}
+                                    {connectedWallet.connection.name}
                                   </Typography>
                                 </Col>
                                 <Col width="auto">
@@ -685,7 +647,7 @@ function Header() {
                                 <Col width="auto">
                                   <IconButton
                                     size={24}
-                                    icons={{ default: tokenIcon }}
+                                    icons={{ default: iconXpla }}
                                   />
                                 </Col>
                                 <Col style={{ paddingLeft: "4px" }}>
@@ -694,7 +656,7 @@ function Header() {
                                     color="primary"
                                     weight="bold"
                                   >
-                                    {tokenSymbol}
+                                    {XPLA_SYMBOL}
                                   </Typography>
                                 </Col>
                               </Row>
@@ -714,7 +676,7 @@ function Header() {
                                   weight="bold"
                                 >
                                   {formatNumber(
-                                    amountToValue(tokenBalance) || 0,
+                                    amountToValue(xplaBalance) || 0,
                                   )}
                                 </Typography>
                                 <Typography
@@ -722,11 +684,11 @@ function Header() {
                                   weight="normal"
                                 >
                                   =&nbsp;
-                                  {tokenPrice &&
+                                  {xplaPrice &&
                                     `$${formatNumber(
                                       formatDecimals(
-                                        Numeric.parse(tokenPrice).mul(
-                                          amountToValue(tokenBalance) || 0,
+                                        Numeric.parse(xplaPrice).mul(
+                                          amountToValue(xplaBalance) || 0,
                                         ),
                                         2,
                                       ),

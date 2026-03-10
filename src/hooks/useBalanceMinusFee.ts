@@ -14,7 +14,7 @@ const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
   useEffect(() => {
     if (balance) {
       if (
-        address === selectedChain.fees.feeTokens[0].denom &&
+        address === selectedChain.fees?.feeTokens[0]?.denom &&
         feeAmount !== undefined
       ) {
         const res = Numeric.parse(amountToValue(balance) || 0).minus(
@@ -28,7 +28,7 @@ const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
       setBalanceMinusFee("0");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [balance, feeAmount, selectedChain.fees.feeTokens[0].denom]);
+  }, [balance, feeAmount, selectedChain.fees?.feeTokens[0]?.denom]);
 
   return useMemo(() => {
     return balanceMinusFee;

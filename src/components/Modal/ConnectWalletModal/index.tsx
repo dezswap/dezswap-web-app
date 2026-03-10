@@ -2,7 +2,6 @@ import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { WalletState } from "@interchain-kit/core";
 import { useWalletManager } from "@interchain-kit/react";
-import { StatefulWallet } from "@interchain-kit/react/store/stateful-wallet";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { ConnectType, WalletApp, useWallet } from "@xpla/wallet-provider";
 import React, {
@@ -113,7 +112,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
   const [wcUri, setWcUri] = useState("");
-  const currentWallet = wm.getWalletByName(wm.currentWalletName);
 
   useEffect(() => {
     if (wm?.walletConnectQRCodeUri) {
@@ -141,7 +139,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
       .flatMap((p) =>
         isMobile() && p.label === "Wallet Connect"
           ? [
-              p as WalletButtonProps,
+              p satisfies WalletButtonProps,
               {
                 label: `${p.label}\n(XPLA GAMES)`,
                 iconSrc: p.iconSrc,
@@ -158,9 +156,9 @@ function ConnectWalletModal(props: ReactModal.Props) {
                     props.onRequestClose(event);
                   }
                 },
-              } as WalletButtonProps,
+              } satisfies WalletButtonProps,
             ]
-          : (p as WalletButtonProps),
+          : (p satisfies WalletButtonProps),
       ),
     ...availableInstallations
       .filter(({ type }) => type !== ConnectType.READONLY)
@@ -176,10 +174,10 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const interchainButtons: WalletButtonProps[] = [
     ...wm.wallets
       .filter(
-        (wallet: StatefulWallet) =>
+        (wallet) =>
           !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
       )
-      .map((wallet: StatefulWallet) => {
+      .map((wallet) => {
         const isInstalled = wallet.walletState !== WalletState.NotExist;
         const iconSrc =
           typeof wallet.info.logo === "string"
@@ -207,7 +205,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
               console.log(error);
             }
           },
-        } as WalletButtonProps;
+        } satisfies WalletButtonProps;
       }),
   ];
 
@@ -215,7 +213,8 @@ function ConnectWalletModal(props: ReactModal.Props) {
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       hasCloseButton
-      title={wcUri ? currentWallet?.info.prettyName : "Connect to a wallet"}
+      // TODO: Wallet Connect -> WalletConnect
+      title={wcUri ? "Wallet Connect" : "Connect to a wallet"}
       hasGoBackButton={!!wcUri}
       onGoBack={() => {
         return setWcUri("");

@@ -1,7 +1,6 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import {
   FormEventHandler,
   useCallback,
@@ -27,20 +26,18 @@ import Message from "~/components/Message";
 import Modal from "~/components/Modal";
 import ProgressBar from "~/components/ProgressBar";
 import Typography from "~/components/Typography";
-import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
 
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
-import useAsset from "~/hooks/useAsset";
 import useAssets from "~/hooks/useAssets";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 import useRequestPost from "~/hooks/useRequestPost";
@@ -59,6 +56,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateCreatePoolMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 enum FormKey {
   asset1Value = "asset1Value",
@@ -78,7 +76,7 @@ const Box = styled(box)`
 `;
 
 function CreatePage() {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
@@ -95,12 +93,11 @@ function CreatePage() {
   }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { nativeTokens } = useNativeTokens();
-  const { validate } = useAssets();
+  const { assetInfos, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     chainName,
-    selectedChain: { explorers, fees },
+    selectedChain: { explorers },
   } = useNetwork();
 
   const form = useForm<Record<FormKey, string>>({
@@ -122,41 +119,47 @@ function CreatePage() {
     onReturnClick: handleModalClose,
   });
 
-  const { data: asset1 } = useAsset(asset1Address);
-  const { data: asset2 } = useAsset(asset2Address);
+  const [asset1, asset2] = useMemo(() => {
+    const assets =
+      asset1Address && asset2Address
+        ? [asset1Address, asset2Address].map(
+            (address) => assetInfos?.[address] || null,
+          )
+        : [undefined, undefined];
+    return assets;
+  }, [asset1Address, asset2Address, assetInfos]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (!asset1 || !asset2) {
+      if (asset1 === null || asset2 === null) {
         errorMessageModal.open();
       }
     }, 1500);
-
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
 
-    if (asset1 && asset2) {
-      const checkValidation = async () => {
-        const isValid1 = await validate(asset1Address);
-        const isValid2 = await validate(asset2Address);
-
-        if (isValid1 && isValid2) return;
-
-        if (!isValid1 || !isValid2 || asset1Address === asset2Address) {
-          errorMessageModal.open();
-        }
-      };
-
-      checkValidation();
+    if (
+      !validate(asset1Address) ||
+      !validate(asset2Address) ||
+      asset1Address === asset2Address
+    ) {
+      errorMessageModal.open();
     }
-
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset1Address, asset2, asset2Address, chainName, validate]);
+  }, [
+    asset1,
+    asset1Address,
+    asset2,
+    asset2Address,
+    errorMessageModal,
+    chainName,
+    validate,
+  ]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const createPoolMsg = useMemo(
     () =>
       walletAddress &&
       asset1?.token &&
@@ -178,27 +181,16 @@ function CreatePage() {
             },
           ])
         : undefined,
-    [
-      walletAddress,
-      asset1?.token,
-      asset1?.decimals,
-      formData.asset1Value,
-      formData.asset2Value,
-      asset2?.token,
-      asset2?.decimals,
-      chainName,
-    ],
+    [walletAddress, asset1, asset2, formData.asset1Value, formData.asset2Value],
   );
 
   const {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(createPoolMsg);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
@@ -207,7 +199,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset1?.token === fees.feeTokens[0]?.denom &&
+      asset1?.token === XPLA_ADDRESS &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
@@ -221,21 +213,13 @@ function CreatePage() {
         },
       );
     }
-  }, [
-    asset1Balance,
-    formData.asset1Value,
-    form,
-    walletAddress,
-    balanceApplied,
-    asset1?.token,
-    asset1?.decimals,
-  ]);
+  }, [asset1Balance, formData.asset1Value, form]);
 
   useEffect(() => {
     if (
       walletAddress &&
       balanceApplied &&
-      asset2?.token === fees.feeTokens[0]?.denom &&
+      asset2?.token === XPLA_ADDRESS &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
@@ -254,15 +238,15 @@ function CreatePage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && createPoolMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createPoolMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [createPoolMsg, fee, requestPost],
   );
 
   const ratio = useMemo(() => {
@@ -487,20 +471,14 @@ function CreatePage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount ? (
-                      <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
-                        amount={feeAmount}
-                      />
-                    ) : (
-                      ""
-                    ),
+                    value: feeAmount
+                      ? `${formatNumber(
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
+                      : "",
                   },
                 ]}
               />
@@ -512,40 +490,32 @@ function CreatePage() {
               `}
             >
               <InfoTable
-                items={[asset1, asset2].map((asset) => {
-                  const tokenLink = getTokenLink(
-                    asset?.token,
-                    explorers?.[0].url,
-                  );
-                  return {
-                    key: asset?.token,
-                    label: `${asset?.symbol} Address`,
-                    value: (
-                      <>
-                        {ellipsisCenter(asset?.token)}&nbsp;
-                        {tokenLink && (
-                          <a
-                            href={tokenLink}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            css={css`
-                              font-size: 0;
-                              vertical-align: middle;
-                              display: inline-block;
-                            `}
-                            title="Go to explorer"
-                          >
-                            <IconButton
-                              size={12}
-                              as="div"
-                              icons={{ default: iconLink }}
-                            />
-                          </a>
-                        )}
-                      </>
-                    ),
-                  };
-                })}
+                items={[asset1, asset2].map((asset) => ({
+                  key: asset?.token,
+                  label: `${asset?.symbol} Address`,
+                  value: (
+                    <>
+                      {ellipsisCenter(asset?.token)}&nbsp;
+                      <a
+                        href={getTokenLink(asset?.token, explorers?.[0].url)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
+                    </>
+                  ),
+                }))}
               />
             </div>
           </Expand>

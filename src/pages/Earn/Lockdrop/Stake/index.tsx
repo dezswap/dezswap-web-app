@@ -1,9 +1,8 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
-import { Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { Controller, useForm } from "react-hook-form";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -20,25 +19,21 @@ import Modal from "~/components/Modal";
 import Slider from "~/components/Slider";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
-import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
-import useAsset from "~/hooks/useAsset";
 import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
-
-import { Token } from "~/types/api";
 
 import {
   amountToValue,
@@ -51,6 +46,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateIncreaseLockupContractMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
@@ -73,11 +69,10 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers },
   } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -87,7 +82,7 @@ function StakePage() {
     },
   });
 
-  const { validate } = useAssets();
+  const { assetInfos } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -106,7 +101,7 @@ function StakePage() {
   const duration = form.watch(FormKey.duration);
   const lpBalance = useBalance(lockdropEventInfo?.lp_token_addr);
 
-  const { register } = form;
+  const { register, formState } = form;
 
   const screenClass = useScreenClass();
   const navigate = useNavigate();
@@ -125,9 +120,19 @@ function StakePage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
-  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
-  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
-  const { data: rewardAsset } = useAsset(lockdropEventInfo?.reward_token_addr);
+
+  const [asset1, asset2] = useMemo(
+    () => pair?.asset_addresses.map((address) => assetInfos?.[address]) || [],
+    [assetInfos, pair],
+  );
+
+  const rewardAsset = useMemo(
+    () =>
+      lockdropEventInfo
+        ? assetInfos?.[lockdropEventInfo.reward_token_addr]
+        : undefined,
+    [assetInfos, lockdropEventInfo],
+  );
 
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
@@ -142,26 +147,22 @@ function StakePage() {
     }
   }, [form, searchParams]);
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+  const increaseLockupContractMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !lockdropEventInfo?.lp_token_addr) {
       return undefined;
     }
-    return [
-      generateIncreaseLockupContractMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        lpTokenAddress: lockdropEventInfo?.lp_token_addr,
-        amount: valueToAmount(lpValue, LP_DECIMALS),
-        duration: Number(duration),
-      }),
-    ];
+    return generateIncreaseLockupContractMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      lpTokenAddress: lockdropEventInfo?.lp_token_addr,
+      amount: valueToAmount(lpValue, LP_DECIMALS),
+      duration: Number(duration),
+    });
   }, [walletAddress, duration, eventAddress, lockdropEventInfo, lpValue]);
 
-  const { fee } = useFee(createTxOptions);
+  const { fee } = useFee(increaseLockupContractMsg);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -186,41 +187,34 @@ function StakePage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     async (event) => {
       event.preventDefault();
-      if (createTxOptions && fee) {
+      if (increaseLockupContractMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: increaseLockupContractMsg,
           fee,
           formElement: event.currentTarget,
         });
       }
     },
-    [fee, requestPost, createTxOptions],
+    [fee, requestPost, increaseLockupContractMsg],
   );
 
   useEffect(() => {
-    const checkValidation = async () => {
-      if (
-        !(await validate(eventAddress || "")) ||
-        (lockdropEventInfo &&
-          (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
-            lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
-        lockdropEventInfoError
-      ) {
-        invalidPathModal.open();
-      }
-    };
-
-    checkValidation();
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      (lockdropEventInfo &&
+        (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
+          lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
+      lockdropEventInfoError
+    ) {
+      invalidPathModal.open();
+    }
   }, [
     lockdropEventInfo,
     lockdropEventInfoError,
     invalidPathModal,
     eventAddress,
   ]);
-  const tokenLink = useMemo(
-    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
-    [explorers, lockdropEventInfo?.lp_token_addr],
-  );
+
   useEffect(() => {
     if (Number(duration) > (lockdropEventInfo?.max_lock_duration || 52)) {
       form.setValue(
@@ -406,19 +400,14 @@ function StakePage() {
                   key: "fee",
                   label: "Fee",
                   tooltip: "The fee paid for executing the transaction.",
-                  value: feeAmount ? (
-                    <AssetValueFormatter
-                      asset={{
-                        symbol:
-                          nativeTokens.find(
-                            (token) => token.token === fees.feeTokens[0]?.denom,
-                          )?.symbol || "",
-                      }}
-                      amount={feeAmount}
-                    />
-                  ) : (
-                    ""
-                  ),
+                  value: feeAmount
+                    ? `${formatNumber(
+                        cutDecimal(
+                          amountToValue(feeAmount) || "0",
+                          DISPLAY_DECIMAL,
+                        ),
+                      )} ${XPLA_SYMBOL}`
+                    : "",
                 },
                 {
                   key: "shareOfPool",
@@ -451,25 +440,26 @@ function StakePage() {
                     <span>
                       {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                       &nbsp;
-                      {tokenLink && (
-                        <a
-                          href={tokenLink}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          css={css`
-                            font-size: 0;
-                            vertical-align: middle;
-                            display: inline-block;
-                          `}
-                          title="Go to explorer"
-                        >
-                          <IconButton
-                            size={12}
-                            as="div"
-                            icons={{ default: iconLink }}
-                          />
-                        </a>
-                      )}
+                      <a
+                        href={getTokenLink(
+                          lockdropEventInfo?.lp_token_addr,
+                          explorers?.[0].url,
+                        )}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        css={css`
+                          font-size: 0;
+                          vertical-align: middle;
+                          display: inline-block;
+                        `}
+                        title="Go to explorer"
+                      >
+                        <IconButton
+                          size={12}
+                          as="div"
+                          icons={{ default: iconLink }}
+                        />
+                      </a>
                     </span>
                   ),
                 },

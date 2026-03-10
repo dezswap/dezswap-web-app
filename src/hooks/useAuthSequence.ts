@@ -2,19 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import useAPI from "./useAPI";
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useNetwork from "./useNetwork";
-import useSigningClient from "./useSigningClient";
 
 function useAuthSequence() {
   const api = useAPI();
-  const { signingClient: client } = useSigningClient();
-  const { walletAddress } = useConnectedWallet();
+  const connectedWallet = useConnectedWallet();
+  const walletAddress = connectedWallet?.walletAddress;
   const { chainName } = useNetwork();
   const isXpla = useMemo(() => chainName.includes("xpla"), [chainName]);
 
   const { data: sequence, isLoading } = useQuery({
-    queryKey: ["authSequence", walletAddress, chainName, isXpla, !!client],
+    queryKey: ["authSequence", walletAddress, chainName, isXpla],
     queryFn: async (): Promise<bigint> => {
       if (!walletAddress || !chainName) {
         throw new Error("Wallet address or chain name is not available");

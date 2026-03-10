@@ -1,12 +1,12 @@
 import { ThemeProvider } from "@emotion/react";
-import { WCWallet } from "@interchain-kit/core";
+import { WCCosmosWallet, WCWallet } from "@interchain-kit/core";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { ChainProvider } from "@interchain-kit/react";
-import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
+import { createCosmosQueryClient } from "@interchainjs/cosmos";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WalletProvider, getChainOptions } from "@xpla/wallet-provider";
-import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
+import { DEFAULT_COSMOS_EVM_SIGNER_CONFIG } from "@xpla/xpla";
 import ReactDOM from "react-dom/client";
 import ResizeObserver from "resize-observer-polyfill";
 
@@ -32,9 +32,12 @@ const params = new URLSearchParams(window.location.search);
 const chainName = params.get(CHAIN_NAME_SEARCH_PARAM) ?? DefaultChainName;
 
 const queryClient = new QueryClient();
+const cosmosQueryClient = await createCosmosQueryClient(
+  "https://cube-rpc.xpla.io",
+);
+
 const defaultOption = {
   projectId: import.meta.env.VITE_PROJECT_ID,
-  relayUrl: "wss://relay.walletconnect.org",
   metadata: {
     name: "Dezswap",
     description: "Dezswap",
@@ -46,6 +49,7 @@ const defaultOption = {
   },
 };
 const walletConnect = new WCWallet(undefined, defaultOption);
+walletConnect.setNetworkWallet("cosmos", new WCCosmosWallet());
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
@@ -54,16 +58,12 @@ const interchainOptions = {
   assetLists: getAssetList(chainName),
   wallets: [keplrWallet, cosmostationWallet, walletConnect],
   signerOptions: {
-    signing: () => {
-      return {
-        signerOptions: chainName.includes("xpla")
-          ? xplaSignerOptions.Cosmos
-          : defaultSignerOptions,
-        broadcast: {
-          checkTx: true,
-        },
-      };
-    },
+    signing: () => ({
+      cosmosSignerConfig: {
+        ...DEFAULT_COSMOS_EVM_SIGNER_CONFIG,
+        queryClient: cosmosQueryClient,
+      },
+    }),
   },
 };
 

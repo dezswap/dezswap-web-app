@@ -85,6 +85,14 @@ export const contractAddresses: {
     play3List: "",
   },
 };
+export const GAS_INFO = {
+  multiplier: 1.4,
+  gasPrice: {
+    amount: new Decimal("850000000000"),
+    denom: "axpla",
+  },
+};
+
 export const getGasInfo = (chainName: string) => {
   if (chainName === "fetchhub")
     return {

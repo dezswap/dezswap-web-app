@@ -1,7 +1,6 @@
 import { css } from "@emotion/react";
 import { useQuery } from "@tanstack/react-query";
-import { Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { useCallback, useEffect, useMemo } from "react";
 import { useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -14,25 +13,31 @@ import IconButton from "~/components/IconButton";
 import InfoTable from "~/components/InfoTable";
 import Modal from "~/components/Modal";
 import Typography from "~/components/Typography";
-import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
-import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { XPLA_SYMBOL } from "~/constants/network";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAssets from "~/hooks/useAssets";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
 
-import { amountToValue, ellipsisCenter, getTokenLink } from "~/utils";
+import {
+  amountToValue,
+  cutDecimal,
+  ellipsisCenter,
+  formatNumber,
+  getTokenLink,
+} from "~/utils";
 import { generateUnstakeLockdropMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 import InputGroup from "../Stake/InputGroup";
 
@@ -42,14 +47,14 @@ function UnlockPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
-  const { nativeTokens } = useNativeTokens();
+
   const { findPairByLpAddress } = usePairs();
-  const { assetInfos, validate } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -96,28 +101,20 @@ function UnlockPage() {
       (item) => item.duration === duration,
     );
   }, [duration, lockdropUserInfo]);
-  const tokenLink = useMemo(
-    () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
-    [explorers, lockdropEventInfo?.lp_token_addr],
-  );
-  const txOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
+
+  const unstakeLockdropMsg = useMemo(() => {
     if (!walletAddress || !eventAddress || !duration) {
       return undefined;
     }
-    return [
-      generateUnstakeLockdropMsg({
-        senderAddress: walletAddress,
-        contractAddress: eventAddress,
-        duration,
-      }),
-    ];
+    return generateUnstakeLockdropMsg({
+      senderAddress: walletAddress,
+      contractAddress: eventAddress,
+      duration,
+    });
   }, [walletAddress, duration, eventAddress]);
 
-  const { fee } = useFee(txOptions);
-
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+  const { fee } = useFee(unstakeLockdropMsg);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -132,37 +129,33 @@ function UnlockPage() {
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (!txOptions || !fee) {
+      if (!unstakeLockdropMsg || !fee) {
         return;
       }
       requestPost({
-        txOptions: { msgs: txOptions },
+        messages: unstakeLockdropMsg,
         fee,
         skipConfirmation: true,
       });
     },
-    [fee, requestPost, txOptions],
+    [fee, requestPost, unstakeLockdropMsg],
   );
 
   useEffect(() => {
-    const checkValidation = async () => {
-      if (
-        !(await validate(eventAddress || "")) ||
-        lockdropEventInfoError ||
-        lockdropUserInfoError ||
-        (!lockdropEventInfoError &&
-          !lockdropUserInfo &&
-          lockdropUserInfo &&
-          !lockupInfo) ||
-        (lockupInfo &&
-          (lockupInfo.unlock_second * 1000 > Date.now() ||
-            Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
-      ) {
-        invalidPathModal.open();
-      }
-    };
-
-    checkValidation();
+    if (
+      !AccAddress.validate(eventAddress || "") ||
+      lockdropEventInfoError ||
+      lockdropUserInfoError ||
+      (!lockdropEventInfoError &&
+        !lockdropUserInfo &&
+        lockdropUserInfo &&
+        !lockupInfo) ||
+      (lockupInfo &&
+        (lockupInfo.unlock_second * 1000 > Date.now() ||
+          Numeric.parse(lockupInfo?.locked_lp_token).lte(0)))
+    ) {
+      invalidPathModal.open();
+    }
   }, [
     eventAddress,
     invalidPathModal,
@@ -214,20 +207,14 @@ function UnlockPage() {
                     key: "fee",
                     label: "Fee",
                     tooltip: "The fee paid for executing the transaction.",
-                    value: feeAmount ? (
-                      <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
-                        amount={feeAmount}
-                      />
-                    ) : (
-                      ""
-                    ),
+                    value: feeAmount
+                      ? `${formatNumber(
+                          cutDecimal(
+                            amountToValue(feeAmount) || "0",
+                            DISPLAY_DECIMAL,
+                          ),
+                        )} ${XPLA_SYMBOL}`
+                      : "",
                   },
                 ]}
               />
@@ -247,25 +234,26 @@ function UnlockPage() {
                       <span>
                         {ellipsisCenter(lockdropEventInfo?.lp_token_addr, 6)}
                         &nbsp;
-                        {tokenLink && (
-                          <a
-                            href={tokenLink}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            css={css`
-                              font-size: 0;
-                              vertical-align: middle;
-                              display: inline-block;
-                            `}
-                            title="Go to explorer"
-                          >
-                            <IconButton
-                              size={12}
-                              as="div"
-                              icons={{ default: iconLink }}
-                            />
-                          </a>
-                        )}
+                        <a
+                          href={getTokenLink(
+                            lockdropEventInfo?.lp_token_addr,
+                            explorers?.[0].url,
+                          )}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          css={css`
+                            font-size: 0;
+                            vertical-align: middle;
+                            display: inline-block;
+                          `}
+                          title="Go to explorer"
+                        >
+                          <IconButton
+                            size={12}
+                            as="div"
+                            icons={{ default: iconLink }}
+                          />
+                        </a>
                       </span>
                     ),
                   },
@@ -279,7 +267,7 @@ function UnlockPage() {
           size="large"
           block
           variant="primary"
-          disabled={!fee || !txOptions}
+          disabled={!fee || !unstakeLockdropMsg}
         >
           Unlock
         </Button>

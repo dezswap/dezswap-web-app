@@ -39,18 +39,17 @@ import {
   MOBILE_SCREEN_CLASS,
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
+import { XPLA_ADDRESS, XPLA_SYMBOL } from "~/constants/network";
 
 import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useFirstProvideModal from "~/hooks/modals/useFirstProvideModal";
-import useAsset from "~/hooks/useAsset";
+import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useHashModal from "~/hooks/useHashModal";
-import useNativeTokens from "~/hooks/useNativeTokens";
-import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
@@ -71,6 +70,7 @@ import {
   valueToAmount,
 } from "~/utils";
 import { generateSwapMsg } from "~/utils/dezswap";
+import { getXplaFeeAmount } from "~/utils/fee";
 
 const Wrapper = styled.form`
   width: 100%;
@@ -154,23 +154,21 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
+  const { assetInfos } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
-  const { nativeTokens } = useNativeTokens();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],
   );
-  const {
-    selectedChain: { fees },
-  } = useNetwork();
+
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -198,8 +196,14 @@ function SwapPage() {
     },
   });
 
-  const { data: asset1 } = useAsset(asset1Address);
-  const { data: asset2 } = useAsset(asset2Address);
+  const asset1 = useMemo(
+    () => assetInfos?.[asset1Address],
+    [asset1Address, assetInfos],
+  );
+  const asset2 = useMemo(
+    () => assetInfos?.[asset2Address],
+    [asset2Address, assetInfos],
+  );
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);
   const dashboardToken2 = useDashboardTokenDetail(asset2Address);
@@ -307,7 +311,7 @@ function SwapPage() {
     asset2?.decimals,
   ]);
 
-  const createTxOptions = useMemo(() => {
+  const swagMsg = useMemo(() => {
     if (
       !simulationResult?.estimatedAmount ||
       simulationResult?.isLoading ||
@@ -321,19 +325,15 @@ function SwapPage() {
       return undefined;
     }
 
-    const swapMsg = [
-      generateSwapMsg(
-        walletAddress,
-        selectedPair.contract_addr,
-        asset1.token,
-        valueToAmount(asset1Value, asset1?.decimals) || "",
-        beliefPrice || "",
-        `${slippageTolerance}`,
-        txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
-      ),
-    ];
-
-    return swapMsg;
+    return generateSwapMsg(
+      walletAddress,
+      selectedPair.contract_addr,
+      asset1.token,
+      valueToAmount(asset1Value, asset1?.decimals) || "",
+      beliefPrice || "",
+      `${slippageTolerance}`,
+      txDeadlineMinutes ? txDeadlineMinutes * 60 : undefined,
+    );
   }, [
     simulationResult,
     walletAddress,
@@ -350,11 +350,9 @@ function SwapPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(swagMsg);
 
-  const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+  const feeAmount = useMemo(() => getXplaFeeAmount(fee), [fee]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
@@ -391,7 +389,7 @@ function SwapPage() {
       walletAddress &&
       balanceApplied &&
       !isReversed &&
-      asset1Address === fees.feeTokens[0]?.denom &&
+      asset1Address === XPLA_ADDRESS &&
       Number(asset1Value) &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
@@ -440,19 +438,19 @@ function SwapPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && swagMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: swagMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [swagMsg, fee, requestPost],
   );
 
   useEffect(() => {
-    if (asset1Address === fees.feeTokens[0]?.denom) {
+    if (asset1Address === XPLA_ADDRESS) {
       form.trigger(FormKey.asset1Value);
     }
   }, [form, asset1Address, asset2Address]);
@@ -1036,13 +1034,7 @@ function SwapPage() {
                     ),
                     value: (
                       <AssetValueFormatter
-                        asset={{
-                          symbol:
-                            nativeTokens.find(
-                              (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
-                            )?.symbol || "",
-                        }}
+                        asset={{ symbol: XPLA_SYMBOL }}
                         amount={feeAmount}
                       />
                     ),

@@ -76,19 +76,22 @@ export const getBlockLink = (height?: string, explorers?: string) => {
   return `${explorers}/blocks/${height}`;
 };
 
-export const getAddressLink = (address?: string, explorers?: string) => {
+export const getAddressLink = (address?: string, explorers?: string | null) => {
   if (explorers?.includes("xpla")) return `${explorers}/address/${address}`;
 
   return `${explorers}/accounts/${address}`;
 };
 
-export const getTransactionLink = (txHash?: string, explorers?: string) => {
+export const getTransactionLink = (
+  txHash?: string,
+  explorers?: string | null,
+) => {
   if (explorers?.includes("xpla")) return `${explorers}/tx/${txHash}`;
 
   return `${explorers}/transactions/${txHash}`;
 };
 
-export const getTokenLink = (address?: string, explorers?: string) => {
+export const getTokenLink = (address?: string, explorers?: string | null) => {
   let tokenAddress = address || "";
   const [, secondPart] = tokenAddress.split(":");
   if (secondPart) {
@@ -99,7 +102,7 @@ export const getTokenLink = (address?: string, explorers?: string) => {
     ? `${explorers}/token/${
         tokenAddress === XPLA_ADDRESS ? "xpla" : tokenAddress
       }`
-    : null;
+    : undefined;
 };
 
 export const convertIbcTokenAddressForPath = (address?: string) =>

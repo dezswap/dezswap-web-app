@@ -1,31 +1,21 @@
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { getIbcTokenHash } from "~/utils";
-
 import useAPI from "./useAPI";
-import useConnectedWallet from "./useConnectedWallet";
-import useNativeTokens from "./useNativeTokens";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useNetwork from "./useNetwork";
-import useVerifiedAssets from "./useVerifiedAssets";
 
 const UPDATE_INTERVAL = 30000;
 
 const useBalances = (addresses: string[]) => {
-  const { walletAddress } = useConnectedWallet();
-  const { verifiedIbcAssets } = useVerifiedAssets();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { chainName } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
   const api = useAPI();
 
   const fetchBalance = useCallback(
     async (address: string) => {
       if (address && chainName && walletAddress) {
-        if (
-          nativeTokens?.some((n) => n.token === address) ||
-          address.includes("ibc") ||
-          (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)])
-        ) {
+        if (!address.startsWith("xpla1")) {
           const value = await api.getNativeTokenBalance(address);
           return `${value || 0}`;
         }
@@ -34,7 +24,7 @@ const useBalances = (addresses: string[]) => {
       }
       return "0";
     },
-    [chainName, walletAddress, verifiedIbcAssets, api, nativeTokens],
+    [api, chainName, walletAddress],
   );
 
   const balanceQueryResults = useQueries({
