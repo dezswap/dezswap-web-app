@@ -9,6 +9,7 @@ import { WalletProvider, getChainOptions } from "@xpla/wallet-provider";
 import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
 import ReactDOM from "react-dom/client";
 import ResizeObserver from "resize-observer-polyfill";
+
 import "simplebar";
 import "simplebar/dist/simplebar.css";
 
