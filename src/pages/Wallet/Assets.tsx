@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Row, Col, useScreenClass } from "react-grid-system";
 import { css } from "@emotion/react";
 import { Numeric } from "@xpla/xpla.js";
@@ -48,7 +48,7 @@ function Assets() {
     screenClass,
   );
   const { availableAssetAddresses } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { tokens: dashboardTokens } = useDashboard();
 
   const balances = useBalances(availableAssetAddresses);
@@ -57,27 +57,34 @@ function Assets() {
   const [sortBy, setSortBy] = useState<keyof TokenWithBalanceAndValue>("value");
   const [sortDirection, setSortDirection] =
     useState<TableSortDirection>("desc");
+  const [assets, setAssets] = useState<TokenWithBalanceAndValue[]>([]);
 
-  const assets = useMemo<TokenWithBalanceAndValue[]>(() => {
-    return balances
-      .filter(
-        (item): item is Exclude<typeof item, undefined | null> =>
-          !!item?.address,
+  useEffect(() => {
+    if (!balances?.length) return;
+
+    const results: TokenWithBalanceAndValue[] = balances
+      .filter((balance): balance is { address: string; balance: string } =>
+        Boolean(balance?.address),
       )
       .map((balance) => {
-        const asset = getAsset(balance.address);
+        const asset = assetInfos[balance.address];
         const dashboardToken = dashboardTokens?.find(
           (item) => item?.address === balance.address,
         );
+
+        const value = Numeric.parse(dashboardToken?.price || 0)
+          .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
+          .toString();
+
         return {
           ...asset,
-          balance: balance?.balance,
-          value: Numeric.parse(dashboardToken?.price || 0)
-            .mul(amountToValue(balance.balance, asset?.decimals || 0) || "0")
-            .toString(),
+          balance: balance.balance,
+          value,
         };
       });
-  }, [balances, dashboardTokens, getAsset]);
+
+    setAssets(results);
+  }, [balances, dashboardTokens, assetInfos]);
 
   const userAssets = useMemo(() => {
     return assets.filter(

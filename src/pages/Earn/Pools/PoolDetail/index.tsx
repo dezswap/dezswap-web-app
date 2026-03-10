@@ -6,7 +6,7 @@ import Hr from "components/Hr";
 import IconButton from "components/IconButton";
 import Panel from "components/Panel";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
@@ -69,12 +69,9 @@ function PoolDetailPage() {
     return poolAddress ? getPair(poolAddress) : undefined;
   }, [poolAddress, getPair]);
 
-  const { getAsset } = useAssets();
   const dashboardPoolData = useDashboardPoolDetail(poolAddress || "");
-
-  const [asset0, asset1] = useMemo(() => {
-    return pair?.asset_addresses.map((address) => getAsset(address)) || [];
-  }, [getAsset, pair]);
+  const { data: asset0 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[1]);
 
   const poolName = useMemo(() => {
     return [asset0?.name, asset1?.name].join("-");

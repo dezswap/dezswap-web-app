@@ -2,7 +2,7 @@ import Modal from "components/Modal";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import usePairs from "hooks/usePairs";
 import { useCallback, useEffect, useMemo } from "react";
 import box from "components/Box";
@@ -35,10 +35,10 @@ import useAPI from "hooks/useAPI";
 import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "hooks/useConnectedWallet";
 import { useNavigate } from "hooks/useNavigate";
+import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import useNativeTokens from "hooks/useNativeTokens";
 import IconButton from "components/IconButton";
 import iconLink from "assets/icons/icon-link.svg";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import InputGroup from "../Stake/InputGroup";
 
 const Box = styled(box)`
@@ -59,7 +59,6 @@ function CancelPage() {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
-  const { getAsset } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
   const { nativeTokens } = useNativeTokens();
@@ -110,25 +109,15 @@ function CancelPage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
-
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { data: rewardAsset } = useAsset(lockdropEventInfo?.reward_token_addr);
 
   const lockupInfo = useMemo(() => {
     return lockdropUserInfo?.lockup_infos.find(
       (item) => item.duration === duration,
     );
   }, [duration, lockdropUserInfo]);
-
-  const rewardAsset = useMemo(
-    () =>
-      lockdropEventInfo
-        ? getAsset(lockdropEventInfo.reward_token_addr)
-        : undefined,
-    [getAsset, lockdropEventInfo],
-  );
 
   const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(() => {
     if (!walletAddress || !eventAddress || !duration) {

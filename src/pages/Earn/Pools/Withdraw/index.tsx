@@ -23,15 +23,15 @@ import useSimulate from "pages/Earn/Pools/Withdraw/useSimulate";
 import usePairs from "hooks/usePairs";
 import useNetwork from "hooks/useNetwork";
 import { useForm } from "react-hook-form";
-import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import { css, useTheme } from "@emotion/react";
 import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
-import { generateWithdrawLiquidityMsg } from "utils/dezswap";
+import { generateWithdrawLiquidityMsg, hasChainPrefix } from "utils/dezswap";
 import useTxDeadlineMinutes from "hooks/useTxDeadlineMinutes";
 import { LP_DECIMALS } from "constants/dezswap";
 import useBalance from "hooks/useBalance";
@@ -83,40 +83,42 @@ function WithdrawPage() {
     () => (poolAddress ? getPair(poolAddress) : undefined),
     [getPair, poolAddress],
   );
-  const { getAsset } = useAssets();
-  const [asset1, asset2] = useMemo(
-    () =>
-      pair
-        ? pair.asset_addresses.map((address) => getAsset(address))
-        : [undefined, undefined],
-    [getAsset, pair],
-  );
+
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
   const dashboardToken1 = useDashboardTokenDetail(asset1?.token);
   const dashboardToken2 = useDashboardTokenDetail(asset2?.token);
 
   useEffect(() => {
+    if (!pair?.asset_addresses?.length) {
+      errorMessageModal.open();
+      return;
+    }
+
     const timerId = setTimeout(() => {
-      if (!asset1?.token || !asset2?.token) {
+      if (!asset1 || !asset2) {
         errorMessageModal.open();
       }
     }, 1500);
-    if (asset1 && asset2) {
-      errorMessageModal.close();
-    }
-    if (poolAddress && !AccAddress.validate(poolAddress)) {
+
+    if (
+      poolAddress &&
+      !hasChainPrefix(poolAddress) &&
+      !errorMessageModal.isOpen
+    ) {
       errorMessageModal.open();
     }
+
     return () => {
       clearTimeout(timerId);
     };
-  }, [asset1, asset2, errorMessageModal, poolAddress]);
+  }, [asset1, asset2, poolAddress]);
 
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
   });
-  const { register } = form;
 
   const { lpValue } = form.watch();
 
@@ -248,9 +250,7 @@ function WithdrawPage() {
             },
           }}
           lpToken={pair?.liquidity_token}
-          assets={
-            pair?.asset_addresses.map((address) => getAsset(address)) || []
-          }
+          assets={[asset1, asset2]}
           onBalanceClick={(value) => {
             form.setValue(FormKey.lpValue, value, {
               shouldValidate: true,

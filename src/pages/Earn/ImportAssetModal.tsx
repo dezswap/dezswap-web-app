@@ -25,6 +25,7 @@ import { Token } from "types/api";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
 import useRPCClient from "hooks/useRPCClient";
+import useAssets from "hooks/useAssets";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -36,6 +37,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const [address, setAddress] = useState("");
   const [page, setPage] = useState<"form" | "confirm" | "complete">("form");
   const { customAssets, addCustomAsset } = useCustomAssets();
+  const { validate } = useAssets();
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const {
@@ -47,6 +49,10 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const balance = useBalance(address);
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
+  const [isValidAddress, setIsValidAddress] = useState<boolean | undefined>(
+    undefined,
+  );
+
   const isNativeToken = useMemo(
     () => nativeTokens.some((item) => item.token === address),
     [address, nativeTokens],
@@ -55,10 +61,20 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
     [address, verifiedIbcAssets],
   );
-  const isValidAddress = useMemo(
-    () => AccAddress.validate(address) || isNativeToken || isIbcToken,
-    [address, isNativeToken, isIbcToken],
-  );
+
+  useEffect(() => {
+    const checkValidity = async () => {
+      const valid = await validate(address);
+      setIsValidAddress(valid || isNativeToken || isIbcToken);
+    };
+
+    if (address) {
+      checkValidity();
+    } else {
+      setIsValidAddress(undefined);
+    }
+  }, [address, isNativeToken, isIbcToken]);
+
   const isDuplicated = useMemo(() => {
     return (
       customAssets?.some((item) => item.token === address) ||

@@ -48,8 +48,8 @@ function Value({
 }
 
 function MobileTokenItem({ number, token }: MobileTokenItemProps) {
-  const { getAsset } = useAssets();
-  const asset = getAsset(token.address);
+  const { assetInfos } = useAssets();
+  const asset = assetInfos?.[token.address];
 
   return (
     <Expand

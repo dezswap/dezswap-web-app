@@ -54,20 +54,19 @@ const IconShift = styled.div`
 
 function PoolValueButton({ poolAddress }: PoolValueButtonProps) {
   const pool = usePool(poolAddress);
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const [isOpposite, setIsOpposite] = useState(false);
 
   const assets = useMemo(() => {
-    const res =
-      pool?.assets.map((asset) => {
-        const address = getAddressFromAssetInfo(asset.info);
-        return address ? getAsset(address) : undefined;
-      }) || [];
-    if (isOpposite) {
-      return res.toReversed();
+    if (!pool?.assets?.length) {
+      return [];
     }
-    return res;
-  }, [getAsset, isOpposite, pool]);
+    const resolvedAssets = pool.assets.map((asset) => {
+      const address = getAddressFromAssetInfo(asset.info);
+      return address ? assetInfos[address] : undefined;
+    });
+    return isOpposite ? resolvedAssets.toReversed() : resolvedAssets;
+  }, [assetInfos, isOpposite, pool]);
 
   const ratio = useMemo(() => {
     if (!pool) {

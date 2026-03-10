@@ -89,7 +89,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const theme = useTheme();
   const [searchKeyword, setSearchKeyword] = useState("");
   const deferredSearchKeyword = useDeferredValue(searchKeyword.toLowerCase());
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const [tabIdx, setTabIdx] = useState(0);
   const { nativeTokens } = useNativeTokens();
@@ -99,7 +99,11 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     const isBookmark = tabs[tabIdx].value === "bookmark";
 
     const addressListWithoutDuplicate = Array.from(
-      new Set(addressList?.filter((address) => address)),
+      new Set(
+        addressList?.filter((address): address is string =>
+          Boolean(address?.trim()),
+        ),
+      ),
     );
     const filteredList = isBookmark
       ? addressListWithoutDuplicate?.filter((address) =>
@@ -122,7 +126,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
     }
 
     const items = filteredList?.map((address) => {
-      const asset = getAsset(address);
+      const asset = assetInfos[address];
       const isVerified =
         asset?.verified || nativeTokens?.some((n) => n.token === address);
       return (
@@ -166,7 +170,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   }, [
     bookmarks,
     deferredSearchKeyword,
-    getAsset,
+    assetInfos,
     handleSelect,
     addressList,
     selectedAssetAddress,

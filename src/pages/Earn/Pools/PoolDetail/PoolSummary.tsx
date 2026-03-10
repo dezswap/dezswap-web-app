@@ -15,7 +15,7 @@ import useDashboardPoolDetail from "hooks/dashboard/useDashboardPoolDetail";
 import HoverUnderline from "components/utils/HoverUnderline";
 import PercentageFormatter from "components/utils/PercentageFormatter";
 import Link from "components/Link";
-import { ComponentProps } from "react";
+import { type ComponentProps, useMemo } from "react";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -74,11 +74,18 @@ function PriceAndChangeRate({
 }
 
 function PoolSummary({ poolAddress }: { poolAddress: string }) {
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
 
   const dashboardPoolData = useDashboardPoolDetail(poolAddress);
   const pool = usePool(poolAddress);
-
+  const assets = useMemo(
+    () =>
+      pool?.assets?.map((poolAsset) => {
+        const address = getAddressFromAssetInfo(poolAsset.info);
+        return address ? assetInfos[address] : undefined;
+      }) || [],
+    [assetInfos, pool],
+  );
   return (
     <Panel shadow>
       <Wrapper>
@@ -100,10 +107,8 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
             gap: 10px;
           `}
         >
-          {pool?.assets?.map((poolAsset) => {
-            const asset = getAsset(
-              getAddressFromAssetInfo(poolAsset.info) || "",
-            );
+          {pool?.assets?.map((poolAsset, index) => {
+            const asset = assets[index];
             return (
               <Row justify="between" align="center" gutterWidth={4}>
                 <Col xs="content">

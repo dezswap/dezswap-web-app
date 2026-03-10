@@ -38,13 +38,11 @@ const useChartData = (address: string, type: ChartAPIParameters["type"]) => {
   const [duration, setDuration] =
     useState<ChartAPIParameters["duration"]>("month");
 
-  const { getAsset } = useAssets();
-
-  // TODO: Remove this when we have a better solution
+  const { assetInfos } = useAssets();
   const isAxlUSDC = useMemo(() => {
-    const asset = getAsset(address);
+    const asset = assetInfos[address];
     return !!(asset?.verified && asset.symbol === "axlUSDC");
-  }, [getAsset, address]);
+  }, [assetInfos, address]);
 
   const { data } = useQuery({
     queryKey: [type, "chart", duration, chainId],

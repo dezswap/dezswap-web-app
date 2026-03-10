@@ -3,8 +3,9 @@ import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "constants/layout";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAssets from "hooks/useAssets";
+import useAsset from "hooks/useAsset";
 import usePairs from "hooks/usePairs";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import box from "components/Box";
 import Typography from "components/Typography";
 import Slider from "components/Slider";
@@ -29,7 +30,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
@@ -43,6 +44,7 @@ import { useNavigate } from "hooks/useNavigate";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import AssetValueFormatter from "components/utils/AssetValueFormatter";
 import useNativeTokens from "hooks/useNativeTokens";
+import { Token } from "types/api";
 import InputGroup from "./InputGroup";
 import useExpectedReward from "./useEstimatedReward";
 
@@ -78,7 +80,7 @@ function StakePage() {
     },
   });
 
-  const { getAsset } = useAssets();
+  const { validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -97,7 +99,7 @@ function StakePage() {
   const duration = form.watch(FormKey.duration);
   const lpBalance = useBalance(lockdropEventInfo?.lp_token_addr);
 
-  const { register, formState } = form;
+  const { register } = form;
 
   const screenClass = useScreenClass();
   const navigate = useNavigate();
@@ -116,19 +118,9 @@ function StakePage() {
         : undefined,
     [findPairByLpAddress, lockdropEventInfo],
   );
-
-  const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
-  );
-
-  const rewardAsset = useMemo(
-    () =>
-      lockdropEventInfo
-        ? getAsset(lockdropEventInfo.reward_token_addr)
-        : undefined,
-    [getAsset, lockdropEventInfo],
-  );
+  const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
+  const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
+  const { data: rewardAsset } = useAsset(lockdropEventInfo?.reward_token_addr);
 
   const { expectedReward } = useExpectedReward({
     lockdropEventAddress: eventAddress,
@@ -199,15 +191,19 @@ function StakePage() {
   );
 
   useEffect(() => {
-    if (
-      !AccAddress.validate(eventAddress || "") ||
-      (lockdropEventInfo &&
-        (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
-          lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
-      lockdropEventInfoError
-    ) {
-      invalidPathModal.open();
-    }
+    const checkValidation = async () => {
+      if (
+        !(await validate(eventAddress || "")) ||
+        (lockdropEventInfo &&
+          (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
+            lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
+        lockdropEventInfoError
+      ) {
+        invalidPathModal.open();
+      }
+    };
+
+    checkValidation();
   }, [
     lockdropEventInfo,
     lockdropEventInfoError,
