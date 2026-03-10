@@ -1,19 +1,22 @@
 import { css } from "@emotion/react";
-import AssetIcon from "components/AssetIcon";
-import IconButton from "components/IconButton";
-import Typography from "components/Typography";
-import Expand from "pages/Earn/Expand";
-import { Col, Row } from "react-grid-system";
-
-import iconBookmark from "assets/icons/icon-bookmark-default.svg";
-import iconBookmarkSelected from "assets/icons/icon-bookmark-selected.svg";
 import styled from "@emotion/styled";
 import { type ComponentProps } from "react";
-import Link from "components/Link";
-import Button from "components/Button";
-import HoverUnderline from "components/utils/HoverUnderline";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { Col, Row } from "react-grid-system";
+
+import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
+import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
+
+import AssetIcon from "~/components/AssetIcon";
+import Button from "~/components/Button";
+import IconButton from "~/components/IconButton";
+import Link from "~/components/Link";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+
+import Expand from "~/pages/Earn/Expand";
+
 import { TokenWithBalanceAndValue } from "./Assets";
 
 interface MobileAssetItemProps {

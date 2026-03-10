@@ -1,12 +1,13 @@
 import {
-  UserDenied,
-  Timeout,
-  SignBytesFailed,
   CreateTxFailed,
+  SignBytesFailed,
+  Timeout,
   TxFailed,
   TxUnspecifiedError,
+  UserDenied,
 } from "@xpla/wallet-provider";
-import { Pair } from "types/pair";
+
+import { Pair } from "~/types/pair";
 
 export interface NetworkInfo {
   chainName: string;

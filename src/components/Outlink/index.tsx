@@ -1,7 +1,8 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import iconOutlink from "assets/icons/icon-link.svg";
 import { type ComponentProps } from "react";
+
+import iconOutlink from "~/assets/icons/icon-link.svg";
 
 interface OutlinkProps {
   iconSize?: number;

@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import type { To } from "react-router-dom";
 
-import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
+import { CHAIN_NAME_SEARCH_PARAM } from "~/constants/dezswap";
+
 import useNetwork from "./useNetwork";
 
 export const useFormatTo = () => {

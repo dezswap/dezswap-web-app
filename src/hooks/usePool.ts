@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pool } from "types/api";
-import useAPI from "hooks/useAPI";
+
+import useAPI from "~/hooks/useAPI";
+
+import { Pool } from "~/types/api";
 
 const usePool = (contractAddress?: string) => {
   const [pool, setPool] = useState<Pool>();

@@ -1,8 +1,10 @@
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 import { TippyProps } from "@tippyjs/react";
-import iconQuestion from "assets/icons/icon-question.svg";
-import Tooltip from "components/Tooltip";
+
+import iconQuestion from "~/assets/icons/icon-question.svg";
+
+import Tooltip from "~/components/Tooltip";
 
 interface TooltipWithIconProps {
   size?: number | string;

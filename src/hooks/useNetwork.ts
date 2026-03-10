@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { CHAIN_NAME_SEARCH_PARAM } from "constants/dezswap";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { NetworkInfo } from "types/common";
+
+import { CHAIN_NAME_SEARCH_PARAM } from "~/constants/dezswap";
+
+import { NetworkInfo } from "~/types/common";
+
 import { useChain } from "./useChain";
 
 const useNetwork = () => {

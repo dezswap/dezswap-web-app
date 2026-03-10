@@ -1,29 +1,34 @@
 import { Outlet, createBrowserRouter, useLocation } from "react-router-dom";
-import PlaygroundPage from "pages/Playground";
-import SwapPage from "pages/Trade/Swap";
-import ProvidePage from "pages/Earn/Pools/Provide";
-import WithdrawPage from "pages/Earn/Pools/Withdraw";
-import PoolPage from "pages/Earn/Pools";
-import TradePage from "pages/Trade";
-import CreatePage from "pages/Earn/Pools/Create";
-import Error404 from "pages/Error404";
-import EarnPage from "pages/Earn";
-import AnalyticsPage from "pages/Analytics";
-import WalletPage from "pages/Wallet";
-import TokenDetailPage from "pages/Tokens/TokenDetail";
-import PoolDetailPage from "pages/Earn/Pools/PoolDetail";
-import MainLayout from "layout/Main";
-import withDisclaimerAgreement from "hocs/withDisclaimerAgreement";
-import SwapPageAsModal from "components/Modal/SwapModal";
-import Redirect from "components/Redirect";
-import PlayAnalytics from "pages/PlayAnalytics";
-import PlayMain from "pages/PlayMain";
+
+import SwapPageAsModal from "~/components/Modal/SwapModal";
+import Redirect from "~/components/Redirect";
+
+import withDisclaimerAgreement from "~/hocs/withDisclaimerAgreement";
+
+import MainLayout from "~/layout/Main";
+
+import AnalyticsPage from "~/pages/Analytics";
+import EarnPage from "~/pages/Earn";
+import PoolPage from "~/pages/Earn/Pools";
+import CreatePage from "~/pages/Earn/Pools/Create";
+import PoolDetailPage from "~/pages/Earn/Pools/PoolDetail";
+import ProvidePage from "~/pages/Earn/Pools/Provide";
+import WithdrawPage from "~/pages/Earn/Pools/Withdraw";
+import Error404 from "~/pages/Error404";
+import PlayAnalytics from "~/pages/PlayAnalytics";
+import PlayMain from "~/pages/PlayMain";
+import PlaygroundPage from "~/pages/Playground";
+import TokenDetailPage from "~/pages/Tokens/TokenDetail";
+import TradePage from "~/pages/Trade";
+import SwapPage from "~/pages/Trade/Swap";
+import WalletPage from "~/pages/Wallet";
+
 // TODO: uncomment when lockdrop is ready
-// import LockdropPage from "pages/Earn/Lockdrop";
-// import StakePage from "pages/Earn/Lockdrop/Stake";
-// import ClaimPage from "pages/Earn/Lockdrop/Claim";
-// import UnlockPage from "pages/Earn/Lockdrop/Unlock";
-// import CancelPage from "pages/Earn/Lockdrop/Cancel";
+// import LockdropPage from "~/pages/Earn/Lockdrop";
+// import StakePage from "~/pages/Earn/Lockdrop/Stake";
+// import ClaimPage from "~/pages/Earn/Lockdrop/Claim";
+// import UnlockPage from "~/pages/Earn/Lockdrop/Unlock";
+// import CancelPage from "~/pages/Earn/Lockdrop/Cancel";
 
 // For legacy links
 function ReplaceToEarn() {

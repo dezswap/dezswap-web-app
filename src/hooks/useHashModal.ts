@@ -1,5 +1,6 @@
 import { useCallback, useId, useMemo } from "react";
 import { useLocation } from "react-router-dom";
+
 import { useNavigate } from "./useNavigate";
 
 const useHashModal = (customId?: string) => {

@@ -1,9 +1,10 @@
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+
 import useAPI from "./useAPI";
+import useConnectedWallet from "./useConnectedWallet";
 import useNetwork from "./useNetwork";
 import useSigningClient from "./useSigningClient";
-import useConnectedWallet from "./useConnectedWallet";
 
 function useAuthSequence() {
   const api = useAPI();

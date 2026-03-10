@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import DashboardTransactionTable from "components/DashboardTransactionTable";
-import useDashboard from "hooks/dashboard/useDashboard";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
+
+import DashboardTransactionTable from "~/components/DashboardTransactionTable";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+import useAPI from "~/hooks/useAPI";
+import useNetwork from "~/hooks/useNetwork";
 
 function Transactions({ whiteList }: { whiteList?: string[] }) {
   const {

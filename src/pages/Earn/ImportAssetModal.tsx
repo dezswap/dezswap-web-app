@@ -1,31 +1,40 @@
 import { css, useTheme } from "@emotion/react";
 import { AccAddress } from "@xpla/xpla.js";
-import Button from "components/Button";
-import Input from "components/Input";
-import Message from "components/Message";
-import Modal from "components/Modal";
-import Typography from "components/Typography";
-import Hr from "components/Hr";
-import Panel from "components/Panel";
-import useBalance from "hooks/useBalance";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import ReactModal from "react-modal";
-import { TokenInfo } from "types/token";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { getIbcTokenHash } from "utils";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
-import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
-import usePairs from "hooks/usePairs";
-import useNetwork from "hooks/useNetwork";
-import useNativeTokens from "hooks/useNativeTokens";
-import imgSuccess from "assets/images/success-import.svg";
-import useVerifiedAssets from "hooks/useVerifiedAssets";
-import { Token } from "types/api";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
-import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
-import useRPCClient from "hooks/useRPCClient";
-import useAssets from "hooks/useAssets";
+import ReactModal from "react-modal";
+
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+import imgSuccess from "~/assets/images/success-import.svg";
+
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import Input from "~/components/Input";
+import Message from "~/components/Message";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import {
+  MOBILE_SCREEN_CLASS,
+  MODAL_CLOSE_TIMEOUT_MS,
+} from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import useBalance from "~/hooks/useBalance";
+import useCustomAssets from "~/hooks/useCustomAssets";
+import useNativeTokens from "~/hooks/useNativeTokens";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRPCClient from "~/hooks/useRPCClient";
+import useVerifiedAssets from "~/hooks/useVerifiedAssets";
+
+import { Token } from "~/types/api";
+import { TokenInfo } from "~/types/token";
+
+import { getIbcTokenHash } from "~/utils";
+import { getQueryData, parseJsonFromBinary } from "~/utils/dezswap";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;

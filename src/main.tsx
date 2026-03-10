@@ -1,25 +1,29 @@
 import { ThemeProvider } from "@emotion/react";
-import { ChainProvider } from "@interchain-kit/react";
+import { WCWallet } from "@interchain-kit/core";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
-import { getChainOptions, WalletProvider } from "@xpla/wallet-provider";
+import { ChainProvider } from "@interchain-kit/react";
+import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WalletProvider, getChainOptions } from "@xpla/wallet-provider";
 import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
-import App from "App";
-import theme from "styles/theme";
-import ResizeObserver from "resize-observer-polyfill";
 import ReactDOM from "react-dom/client";
+import ResizeObserver from "resize-observer-polyfill";
 import "simplebar";
 import "simplebar/dist/simplebar.css";
-import "utils/overrideXplaNumeric";
+
 import {
   CHAIN_NAME_SEARCH_PARAM,
-  getAssetList,
   DefaultChainName,
+  getAssetList,
   getChain,
-} from "constants/dezswap";
-import { WCWallet } from "@interchain-kit/core";
-import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
+} from "~/constants/dezswap";
+
+import theme from "~/styles/theme";
+
+import "~/utils/overrideXplaNumeric";
+
+import App from "./App";
 
 window.ResizeObserver = ResizeObserver;
 

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
 import { Numeric } from "@xpla/xpla.js";
-import { amountToValue, valueToAmount } from "utils";
+import { useEffect, useMemo, useState } from "react";
+
+import { amountToValue, valueToAmount } from "~/utils";
+
 import useBalance from "./useBalance";
 import useNetwork from "./useNetwork";
 

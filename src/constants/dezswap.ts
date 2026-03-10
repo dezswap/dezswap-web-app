@@ -1,8 +1,9 @@
 import { assetLists, chains } from "@chain-registry/v2";
 import Decimal from "decimal.js";
-import iconXpla from "assets/icons/icon-chain-xpla-32px.svg";
-import iconXplaGray from "assets/icons/icon-chain-xpla-gray-32px.svg";
-import iconASI from "assets/icons/icon-chain-asi-32px.svg";
+
+import iconASI from "~/assets/icons/icon-chain-asi-32px.svg";
+import iconXpla from "~/assets/icons/icon-chain-xpla-32px.svg";
+import iconXplaGray from "~/assets/icons/icon-chain-xpla-gray-32px.svg";
 
 export type XplaChainNames = "dimension" | "cube";
 export const DefaultChainName = "xpla";

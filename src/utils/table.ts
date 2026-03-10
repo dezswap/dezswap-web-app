@@ -1,5 +1,6 @@
 import { Numeric } from "@xpla/xpla.js";
-import { TableSortDirection } from "components/Table";
+
+import { TableSortDirection } from "~/components/Table";
 
 export const getBasicSortFunction = <R extends object>(
   key: keyof R,

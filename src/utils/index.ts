@@ -1,8 +1,10 @@
-import { Numeric } from "@xpla/xpla.js";
-import { IBC_PREFIX, XPLA_ADDRESS } from "constants/network";
-import { Decimal } from "decimal.js";
-import { DashboardChartItem } from "types/dashboard-api";
 import { fromBech32 } from "@interchainjs/encoding";
+import { Numeric } from "@xpla/xpla.js";
+import { Decimal } from "decimal.js";
+
+import { IBC_PREFIX, XPLA_ADDRESS } from "~/constants/network";
+
+import { DashboardChartItem } from "~/types/dashboard-api";
 
 export const formatDecimals = (value: Numeric.Input, decimals = 18) => {
   const t = Numeric.parse(value).toString();

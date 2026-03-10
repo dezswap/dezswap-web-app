@@ -1,13 +1,17 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import ChangeRateFormatter from "components/utils/ChangeRateFormatter";
-import Panel from "components/Panel";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useDashboard from "hooks/dashboard/useDashboard";
 import { useEffect, useMemo, useState } from "react";
 import { useScreenClass } from "react-grid-system";
-import { formatCurrency } from "utils";
+
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useDashboard from "~/hooks/dashboard/useDashboard";
+
+import { formatCurrency } from "~/utils";
 
 const List = styled.div`
   position: absolute;

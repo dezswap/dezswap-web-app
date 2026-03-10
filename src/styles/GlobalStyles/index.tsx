@@ -1,8 +1,9 @@
-import { css, Global, useTheme } from "@emotion/react";
-import { MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+import { Global, css, useTheme } from "@emotion/react";
 import reset from "emotion-reset";
-import "tippy.js/dist/tippy.css";
 import "tippy.js/dist/svg-arrow.css";
+import "tippy.js/dist/tippy.css";
+
+import { MODAL_CLOSE_TIMEOUT_MS } from "~/constants/layout";
 
 function GlobalStyles() {
   const theme = useTheme();
@@ -52,8 +53,8 @@ function GlobalStyles() {
               :has(.ReactModal__Overlay.inner-modal)
             ),
           .ReactModal__Body--open:has(
-              .ReactModal__Overlay .ReactModal__Overlay.inner-modal
-            ) {
+            .ReactModal__Overlay .ReactModal__Overlay.inner-modal
+          ) {
             overflow: hidden;
           }
           .ReactModal__Overlay {

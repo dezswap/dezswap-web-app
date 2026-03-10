@@ -1,11 +1,14 @@
-import { useCallback, useMemo } from "react";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
-import useCustomAssets from "hooks/useCustomAssets";
 import { useQuery } from "@tanstack/react-query";
-import { Token } from "types/api";
-import useNativeTokens from "./useNativeTokens";
+import { useCallback, useMemo } from "react";
+
+import useAPI from "~/hooks/useAPI";
+import useCustomAssets from "~/hooks/useCustomAssets";
+import useNetwork from "~/hooks/useNetwork";
+
+import { Token } from "~/types/api";
+
 import useFetchDecimal from "./useFetchDecimal";
+import useNativeTokens from "./useNativeTokens";
 
 const useAssets = () => {
   const api = useAPI();
@@ -39,12 +42,15 @@ const useAssets = () => {
 
   const assetInfos = useMemo(
     () =>
-      [...(assets ?? []), ...(customAssets ?? [])]?.reduce((acc, token) => {
-        if (token.token) {
-          acc[token.token] = token;
-        }
-        return acc;
-      }, {} as Record<string, Token>),
+      [...(assets ?? []), ...(customAssets ?? [])]?.reduce(
+        (acc, token) => {
+          if (token.token) {
+            acc[token.token] = token;
+          }
+          return acc;
+        },
+        {} as Record<string, Token>,
+      ),
     [assets, customAssets],
   );
 

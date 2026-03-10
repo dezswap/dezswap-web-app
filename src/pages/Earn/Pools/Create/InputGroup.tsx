@@ -1,16 +1,21 @@
-import { forwardRef } from "react";
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import Box from "components/Box";
-import Button from "components/Button";
-import Copy from "components/Copy";
-import { NumberInput, NumberInputProps } from "components/Input";
-import Typography from "components/Typography";
+import { forwardRef } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { formatNumber, formatDecimals, amountToValue } from "utils";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { Token } from "types/api";
-import useBalance from "hooks/useBalance";
+
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Copy from "~/components/Copy";
+import { NumberInput, NumberInputProps } from "~/components/Input";
+import Typography from "~/components/Typography";
+
+import useBalance from "~/hooks/useBalance";
+
+import { Token } from "~/types/api";
+
+import { amountToValue, formatDecimals, formatNumber } from "~/utils";
 
 interface InputGroupProps extends NumberInputProps {
   asset?: Partial<Token>;

@@ -1,5 +1,4 @@
 import Tippy, { TippyProps } from "@tippyjs/react";
-import Tooltip from "components/Tooltip";
 import {
   ComponentRef,
   forwardRef,
@@ -8,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+import Tooltip from "~/components/Tooltip";
 
 interface OverflowTooltipProps extends Omit<TippyProps, "children"> {
   children: TippyProps["children"] | string;

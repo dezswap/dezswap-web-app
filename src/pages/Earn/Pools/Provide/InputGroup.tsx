@@ -1,20 +1,25 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import Box from "components/Box";
-import Button from "components/Button";
-import Copy from "components/Copy";
-import { NumberInput, NumberInputProps } from "components/Input";
-import Typography from "components/Typography";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import { formatNumber, formatDecimals, amountToValue } from "utils";
-import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { Token } from "types/api";
-import useBalance from "hooks/useBalance";
 import { Numeric } from "@xpla/xpla.js";
-import { UseControllerProps, useController } from "react-hook-form";
-import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
 import { useMemo } from "react";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+import { Col, Row, useScreenClass } from "react-grid-system";
+import { UseControllerProps, useController } from "react-hook-form";
+
+import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Copy from "~/components/Copy";
+import { NumberInput, NumberInputProps } from "~/components/Input";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
+import useBalance from "~/hooks/useBalance";
+
+import { Token } from "~/types/api";
+
+import { amountToValue, formatDecimals, formatNumber } from "~/utils";
 
 interface InputGroupProps extends NumberInputProps {
   asset?: Partial<Token> | null;

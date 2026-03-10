@@ -1,9 +1,10 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Typography from "components/Typography";
 import RCSlider, { SliderProps as RCSliderProps } from "rc-slider";
 import "rc-slider/assets/index.css";
 import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
+
+import Typography from "~/components/Typography";
 
 interface SliderProps extends RCSliderProps {
   showValue?: boolean;

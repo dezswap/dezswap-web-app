@@ -1,6 +1,22 @@
+import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
+import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
+import { Any } from "@xpla/xplajs/google/protobuf/any";
+import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
-
 import { useCallback, useMemo } from "react";
+
+import api, { ApiVersion } from "~/api";
+
+import { contractAddresses, getGasInfo } from "~/constants/dezswap";
+
+import useNetwork from "~/hooks/useNetwork";
+
+import { LockdropUserInfo } from "~/types/lockdrop";
+import type {
+  VerifiedAssets,
+  VerifiedIbcAssets,
+  WhiteList,
+} from "~/types/token";
 
 import {
   createEncodedTx,
@@ -9,18 +25,10 @@ import {
   getQueryData,
   hasChainPrefix,
   parseJsonFromBinary,
-} from "utils/dezswap";
-import type { VerifiedAssets, VerifiedIbcAssets, WhiteList } from "types/token";
-import { contractAddresses, getGasInfo } from "constants/dezswap";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
-import useNetwork from "hooks/useNetwork";
-import api, { ApiVersion } from "api";
-import { EncodeObject } from "@xpla/xplajs/types";
-import { EthAccount, BaseAccount } from "@interchainjs/cosmos-types";
-import { LockdropUserInfo } from "types/lockdrop";
-import useRPCClient from "./useRPCClient";
+} from "~/utils/dezswap";
+
 import useConnectedWallet from "./useConnectedWallet";
-import { Any } from "@xpla/xplajs/google/protobuf/any";
+import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;
 

@@ -1,7 +1,9 @@
-import Decimal from "decimal.js";
-import { formatPercentage } from "utils";
-import { Numeric } from "@xpla/xpla.js";
 import { css } from "@emotion/react";
+import { Numeric } from "@xpla/xpla.js";
+import Decimal from "decimal.js";
+
+import { formatPercentage } from "~/utils";
+
 import OverflowTooltip from "../OverflowTooltip";
 
 interface PercentageFormatterProps {

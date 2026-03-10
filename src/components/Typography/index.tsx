@@ -1,7 +1,8 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { CSSProperties } from "react";
-import colors, { Colors } from "styles/theme/colors";
+
+import colors, { Colors } from "~/styles/theme/colors";
 
 type Color = keyof Colors;
 

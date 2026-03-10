@@ -1,22 +1,28 @@
 import { css } from "@emotion/react";
-import HoverUnderline from "components/utils/HoverUnderline";
-import Input from "components/Input";
-import Pagination from "components/Pagination";
-import Panel from "components/Panel";
-import Table, { TableSortDirection } from "components/Table";
-import Typography from "components/Typography";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
-import useAssets from "hooks/useAssets";
+import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
-import { DashboardPool } from "types/dashboard-api";
-import { Numeric } from "@xpla/xpla.js";
-import { getBasicSortFunction } from "utils/table";
-import usePairs from "hooks/usePairs";
-import AssetIcon from "components/AssetIcon";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import PercentageFormatter from "components/utils/PercentageFormatter";
-import Link from "components/Link";
+
+import AssetIcon from "~/components/AssetIcon";
+import Input from "~/components/Input";
+import Link from "~/components/Link";
+import Pagination from "~/components/Pagination";
+import Panel from "~/components/Panel";
+import Table, { TableSortDirection } from "~/components/Table";
+import Typography from "~/components/Typography";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import useAssets from "~/hooks/useAssets";
+import usePairs from "~/hooks/usePairs";
+
+import { DashboardPool } from "~/types/dashboard-api";
+
+import { getBasicSortFunction } from "~/utils/table";
+
 import MobilePoolItem from "./MobilePoolItem";
 
 interface DashboardPoolTableProps {

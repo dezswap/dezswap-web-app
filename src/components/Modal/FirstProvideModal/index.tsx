@@ -1,15 +1,18 @@
 import { css, useTheme } from "@emotion/react";
-
-import FirstProvide from "assets/images/be_the_first.svg";
-import Panel from "components/Panel";
-import Modal from "components/Modal";
-import Typography from "components/Typography";
 import { useScreenClass } from "react-grid-system";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Button from "components/Button";
 import ReactModal from "react-modal";
-import { convertIbcTokenAddressForPath } from "utils";
-import Link from "components/Link";
+
+import FirstProvide from "~/assets/images/be_the_first.svg";
+
+import Button from "~/components/Button";
+import Link from "~/components/Link";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import { convertIbcTokenAddressForPath } from "~/utils";
 
 interface FirstProvideModalProps {
   addresses?: [string, string];

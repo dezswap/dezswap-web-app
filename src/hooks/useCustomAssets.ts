@@ -1,21 +1,26 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useAtom } from "jotai";
-import useNetwork from "hooks/useNetwork";
-import { customAssetsAtom } from "stores/assets";
 import { AccAddress } from "@xpla/xpla.js";
-import { getIbcTokenHash } from "utils";
-import { Token } from "types/api";
-import { TokenInfo } from "types/token";
+import { useAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+
+import useNetwork from "~/hooks/useNetwork";
+
+import { customAssetsAtom } from "~/stores/assets";
+
+import { Token } from "~/types/api";
+import { TokenInfo } from "~/types/token";
+
+import { getIbcTokenHash } from "~/utils";
 import {
   getQueryData,
   hasChainPrefix,
   parseJsonFromBinary,
-} from "utils/dezswap";
-import useRPCClient from "./useRPCClient";
-import usePairs from "./usePairs";
-import useVerifiedAssets from "./useVerifiedAssets";
+} from "~/utils/dezswap";
+
 import useFetchDecimal from "./useFetchDecimal";
 import useNativeTokens from "./useNativeTokens";
+import usePairs from "./usePairs";
+import useRPCClient from "./useRPCClient";
+import useVerifiedAssets from "./useVerifiedAssets";
 
 const UPDATE_INTERVAL_SEC = 5000;
 
