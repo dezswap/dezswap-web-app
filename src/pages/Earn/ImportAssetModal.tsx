@@ -20,11 +20,11 @@ import {
   MOBILE_SCREEN_CLASS,
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
-import { nativeTokens } from "~/constants/network";
 
 import useAPI from "~/hooks/useAPI";
 import useBalance from "~/hooks/useBalance";
 import useCustomAssets from "~/hooks/useCustomAssets";
+import useNativeTokens from "~/hooks/useNativeTokens";
 import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRPCClient from "~/hooks/useRPCClient";
@@ -33,7 +33,7 @@ import useVerifiedAssets from "~/hooks/useVerifiedAssets";
 import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
-import { getIbcTokenHash, isNativeTokenAddress } from "~/utils";
+import { isNativeToken as checkIsNativeToken, getIbcTokenHash } from "~/utils";
 import { parseJsonFromUtf8, toUtf8 } from "~/utils/encode";
 
 interface ImportAssetModalProps extends ReactModal.Props {
@@ -49,8 +49,10 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const {
-    selectedChain: { chainName, chainId },
+    chainName,
+    selectedChain: { chainId, bech32Prefix },
   } = useNetwork();
+  const { nativeTokens } = useNativeTokens();
   const { client } = useRPCClient();
 
   const api = useAPI();
@@ -59,8 +61,8 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const deferredAddress = useDeferredValue(address);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
   const isNativeToken = useMemo(
-    () => isNativeTokenAddress(chainName, address),
-    [chainName, address],
+    () => checkIsNativeToken(address, bech32Prefix ?? ""),
+    [bech32Prefix, address],
   );
   const isIbcToken = useMemo(
     () => verifiedIbcAssets?.[getIbcTokenHash(address)] !== undefined,
@@ -104,7 +106,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens[chainName]?.find(
+        const asset = nativeTokens?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
@@ -155,6 +157,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
+    nativeTokens,
     chainName,
     client,
     address,

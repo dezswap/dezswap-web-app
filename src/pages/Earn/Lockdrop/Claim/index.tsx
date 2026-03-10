@@ -66,7 +66,7 @@ function ClaimPage() {
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -110,13 +110,13 @@ function ClaimPage() {
   }, [duration, lockdropUserInfo]);
 
   const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
+    () => pair?.asset_addresses.map((address) => assetInfos?.[address]) || [],
+    [assetInfos, pair],
   );
 
   const rewardAsset = useMemo(
-    () => getAsset(lockdropEventInfo?.reward_token_addr || ""),
-    [getAsset, lockdropEventInfo],
+    () => assetInfos?.[lockdropEventInfo?.reward_token_addr || ""],
+    [assetInfos, lockdropEventInfo],
   );
 
   const claimLockdropMsg = useMemo(() => {

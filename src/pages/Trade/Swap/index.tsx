@@ -154,7 +154,7 @@ function SwapPage() {
   const { value: slippageTolerance } = useSlippageTolerance();
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const { availableAssetAddresses, findPair } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
@@ -197,12 +197,12 @@ function SwapPage() {
   });
 
   const asset1 = useMemo(
-    () => getAsset(asset1Address),
-    [asset1Address, getAsset],
+    () => assetInfos?.[asset1Address],
+    [asset1Address, assetInfos],
   );
   const asset2 = useMemo(
-    () => getAsset(asset2Address),
-    [asset2Address, getAsset],
+    () => assetInfos?.[asset2Address],
+    [asset2Address, assetInfos],
   );
 
   const dashboardToken1 = useDashboardTokenDetail(asset1Address);

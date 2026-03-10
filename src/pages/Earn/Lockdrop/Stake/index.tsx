@@ -82,7 +82,7 @@ function StakePage() {
     },
   });
 
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 
@@ -122,16 +122,16 @@ function StakePage() {
   );
 
   const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
+    () => pair?.asset_addresses.map((address) => assetInfos?.[address]) || [],
+    [assetInfos, pair],
   );
 
   const rewardAsset = useMemo(
     () =>
       lockdropEventInfo
-        ? getAsset(lockdropEventInfo.reward_token_addr)
+        ? assetInfos?.[lockdropEventInfo.reward_token_addr]
         : undefined,
-    [getAsset, lockdropEventInfo],
+    [assetInfos, lockdropEventInfo],
   );
 
   const { expectedReward } = useExpectedReward({

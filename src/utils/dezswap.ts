@@ -8,8 +8,8 @@ import {
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
 import {
-  DefaultChain,
   DefaultChainName,
+  SupportedChains,
   contractAddresses,
 } from "~/constants/dezswap";
 
@@ -359,7 +359,7 @@ export const getValidChain = (inputChainName: string | null | undefined) => {
       chainName: DefaultChainName,
       isValidChain: true,
     };
-  const isValidChain = DefaultChain.some(
+  const isValidChain = SupportedChains.some(
     (supportChain) => supportChain.chainName === inputChainName,
   );
   return {

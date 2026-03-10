@@ -54,7 +54,7 @@ function UnlockPage() {
   const api = useAPI();
 
   const { findPairByLpAddress } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
@@ -87,8 +87,8 @@ function UnlockPage() {
   );
 
   const [asset1, asset2] = useMemo(
-    () => pair?.asset_addresses.map((address) => getAsset(address)) || [],
-    [getAsset, pair],
+    () => pair?.asset_addresses.map((address) => assetInfos?.[address]) || [],
+    [assetInfos, pair],
   );
 
   const duration = useMemo(() => {

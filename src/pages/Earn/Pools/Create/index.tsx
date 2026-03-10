@@ -93,7 +93,7 @@ function CreatePage() {
   }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { getAsset, validate } = useAssets();
+  const { assetInfos, validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
     chainName,
@@ -123,11 +123,11 @@ function CreatePage() {
     const assets =
       asset1Address && asset2Address
         ? [asset1Address, asset2Address].map(
-            (address) => getAsset(address) || null,
+            (address) => assetInfos?.[address] || null,
           )
         : [undefined, undefined];
     return assets;
-  }, [asset1Address, asset2Address, getAsset]);
+  }, [asset1Address, asset2Address, assetInfos]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {

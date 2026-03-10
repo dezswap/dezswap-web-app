@@ -142,31 +142,28 @@ const useAPI = (version: ApiVersion = "v1") => {
     return res.block?.header.height ?? ("0" as unknown as string);
   }, [client]);
 
-  // unused func
-  // const getDecimal = useCallback(
-  //   async (denom: string) => {
-  //     const contractAddress = contractAddresses[chainName]?.factory;
-  //     if (!contractAddress || !denom) {
-  //       return undefined;
-  //     }
+  const getDecimal = useCallback(
+    async (denom: string) => {
+      const contractAddress = contractAddresses[chainName]?.factory;
+      if (!contractAddress || !denom || !client) {
+        return undefined;
+      }
 
-  //     const queryData = toBase64(
-  //       toUtf8(
-  //         JSON.stringify({
-  //           native_token_decimals: { denom },
-  //         }),
-  //       ),
-  //     )
+      const queryData = toUtf8({
+        native_token_decimals: { denom },
+      });
 
-  //     const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
-  //       address: contractAddress,
-  //       queryData,
-  //     });
-  //     const tokenDecimals = parseJsonFromBinary(res) as unknown as Decimal;
-  //     return tokenDecimals.decimals;
-  //   },
-  //   [chainName, client],
-  // );
+      const { data: res } = await client.cosmwasm.wasm.v1.smartContractState({
+        address: contractAddress,
+        queryData,
+      });
+      const tokenDecimals = parseJsonFromUtf8(res) as unknown as {
+        decimals: number;
+      };
+      return tokenDecimals.decimals;
+    },
+    [chainName, client],
+  );
 
   const getLockdropEvents = useCallback(
     async (startAfter = 0) => {
@@ -334,7 +331,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      // getDecimal,
+      getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,
@@ -354,7 +351,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       getVerifiedTokenInfos,
       getVerifiedIbcTokenInfos,
       getLatestBlockHeight,
-      // getDecimal,
+      getDecimal,
       getLockdropEvents,
       getLockdropEventInfo,
       getLockdropUserInfo,

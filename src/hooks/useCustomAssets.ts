@@ -2,8 +2,7 @@ import { AccAddress } from "@xpla/xpla.js";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { nativeTokens } from "~/constants/network";
-
+import useNativeTokens from "~/hooks/useNativeTokens";
 import useNetwork from "~/hooks/useNetwork";
 
 import { customAssetsAtom } from "~/stores/assets";
@@ -11,7 +10,7 @@ import { customAssetsAtom } from "~/stores/assets";
 import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
-import { getIbcTokenHash, isNativeTokenAddress } from "~/utils";
+import { getIbcTokenHash, isNativeToken } from "~/utils";
 import { parseJsonFromUtf8, toUtf8 } from "~/utils/encode";
 
 import usePairs from "./usePairs";
@@ -28,8 +27,9 @@ const useCustomAssets = () => {
   const { client } = useRPCClient();
   const {
     chainName,
-    selectedChain: { chainId },
+    selectedChain: { chainId, bech32Prefix },
   } = useNetwork();
+  const { nativeTokens } = useNativeTokens();
   const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
     xpla: [],
     xplatestnet: [],
@@ -51,8 +51,8 @@ const useCustomAssets = () => {
               Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            if (isNativeTokenAddress(chainName, address)) {
-              const asset = nativeTokens[chainName]?.find(
+            if (isNativeToken(address, bech32Prefix ?? "")) {
+              const asset = nativeTokens?.find(
                 (item) => item.token === address,
               );
               if (asset) {
@@ -140,6 +140,8 @@ const useCustomAssets = () => {
   }, [
     chainName,
     chainId,
+    bech32Prefix,
+    nativeTokens,
     customAssetStore,
     verifiedIbcAssets,
     setCustomAssetStore,
@@ -150,7 +152,7 @@ const useCustomAssets = () => {
   const addFetchQueue = useCallback(
     (address: string, networkName: string) => {
       if (
-        nativeTokens[networkName]?.some((item) => item.token === address) ||
+        nativeTokens?.some((item) => item.token === address) ||
         AccAddress.validate(address) ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {

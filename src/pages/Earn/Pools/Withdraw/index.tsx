@@ -90,13 +90,13 @@ function WithdrawPage() {
     () => (poolAddress ? getPair(poolAddress) : undefined),
     [getPair, poolAddress],
   );
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const [asset1, asset2] = useMemo(
     () =>
       pair
-        ? pair.asset_addresses.map((address) => getAsset(address))
+        ? pair.asset_addresses.map((address) => assetInfos?.[address])
         : [undefined, undefined],
-    [getAsset, pair],
+    [assetInfos, pair],
   );
 
   const dashboardToken1 = useDashboardTokenDetail(asset1?.token);
@@ -243,7 +243,7 @@ function WithdrawPage() {
           }}
           lpToken={pair?.liquidity_token}
           assets={
-            pair?.asset_addresses.map((address) => getAsset(address)) || []
+            pair?.asset_addresses.map((address) => assetInfos?.[address]) || []
           }
           onBalanceClick={(value) => {
             form.setValue(FormKey.lpValue, value, {

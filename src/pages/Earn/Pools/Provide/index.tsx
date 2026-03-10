@@ -78,7 +78,7 @@ function ProvidePage() {
   const navigate = useNavigate();
   const screenClass = useScreenClass();
   const { getPair } = usePairs();
-  const { getAsset } = useAssets();
+  const { assetInfos } = useAssets();
   const [isReversed, setIsReversed] = useState(false);
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
@@ -101,8 +101,8 @@ function ProvidePage() {
   );
 
   const [asset1, asset2] = useMemo(
-    () => (pair?.asset_addresses || []).map((address) => getAsset(address)),
-    [getAsset, pair?.asset_addresses],
+    () => (pair?.asset_addresses || []).map((address) => assetInfos?.[address]),
+    [assetInfos, pair?.asset_addresses],
   );
 
   useEffect(() => {
