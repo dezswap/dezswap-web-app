@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from "react";
-import FirstProvideModal from "components/Modal/FirstProvideModal";
-import useGlobalElement from "hooks/useGlobalElement";
-import useModal from "hooks/useModal";
+
+import FirstProvideModal from "~/components/Modal/FirstProvideModal";
+
+import useGlobalElement from "~/hooks/useGlobalElement";
+import useModal from "~/hooks/useModal";
 
 const useFirstProvideModal = ({
   addresses,

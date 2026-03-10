@@ -1,11 +1,13 @@
-import styled from "@emotion/styled";
-import Box from "components/Box";
-import IconButton from "components/IconButton";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 
-import iconSortDefault from "assets/icons/icon-sort-default.svg";
-import iconSortAsc from "assets/icons/icon-sort-asc.svg";
-import iconSortDesc from "assets/icons/icon-sort-desc.svg";
+import iconSortAsc from "~/assets/icons/icon-sort-asc.svg";
+import iconSortDefault from "~/assets/icons/icon-sort-default.svg";
+import iconSortDesc from "~/assets/icons/icon-sort-desc.svg";
+
+import Box from "~/components/Box";
+import IconButton from "~/components/IconButton";
+
 import { TableHeaderProps } from ".";
 
 const sortIcons = {

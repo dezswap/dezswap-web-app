@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createRPCQueryClient } from "@xpla/xplajs/xpla/rpc.query";
+
 import useNetwork from "./useNetwork";
 
 const useRPCClient = () => {

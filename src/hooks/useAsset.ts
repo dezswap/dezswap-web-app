@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+
 import useAssets from "./useAssets";
 
 const useAsset = (assetAddress: string | undefined) => {

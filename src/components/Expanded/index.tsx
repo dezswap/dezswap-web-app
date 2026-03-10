@@ -1,7 +1,9 @@
 import styled from "@emotion/styled";
-import iconDropdown from "assets/icons/icon-dropdown-24px.svg";
 import { useEffect, useState } from "react";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+
+import iconDropdown from "~/assets/icons/icon-dropdown-24px.svg";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   label?: React.ReactNode;

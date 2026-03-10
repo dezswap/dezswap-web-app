@@ -1,26 +1,30 @@
 import { css, useTheme } from "@emotion/react";
-
-import BroadcastingSvg from "assets/images/broadcasting.svg";
-import Success from "assets/images/success.svg";
-import Failed from "assets/images/failed.svg";
-import iconLink from "assets/icons/icon-link.svg";
-
-import { MouseEventHandler, useEffect, useMemo, useState } from "react";
-import { ellipsisCenter, getTransactionLink } from "utils";
 import { TxInfo } from "@xpla/xpla.js";
-import { TxError } from "types/common";
-import Panel from "components/Panel";
-import Modal from "components/Modal";
-import useRPCClient from "hooks/useRPCClient";
-import useNetwork from "hooks/useNetwork";
-import Typography from "components/Typography";
-import { Col, Row, useScreenClass } from "react-grid-system";
-import IconButton from "components/IconButton";
-import Hr from "components/Hr";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
-import Button from "components/Button";
-import LoadingIndicator from "components/LoadingIndicator";
 import { TxResponse } from "@xpla/xplajs/cosmos/base/abci/v1beta1/abci";
+import { MouseEventHandler, useEffect, useMemo, useState } from "react";
+import { Col, Row, useScreenClass } from "react-grid-system";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+import BroadcastingSvg from "~/assets/images/broadcasting.svg";
+import Failed from "~/assets/images/failed.svg";
+import Success from "~/assets/images/success.svg";
+
+import Button from "~/components/Button";
+import Hr from "~/components/Hr";
+import IconButton from "~/components/IconButton";
+import LoadingIndicator from "~/components/LoadingIndicator";
+import Modal from "~/components/Modal";
+import Panel from "~/components/Panel";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useNetwork from "~/hooks/useNetwork";
+import useRPCClient from "~/hooks/useRPCClient";
+
+import { TxError } from "~/types/common";
+
+import { ellipsisCenter, getTransactionLink } from "~/utils";
 
 interface TxBroadcastingModalProps {
   txHash?: string;

@@ -1,9 +1,12 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import iconToken from "assets/icons/icon-default-token.svg";
-import iconVerified from "assets/icons/icon-verified.svg";
-import Tooltip from "components/Tooltip";
-import { Token } from "types/api";
+
+import iconToken from "~/assets/icons/icon-default-token.svg";
+import iconVerified from "~/assets/icons/icon-verified.svg";
+
+import Tooltip from "~/components/Tooltip";
+
+import { Token } from "~/types/api";
 
 interface AssetIconProps {
   asset: Partial<Token>;

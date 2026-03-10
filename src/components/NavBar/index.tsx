@@ -1,8 +1,9 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import Tippy, { TippyProps } from "@tippyjs/react/headless";
-import { useFormatTo } from "hooks/useFormatTo";
 import { NavLink } from "react-router-dom";
+
+import { useFormatTo } from "~/hooks/useFormatTo";
 
 const Wrapper = styled.div`
   width: 100%;

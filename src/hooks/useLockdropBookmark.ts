@@ -1,7 +1,9 @@
-import { useCallback, useMemo } from "react";
-import useNetwork from "hooks/useNetwork";
-import { lockdropBookmarksAtom } from "stores/lockdrops";
 import { useAtom } from "jotai";
+import { useCallback, useMemo } from "react";
+
+import useNetwork from "~/hooks/useNetwork";
+
+import { lockdropBookmarksAtom } from "~/stores/lockdrops";
 
 const useLockdropBookmark = () => {
   const { chainName } = useNetwork();

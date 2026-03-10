@@ -1,26 +1,31 @@
-import styled from "@emotion/styled";
-import Button from "components/Button";
-import { Container, Visible } from "react-grid-system";
-import IconButton from "components/IconButton";
-
-import iconMedium from "assets/icons/icon-medium.svg";
-import iconMediumHover from "assets/icons/icon-medium-hover.svg";
-import iconTwitter from "assets/icons/icon-twitter.svg";
-import iconTwitterHover from "assets/icons/icon-twitter-hover.svg";
-import iconDiscord from "assets/icons/icon-discord.svg";
-import iconDiscordHover from "assets/icons/icon-discord-hover.svg";
-import iconGitHub from "assets/icons/icon-github.svg";
-import iconGitHubHover from "assets/icons/icon-github-hover.svg";
-import iconDocs from "assets/icons/icon-docs.svg";
-import iconDocsHover from "assets/icons/icon-docs-hover.svg";
-import iconLink from "assets/icons/icon-link.svg";
-import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "constants/layout";
 import { css } from "@emotion/react";
-import { useLatestBlock } from "hooks/useLatestBlock";
-import { getBlockLink } from "utils";
-import useNetwork from "hooks/useNetwork";
-import Tooltip from "components/Tooltip";
-import Typography from "components/Typography";
+import styled from "@emotion/styled";
+import { Container, Visible } from "react-grid-system";
+
+import iconDiscordHover from "~/assets/icons/icon-discord-hover.svg";
+import iconDiscord from "~/assets/icons/icon-discord.svg";
+import iconDocsHover from "~/assets/icons/icon-docs-hover.svg";
+import iconDocs from "~/assets/icons/icon-docs.svg";
+import iconGitHubHover from "~/assets/icons/icon-github-hover.svg";
+import iconGitHub from "~/assets/icons/icon-github.svg";
+import iconLink from "~/assets/icons/icon-link.svg";
+import iconMediumHover from "~/assets/icons/icon-medium-hover.svg";
+import iconMedium from "~/assets/icons/icon-medium.svg";
+import iconTwitterHover from "~/assets/icons/icon-twitter-hover.svg";
+import iconTwitter from "~/assets/icons/icon-twitter.svg";
+
+import Button from "~/components/Button";
+import IconButton from "~/components/IconButton";
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+
+import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
+
+import { useLatestBlock } from "~/hooks/useLatestBlock";
+import useNetwork from "~/hooks/useNetwork";
+
+import { getBlockLink } from "~/utils";
+
 import MobileDelegateBanner from "./MobileDelegateBanner";
 
 const Wrapper = styled.footer`

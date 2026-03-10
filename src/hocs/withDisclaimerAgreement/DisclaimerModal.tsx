@@ -1,14 +1,16 @@
-import Modal from "components/Modal";
-import Typography from "components/Typography";
-import ReactModal from "react-modal";
 import { css, useTheme } from "@emotion/react";
-import Checkbox from "components/Checkbox";
-import Button from "components/Button";
-import Box from "components/Box";
-import { Col, Row } from "react-grid-system";
-import Hr from "components/Hr";
 import styled from "@emotion/styled";
-import colors from "styles/theme/colors";
+import { Col, Row } from "react-grid-system";
+import ReactModal from "react-modal";
+
+import Box from "~/components/Box";
+import Button from "~/components/Button";
+import Checkbox from "~/components/Checkbox";
+import Hr from "~/components/Hr";
+import Modal from "~/components/Modal";
+import Typography from "~/components/Typography";
+
+import colors from "~/styles/theme/colors";
 
 const Content = styled(Typography)`
   font-weight: 400;

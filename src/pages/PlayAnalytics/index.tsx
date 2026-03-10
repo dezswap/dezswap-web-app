@@ -1,14 +1,17 @@
-import { Col, Container, Row } from "react-grid-system";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import Hr from "components/Hr";
-import ScrollToTop from "components/ScrollToTop";
-import Typography from "components/Typography";
-import useDashboardTokenDetail from "hooks/dashboard/useDashboardTokenDetail";
-import Chart from "pages/Tokens/TokenDetail/Chart";
-import TokenSummary from "pages/Tokens/TokenDetail/TokenSummary";
-import TokenTransactions from "pages/Tokens/TokenDetail/TokenTransactions";
-import { useParams, Outlet } from "react-router-dom";
+import styled from "@emotion/styled";
+import { Col, Container, Row } from "react-grid-system";
+import { Outlet, useParams } from "react-router-dom";
+
+import Hr from "~/components/Hr";
+import ScrollToTop from "~/components/ScrollToTop";
+import Typography from "~/components/Typography";
+
+import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
+
+import Chart from "~/pages/Tokens/TokenDetail/Chart";
+import TokenSummary from "~/pages/Tokens/TokenDetail/TokenSummary";
+import TokenTransactions from "~/pages/Tokens/TokenDetail/TokenTransactions";
 
 const Wrapper = styled(Container)`
   width: 100%;

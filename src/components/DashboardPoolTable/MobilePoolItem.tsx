@@ -1,19 +1,23 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
-import AssetIcon from "components/AssetIcon";
-import HoverUnderline from "components/utils/HoverUnderline";
-import Typography from "components/Typography";
-import useAssets from "hooks/useAssets";
-import useModal from "hooks/useModal";
-import usePairs from "hooks/usePairs";
-import Expand from "pages/Earn/Expand";
 import { type ComponentProps, useMemo } from "react";
-import { Row, Col } from "react-grid-system";
-import { DashboardPool } from "types/dashboard-api";
-import CurrencyFormatter from "components/utils/CurrencyFormatter";
-import PercentageFormatter from "components/utils/PercentageFormatter";
-import Link from "components/Link";
+import { Col, Row } from "react-grid-system";
+
+import AssetIcon from "~/components/AssetIcon";
+import Link from "~/components/Link";
+import Typography from "~/components/Typography";
+import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import HoverUnderline from "~/components/utils/HoverUnderline";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
+
+import useAssets from "~/hooks/useAssets";
+import useModal from "~/hooks/useModal";
+import usePairs from "~/hooks/usePairs";
+
+import Expand from "~/pages/Earn/Expand";
+
+import { DashboardPool } from "~/types/dashboard-api";
 
 interface MobilePoolItemProps {
   pool: DashboardPool;

@@ -5,7 +5,7 @@ import {
   useNavigate as useRRNavigate,
 } from "react-router-dom";
 
-import { useFormatTo } from "hooks/useFormatTo";
+import { useFormatTo } from "~/hooks/useFormatTo";
 
 export const useNavigate = () => {
   const navigateRR = useRRNavigate();

@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from "react";
-import useAPI from "hooks/useAPI";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+
+import useAPI from "~/hooks/useAPI";
 
 const useFetchDecimal = () => {
   const api = useAPI();

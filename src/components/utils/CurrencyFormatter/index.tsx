@@ -1,6 +1,8 @@
-import { formatCurrency } from "utils";
-import { Numeric } from "@xpla/xpla.js";
 import { css } from "@emotion/react";
+import { Numeric } from "@xpla/xpla.js";
+
+import { formatCurrency } from "~/utils";
+
 import OverflowTooltip from "../OverflowTooltip";
 
 interface CurrencyFormatterProps {

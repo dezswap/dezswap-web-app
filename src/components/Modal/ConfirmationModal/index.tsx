@@ -1,10 +1,15 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Button from "components/Button";
-import Modal from "components/Modal";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import { useEffect, useRef, useState } from "react";
 import { useScreenClass } from "react-grid-system";
+
+import Button from "~/components/Button";
+import Modal from "~/components/Modal";
+
+import {
+  MOBILE_SCREEN_CLASS,
+  MODAL_CLOSE_TIMEOUT_MS,
+} from "~/constants/layout";
 
 const Content = styled.div`
   & button[type="submit"] {

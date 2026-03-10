@@ -1,10 +1,11 @@
-import { forwardRef } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import { forwardRef } from "react";
 
-import iconCheckbox from "assets/icons/icon-checkbox.svg";
-import iconCheckboxChecked from "assets/icons/icon-checkbox-checked.svg";
-import Typography from "components/Typography";
+import iconCheckboxChecked from "~/assets/icons/icon-checkbox-checked.svg";
+import iconCheckbox from "~/assets/icons/icon-checkbox.svg";
+
+import Typography from "~/components/Typography";
 
 interface CheckboxProps extends React.HTMLProps<HTMLInputElement> {
   block?: boolean;

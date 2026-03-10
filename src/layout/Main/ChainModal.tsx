@@ -1,21 +1,24 @@
 import styled from "@emotion/styled";
-import AssetIcon from "components/AssetIcon";
-import Modal from "components/Modal";
-import {
-  CHAIN_ICONS,
-  CHAIN_NAME_SEARCH_PARAM,
-  SupportedChains,
-} from "constants/dezswap";
-import {
-  DEFAULT_GUTTER_WIDTH,
-  GRID_MAX_WIDTH,
-  MOBILE_SCREEN_CLASS,
-} from "constants/layout";
-import useNetwork from "hooks/useNetwork";
 import { useMemo } from "react";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
 import { useSearchParams } from "react-router-dom";
+
+import AssetIcon from "~/components/AssetIcon";
+import Modal from "~/components/Modal";
+
+import {
+  CHAIN_ICONS,
+  CHAIN_NAME_SEARCH_PARAM,
+  SupportedChains,
+} from "~/constants/dezswap";
+import {
+  DEFAULT_GUTTER_WIDTH,
+  GRID_MAX_WIDTH,
+  MOBILE_SCREEN_CLASS,
+} from "~/constants/layout";
+
+import useNetwork from "~/hooks/useNetwork";
 
 const Overlay = styled.div`
   position: fixed;
@@ -132,10 +135,8 @@ function ChainModal(modalProps: ReactModal.Props) {
                     chain.logoURIs?.png,
                 }}
               />
-              {
-                // FIXME:
-                chain.prettyName?.replace("Fetch.ai", "ASI")
-              }
+              {// FIXME:
+              chain.prettyName?.replace("Fetch.ai", "ASI")}
             </ChainsWrapper>
           ))}
       </Modal>

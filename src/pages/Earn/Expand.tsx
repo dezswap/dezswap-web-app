@@ -1,15 +1,18 @@
-import Box from "components/Box";
-import iconExpand from "assets/icons/icon-expand.svg";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import Hr from "components/Hr";
+import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
+
+import iconExpand from "~/assets/icons/icon-expand.svg";
+
+import Box from "~/components/Box";
+import Hr from "~/components/Hr";
+
 import {
   LARGE_BROWSER_SCREEN_CLASS,
   MOBILE_SCREEN_CLASS,
   SMALL_BROWSER_SCREEN_CLASS,
   TABLET_SCREEN_CLASS,
-} from "constants/layout";
+} from "~/constants/layout";
 
 type ExpandProps = React.PropsWithChildren<{
   header?: React.ReactNode;

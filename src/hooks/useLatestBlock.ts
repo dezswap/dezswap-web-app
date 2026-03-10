@@ -1,5 +1,7 @@
-import useAPI from "hooks/useAPI";
 import { useQuery } from "@tanstack/react-query";
+
+import useAPI from "~/hooks/useAPI";
+
 import useNetwork from "./useNetwork";
 
 const UPDATE_INTERVAL = 3000;

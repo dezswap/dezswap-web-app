@@ -1,10 +1,12 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import Tooltip from "components/Tooltip";
-import Typography from "components/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Container } from "react-grid-system";
 import { useMatch } from "react-router-dom";
+
+import Tooltip from "~/components/Tooltip";
+import Typography from "~/components/Typography";
+
 import DelegateButton from "./DelegateButton";
 
 const Wrapper = styled.div`

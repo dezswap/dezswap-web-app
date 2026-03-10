@@ -1,10 +1,15 @@
 import { css } from "@emotion/react";
-import Hr from "components/Hr";
-import Modal from "components/Modal";
-import SettingsForm, { SettingsFormProps } from "components/SettingsForm";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";
-import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
+
+import Hr from "~/components/Hr";
+import Modal from "~/components/Modal";
+import SettingsForm, { SettingsFormProps } from "~/components/SettingsForm";
+
+import {
+  MOBILE_SCREEN_CLASS,
+  MODAL_CLOSE_TIMEOUT_MS,
+} from "~/constants/layout";
 
 function SettingsModal({
   items,

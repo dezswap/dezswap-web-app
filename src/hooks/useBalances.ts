@@ -1,11 +1,13 @@
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getIbcTokenHash } from "utils";
+
+import { getIbcTokenHash } from "~/utils";
+
 import useAPI from "./useAPI";
-import useNetwork from "./useNetwork";
-import useVerifiedAssets from "./useVerifiedAssets";
 import useConnectedWallet from "./useConnectedWallet";
 import useNativeTokens from "./useNativeTokens";
+import useNetwork from "./useNetwork";
+import useVerifiedAssets from "./useVerifiedAssets";
 
 const UPDATE_INTERVAL = 30000;
 

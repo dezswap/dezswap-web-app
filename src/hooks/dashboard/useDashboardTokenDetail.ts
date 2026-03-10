@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import useAPI from "hooks/useAPI";
-import useNetwork from "hooks/useNetwork";
+
+import useAPI from "~/hooks/useAPI";
+import useNetwork from "~/hooks/useNetwork";
 
 const useDashboardTokenDetail = (tokenAddress?: string) => {
   const {

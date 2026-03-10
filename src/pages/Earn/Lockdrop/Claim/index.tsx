@@ -1,16 +1,38 @@
-import Modal from "components/Modal";
-import { MOBILE_SCREEN_CLASS } from "constants/layout";
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { useQuery } from "@tanstack/react-query";
+import { Numeric } from "@xpla/xpla.js";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
-import useAssets from "hooks/useAssets";
-import iconLink from "assets/icons/icon-link.svg";
-import { useCallback, useEffect, useMemo } from "react";
-import box from "components/Box";
-import Typography from "components/Typography";
-import { css } from "@emotion/react";
-import Expand from "components/Expanded";
-import InfoTable from "components/InfoTable";
-import useLockdropEvents from "hooks/useLockdropEvents";
+
+import iconLink from "~/assets/icons/icon-link.svg";
+
+import box from "~/components/Box";
+import Button from "~/components/Button";
+import Expand from "~/components/Expanded";
+import IconButton from "~/components/IconButton";
+import InfoTable from "~/components/InfoTable";
+import Modal from "~/components/Modal";
+import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
+import Typography from "~/components/Typography";
+import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
+
+import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
+import useAPI from "~/hooks/useAPI";
+import useAssets from "~/hooks/useAssets";
+import useConnectedWallet from "~/hooks/useConnectedWallet";
+import useFee from "~/hooks/useFee";
+import useLockdropEvents from "~/hooks/useLockdropEvents";
+import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNavigate } from "~/hooks/useNavigate";
+import useNetwork from "~/hooks/useNetwork";
+import usePairs from "~/hooks/usePairs";
+import useRequestPost from "~/hooks/useRequestPost";
+
 import {
   amountToValue,
   cutDecimal,
@@ -18,25 +40,8 @@ import {
   formatDecimals,
   formatNumber,
   getTokenLink,
-} from "utils";
-import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
-import { generateClaimLockdropMsg } from "utils/dezswap";
-import useFee from "hooks/useFee";
-import { Numeric } from "@xpla/xpla.js";
-import styled from "@emotion/styled";
-import { useQuery } from "@tanstack/react-query";
-import useNetwork from "hooks/useNetwork";
-import useAPI from "hooks/useAPI";
-import Button from "components/Button";
-import useRequestPost from "hooks/useRequestPost";
-import useInvalidPathModal from "hooks/modals/useInvalidPathModal";
-import useNativeTokens from "hooks/useNativeTokens";
-import IconButton from "components/IconButton";
-import usePairs from "hooks/usePairs";
-import useConnectedWallet from "hooks/useConnectedWallet";
-import { useNavigate } from "hooks/useNavigate";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import AssetValueFormatter from "components/utils/AssetValueFormatter";
+} from "~/utils";
+import { generateClaimLockdropMsg } from "~/utils/dezswap";
 
 const Box = styled(box)`
   & > * {

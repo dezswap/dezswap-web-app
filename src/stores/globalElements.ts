@@ -1,5 +1,5 @@
-import React from "react";
 import { atom } from "jotai";
+import React from "react";
 
 const globalElementsAtom = atom<
   {
