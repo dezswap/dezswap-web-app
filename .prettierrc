@@ -5,5 +5,24 @@
   "useTabs": false,
   "tabWidth": 2,
   "printWidth": 80,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^~/api(/.*)?$",
+    "^~/assets/(.*)$",
+    "^~/components/(.*)$",
+    "^~/constants/(.*)$",
+    "^~/hocs/(.*)$",
+    "^~/hooks/(.*)$",
+    "^~/layout/(.*)$",
+    "^~/pages/(.*)$",
+    "^~/stores/(.*)$",
+    "^~/styles/(.*)$",
+    "^~/types/(.*)$",
+    "^~/utils(/.*)?$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }
