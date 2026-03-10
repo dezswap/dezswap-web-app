@@ -87,9 +87,9 @@ export const contractAddresses: {
 export const getGasInfo = (chainName: string) => {
   if (chainName === "fetchhub")
     return {
-      multiplier: 1,
+      multiplier: 1.4,
       gasPrice: {
-        amount: new Decimal("0"),
+        amount: new Decimal("2"),
         denom: "afet",
       },
     };
