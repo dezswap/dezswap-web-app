@@ -108,7 +108,7 @@ function CreatePage() {
   }, [navigate]);
 
   const handleTxSuccess = useCallback(() => {
-    window.location.replace("/pool");
+    window.location.replace(`/pool${window.location.search}`);
   }, []);
 
   const { requestPost } = useRequestPost(handleTxSuccess, true);
