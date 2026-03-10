@@ -1,10 +1,10 @@
 import {
-  AccAddress,
   Coin,
   Coins,
   MsgExecuteContract as BeforeMsgExecuteContract,
   Numeric,
 } from "@xpla/xpla.js";
+import { fromBech32 } from "@interchainjs/encoding";
 import { Asset, NativeAsset } from "types/pair";
 import {
   contractAddresses,
@@ -49,6 +49,15 @@ export const getQueryData = (query: object) => {
 export const parseJsonFromBinary = (binaryData: Uint8Array) =>
   JSON.parse(new TextDecoder().decode(binaryData));
 
+const isBech32Address = (address: string) => {
+  try {
+    fromBech32(address);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const createEncodedTx = (
   messages: EncodeObject[],
   authSequence: bigint,
@@ -78,7 +87,7 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
   new Coins(
     assets
       .filter(
-        (a) => !AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
+        (a) => !isBech32Address(a.address) && Numeric.parse(a.amount).gt(0),
       )
       .sort((a, b) => a.address.localeCompare(b.address))
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
@@ -107,7 +116,7 @@ export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
 };
 
 const assetMsg = (asset: { address: string; amount: string }) => ({
-  info: AccAddress.validate(asset.address)
+  info: isBech32Address(asset.address)
     ? { token: { contract_addr: asset.address } }
     : { native_token: { denom: asset.address } },
   amount: asset.amount,
@@ -140,9 +149,7 @@ export const generateCreatePoolMsg = (
   assets: { address: string; amount: string }[],
 ) => [
   ...assets
-    .filter(
-      (a) => AccAddress.validate(a.address) && Numeric.parse(a.amount).gt(0),
-    )
+    .filter((a) => isBech32Address(a.address) && Numeric.parse(a.amount).gt(0))
     .map((a) =>
       MsgExecuteContract.fromPartial({
         sender,
@@ -179,7 +186,7 @@ export const generateAddLiquidityMsg = (
   txDeadlineSeconds = 1200,
 ) => [
   ...assets
-    .filter((a) => AccAddress.validate(a.address))
+    .filter((a) => isBech32Address(a.address))
     .map((a) =>
       MsgExecuteContract.fromPartial({
         sender,
@@ -253,7 +260,7 @@ export const generateSwapMsg = (
   txDeadlineSeconds = 1200,
 ) => {
   const maxSpreadFixed = `${(parseFloat(maxSpread) / 100).toFixed(4)}`;
-  const isCW20 = AccAddress.validate(fromAssetAddress);
+  const isCW20 = isBech32Address(fromAssetAddress);
 
   if (isCW20) {
     const sendMsg = createEncodedMessage({

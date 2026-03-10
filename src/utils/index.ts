@@ -283,12 +283,17 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
   }
 };
 
-export const isNativeToken = (denom: string, prefix: string): boolean => {
+export const isBech32WithPrefix = (address: string, prefix: string) => {
   try {
-    const decoded = fromBech32(denom);
-    return decoded.prefix !== prefix;
-  } catch (error) {
-    // If Bech32 parsing fails, treat it as a denom token (not a local contract-address token. e.g., ibc/, xerc20:, axpla, ...).
-    return true;
+    const decoded = fromBech32(address);
+    return decoded.prefix === prefix;
+  } catch {
+    return false;
   }
+};
+
+export const isNativeToken = (denom: string, prefix: string): boolean => {
+  // If it is not a local bech32 contract address with this chain prefix,
+  // treat it as a denom token (e.g., ibc/, xerc20:, axpla, ...).
+  return !isBech32WithPrefix(denom, prefix);
 };

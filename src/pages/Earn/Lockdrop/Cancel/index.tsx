@@ -21,12 +21,13 @@ import {
   formatDateTime,
   formatNumber,
   getTokenLink,
+  isBech32WithPrefix,
 } from "utils";
 import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateCancelLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
@@ -56,7 +57,7 @@ function CancelPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers, fees, bech32Prefix },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
   const { getAsset } = useAssets();
@@ -167,7 +168,7 @@ function CancelPage() {
 
   useEffect(() => {
     if (
-      !AccAddress.validate(eventAddress || "") ||
+      !isBech32WithPrefix(eventAddress || "", bech32Prefix) ||
       (lockdropEventInfo &&
         lockdropEventInfo.event_cancelable_until * 1000 < Date.now()) ||
       lockdropEventInfoError
@@ -179,6 +180,7 @@ function CancelPage() {
     lockdropEventInfoError,
     invalidPathModal,
     eventAddress,
+    bech32Prefix,
   ]);
 
   return (

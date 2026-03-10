@@ -18,11 +18,12 @@ import {
   formatDecimals,
   formatNumber,
   getTokenLink,
+  isBech32WithPrefix,
 } from "utils";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateClaimLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import useNetwork from "hooks/useNetwork";
@@ -54,7 +55,7 @@ function ClaimPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers, fees, bech32Prefix },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
 
@@ -166,7 +167,7 @@ function ClaimPage() {
 
   useEffect(() => {
     if (
-      !AccAddress.validate(eventAddress || "") ||
+      !isBech32WithPrefix(eventAddress || "", bech32Prefix) ||
       lockdropEventInfoError ||
       lockdropUserInfoError ||
       (!lockdropEventInfoError &&
@@ -184,6 +185,7 @@ function ClaimPage() {
     lockdropUserInfoError,
     lockdropUserInfo,
     lockupInfo,
+    bech32Prefix,
   ]);
 
   return (

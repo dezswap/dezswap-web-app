@@ -9,6 +9,7 @@ import {
   formatDecimals,
   formatNumber,
   getTokenLink,
+  isBech32WithPrefix,
   valueToAmount,
 } from "utils";
 import iconWithdraw from "assets/icons/icon-withdraw.svg";
@@ -29,7 +30,6 @@ import Box from "components/Box";
 import Hr from "components/Hr";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
 import { Numeric } from "@xpla/xpla.js";
-import { fromBech32 } from "@interchainjs/encoding";
 import useRequestPost from "hooks/useRequestPost";
 import useFee from "hooks/useFee";
 import { generateWithdrawLiquidityMsg } from "utils/dezswap";
@@ -105,15 +105,8 @@ function WithdrawPage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (poolAddress) {
-      try {
-        const decoded = fromBech32(poolAddress);
-        if (decoded.prefix !== bech32Prefix) {
-          errorMessageModal.open();
-        }
-      } catch {
-        errorMessageModal.open();
-      }
+    if (poolAddress && !isBech32WithPrefix(poolAddress, bech32Prefix)) {
+      errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);

@@ -24,11 +24,11 @@ import {
   formatNumber,
   formatRatio,
   getTokenLink,
+  isBech32WithPrefix,
   valueToAmount,
 } from "utils";
 import { LOCKED_LP_SUPPLY, LP_DECIMALS } from "constants/dezswap";
 import { Numeric } from "@xpla/xpla.js";
-import { fromBech32 } from "@interchainjs/encoding";
 import Typography from "components/Typography";
 import useBalanceMinusFee from "hooks/useBalanceMinusFee";
 import useFee from "hooks/useFee";
@@ -108,15 +108,8 @@ function ProvidePage() {
     if (asset1 && asset2) {
       errorMessageModal.close();
     }
-    if (poolAddress) {
-      try {
-        const decoded = fromBech32(poolAddress);
-        if (decoded.prefix !== bech32Prefix) {
-          errorMessageModal.open();
-        }
-      } catch {
-        errorMessageModal.open();
-      }
+    if (poolAddress && !isBech32WithPrefix(poolAddress, bech32Prefix)) {
+      errorMessageModal.open();
     }
     return () => {
       clearTimeout(timerId);

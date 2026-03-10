@@ -22,6 +22,7 @@ import {
   formatDateTime,
   formatNumber,
   getTokenLink,
+  isBech32WithPrefix,
   valueToAmount,
 } from "utils";
 import { Controller, useForm } from "react-hook-form";
@@ -29,7 +30,7 @@ import { LP_DECIMALS } from "constants/dezswap";
 import TooltipWithIcon from "components/Tooltip/TooltipWithIcon";
 import { generateIncreaseLockupContractMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import useRequestPost from "hooks/useRequestPost";
 import useBalance from "hooks/useBalance";
 import styled from "@emotion/styled";
@@ -66,7 +67,7 @@ function StakePage() {
   const [searchParams] = useSearchParams();
   const { walletAddress } = useConnectedWallet();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers, fees, bech32Prefix },
   } = useNetwork();
   const { nativeTokens } = useNativeTokens();
   const form = useForm<Record<FormKey, string>>({
@@ -200,7 +201,7 @@ function StakePage() {
 
   useEffect(() => {
     if (
-      !AccAddress.validate(eventAddress || "") ||
+      !isBech32WithPrefix(eventAddress || "", bech32Prefix) ||
       (lockdropEventInfo &&
         (lockdropEventInfo.event_end_second * 1000 < Date.now() ||
           lockdropEventInfo.event_start_second * 1000 > Date.now())) ||
@@ -213,6 +214,7 @@ function StakePage() {
     lockdropEventInfoError,
     invalidPathModal,
     eventAddress,
+    bech32Prefix,
   ]);
   const tokenLink = useMemo(
     () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),

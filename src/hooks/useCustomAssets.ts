@@ -2,8 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtom } from "jotai";
 import useNetwork from "hooks/useNetwork";
 import { customAssetsAtom } from "stores/assets";
-import { AccAddress } from "@xpla/xpla.js";
-import { getIbcTokenHash } from "utils";
+import { getIbcTokenHash, isBech32WithPrefix } from "utils";
 import { Token } from "types/api";
 import { TokenInfo } from "types/token";
 import { getQueryData, parseJsonFromBinary } from "utils/dezswap";
@@ -22,9 +21,9 @@ const useCustomAssets = () => {
   const { client } = useRPCClient();
   const {
     chainName,
-    selectedChain: { chainId },
+    selectedChain: { chainId, bech32Prefix },
   } = useNetwork();
-  const fetchQueue = useRef<{ [K in string]?: AccAddress[] }>({
+  const fetchQueue = useRef<{ [K in string]?: string[] }>({
     xpla: [],
     xplatestnet: [],
   });
@@ -133,6 +132,7 @@ const useCustomAssets = () => {
     chainName,
     chainId,
     customAssetStore,
+    nativeTokens,
     verifiedIbcAssets,
     setCustomAssetStore,
     client,
@@ -143,7 +143,7 @@ const useCustomAssets = () => {
     (address: string, networkName: string) => {
       if (
         nativeTokens.some((item) => item.token === address) ||
-        AccAddress.validate(address) ||
+        isBech32WithPrefix(address, bech32Prefix) ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {
         if (!fetchQueue.current[networkName]?.includes(address)) {
@@ -154,7 +154,7 @@ const useCustomAssets = () => {
         fetchAsset();
       }
     },
-    [fetchAsset, verifiedIbcAssets],
+    [bech32Prefix, fetchAsset, nativeTokens, verifiedIbcAssets],
   );
 
   const getAsset = useCallback(

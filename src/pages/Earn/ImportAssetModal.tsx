@@ -1,5 +1,4 @@
 import { css, useTheme } from "@emotion/react";
-import { AccAddress } from "@xpla/xpla.js";
 import Button from "components/Button";
 import Input from "components/Input";
 import Message from "components/Message";
@@ -12,7 +11,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import ReactModal from "react-modal";
 import { TokenInfo } from "types/token";
 import iconDefaultToken from "assets/icons/icon-default-token.svg";
-import { getIbcTokenHash } from "utils";
+import { getIbcTokenHash, isBech32WithPrefix } from "utils";
 import { MOBILE_SCREEN_CLASS, MODAL_CLOSE_TIMEOUT_MS } from "constants/layout";
 import useCustomAssets from "hooks/useCustomAssets";
 import { useScreenClass } from "react-grid-system";
@@ -39,7 +38,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const { availableAssetAddresses } = usePairs();
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const {
-    selectedChain: { chainId },
+    selectedChain: { chainId, bech32Prefix },
   } = useNetwork();
   const { client } = useRPCClient();
   const { nativeTokens } = useNativeTokens();
@@ -56,8 +55,9 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     [address, verifiedIbcAssets],
   );
   const isValidAddress = useMemo(
-    () => AccAddress.validate(address) || isNativeToken || isIbcToken,
-    [address, isNativeToken, isIbcToken],
+    () =>
+      isBech32WithPrefix(address, bech32Prefix) || isNativeToken || isIbcToken,
+    [address, bech32Prefix, isNativeToken, isIbcToken],
   );
   const isDuplicated = useMemo(() => {
     return (
@@ -142,6 +142,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isValidAddress,
     isNativeToken,
     isIbcToken,
+    nativeTokens,
     verifiedIbcAssets,
     client,
     address,

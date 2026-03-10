@@ -9,10 +9,15 @@ import { css } from "@emotion/react";
 import Expand from "components/Expanded";
 import InfoTable from "components/InfoTable";
 import useLockdropEvents from "hooks/useLockdropEvents";
-import { amountToValue, ellipsisCenter, getTokenLink } from "utils";
+import {
+  amountToValue,
+  ellipsisCenter,
+  getTokenLink,
+  isBech32WithPrefix,
+} from "utils";
 import { generateUnstakeLockdropMsg } from "utils/dezswap";
 import useFee from "hooks/useFee";
-import { AccAddress, Numeric } from "@xpla/xpla.js";
+import { Numeric } from "@xpla/xpla.js";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import useNetwork from "hooks/useNetwork";
@@ -36,7 +41,7 @@ function UnlockPage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
   const {
-    selectedChain: { chainId, explorers, fees },
+    selectedChain: { chainId, explorers, fees, bech32Prefix },
   } = useNetwork();
   const { walletAddress } = useConnectedWallet();
   const { getLockdropEventInfo } = useLockdropEvents();
@@ -140,7 +145,7 @@ function UnlockPage() {
 
   useEffect(() => {
     if (
-      !AccAddress.validate(eventAddress || "") ||
+      !isBech32WithPrefix(eventAddress || "", bech32Prefix) ||
       lockdropEventInfoError ||
       lockdropUserInfoError ||
       (!lockdropEventInfoError &&
@@ -160,6 +165,7 @@ function UnlockPage() {
     lockdropUserInfo,
     lockdropUserInfoError,
     lockupInfo,
+    bech32Prefix,
   ]);
 
   return (
