@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
-import { Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -165,9 +165,10 @@ function ClaimPage() {
   );
 
   useEffect(() => {
-    const checkValidation = async () => {
+    const checkValidation = () => {
       if (
-        !(await validate(eventAddress || "")) ||
+        // TODO: isContractAddress
+        !AccAddress.validate(eventAddress || "") ||
         lockdropEventInfoError ||
         lockdropUserInfoError ||
         (!lockdropEventInfoError &&
