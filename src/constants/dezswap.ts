@@ -66,7 +66,7 @@ export const contractAddresses: {
   xplatestnet: {
     factory: "xpla1j4kgjl6h4rt96uddtzdxdu39h0mhn4vrtydufdrk4uxxnrpsnw2qug2yx2",
     router: "xpla1pr40depxf8w50y58swdyhc0s2yjptd2xtqgnyfvkz6k40ng53gqqnyftkm",
-    lockdrop: "xpla1009jkfkfs6x484a9s34zq030dk4sa0ygk8z7hw6hegcupkadjpfs39e5du",
+    lockdrop: "xpla1k7elkr2rh8rtxw0u9zss2wvyctmn0am8hhwguxsme7n3z39jf7xql3mk2r",
     play3List:
       "xpla1hylp38a8rwzzktq0esvsqnuaxvvf3uvtsex8du8wcpawaaqjczus4st6s0",
   },

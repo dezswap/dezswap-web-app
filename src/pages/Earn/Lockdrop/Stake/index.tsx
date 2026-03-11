@@ -21,9 +21,10 @@ import Slider from "~/components/Slider";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
 import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
@@ -369,12 +370,11 @@ function StakePage() {
                 display: inline-block;
               `}
             >
-              {formatNumber(
-                cutDecimal(
-                  amountToValue(expectedReward, rewardAsset?.decimals) || 0,
-                  DISPLAY_DECIMAL,
-                ),
-              )}
+              <AssetValueFormatter
+                amount={expectedReward}
+                asset={rewardAsset}
+                showSymbol={false}
+              />
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -423,15 +423,15 @@ function StakePage() {
                 {
                   key: "shareOfPool",
                   label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                  value: `${cutDecimal(
-                    Numeric.parse(expectedReward || "0")
-                      .dividedBy(
-                        lockdropEventInfo?.total_lockdrop_reward || "1",
-                      )
-                      .mul(100)
-                      .toString(),
-                    2,
-                  )}%`,
+                  value: (
+                    <PercentageFormatter
+                      value={Numeric.parse(expectedReward || "0")
+                        .dividedBy(
+                          lockdropEventInfo?.total_lockdrop_reward || "1",
+                        )
+                        .mul(100)}
+                    />
+                  ),
                 },
               ]}
             />

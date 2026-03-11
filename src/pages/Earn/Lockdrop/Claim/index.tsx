@@ -18,6 +18,7 @@ import Modal from "~/components/Modal";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
 import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
@@ -33,14 +34,7 @@ import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
 
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatDecimals,
-  formatNumber,
-  getTokenLink,
-} from "~/utils";
+import { ellipsisCenter, getTokenLink } from "~/utils";
 import { generateClaimLockdropMsg } from "~/utils/dezswap";
 
 const Box = styled(box)`
@@ -239,17 +233,15 @@ function ClaimPage() {
                 display: inline-block;
               `}
             >
-              {lockupInfo
-                ? formatNumber(
-                    formatDecimals(
-                      amountToValue(
-                        lockupInfo.claimable || 0,
-                        rewardAsset?.decimals,
-                      ) || "",
-                      2,
-                    ),
-                  )
-                : ""}
+              {lockupInfo ? (
+                <AssetValueFormatter
+                  amount={lockupInfo.claimable}
+                  asset={rewardAsset}
+                  showSymbol={false}
+                />
+              ) : (
+                ""
+              )}
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -304,15 +296,15 @@ function ClaimPage() {
                   {
                     key: "shareOfPool",
                     label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                    value: `${cutDecimal(
-                      Numeric.parse(lockupInfo?.total_reward || "0")
-                        .dividedBy(
-                          lockdropEventInfo?.total_lockdrop_reward || "1",
-                        )
-                        .mul(100)
-                        .toString(),
-                      2,
-                    )}%`,
+                    value: (
+                      <PercentageFormatter
+                        value={Numeric.parse(lockupInfo?.total_reward || "0")
+                          .dividedBy(
+                            lockdropEventInfo?.total_lockdrop_reward || "1",
+                          )
+                          .mul(100)}
+                      />
+                    ),
                   },
                 ]}
               />

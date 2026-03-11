@@ -214,7 +214,7 @@ const navLinks = [
       {
         path: "/earn/lockdrop",
         label: "LP Lock&Drop",
-        disabled: true,
+        disabled: false,
       },
     ],
   },
@@ -349,8 +349,8 @@ function Header() {
   const { walletName, logo } = useMemo(() => {
     if (connectedWallet.isInterchain)
       return {
-        walletName: interchainWallet.info.prettyName,
-        logo: interchainWallet.info.logo?.toString(),
+        walletName: interchainWallet?.info.prettyName,
+        logo: interchainWallet?.info.logo?.toString(),
       };
     return {
       walletName: connectedWallet?.connection?.name,
