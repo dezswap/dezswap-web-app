@@ -1,7 +1,9 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import RCSlider, { SliderProps as RCSliderProps } from "rc-slider";
+
 import "rc-slider/assets/index.css";
+
 import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import Typography from "~/components/Typography";
@@ -131,8 +133,7 @@ function Slider({
         trackStyle={{ backgroundSize: `${wrapperWidth}px 100%`, ...trackStyle }}
         handleRender={
           showValue
-            ? // eslint-disable-next-line react/no-unstable-nested-components
-              (origin, props) => {
+            ? (origin, props) => {
                 return (
                   <SliderHandle
                     origin={origin}

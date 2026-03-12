@@ -270,7 +270,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             if (onChange) {
               onChange(event);
             }
-          } catch (error) {
+          } catch {
             event.preventDefault();
           }
         }

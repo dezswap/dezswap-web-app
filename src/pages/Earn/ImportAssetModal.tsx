@@ -1,5 +1,4 @@
 import { css, useTheme } from "@emotion/react";
-import { AccAddress } from "@xpla/xpla.js";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 import ReactModal from "react-modal";

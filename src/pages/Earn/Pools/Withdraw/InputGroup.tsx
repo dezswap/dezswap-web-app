@@ -72,7 +72,7 @@ function InputGroup({
         .mul(dashboardPool?.recent.tvl)
         .toNumber();
       return res;
-    } catch (error) {
+    } catch {
       return 0;
     }
   }, [dashboardPool?.recent.tvl, field.value, pool?.total_share]);

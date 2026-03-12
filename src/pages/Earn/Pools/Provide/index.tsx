@@ -61,7 +61,7 @@ import {
 } from "~/utils";
 import { generateAddLiquidityMsg, hasChainPrefix } from "~/utils/dezswap";
 
-export enum FormKey {
+enum FormKey {
   asset1Value = "asset1Value",
   asset2Value = "asset2Value",
 }

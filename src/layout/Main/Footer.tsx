@@ -9,8 +9,6 @@ import iconDocs from "~/assets/icons/icon-docs.svg";
 import iconGitHubHover from "~/assets/icons/icon-github-hover.svg";
 import iconGitHub from "~/assets/icons/icon-github.svg";
 import iconLink from "~/assets/icons/icon-link.svg";
-import iconMediumHover from "~/assets/icons/icon-medium-hover.svg";
-import iconMedium from "~/assets/icons/icon-medium.svg";
 import iconTwitterHover from "~/assets/icons/icon-twitter-hover.svg";
 import iconTwitter from "~/assets/icons/icon-twitter.svg";
 

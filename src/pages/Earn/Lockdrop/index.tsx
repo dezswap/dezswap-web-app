@@ -81,7 +81,7 @@ function LockdropPage() {
     refetch: refetchLockdropEvents,
   } = useLockdropEvents();
   const api = useAPI();
-  const { findPair, findPairByLpAddress } = usePairs();
+  const { findPairByLpAddress } = usePairs();
 
   const lockdropEvents = useMemo(() => {
     return originalLockdropEvents.map((lockdropEvent, index) => ({
