@@ -14,7 +14,7 @@ const useDashboardPoolDetail = (poolAddress: string) => {
       try {
         const res = await api.dashboard.getPoolDetail(poolAddress);
         return res;
-      } catch (error) {
+      } catch {
         return null;
       }
     },

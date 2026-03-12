@@ -1,5 +1,5 @@
-/* eslint-disable prefer-rest-params */
-/* eslint-disable no-undef */
+ 
+ 
 import packageJson from "../package.json";
 
 if (window.location.href.startsWith(packageJson.homepage)) {

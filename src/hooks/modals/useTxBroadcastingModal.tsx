@@ -43,7 +43,15 @@ const useTxBroadcastingModal = ({
         onRetryClick={modal.close}
       />
     ),
-    [modal.close, modal.isOpen, txError, txHash],
+    [
+      modal.close,
+      modal.isOpen,
+      onDoneClick,
+      queryClient,
+      txError,
+      txHash,
+      walletAddress,
+    ],
   );
   useGlobalElement(element);
   return modal;

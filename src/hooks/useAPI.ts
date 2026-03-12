@@ -1,3 +1,5 @@
+// TODO: refactor this hook using react-query
+/* eslint-disable react-hooks/preserve-manual-memoization */
 import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import { Any } from "@xpla/xplajs/google/protobuf/any";
@@ -301,7 +303,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         res = [...res, ...parsed];
         lastAddress = res[res.length - 1].cont_addr;
         if (parsed.length < PLAY3_LIST_SIZE) break;
-      } catch (e) {
+      } catch {
         return res;
       }
     }
