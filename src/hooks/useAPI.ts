@@ -1,3 +1,5 @@
+// TODO: refactor this hook using react-query
+/* eslint-disable react-hooks/preserve-manual-memoization */
 import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import { Any } from "@xpla/xplajs/google/protobuf/any";

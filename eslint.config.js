@@ -17,7 +17,6 @@ export default defineConfig([
     ],
     // TODO: fix these warnings and change to "error"
     rules: {
-      "react-hooks/preserve-manual-memoization": "warn",
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/refs": "warn",
