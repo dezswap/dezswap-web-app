@@ -20,30 +20,18 @@ jobs:
     if: github.event.inputs.deploy == 'true'
     name: Build, Deploy to S3 bucket
     runs-on: [ubuntu-latest]
-    strategy:
-      matrix:
-        node-version: [22.x]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository 📝
+        uses: actions/checkout@v6
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-
-      - name: Package install
-        run: pnpm install
+      - name: Setup
+        uses: ./.github/actions/install
 
       - name: Build
         env:
           VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
-        run: CI=false pnpm build
+        run: pnpm build
 
       - name: Transfer to S3 for serving static
         uses: jakejarvis/s3-sync-action@master
