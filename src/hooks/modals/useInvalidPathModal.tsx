@@ -25,7 +25,7 @@ const useInvalidPathModal = ({
         }}
       />
     ),
-    [modal.close, modal.isOpen],
+    [modal.isOpen, onReturnClick],
   );
   useGlobalElement(element);
   return modal;

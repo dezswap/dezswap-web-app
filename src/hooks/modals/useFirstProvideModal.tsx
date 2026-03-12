@@ -20,7 +20,7 @@ const useFirstProvideModal = ({
     if (onClickCancel) {
       onClickCancel();
     }
-  }, [modal.close, onClickCancel]);
+  }, [modal, onClickCancel]);
 
   const element = useMemo(
     () => (
@@ -30,7 +30,7 @@ const useFirstProvideModal = ({
         onRequestClose={handleClose}
       />
     ),
-    [handleClose, modal.isOpen],
+    [addresses, handleClose, modal.isOpen],
   );
   useGlobalElement(element);
   return modal;

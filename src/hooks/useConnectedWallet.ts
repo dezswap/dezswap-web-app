@@ -1,3 +1,5 @@
+// TODO: rework this hook leveraging more of InterchainKit's features and simplifying the logic
+/* eslint-disable react-hooks/preserve-manual-memoization */
 import { WalletState } from "@interchain-kit/core";
 import { type SigningClient, useWalletManager } from "@interchain-kit/react";
 import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
