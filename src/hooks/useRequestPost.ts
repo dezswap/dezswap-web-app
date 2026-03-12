@@ -85,11 +85,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
         }
       }
     },
-    [
-      connectedWallet.walletAddress,
-      txBroadcastModal,
-      signingClient === undefined,
-    ],
+    [connectedWallet, txBroadcastModal, signingClient],
   );
 
   const handleConfirm = useCallback(async () => {

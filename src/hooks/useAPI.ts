@@ -301,7 +301,7 @@ const useAPI = (version: ApiVersion = "v1") => {
         res = [...res, ...parsed];
         lastAddress = res[res.length - 1].cont_addr;
         if (parsed.length < PLAY3_LIST_SIZE) break;
-      } catch (e) {
+      } catch {
         return res;
       }
     }

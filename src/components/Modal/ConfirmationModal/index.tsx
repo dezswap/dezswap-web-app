@@ -44,7 +44,6 @@ function ConfirmationModal({
       elDiv.appendChild(node);
       const inputs = elDiv.getElementsByTagName("input");
       Array.from(inputs).forEach((elInput) => {
-        // eslint-disable-next-line no-param-reassign
         elInput.size = elInput.value.length;
         elInput.setAttribute("value", elInput.value);
       });

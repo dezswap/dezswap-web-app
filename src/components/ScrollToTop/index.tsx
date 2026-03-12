@@ -13,7 +13,6 @@ function ScrollToTop({ children }: PropsWithChildren) {
       console.log(error);
     }
   }, []);
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 }
 

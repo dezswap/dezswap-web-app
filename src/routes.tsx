@@ -1,4 +1,4 @@
-import { Outlet, createBrowserRouter, useLocation } from "react-router-dom";
+import { Outlet, createBrowserRouter } from "react-router-dom";
 
 import SwapPageAsModal from "~/components/Modal/SwapModal";
 import Redirect from "~/components/Redirect";
@@ -15,6 +15,7 @@ import PoolDetailPage from "~/pages/Earn/Pools/PoolDetail";
 import ProvidePage from "~/pages/Earn/Pools/Provide";
 import WithdrawPage from "~/pages/Earn/Pools/Withdraw";
 import Error404 from "~/pages/Error404";
+import { ReplaceToEarn } from "~/pages/Legacy/ReplaceToEarn";
 import PlayAnalytics from "~/pages/PlayAnalytics";
 import PlayMain from "~/pages/PlayMain";
 import PlaygroundPage from "~/pages/Playground";
@@ -29,15 +30,6 @@ import WalletPage from "~/pages/Wallet";
 // import ClaimPage from "~/pages/Earn/Lockdrop/Claim";
 // import UnlockPage from "~/pages/Earn/Lockdrop/Unlock";
 // import CancelPage from "~/pages/Earn/Lockdrop/Cancel";
-
-// For legacy links
-function ReplaceToEarn() {
-  const location = useLocation();
-
-  return (
-    <Redirect to={`/earn${location.pathname}`.replace("/pool", "/pools")} />
-  );
-}
 
 const OutletWithDisclaimerAgreement = withDisclaimerAgreement(Outlet);
 

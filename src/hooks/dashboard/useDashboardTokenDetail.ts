@@ -17,7 +17,7 @@ const useDashboardTokenDetail = (tokenAddress?: string) => {
       try {
         const res = await api.dashboard.getTokenDetail(tokenAddress);
         return res;
-      } catch (error) {
+      } catch {
         return null;
       }
     },

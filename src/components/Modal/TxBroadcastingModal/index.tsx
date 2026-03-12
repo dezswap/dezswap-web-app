@@ -41,7 +41,6 @@ function TxBroadcastingModal({
   txError,
   isOpen,
   onDoneClick,
-  onRetryClick,
   ...modalProps
 }: ReactModal.Props & TxBroadcastingModalProps) {
   const {
