@@ -11,6 +11,8 @@ import {
 import { useScreenClass } from "react-grid-system";
 import { useBlocker, useSearchParams } from "react-router-dom";
 
+import { setNetworkName } from "~/api/custom-instance";
+
 import iconOverview from "~/assets/icons/icon-overview-24px.svg";
 import iconPool from "~/assets/icons/icon-pool.svg";
 import iconTrade from "~/assets/icons/icon-trade.svg";
@@ -154,6 +156,11 @@ function MainLayout({ children }: PropsWithChildren) {
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // sync network name with api instance
+  useEffect(() => {
+    setNetworkName(chainName);
+  }, [chainName]);
 
   const handleModalClose = useCallback(() => {
     const newParams = new URLSearchParams(searchParams);
