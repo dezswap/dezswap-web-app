@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { useQueryClient } from "@tanstack/react-query";
 import { WalletStatus, useWallet } from "@xpla/wallet-provider";
 import { useAtomValue } from "jotai";
 import {
@@ -157,10 +158,12 @@ function MainLayout({ children }: PropsWithChildren) {
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // sync network name with api instance
+  // sync network name with api instance and clear cache on network change
+  const queryClient = useQueryClient();
   useEffect(() => {
     setNetworkName(chainName);
-  }, [chainName]);
+    queryClient.clear();
+  }, [chainName, queryClient]);
 
   const handleModalClose = useCallback(() => {
     const newParams = new URLSearchParams(searchParams);
