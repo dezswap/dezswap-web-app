@@ -200,8 +200,11 @@ function WithdrawPage() {
     [explorers, asset2?.token],
   );
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens]);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -495,7 +498,7 @@ function WithdrawPage() {
                           symbol:
                             nativeTokens.find(
                               (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
+                                token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",
                         }}
                         amount={feeAmount}

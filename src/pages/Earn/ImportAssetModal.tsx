@@ -182,7 +182,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,
@@ -197,7 +197,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     if (onFinish && tokenInfo) {
       const asset = {
         ...tokenInfo,
-        chainId,
+        chainId: chainId ?? "",
         icon: iconSrc || "",
         protocol: "",
         token: address,

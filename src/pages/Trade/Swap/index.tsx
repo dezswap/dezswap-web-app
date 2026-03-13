@@ -353,8 +353,11 @@ function SwapPage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1Address, feeAmount);
 
@@ -391,7 +394,7 @@ function SwapPage() {
       walletAddress &&
       balanceApplied &&
       !isReversed &&
-      asset1Address === fees.feeTokens[0]?.denom &&
+      asset1Address === fees?.feeTokens[0]?.denom &&
       Number(asset1Value) &&
       Numeric.parse(asset1Value || 0).gt(
         Numeric.parse(
@@ -452,7 +455,7 @@ function SwapPage() {
   );
 
   useEffect(() => {
-    if (asset1Address === fees.feeTokens[0]?.denom) {
+    if (asset1Address === fees?.feeTokens[0]?.denom) {
       form.trigger(FormKey.asset1Value);
     }
   }, [form, asset1Address, asset2Address]);
@@ -1040,7 +1043,7 @@ function SwapPage() {
                           symbol:
                             nativeTokens.find(
                               (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
+                                token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",
                         }}
                         amount={feeAmount}
