@@ -1,0 +1,1630 @@
+{
+  "schemes": [],
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "title": "Dezswap API",
+    "contact": {},
+    "version": "0.0.1"
+  },
+  "host": "dezswap-api.dezswap.io",
+  "basePath": "/v1",
+  "paths": {
+    "/coingecko/pairs": {
+      "get": {
+        "description": "get Pairs",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coingecko"],
+        "summary": "All Pairs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/coingecko.PairRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/coingecko/pairs/{address}": {
+      "get": {
+        "description": "get Pair by Address",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coingecko"],
+        "summary": "Get a pair",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pair Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/coingecko.PairRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/coingecko/tickers": {
+      "get": {
+        "description": "get Tickers",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coingecko"],
+        "summary": "All Tickers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/coingecko.TickerRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/coingecko/tickers/{id}": {
+      "get": {
+        "description": "get Ticker by Id",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coingecko"],
+        "summary": "Get a ticker",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Ticker ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/coingecko.TickerRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/coinmarketcap/tickers": {
+      "get": {
+        "description": "get Tickers",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coinmarketcap"],
+        "summary": "All Tickers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/coinmarketcap.TickersRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/coinmarketcap/tickers/{id}": {
+      "get": {
+        "description": "get Ticker by Id",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["coinmarketcap"],
+        "summary": "Get a ticker",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Ticker ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/coinmarketcap.TickerRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/chart/pools/{address}/{type}": {
+      "get": {
+        "description": "get Charts data",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Charts of Dezswap's Pool",
+        "parameters": [
+          {
+            "enum": ["year", "quarter", "month"],
+            "type": "string",
+            "description": "default(empty) value is all",
+            "name": "duration",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pool Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          },
+          {
+            "enum": ["volume", "tvl", "apr", "fee"],
+            "type": "string",
+            "description": "chart type",
+            "name": "type",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.ChartItem"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/chart/tokens/{address}/{type}": {
+      "get": {
+        "description": "get Charts data",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Charts of Dezswap's Pool related a given token",
+        "parameters": [
+          {
+            "enum": ["year", "quarter", "month"],
+            "type": "string",
+            "description": "default(empty) value is all",
+            "name": "duration",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Token Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          },
+          {
+            "enum": ["volume", "tvl", "price"],
+            "type": "string",
+            "description": "chart type",
+            "name": "type",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.ChartItem"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/chart/{type}": {
+      "get": {
+        "description": "get Charts data",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Charts of Dezswap's Pools",
+        "parameters": [
+          {
+            "enum": ["year", "quarter", "month"],
+            "type": "string",
+            "description": "default(empty) value is all",
+            "name": "duration",
+            "in": "query"
+          },
+          {
+            "enum": ["volume", "tvl", "apr", "fee"],
+            "type": "string",
+            "description": "chart type",
+            "name": "type",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.ChartItem"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/pools": {
+      "get": {
+        "description": "get Pools data of dezswap (address, tvl, volume, fee, apr)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's Pools",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "token address",
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.PoolRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/pools/{address}": {
+      "get": {
+        "description": "get Pool's detail information of dezswap",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's Pool Detail",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pool Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/dashboard.PoolDetailRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/recent": {
+      "get": {
+        "description": "get Recent",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Recent 24H data with it's change rate",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/dashboard.RecentRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/statistics": {
+      "get": {
+        "description": "get Statistic data of dezswap (address count, tx count, fee)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's statistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.StatisticResItem"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/tokens": {
+      "get": {
+        "description": "get Tokens data of dezswap (address, price, priceChange, volume, tvl)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's Tokens",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.TokenRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/tokens/{address}": {
+      "get": {
+        "description": "get Token data of dezswap (address, price, price_change, volume_24h,  volume_24h_change, volume_7d, volume_7d_change, tvl)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's Token Stats",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "token address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/dashboard.TokenRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/txs": {
+      "get": {
+        "description": "get Transactions data of dezswap",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["dashboard"],
+        "summary": "Dezswap's Transactions",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pool address",
+            "name": "pool",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Token addresses",
+            "name": "token",
+            "in": "query"
+          },
+          {
+            "enum": ["swap", "add", "remove"],
+            "type": "string",
+            "description": "Transaction type, empty value is for all types",
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dashboard.TxRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Checks overall service and dependency health",
+        "produces": ["application/json"],
+        "tags": ["status"],
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.HealthResponse"
+            }
+          }
+        }
+      }
+    },
+    "/notices": {
+      "get": {
+        "description": "get Notices",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["notice"],
+        "summary": "Notices of the chain",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "target chain name e.g. (dimension, cube)",
+            "name": "chain",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "the starting timestamp in Unix timestamp format e.g. 1696917605 (default: three months prior to the current time)",
+            "name": "startTs",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "condition to get items after the id",
+            "name": "after",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "the number of items to return (default: 10)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "order of items to return (default: descending order)",
+            "name": "asc",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/notice.noticeItem"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/pairs": {
+      "get": {
+        "description": "get Pairs",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "All Pairs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.PairsRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/pairs/{address}": {
+      "get": {
+        "description": "get Pair by Address",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "Get a pair",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pair Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.PairRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/pools": {
+      "get": {
+        "description": "get Pools",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "All Pools",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/controller.PoolRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/pools/{address}": {
+      "get": {
+        "description": "get Pool by Address",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "Get a pool",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pool Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.PoolRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/routes": {
+      "get": {
+        "description": "get routes based on the given token address",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["router"],
+        "summary": "All Routes",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Offer token address",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Ask token Address",
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Number of hops between the starting token and the ending token",
+            "name": "hopCount",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/router.RouteRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "description": "get pair stats",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "All pair stats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.StatsRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/stats/{period}": {
+      "get": {
+        "description": "get a pair stat by period",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "Get a stat",
+        "parameters": [
+          {
+            "enum": ["24h", "7d", "1mon"],
+            "type": "string",
+            "description": "period 24h,7d,1mon",
+            "name": "period",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.StatRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/tokens": {
+      "get": {
+        "description": "get Tokens",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "All Tokens",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/controller.TokenRes"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/tokens/{address}": {
+      "get": {
+        "description": "get Token by Address",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "summary": "Get a token",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Token Address",
+            "name": "address",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/controller.TokenRes"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/httputil.BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/httputil.NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/httputil.InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "description": "Returns the current application version",
+        "produces": ["application/json"],
+        "tags": ["status"],
+        "summary": "Get application version",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "coingecko.PairRes": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "string"
+        },
+        "pool_id": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "ticker_id": {
+          "type": "string"
+        }
+      }
+    },
+    "coingecko.TickerRes": {
+      "type": "object",
+      "properties": {
+        "base_currency": {
+          "type": "string"
+        },
+        "base_volume": {
+          "type": "string"
+        },
+        "last_price": {
+          "type": "string"
+        },
+        "liquidity_in_usd": {
+          "type": "string"
+        },
+        "pool_id": {
+          "type": "string"
+        },
+        "target_currency": {
+          "type": "string"
+        },
+        "target_volume": {
+          "type": "string"
+        },
+        "ticker_id": {
+          "type": "string"
+        }
+      }
+    },
+    "coinmarketcap.TickerRes": {
+      "type": "object",
+      "properties": {
+        "base_id": {
+          "type": "string"
+        },
+        "base_name": {
+          "type": "string"
+        },
+        "base_symbol": {
+          "type": "string"
+        },
+        "base_volume": {
+          "type": "string"
+        },
+        "last_price": {
+          "type": "string"
+        },
+        "quote_id": {
+          "type": "string"
+        },
+        "quote_name": {
+          "type": "string"
+        },
+        "quote_symbol": {
+          "type": "string"
+        },
+        "quote_volume": {
+          "type": "string"
+        }
+      }
+    },
+    "coinmarketcap.TickersRes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/coinmarketcap.TickerRes"
+      }
+    },
+    "controller.HealthDependency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "controller.HealthResponse": {
+      "type": "object",
+      "properties": {
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/controller.HealthDependency"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "controller.PairRes": {
+      "type": "object",
+      "properties": {
+        "asset_decimals": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "asset_infos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dezswap.AssetInfoTokenRes"
+          }
+        },
+        "contract_addr": {
+          "type": "string"
+        },
+        "liquidity_token": {
+          "type": "string"
+        }
+      }
+    },
+    "controller.PairsRes": {
+      "type": "object",
+      "properties": {
+        "pairs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/controller.PairRes"
+          }
+        }
+      }
+    },
+    "controller.PoolRes": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dezswap.AssetInfoRes"
+          }
+        },
+        "total_share": {
+          "type": "string"
+        }
+      }
+    },
+    "controller.StatRes": {
+      "type": "object",
+      "properties": {
+        "apr": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/controller.StatValueRes"
+          }
+        },
+        "fee": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/controller.StatValueRes"
+          }
+        },
+        "volume": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/controller.StatValueRes"
+          }
+        }
+      }
+    },
+    "controller.StatValueRes": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "controller.StatsRes": {
+      "type": "object",
+      "properties": {
+        "stats_1mon": {
+          "$ref": "#/definitions/controller.StatRes"
+        },
+        "stats_24h": {
+          "$ref": "#/definitions/controller.StatRes"
+        },
+        "stats_7d": {
+          "$ref": "#/definitions/controller.StatRes"
+        }
+      }
+    },
+    "controller.TokenRes": {
+      "type": "object",
+      "properties": {
+        "chainId": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "total_supply": {
+          "type": "string"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "dashboard.ChartItem": {
+      "type": "object",
+      "properties": {
+        "t": {
+          "type": "string"
+        },
+        "v": {
+          "type": "string"
+        }
+      }
+    },
+    "dashboard.PoolDetailRes": {
+      "type": "object",
+      "properties": {
+        "recent": {
+          "$ref": "#/definitions/dashboard.RecentRes"
+        },
+        "txs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dashboard.TxRes"
+          }
+        }
+      }
+    },
+    "dashboard.PoolRes": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "apr": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "string"
+        },
+        "tvl": {
+          "type": "string"
+        },
+        "volume": {
+          "type": "string"
+        }
+      }
+    },
+    "dashboard.RecentRes": {
+      "type": "object",
+      "properties": {
+        "apr": {
+          "type": "number"
+        },
+        "aprChangeRate": {
+          "type": "number"
+        },
+        "fee": {
+          "type": "string"
+        },
+        "feeChangeRate": {
+          "type": "number"
+        },
+        "tvl": {
+          "type": "string"
+        },
+        "tvlChangeRate": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "string"
+        },
+        "volumeChangeRate": {
+          "type": "number"
+        }
+      }
+    },
+    "dashboard.StatisticResItem": {
+      "type": "object",
+      "properties": {
+        "addressCount": {
+          "type": "integer"
+        },
+        "fee": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "txCount": {
+          "type": "integer"
+        }
+      }
+    },
+    "dashboard.TokenRes": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "string"
+        },
+        "price": {
+          "type": "string"
+        },
+        "priceChange": {
+          "type": "number"
+        },
+        "tvl": {
+          "type": "string"
+        },
+        "tvlChange": {
+          "type": "string"
+        },
+        "volume24h": {
+          "type": "string"
+        },
+        "volume24hChange": {
+          "type": "string"
+        },
+        "volume7d": {
+          "type": "string"
+        },
+        "volume7dChange": {
+          "type": "string"
+        }
+      }
+    },
+    "dashboard.TxRes": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "actionDisplay": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "asset0": {
+          "type": "string"
+        },
+        "asset0amount": {
+          "type": "string"
+        },
+        "asset1": {
+          "type": "string"
+        },
+        "asset1amount": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "totalValue": {
+          "type": "string"
+        }
+      }
+    },
+    "dezswap.AssetInfoRes": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "info": {
+          "$ref": "#/definitions/dezswap.AssetInfoTokenRes"
+        }
+      }
+    },
+    "dezswap.AssetInfoTokenRes": {
+      "type": "object",
+      "properties": {
+        "native_token": {
+          "$ref": "#/definitions/dezswap.NativeTokenAssetInfoRes"
+        },
+        "token": {
+          "$ref": "#/definitions/dezswap.TokenAssetInfoRes"
+        }
+      }
+    },
+    "dezswap.NativeTokenAssetInfoRes": {
+      "type": "object",
+      "properties": {
+        "denom": {
+          "type": "string"
+        }
+      }
+    },
+    "dezswap.TokenAssetInfoRes": {
+      "type": "object",
+      "properties": {
+        "contract_addr": {
+          "type": "string"
+        }
+      }
+    },
+    "httputil.BadRequestError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "example": 400
+        },
+        "message": {
+          "type": "string",
+          "example": "bad request"
+        }
+      }
+    },
+    "httputil.InternalServerError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "example": 500
+        },
+        "message": {
+          "type": "string",
+          "example": "internal server error"
+        }
+      }
+    },
+    "httputil.NotFoundError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "example": 404
+        },
+        "message": {
+          "type": "string",
+          "example": "not found"
+        }
+      }
+    },
+    "notice.noticeItem": {
+      "type": "object",
+      "properties": {
+        "chain": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "router.RouteRes": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "hopCount": {
+          "type": "integer"
+        },
+        "route": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
