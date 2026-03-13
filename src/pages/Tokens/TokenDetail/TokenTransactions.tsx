@@ -1,9 +1,9 @@
+import { useGetDashboardTxs } from "~/api/dezswap";
+
 import DashboardTransactionTable from "~/components/DashboardTransactionTable";
 
-import useDashboardTransactions from "./useDashboardTransactions";
-
 function TokenTransactions({ tokenAddress }: { tokenAddress: string }) {
-  const transactions = useDashboardTransactions(tokenAddress);
+  const { data: transactions } = useGetDashboardTxs({ token: tokenAddress });
   return <DashboardTransactionTable data={transactions || []} />;
 }
 

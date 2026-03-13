@@ -5,6 +5,8 @@ import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
 
+import { useGetDashboardPoolsAddress } from "~/api/dezswap";
+
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
 
@@ -22,7 +24,6 @@ import Typography from "~/components/Typography";
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
@@ -74,7 +75,10 @@ function PoolDetailPage() {
     return poolAddress ? getPair(poolAddress) : undefined;
   }, [poolAddress, getPair]);
 
-  const dashboardPoolData = useDashboardPoolDetail(poolAddress || "");
+  const { data: dashboardPoolData } = useGetDashboardPoolsAddress(
+    poolAddress || "",
+    { query: { enabled: !!poolAddress } },
+  );
   const { data: asset0 } = useAsset(pair?.asset_addresses?.[0]);
   const { data: asset1 } = useAsset(pair?.asset_addresses?.[1]);
 

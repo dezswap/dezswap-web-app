@@ -3,6 +3,8 @@ import styled from "@emotion/styled";
 import { type ComponentProps } from "react";
 import { Col, Row } from "react-grid-system";
 
+import type { DashboardTokenRes } from "~/api/dezswap/models";
+
 import AssetIcon from "~/components/AssetIcon";
 import Link from "~/components/Link";
 import Typography from "~/components/Typography";
@@ -14,11 +16,9 @@ import useAssets from "~/hooks/useAssets";
 
 import Expand from "~/pages/Earn/Expand";
 
-import { DashboardToken } from "~/types/dashboard-api";
-
 interface MobileTokenItemProps {
   number: number;
-  token: DashboardToken;
+  token: DashboardTokenRes;
 }
 
 const Content = styled.div`

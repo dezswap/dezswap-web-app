@@ -14,6 +14,8 @@ import {
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm, useWatch } from "react-hook-form";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import iconDefaultAsset from "~/assets/icons/icon-default-token.svg";
 import iconSwapHover from "~/assets/icons/icon-from-to-hover.svg";
 import iconSwap from "~/assets/icons/icon-from-to.svg";
@@ -40,7 +42,6 @@ import {
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useFirstProvideModal from "~/hooks/modals/useFirstProvideModal";
 import useAsset from "~/hooks/useAsset";
@@ -201,8 +202,14 @@ function SwapPage() {
   const { data: asset1 } = useAsset(asset1Address);
   const { data: asset2 } = useAsset(asset2Address);
 
-  const dashboardToken1 = useDashboardTokenDetail(asset1Address);
-  const dashboardToken2 = useDashboardTokenDetail(asset2Address);
+  const { data: dashboardToken1 } = useGetDashboardTokensAddress(
+    asset1Address ?? "",
+    { query: { enabled: !!asset1Address, staleTime: 1000 * 60 * 5 } },
+  );
+  const { data: dashboardToken2 } = useGetDashboardTokensAddress(
+    asset2Address ?? "",
+    { query: { enabled: !!asset2Address, staleTime: 1000 * 60 * 5 } },
+  );
 
   const simulationResult = useSimulate({
     fromAddress: asset1Address,

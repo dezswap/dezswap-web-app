@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet } from "react-router-dom";
 
+import { useGetDashboardPools } from "~/api/dezswap";
+
 import Link from "~/components/Link";
 import Pagination from "~/components/Pagination";
 import Panel from "~/components/Panel";
@@ -14,11 +16,10 @@ import Typography from "~/components/Typography";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useBalances from "~/hooks/useBalances";
 import usePairBookmark from "~/hooks/usePairBookmark";
 import usePairs from "~/hooks/usePairs";
-import usePools from "~/hooks/usePools";
+import { usePools } from "~/hooks/usePools";
 import useSearchParamState from "~/hooks/useSearchParamState";
 
 import { DashboardPool } from "~/types/dashboard-api";
@@ -53,8 +54,8 @@ function PoolPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const { findPair, getPair } = usePairs();
   const { bookmarks, toggleBookmark } = usePairBookmark();
-  const { pools: dashboardPools } = useDashboard();
-  const { pools } = usePools();
+  const { data: dashboardPools } = useGetDashboardPools();
+  const { data: pools } = usePools();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const notListedPools = useMemo(() => {

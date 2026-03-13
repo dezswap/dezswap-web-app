@@ -4,13 +4,14 @@ import { Numeric } from "@xpla/xpla.js";
 import { type ComponentProps, useMemo } from "react";
 import { Col, Row } from "react-grid-system";
 
+import { useGetDashboardTokens } from "~/api/dezswap";
+
 import AssetIcon from "~/components/AssetIcon";
 import Hr from "~/components/Hr";
 import Panel from "~/components/Panel";
 import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAsset from "~/hooks/useAsset";
 
 import { formatDecimals, formatNumber } from "~/utils";
@@ -72,7 +73,7 @@ function PriceAndChangeRate({
 }
 
 function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
-  const { tokens } = useDashboard();
+  const { data: tokens } = useGetDashboardTokens();
   const { data: asset } = useAsset(tokenAddress);
 
   const dashboardToken = useMemo(() => {
