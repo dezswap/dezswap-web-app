@@ -3,6 +3,8 @@ import styled from "@emotion/styled";
 import { type ComponentProps, useId, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import { useGetDashboardStatistics } from "~/api/dezswap";
+
 import iconFullscreen from "~/assets/icons/icon-fullscreen.svg";
 
 import IconButton from "~/components/IconButton";
@@ -14,7 +16,6 @@ import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useHashModal from "~/hooks/useHashModal";
 
 import Select from "~/pages/Earn/Pools/Select";
@@ -210,7 +211,7 @@ function Charts() {
   const tvl = useChartData("tvl");
   // const fee = useChartData("fee");
 
-  const { statistics } = useDashboard();
+  const { data: statistics } = useGetDashboardStatistics();
 
   // TODO: Refactor
   const addresses: DashboardChartItem[] =

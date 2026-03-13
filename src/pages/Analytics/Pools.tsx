@@ -1,9 +1,9 @@
+import { useGetDashboardPools } from "~/api/dezswap";
+
 import DashboardPoolTable from "~/components/DashboardPoolTable";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
-
 function Pools() {
-  const { pools } = useDashboard();
+  const { data: pools } = useGetDashboardPools();
 
   return <DashboardPoolTable data={pools || []} />;
 }

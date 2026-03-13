@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { useGetDashboardTxs } from "~/api/dezswap";
+
 import DashboardTransactionTable from "~/components/DashboardTransactionTable";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAPI from "~/hooks/useAPI";
 import useNetwork from "~/hooks/useNetwork";
 
@@ -11,7 +12,7 @@ function Transactions({ whiteList }: { whiteList?: string[] }) {
     selectedChain: { chainId },
   } = useNetwork();
   const api = useAPI();
-  const { transactions } = useDashboard();
+  const { data: transactions } = useGetDashboardTxs();
 
   const { data: filteredTx = [] } = useQuery({
     queryKey: ["dashboard", "transactions", whiteList, chainId],

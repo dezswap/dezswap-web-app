@@ -3,6 +3,8 @@ import { Numeric } from "@xpla/xpla.js";
 import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import { useGetDashboardTokens } from "~/api/dezswap";
+
 import AssetIcon from "~/components/AssetIcon";
 import Box from "~/components/Box";
 import Link from "~/components/Link";
@@ -14,13 +16,12 @@ import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAssets from "~/hooks/useAssets";
 
 function TopMovers({ whiteList }: { whiteList?: string[] }) {
   const screenClass = useScreenClass();
   const { assetInfos } = useAssets();
-  const { tokens } = useDashboard();
+  const { data: tokens } = useGetDashboardTokens();
   const topMovingTokens = useMemo(() => {
     const tokenList = whiteList
       ? tokens?.filter((token) => whiteList.includes(token.address))

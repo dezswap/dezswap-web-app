@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { useQueryClient } from "@tanstack/react-query";
 import { WalletStatus, useWallet } from "@xpla/wallet-provider";
 import { useAtomValue } from "jotai";
 import {
@@ -10,6 +11,8 @@ import {
 } from "react";
 import { useScreenClass } from "react-grid-system";
 import { useBlocker, useSearchParams } from "react-router-dom";
+
+import { setNetworkName } from "~/api/custom-instance";
 
 import iconOverview from "~/assets/icons/icon-overview-24px.svg";
 import iconPool from "~/assets/icons/icon-pool.svg";
@@ -154,6 +157,13 @@ function MainLayout({ children }: PropsWithChildren) {
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // sync network name with api instance and clear cache on network change
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    setNetworkName(chainName);
+    queryClient.clear();
+  }, [chainName, queryClient]);
 
   const handleModalClose = useCallback(() => {
     const newParams = new URLSearchParams(searchParams);

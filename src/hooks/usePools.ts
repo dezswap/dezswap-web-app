@@ -1,20 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useGetPools } from "~/api/dezswap";
+import type {
+  ControllerPoolRes,
+  DezswapAssetInfoRes,
+} from "~/api/dezswap/models";
 
-import useAPI from "./useAPI";
-import useNetwork from "./useNetwork";
+// TODO: check this is required for real
+type PoolAsset = Omit<DezswapAssetInfoRes, "amount"> & { amount: string };
 
-const usePools = () => {
-  const { chainName } = useNetwork();
-  const api = useAPI();
-  const { data: pools } = useQuery({
-    queryKey: ["pools", chainName],
-    queryFn: async () => {
-      const res = await api.getPools();
-      return res;
-    },
-  });
-
-  return { pools };
+type Pool = Omit<ControllerPoolRes, "assets"> & {
+  assets: [PoolAsset, PoolAsset];
 };
 
-export default usePools;
+export const usePools = useGetPools<Pool[]>;
+export type { Pool, PoolAsset };

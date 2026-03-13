@@ -13,9 +13,8 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useBalances from "~/hooks/useBalances";
 import usePairBookmark from "~/hooks/usePairBookmark";
 import usePairs from "~/hooks/usePairs";
-import usePools from "~/hooks/usePools";
-
-import { Pool } from "~/types/api";
+import { usePools } from "~/hooks/usePools";
+import type { Pool } from "~/hooks/usePools";
 
 import PoolItem from "./PoolItem";
 
@@ -43,7 +42,7 @@ function Pools() {
   );
   const [selectedTabIndex, setSelectedIndex] = useState(0);
   const { getPair } = usePairs();
-  const { pools } = usePools();
+  const { data: pools } = usePools();
   const { bookmarks, toggleBookmark } = usePairBookmark();
   const balances = useBalances(
     pools?.map((pool) => getPair(pool.address)?.liquidity_token || "") || [],

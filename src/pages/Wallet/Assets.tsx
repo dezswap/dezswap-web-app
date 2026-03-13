@@ -3,6 +3,8 @@ import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import { useGetDashboardTokens } from "~/api/dezswap";
+
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
 
@@ -19,7 +21,6 @@ import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAssets from "~/hooks/useAssets";
 import useBalances from "~/hooks/useBalances";
 import useBookmark from "~/hooks/useBookmark";
@@ -55,7 +56,7 @@ function Assets() {
   );
   const { availableAssetAddresses } = usePairs();
   const { assetInfos } = useAssets();
-  const { tokens: dashboardTokens } = useDashboard();
+  const { data: dashboardTokens } = useGetDashboardTokens();
 
   const balances = useBalances(availableAssetAddresses);
   const { bookmarks, toggleBookmark } = useBookmark();
