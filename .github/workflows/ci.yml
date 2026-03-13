@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository 📝
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/install
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm prettier --check **/*.{ts,tsx}
+
+      - name: Unit Test
+        run: pnpm test --reporter=verbose
+
+      - name: Build
+        run: pnpm build
