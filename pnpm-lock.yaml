@@ -138,6 +138,9 @@ importers:
         specifier: ^6.3.7
         version: 6.3.7
     devDependencies:
+      '@chain-registry/types':
+        specifier: ^2.0.167
+        version: 2.0.167
       '@chain-registry/v2-types':
         specifier: 0.53.146
         version: 0.53.146
@@ -315,8 +318,8 @@ packages:
   '@chain-registry/keplr@2.0.130':
     resolution: {integrity: sha512-u/76uOJW+CuvGNh4+hPX36JpaDaYMGdPvWLG80gyX0mqc1Jle0BcI9Z8MaTb7DhnVeVuTyzpZmP4I35ncJiyYg==}
 
-  '@chain-registry/types@2.0.130':
-    resolution: {integrity: sha512-W7Whr4iZmNR+XMcgjVbB+5QPA8+5buaM1v7vTOsFf/puH93NNEHaUUCaGgFIwgDAhDic8g4CjrIpKgWO/Ya9nw==}
+  '@chain-registry/types@2.0.167':
+    resolution: {integrity: sha512-Z5Js+M8w/qOmO+bB2lM4R1013/E9ExApGK3QdcnudE+cnd+aSdXoMYuN61El8Xmvss9lTnmTJGWlm4pN44sXLQ==}
 
   '@chain-registry/v2-types@0.53.146':
     resolution: {integrity: sha512-GnqdNnEJ+ZTAc/0S9fQbwL5GpIvF3LZ/P3o6qh6EyITSiRA1Y55FXs59eSddltpPX5EgyWDwNpJjY+Q5uYlAkA==}
@@ -5015,14 +5018,14 @@ snapshots:
 
   '@chain-registry/keplr@2.0.130':
     dependencies:
-      '@chain-registry/types': 2.0.130
+      '@chain-registry/types': 2.0.167
       '@keplr-wallet/cosmos': 0.12.28
       '@keplr-wallet/crypto': 0.12.28
       '@types/semver': 7.7.1
       chain-registry: 2.0.130
       semver: 7.7.3
 
-  '@chain-registry/types@2.0.130': {}
+  '@chain-registry/types@2.0.167': {}
 
   '@chain-registry/v2-types@0.53.146': {}
 
@@ -5589,7 +5592,7 @@ snapshots:
   '@interchain-kit/core@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
       '@chain-registry/keplr': 2.0.130
-      '@chain-registry/types': 2.0.130
+      '@chain-registry/types': 2.0.167
       '@interchainjs/cosmos': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/cosmos-types': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
       '@interchainjs/types': 1.11.11
@@ -5701,7 +5704,7 @@ snapshots:
 
   '@interchain-kit/react@0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
-      '@chain-registry/types': 2.0.130
+      '@chain-registry/types': 2.0.167
       '@interchain-kit/core': 0.3.42(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchain-ui/react': 1.26.3(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@interchainjs/cosmos': 1.11.11(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
@@ -8583,7 +8586,7 @@ snapshots:
 
   chain-registry@2.0.130:
     dependencies:
-      '@chain-registry/types': 2.0.130
+      '@chain-registry/types': 2.0.167
 
   chalk@2.4.2:
     dependencies:
