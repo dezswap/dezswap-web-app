@@ -154,8 +154,11 @@ function StakePage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens[0]]);
 
   const buttonMsg = useMemo(() => {
     if (lpValue && Numeric.parse(lpValue).gt(0)) {
@@ -405,7 +408,8 @@ function StakePage() {
                       asset={{
                         symbol:
                           nativeTokens.find(
-                            (token) => token.token === fees.feeTokens[0]?.denom,
+                            (token) =>
+                              token.token === fees?.feeTokens[0]?.denom,
                           )?.symbol || "",
                       }}
                       amount={feeAmount}

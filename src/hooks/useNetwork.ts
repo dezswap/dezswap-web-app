@@ -38,7 +38,7 @@ const useNetwork = () => {
   const [network, setNetwork] = useState<NetworkInfo>({
     chainName,
     selectedChain,
-    rpcUrl: selectedChain?.apis?.rpc?.[0]?.address,
+    rpcUrl: selectedChain?.apis?.rpc?.[0]?.address || "",
   });
 
   useEffect(() => {

@@ -509,7 +509,7 @@ function Header() {
                         alt={prettyName}
                       />
                       {screenClass !== MOBILE_SCREEN_CLASS &&
-                        prettyName.replace("Fetch.ai", "ASI")}
+                        prettyName?.replace("Fetch.ai", "ASI")}
                     </ChainButton>
                   </Col>
                   <Col width="auto">
