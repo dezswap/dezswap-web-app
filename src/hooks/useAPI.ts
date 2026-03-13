@@ -343,7 +343,7 @@ const useAPI = (version: ApiVersion = "v1") => {
       const fee = await calculateFee(
         { gasUsed: res?.gasInfo?.gasUsed },
         getGasInfo(chainName),
-        () => Promise.resolve(chainId),
+        chainId ? () => Promise.resolve(chainId) : undefined,
       );
 
       return fee;

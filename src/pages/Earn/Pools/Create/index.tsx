@@ -197,8 +197,11 @@ function CreatePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens]);
 
   const asset1Balance = useBalanceMinusFee(asset1?.token, feeAmount);
   const asset2Balance = useBalanceMinusFee(asset2?.token, feeAmount);
@@ -207,7 +210,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset1?.token === fees.feeTokens[0]?.denom &&
+      asset1?.token === fees?.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(amountToValue(asset1Balance, asset1?.decimals) || 0),
@@ -235,7 +238,7 @@ function CreatePage() {
     if (
       walletAddress &&
       balanceApplied &&
-      asset2?.token === fees.feeTokens[0]?.denom &&
+      asset2?.token === fees?.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(amountToValue(asset2Balance, asset2?.decimals) || 0),
@@ -493,7 +496,7 @@ function CreatePage() {
                           symbol:
                             nativeTokens.find(
                               (token) =>
-                                token.token === fees.feeTokens[0]?.denom,
+                                token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",
                         }}
                         amount={feeAmount}

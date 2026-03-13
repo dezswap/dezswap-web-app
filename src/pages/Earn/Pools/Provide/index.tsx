@@ -227,8 +227,11 @@ function ProvidePage() {
   } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens]);
 
   const asset1BalanceMinusFee = useBalanceMinusFee(asset1?.token, feeAmount);
 
@@ -314,7 +317,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (!isReversed || isPoolEmpty) &&
-      asset1?.token === fees.feeTokens[0]?.denom &&
+      asset1?.token === fees?.feeTokens[0]?.denom &&
       formData.asset1Value &&
       Numeric.parse(formData.asset1Value || 0).gt(
         Numeric.parse(
@@ -337,7 +340,7 @@ function ProvidePage() {
       walletAddress &&
       balanceApplied &&
       (isReversed || isPoolEmpty) &&
-      asset2?.token === fees.feeTokens[0]?.denom &&
+      asset2?.token === fees?.feeTokens[0]?.denom &&
       formData.asset2Value &&
       Numeric.parse(formData.asset2Value || 0).gt(
         Numeric.parse(
@@ -570,7 +573,7 @@ function ProvidePage() {
                                 symbol:
                                   nativeTokens.find(
                                     (token) =>
-                                      token.token === fees.feeTokens[0]?.denom,
+                                      token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",
                               }}
                               amount={feeAmount}
@@ -680,7 +683,7 @@ function ProvidePage() {
                                 symbol:
                                   nativeTokens.find(
                                     (token) =>
-                                      token.token === fees.feeTokens[0]?.denom,
+                                      token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",
                               }}
                               amount={feeAmount}
