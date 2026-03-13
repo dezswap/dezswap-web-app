@@ -9,6 +9,11 @@ import MainLayout from "~/layout/Main";
 
 import AnalyticsPage from "~/pages/Analytics";
 import EarnPage from "~/pages/Earn";
+import LockdropPage from "~/pages/Earn/Lockdrop";
+import CancelPage from "~/pages/Earn/Lockdrop/Cancel";
+import ClaimPage from "~/pages/Earn/Lockdrop/Claim";
+import StakePage from "~/pages/Earn/Lockdrop/Stake";
+import UnlockPage from "~/pages/Earn/Lockdrop/Unlock";
 import PoolPage from "~/pages/Earn/Pools";
 import CreatePage from "~/pages/Earn/Pools/Create";
 import PoolDetailPage from "~/pages/Earn/Pools/PoolDetail";
@@ -22,13 +27,6 @@ import TokenDetailPage from "~/pages/Tokens/TokenDetail";
 import TradePage from "~/pages/Trade";
 import SwapPage from "~/pages/Trade/Swap";
 import WalletPage from "~/pages/Wallet";
-
-// TODO: uncomment when lockdrop is ready
-// import LockdropPage from "~/pages/Earn/Lockdrop";
-// import StakePage from "~/pages/Earn/Lockdrop/Stake";
-// import ClaimPage from "~/pages/Earn/Lockdrop/Claim";
-// import UnlockPage from "~/pages/Earn/Lockdrop/Unlock";
-// import CancelPage from "~/pages/Earn/Lockdrop/Cancel";
 
 // For legacy links
 function ReplaceToEarn() {
@@ -102,22 +100,21 @@ const routes = createBrowserRouter([
               { path: "*", element: <Error404 /> },
             ],
           },
-          // TODO: uncomment when lockdrop is ready
-          // {
-          //   path: "lockdrop",
-          //   element: <LockdropPage />,
-          //   children: [
-          //     {
-          //       path: ":eventAddress",
-          //       children: [
-          //         { index: true, element: <StakePage /> },
-          //         { path: "claim", element: <ClaimPage /> },
-          //         { path: "unlock", element: <UnlockPage /> },
-          //         { path: "cancel", element: <CancelPage /> },
-          //       ],
-          //     },
-          //   ],
-          // },
+          {
+            path: "lockdrop",
+            element: <LockdropPage />,
+            children: [
+              {
+                path: ":eventAddress",
+                children: [
+                  { index: true, element: <StakePage /> },
+                  { path: "claim", element: <ClaimPage /> },
+                  { path: "unlock", element: <UnlockPage /> },
+                  { path: "cancel", element: <CancelPage /> },
+                ],
+              },
+            ],
+          },
           { index: true, element: <Redirect to="pools" /> },
         ],
       },

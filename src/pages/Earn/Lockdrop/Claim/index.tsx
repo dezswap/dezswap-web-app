@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
-import { Numeric } from "@xpla/xpla.js";
+import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -18,6 +18,7 @@ import Modal from "~/components/Modal";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
 import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
@@ -33,14 +34,7 @@ import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
 
-import {
-  amountToValue,
-  cutDecimal,
-  ellipsisCenter,
-  formatDecimals,
-  formatNumber,
-  getTokenLink,
-} from "~/utils";
+import { ellipsisCenter, getTokenLink } from "~/utils";
 import { generateClaimLockdropMsg } from "~/utils/dezswap";
 
 const Box = styled(box)`
@@ -171,9 +165,10 @@ function ClaimPage() {
   );
 
   useEffect(() => {
-    const checkValidation = async () => {
+    const checkValidation = () => {
       if (
-        !(await validate(eventAddress || "")) ||
+        // TODO: isContractAddress
+        !AccAddress.validate(eventAddress || "") ||
         lockdropEventInfoError ||
         lockdropUserInfoError ||
         (!lockdropEventInfoError &&
@@ -239,17 +234,15 @@ function ClaimPage() {
                 display: inline-block;
               `}
             >
-              {lockupInfo
-                ? formatNumber(
-                    formatDecimals(
-                      amountToValue(
-                        lockupInfo.claimable || 0,
-                        rewardAsset?.decimals,
-                      ) || "",
-                      2,
-                    ),
-                  )
-                : ""}
+              {lockupInfo ? (
+                <AssetValueFormatter
+                  amount={lockupInfo.claimable}
+                  asset={rewardAsset}
+                  showSymbol={false}
+                />
+              ) : (
+                ""
+              )}
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -304,15 +297,15 @@ function ClaimPage() {
                   {
                     key: "shareOfPool",
                     label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                    value: `${cutDecimal(
-                      Numeric.parse(lockupInfo?.total_reward || "0")
-                        .dividedBy(
-                          lockdropEventInfo?.total_lockdrop_reward || "1",
-                        )
-                        .mul(100)
-                        .toString(),
-                      2,
-                    )}%`,
+                    value: (
+                      <PercentageFormatter
+                        value={Numeric.parse(lockupInfo?.total_reward || "0")
+                          .dividedBy(
+                            lockdropEventInfo?.total_lockdrop_reward || "1",
+                          )
+                          .mul(100)}
+                      />
+                    ),
                   },
                 ]}
               />

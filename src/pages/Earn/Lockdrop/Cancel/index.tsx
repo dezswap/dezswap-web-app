@@ -19,9 +19,10 @@ import Modal from "~/components/Modal";
 import TooltipWithIcon from "~/components/Tooltip/TooltipWithIcon";
 import Typography from "~/components/Typography";
 import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
+import PercentageFormatter from "~/components/utils/PercentageFormatter";
 
 import { LP_DECIMALS } from "~/constants/dezswap";
-import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
+import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
@@ -263,15 +264,11 @@ function CancelPage() {
                 display: inline-block;
               `}
             >
-              {formatNumber(
-                cutDecimal(
-                  amountToValue(
-                    lockupInfo?.total_reward || "0",
-                    rewardAsset?.decimals,
-                  ) || 0,
-                  DISPLAY_DECIMAL,
-                ),
-              )}
+              <AssetValueFormatter
+                amount={lockupInfo?.total_reward}
+                asset={rewardAsset}
+                showSymbol={false}
+              />
             </Typography>
             &nbsp;{rewardAsset?.symbol}
           </Typography>
@@ -320,15 +317,15 @@ function CancelPage() {
                 {
                   key: "shareOfPool",
                   label: `Share of pool’s ${rewardAsset?.symbol} Rewards`,
-                  value: `${cutDecimal(
-                    Numeric.parse(lockupInfo?.total_reward || "0")
-                      .dividedBy(
-                        lockdropEventInfo?.total_lockdrop_reward || "1",
-                      )
-                      .mul(100)
-                      .toString(),
-                    2,
-                  )}%`,
+                  value: (
+                    <PercentageFormatter
+                      value={Numeric.parse(lockupInfo?.total_reward || "0")
+                        .dividedBy(
+                          lockdropEventInfo?.total_lockdrop_reward || "1",
+                        )
+                        .mul(100)}
+                    />
+                  ),
                 },
               ]}
             />

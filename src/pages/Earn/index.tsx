@@ -8,7 +8,6 @@ import iconReload from "~/assets/icons/icon-reload.svg";
 
 import Hr from "~/components/Hr";
 import IconButton from "~/components/IconButton";
-import Tooltip from "~/components/Tooltip";
 import Typography from "~/components/Typography";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
@@ -63,19 +62,15 @@ function EarnPage() {
               Pools
             </Typography>
           </NavLink>
-          <Tooltip content="Coming soon" offset={[0, -12]}>
-            <div>
-              <NavLink className="disabled" to={formatTo({ to: "lockdrop" })}>
-                <Typography
-                  size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
-                  color="primary"
-                  weight={900}
-                >
-                  LP Lock&Drop
-                </Typography>
-              </NavLink>
-            </div>
-          </Tooltip>
+          <NavLink to={formatTo({ to: "lockdrop" })}>
+            <Typography
+              size={screenClass === MOBILE_SCREEN_CLASS ? 26 : 32}
+              color="primary"
+              weight={900}
+            >
+              LP Lock&Drop
+            </Typography>
+          </NavLink>
           <IconButton
             css={css`
               margin-left: auto;

@@ -15,6 +15,7 @@ const useLockdropEvents = () => {
     refetch,
   } = useQuery({
     queryKey: ["lockdropEvents", chainId],
+    enabled: !api.isLoading,
     queryFn: async () => {
       const fetchAll = async (
         prevData: LockdropEvent[] = [],

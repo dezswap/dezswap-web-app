@@ -328,6 +328,7 @@ function LockdropPage() {
               </Col>
             )}
           </Row>
+          {/* TODO: Replace it to the new Table component */}
           <div
             css={css`
               margin-bottom: 25px;
