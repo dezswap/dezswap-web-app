@@ -2,6 +2,9 @@ import { css } from "@emotion/react";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import { useGetDashboardTokens } from "~/api/dezswap";
+import type { DashboardTokenRes } from "~/api/dezswap/models";
+
 import AssetIcon from "~/components/AssetIcon";
 import Input from "~/components/Input";
 import Link from "~/components/Link";
@@ -15,10 +18,7 @@ import HoverUnderline from "~/components/utils/HoverUnderline";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAssets from "~/hooks/useAssets";
-
-import { DashboardToken } from "~/types/dashboard-api";
 
 import { getBasicSortFunction } from "~/utils/table";
 
@@ -34,11 +34,11 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
   const [page, setPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const [sortBy, setSortBy] = useState<keyof DashboardToken>("tvl");
+  const [sortBy, setSortBy] = useState<keyof DashboardTokenRes>("tvl");
   const [sortDirection, setSortDirection] =
     useState<TableSortDirection>("desc");
 
-  const { tokens } = useDashboard();
+  const { data: tokens } = useGetDashboardTokens();
 
   const { assetInfos } = useAssets();
 

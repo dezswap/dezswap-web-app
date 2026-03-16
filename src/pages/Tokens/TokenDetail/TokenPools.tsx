@@ -1,9 +1,9 @@
+import { useGetDashboardPools } from "~/api/dezswap";
+
 import DashboardPoolTable from "~/components/DashboardPoolTable";
 
-import useDashboardPools from "./useDashboardPools";
-
 function TokenPools({ tokenAddress }: { tokenAddress: string }) {
-  const pools = useDashboardPools(tokenAddress);
+  const { data: pools } = useGetDashboardPools({ token: tokenAddress });
   return <DashboardPoolTable title="Pools" data={pools || []} />;
 }
 

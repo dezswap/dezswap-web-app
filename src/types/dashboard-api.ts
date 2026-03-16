@@ -54,23 +54,11 @@ export type DashboardChartItem = {
   v: string;
 };
 
-export type DashboardRecentResponse = DashboardRecent;
-
-export type DashboardPoolsResponse = DashboardPool[];
 export type DashboardPoolDetailResponse = {
   recent: DashboardRecent;
   txs: DashboardTransaction[];
 };
-export type DashboardTransactionsResponse = DashboardTransaction[];
-export type DashboardTokensResponse = DashboardToken[];
 
 export type DashboardTokenDetailResponse = DashboardToken;
-
-export type DashboardStatisticsResponse = {
-  addressCount: number;
-  txCount: number;
-  fee: string;
-  timestamp: string;
-}[];
 
 export type DashboardChartResponse = DashboardChartItem[];

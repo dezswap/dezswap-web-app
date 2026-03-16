@@ -7,6 +7,8 @@ import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Popover } from "react-tiny-popover";
 import SimpleBar from "simplebar";
 
+import { useGetDashboardTokens } from "~/api/dezswap";
+
 import iconArrowRight from "~/assets/icons/icon-arrow-right.svg";
 import iconDropdown from "~/assets/icons/icon-dropdown-arrow.svg";
 import iconLink from "~/assets/icons/icon-link.svg";
@@ -38,7 +40,6 @@ import {
   SMALL_BROWSER_SCREEN_CLASS,
 } from "~/constants/layout";
 
-import useDashboard from "~/hooks/dashboard/useDashboard";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
@@ -320,7 +321,7 @@ function Header() {
   } = useNetwork();
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
-  const { tokens: dashboardTokens } = useDashboard();
+  const { data: dashboardTokens } = useGetDashboardTokens();
   const { wallet: interchainWallet } = useChain(chainName);
   const { nativeTokens } = useNativeTokens();
   const {

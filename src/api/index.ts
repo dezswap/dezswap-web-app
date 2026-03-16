@@ -10,13 +10,8 @@ import {
   DashboardChartResponse,
   DashboardChartType,
   DashboardPoolDetailResponse,
-  DashboardPoolsResponse,
-  DashboardRecentResponse,
-  DashboardStatisticsResponse,
   DashboardTokenChartType,
   DashboardTokenDetailResponse,
-  DashboardTokensResponse,
-  DashboardTransactionsResponse,
 } from "~/types/dashboard-api";
 
 import { isNativeToken } from "~/utils";
@@ -82,22 +77,10 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
         return res.data;
       },
       dashboard: {
-        async getPools(token?: string) {
-          const res = await apiClient.get<DashboardPoolsResponse>(
-            `/dashboard/pools`,
-            { params: { token } },
-          );
-          return res.data;
-        },
         async getPoolDetail(address: string) {
           const res = await apiClient.get<DashboardPoolDetailResponse>(
             `dashboard/pools/${address}`,
           );
-          return res.data;
-        },
-        async getRecent() {
-          const res =
-            await apiClient.get<DashboardRecentResponse>(`/dashboard/recent`);
           return res.data;
         },
         async getChart({
@@ -143,27 +126,9 @@ const api = (networkName: string, version: ApiVersion = "v1") => {
           );
           return res.data;
         },
-        async getStatistics() {
-          const res = await apiClient.get<DashboardStatisticsResponse>(
-            `/dashboard/statistics`,
-          );
-          return res.data;
-        },
-        async getTokens() {
-          const res =
-            await apiClient.get<DashboardTokensResponse>(`/dashboard/tokens`);
-          return res.data;
-        },
         async getTokenDetail(address: string) {
           const res = await apiClient.get<DashboardTokenDetailResponse>(
             `/dashboard/tokens/${encodeURIComponent(address)}`,
-          );
-          return res.data;
-        },
-        async getTransactions(params?: { pool?: string; token?: string }) {
-          const res = await apiClient.get<DashboardTransactionsResponse>(
-            `/dashboard/txs`,
-            { params },
           );
           return res.data;
         },
