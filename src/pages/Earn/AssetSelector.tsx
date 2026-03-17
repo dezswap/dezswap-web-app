@@ -20,7 +20,7 @@ import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 
 import { customAssetsAtom } from "~/stores/assets";

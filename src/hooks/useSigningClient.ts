@@ -4,7 +4,7 @@ import { toEncoders } from "@interchainjs/cosmos/utils";
 import { useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 
 function useSigningClient() {
   const wm = useWalletManager();

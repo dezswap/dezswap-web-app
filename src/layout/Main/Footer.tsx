@@ -20,7 +20,7 @@ import Typography from "~/components/Typography";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
 import { useLatestBlock } from "~/hooks/useLatestBlock";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { getBlockLink } from "~/utils";
 

@@ -9,7 +9,7 @@ import HoverUnderline from "~/components/utils/HoverUnderline";
 
 import useAssets from "~/hooks/useAssets";
 import useModal from "~/hooks/useModal";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import Expand from "~/pages/Earn/Expand";
 

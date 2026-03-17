@@ -23,7 +23,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useAPI from "~/hooks/useAPI";
 import useLockdropBookmark from "~/hooks/useLockdropBookmark";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useSearchParamState from "~/hooks/useSearchParamState";
 

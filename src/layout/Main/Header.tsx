@@ -1,5 +1,6 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import { useChain } from "@interchain-kit/react";
 import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useRef } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
@@ -40,12 +41,11 @@ import {
 import useDashboard from "~/hooks/dashboard/useDashboard";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useBalance from "~/hooks/useBalance";
-import { useChain } from "~/hooks/useChain";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
 import useNativeTokens from "~/hooks/useNativeTokens";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import useNotifications from "~/hooks/useNotifications";
 
 import {

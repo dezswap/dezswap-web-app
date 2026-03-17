@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import useAPI from "../useAPI";
-import useNetwork from "../useNetwork";
+import { useNetwork } from "../useNetwork";
 
 const useDashboard = () => {
   const {

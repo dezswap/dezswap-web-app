@@ -24,7 +24,7 @@ import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useCustomAssets from "~/hooks/useCustomAssets";
 import useNativeTokens from "~/hooks/useNativeTokens";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRPCClient from "~/hooks/useRPCClient";
 import useVerifiedAssets from "~/hooks/useVerifiedAssets";

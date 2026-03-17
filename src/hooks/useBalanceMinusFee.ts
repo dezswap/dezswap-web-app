@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { amountToValue, valueToAmount } from "~/utils";
 
 import useBalance from "./useBalance";
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 
 const useBalanceMinusFee = (address?: string, feeAmount?: string) => {
   const balance = useBalance(address);

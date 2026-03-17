@@ -19,7 +19,7 @@ import Typography from "~/components/Typography";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import useRPCClient from "~/hooks/useRPCClient";
 
 import { TxError } from "~/types/common";

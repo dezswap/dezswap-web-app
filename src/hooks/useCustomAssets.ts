@@ -2,7 +2,7 @@ import { AccAddress } from "@xpla/xpla.js";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { customAssetsAtom } from "~/stores/assets";
 

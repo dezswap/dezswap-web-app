@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 
 import useAPI from "~/hooks/useAPI";
 import useAssets from "~/hooks/useAssets";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { DashboardChartResponse } from "~/types/dashboard-api";
 

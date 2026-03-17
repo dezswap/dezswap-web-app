@@ -8,7 +8,7 @@ import {
 } from "~/stores/notifications";
 
 import useAPI from "./useAPI";
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 
 const useNotifications = () => {
   const {
