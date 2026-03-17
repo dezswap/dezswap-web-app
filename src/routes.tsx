@@ -3,6 +3,8 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 import SwapPageAsModal from "~/components/Modal/SwapModal";
 import Redirect from "~/components/Redirect";
 
+import { CHAIN_NAME_SEARCH_PARAM } from "~/constants/dezswap";
+
 import withDisclaimerAgreement from "~/hocs/withDisclaimerAgreement";
 
 import MainLayout from "~/layout/Main";
@@ -29,11 +31,26 @@ import TradePage from "~/pages/Trade";
 import SwapPage from "~/pages/Trade/Swap";
 import WalletPage from "~/pages/Wallet";
 
+import { chainNameStore } from "~/stores/chainName";
+
+import { getValidChain } from "~/utils/dezswap";
+
 const OutletWithDisclaimerAgreement = withDisclaimerAgreement(Outlet);
+
+const chainLoader = ({ request }: { request: Request }) => {
+  const url = new URL(request.url);
+  const raw = url.searchParams.get(CHAIN_NAME_SEARCH_PARAM);
+  const { isValidChain, chainName } = getValidChain(raw);
+
+  chainNameStore.setState({ chainName });
+
+  return { chainName, isValidChain };
+};
 
 const routes = createBrowserRouter([
   {
     path: "/",
+    loader: chainLoader,
     element: (
       <MainLayout>
         <OutletWithDisclaimerAgreement />

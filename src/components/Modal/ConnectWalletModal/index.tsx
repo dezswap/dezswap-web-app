@@ -26,7 +26,7 @@ import Typography from "~/components/Typography";
 import { UNSUPPORT_WALLET_LIST } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useChainName } from "~/stores/chainName";
 
 const StyledWalletButton = styled.button`
   width: auto;
@@ -108,7 +108,7 @@ function QrModalContent({ uri }: { uri: string }) {
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
-  const { chainName } = useNetwork();
+  const chainName = useChainName();
   const theme = useTheme();
   const screenClass = useScreenClass();
   const wm = useWalletManager();
