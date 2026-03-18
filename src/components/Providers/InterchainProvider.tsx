@@ -54,5 +54,10 @@ export function InterchainProvider({
     [chainName],
   );
 
-  return <ChainProvider {...interchainOptions}>{children}</ChainProvider>;
+  return (
+    // ChainProvider is not reactive to props change, so remount is needed when chainName changes
+    <ChainProvider {...interchainOptions} key={chainName}>
+      {children}
+    </ChainProvider>
+  );
 }

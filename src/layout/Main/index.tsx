@@ -171,6 +171,7 @@ function MainLayout({ children }: PropsWithChildren) {
         wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
 
       if (chainName === walletChain) return;
+      // TODO: fix this - Dapp should control wallet's chain, not the opposite way around!!
       const newParams = new URLSearchParams(searchParams);
       newParams.set(CHAIN_NAME_SEARCH_PARAM, walletChain);
       setSearchParams(newParams);
