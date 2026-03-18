@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
 
-import { useGetDashboardPoolsAddress } from "~/api/dezswap";
+import { useGetDashboardPoolsAddress, useGetPoolsAddress } from "~/api/dezswap";
 
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
@@ -31,7 +31,6 @@ import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairBookmark from "~/hooks/usePairBookmark";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 
 import {
   amountToValue,
@@ -70,7 +69,9 @@ function PoolDetailPage() {
   });
 
   const { getPair } = usePairs();
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress ?? "", {
+    query: { enabled: !!poolAddress },
+  });
   const pair = useMemo(() => {
     return poolAddress ? getPair(poolAddress) : undefined;
   }, [poolAddress, getPair]);

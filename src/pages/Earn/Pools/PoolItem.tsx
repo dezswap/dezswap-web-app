@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Col, Hidden, Row, useScreenClass } from "react-grid-system";
 
-import { useGetDashboardPools } from "~/api/dezswap";
+import { useGetDashboardPools, useGetPoolsAddress } from "~/api/dezswap";
 
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
@@ -41,7 +41,6 @@ import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 
 import { formatDecimals, formatNumber, getAddressLink } from "~/utils";
 
@@ -206,7 +205,7 @@ interface PoolItemProps {
 }
 
 function PoolItem({ poolAddress, bookmarked, onBookmarkClick }: PoolItemProps) {
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress);
   const { data: dashboardPools } = useGetDashboardPools();
   const dashboardPool = useMemo(
     () => dashboardPools?.find((item) => item.address === poolAddress),

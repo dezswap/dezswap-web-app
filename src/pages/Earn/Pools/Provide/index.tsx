@@ -12,6 +12,8 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
+import { useGetPoolsAddress } from "~/api/dezswap";
+
 import iconLink from "~/assets/icons/icon-link.svg";
 import iconProvide from "~/assets/icons/icon-provide.svg";
 import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
@@ -42,7 +44,6 @@ import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
 import useSlippageTolerance from "~/hooks/useSlippageTolerance";
 import useTxDeadlineMinutes from "~/hooks/useTxDeadlineMinutes";
@@ -133,7 +134,9 @@ function ProvidePage() {
   });
   const formData = form.watch();
 
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress ?? "", {
+    query: { enabled: !!poolAddress },
+  });
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&

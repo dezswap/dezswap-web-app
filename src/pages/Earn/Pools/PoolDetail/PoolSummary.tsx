@@ -4,7 +4,7 @@ import { Numeric } from "@xpla/xpla.js";
 import { type ComponentProps, useMemo } from "react";
 import { Col, Row } from "react-grid-system";
 
-import { useGetDashboardPoolsAddress } from "~/api/dezswap";
+import { useGetDashboardPoolsAddress, useGetPoolsAddress } from "~/api/dezswap";
 
 import AssetIcon from "~/components/AssetIcon";
 import Hr from "~/components/Hr";
@@ -16,7 +16,6 @@ import HoverUnderline from "~/components/utils/HoverUnderline";
 import PercentageFormatter from "~/components/utils/PercentageFormatter";
 
 import useAssets from "~/hooks/useAssets";
-import usePool from "~/hooks/usePool";
 
 import { amountToValue, formatDecimals, formatNumber } from "~/utils";
 import { getAddressFromAssetInfo } from "~/utils/dezswap";
@@ -81,7 +80,7 @@ function PoolSummary({ poolAddress }: { poolAddress: string }) {
   const { assetInfos } = useAssets();
 
   const { data: dashboardPoolData } = useGetDashboardPoolsAddress(poolAddress);
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress);
   const assets = useMemo(
     () =>
       pool?.assets?.map((poolAsset) => {

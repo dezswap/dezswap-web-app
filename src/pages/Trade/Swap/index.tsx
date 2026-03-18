@@ -14,7 +14,10 @@ import {
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm, useWatch } from "react-hook-form";
 
-import { useGetDashboardTokensAddress } from "~/api/dezswap";
+import {
+  useGetDashboardTokensAddress,
+  useGetPoolsAddress,
+} from "~/api/dezswap";
 
 import iconDefaultAsset from "~/assets/icons/icon-default-token.svg";
 import iconSwapHover from "~/assets/icons/icon-from-to-hover.svg";
@@ -53,7 +56,6 @@ import useHashModal from "~/hooks/useHashModal";
 import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
 import useSearchParamState from "~/hooks/useSearchParamState";
 import useSlippageTolerance from "~/hooks/useSlippageTolerance";
@@ -279,7 +281,9 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
-  const pool = usePool(selectedPair?.contract_addr);
+  const { data: pool } = useGetPoolsAddress(selectedPair?.contract_addr ?? "", {
+    query: { enabled: !!selectedPair?.contract_addr },
+  });
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&

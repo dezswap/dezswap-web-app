@@ -1,7 +1,7 @@
 import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 
-import usePool from "~/hooks/usePool";
+import { useGetPoolsAddress } from "~/api/dezswap";
 
 export interface ProvideSimulationResult {
   estimatedAmount: string;
@@ -23,7 +23,7 @@ const useSimulate = ({
   asset2Address?: string;
   asset2Amount?: string;
 }) => {
-  const pool = usePool(pairAddress);
+  const { data: pool } = useGetPoolsAddress(pairAddress);
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [result, setResult] = useState<ProvideSimulationResult>();
@@ -39,7 +39,7 @@ const useSimulate = ({
               "token" in asset.info
                 ? asset.info.token.contract_addr
                 : asset.info.native_token.denom,
-            amount: asset.amount,
+            amount: asset.amount || "0",
           }));
 
           if (poolAssets && poolAssets.length > 1) {
