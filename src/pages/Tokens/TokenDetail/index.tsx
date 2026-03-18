@@ -12,6 +12,8 @@ import {
 } from "react-grid-system";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
 
@@ -29,7 +31,6 @@ import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
@@ -69,7 +70,10 @@ function TokenDetailPage() {
     },
   });
 
-  const dashboardToken = useDashboardTokenDetail(tokenAddress);
+  const { data: dashboardToken } = useGetDashboardTokensAddress(
+    tokenAddress ?? "",
+    { query: { enabled: !!tokenAddress, staleTime: 1000 * 60 * 5 } },
+  );
 
   const { data: asset } = useAsset(tokenAddress);
 
