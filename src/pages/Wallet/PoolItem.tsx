@@ -4,6 +4,11 @@ import { Numeric } from "@xpla/xpla.js";
 import { type ComponentProps, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import {
+  type ControllerPoolRes as Pool,
+  useGetDashboardPoolsAddress,
+} from "~/api/dezswap";
+
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
 
@@ -23,15 +28,12 @@ import PercentageFormatter from "~/components/utils/PercentageFormatter";
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 
 import Expand from "~/pages/Earn/Expand";
-
-import { Pool } from "~/types/api";
 
 import { formatDecimals, formatNumber, getAddressLink } from "~/utils";
 
@@ -120,7 +122,9 @@ function PoolItem({
   const { getPair } = usePairs();
   const pair = useMemo(() => getPair(pool.address), [getPair, pool]);
   const lpBalance = useBalance(pair?.liquidity_token);
-  const dashboardPoolDetail = useDashboardPoolDetail(pool.address);
+  const { data: dashboardPoolDetail } = useGetDashboardPoolsAddress(
+    pool.address,
+  );
 
   const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
   const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
@@ -261,7 +265,7 @@ function PoolItem({
         >
           <AssetValueFormatter
             asset={asset1}
-            amount={Numeric.parse(pool.assets[0].amount)
+            amount={Numeric.parse(pool.assets[0].amount || "0")
               .times(userShare)
               .toFixed(0)}
           />
@@ -276,7 +280,7 @@ function PoolItem({
         >
           <AssetValueFormatter
             asset={asset2}
-            amount={Numeric.parse(pool.assets[1].amount)
+            amount={Numeric.parse(pool.assets[1].amount || "0")
               .times(userShare)
               .toFixed(0)}
           />
