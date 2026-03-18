@@ -20,7 +20,7 @@ jobs:
         run: pnpm lint
 
       - name: Format
-        run: pnpm prettier --check **/*.{ts,tsx}
+        run: pnpm prettier --check "**/*.{ts,tsx}"
 
       - name: Unit Test
         run: pnpm test --reporter=verbose
