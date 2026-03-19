@@ -187,6 +187,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         protocol: "",
         token: address,
         verified: false,
+        total_supply: "",
       };
       addCustomAsset(asset);
       setPage("complete");
@@ -202,6 +203,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         protocol: "",
         token: address,
         verified: false,
+        total_supply: "",
       };
       onFinish(asset);
     }

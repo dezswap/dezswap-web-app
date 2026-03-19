@@ -23,7 +23,7 @@ import {
   contractAddresses,
 } from "~/constants/dezswap";
 
-import { AssetInfo } from "~/types/api";
+import type { AssetInfo } from "~/types/api";
 import { Asset, NativeAsset } from "~/types/pair";
 
 const CHAIN_PREFIXS = ["xpla1", "fetch1"];

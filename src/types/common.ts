@@ -9,8 +9,6 @@ import type {
   UserDenied,
 } from "@xpla/wallet-provider";
 
-import type { Pair } from "~/types/pair";
-
 export interface NetworkInfo {
   chainName: string;
   selectedChain: Chain;
@@ -24,20 +22,3 @@ export type TxError =
   | CreateTxFailed
   | TxFailed
   | TxUnspecifiedError;
-
-export interface PairExtended extends Pair {
-  asset_addresses: string[];
-}
-
-export interface BlockHeader {
-  height: string;
-}
-
-export interface BlockInfo {
-  header: BlockHeader;
-}
-
-export interface LatestBlock {
-  blockId: string;
-  block: BlockInfo;
-}

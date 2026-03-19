@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
 import { useGetPools } from "~/api/dezswap";
-import type { ControllerPoolRes as Pool } from "~/api/dezswap/models";
 
 import Pagination from "~/components/Pagination";
 import Panel from "~/components/Panel";
@@ -16,6 +15,8 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useBalances from "~/hooks/useBalances";
 import usePairBookmark from "~/hooks/usePairBookmark";
 import usePairs from "~/hooks/usePairs";
+
+import type { Pool } from "~/types/api";
 
 import PoolItem from "./PoolItem";
 
