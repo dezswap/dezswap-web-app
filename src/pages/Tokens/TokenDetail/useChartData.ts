@@ -1,19 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
-import useAPI from "~/hooks/useAPI";
-import useAssets from "~/hooks/useAssets";
-import { useNetwork } from "~/hooks/useNetwork";
+import {
+  getDashboardChartTokensAddressType,
+  useGetDashboardChartTokensAddressType,
+} from "~/api/dezswap";
+import type { GetDashboardChartTokensAddressTypeDuration } from "~/api/dezswap/models";
 
-import { DashboardChartResponse } from "~/types/dashboard-api";
+import useAssets from "~/hooks/useAssets";
 
 type ChartAPIParameters = Parameters<
-  ReturnType<typeof useAPI>["dashboard"]["getTokenChart"]
->[0];
+  typeof useGetDashboardChartTokensAddressType
+>;
 
 const getAxlUSDCChartData = (
-  duration: ChartAPIParameters["duration"] = "month",
-): DashboardChartResponse => {
+  duration: GetDashboardChartTokensAddressTypeDuration | "all" = "month",
+): Awaited<ReturnType<typeof getDashboardChartTokensAddressType>> => {
   const days = {
     year: 365,
     quarter: 90,
@@ -32,36 +34,40 @@ const getAxlUSDCChartData = (
   return data.toReversed();
 };
 
-const useChartData = (address: string, type: ChartAPIParameters["type"]) => {
-  const {
-    selectedChain: { chainId },
-  } = useNetwork();
-  const api = useAPI();
-  const [duration, setDuration] =
-    useState<ChartAPIParameters["duration"]>("month");
+export const useChartData = (
+  address: ChartAPIParameters[0],
+  type: ChartAPIParameters[1],
+) => {
+  // TODO: mv duration state to component and remove this wrapper hook
+  const [duration, setDuration] = useState<
+    GetDashboardChartTokensAddressTypeDuration | "all"
+  >("month");
 
   const { assetInfos } = useAssets();
+
   const isAxlUSDC = useMemo(() => {
     const asset = assetInfos[address];
     return !!(asset?.verified && asset.symbol === "axlUSDC");
   }, [assetInfos, address]);
 
-  const { data } = useQuery({
-    queryKey: [type, "chart", duration, chainId],
-    queryFn: async () => {
-      if (isAxlUSDC && type === "price") {
-        return getAxlUSDCChartData(duration);
-      }
-      const res = await api.dashboard.getTokenChart({
-        address,
-        type,
-        duration,
-      });
-      return res;
-    },
+  const axlUSDCQuery = useQuery({
+    queryKey: ["axlUSDCChartData", duration],
+    queryFn: () => getAxlUSDCChartData(duration),
+    enabled: isAxlUSDC,
   });
 
-  return { type, data, duration, setDuration };
-};
+  const dashboardQuery = useGetDashboardChartTokensAddressType(
+    address,
+    type,
+    // @ts-expect-error "all" is valid value but not included in the spec
+    { duration },
+    { query: { enabled: !isAxlUSDC } },
+  );
 
-export default useChartData;
+  return {
+    ...(isAxlUSDC ? axlUSDCQuery : dashboardQuery),
+    type,
+    duration,
+    setDuration,
+  };
+};

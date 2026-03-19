@@ -1,26 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-import useAPI from "~/hooks/useAPI";
-import { useNetwork } from "~/hooks/useNetwork";
+import { useGetDashboardChartType } from "~/api/dezswap";
+import type { GetDashboardChartTypeDuration } from "~/api/dezswap/models";
 
-type ChartAPIParameters = Parameters<
-  ReturnType<typeof useAPI>["dashboard"]["getChart"]
->[0];
+type ChartAPIParameters = Parameters<typeof useGetDashboardChartType>;
 
-const useChartData = (type: ChartAPIParameters["type"]) => {
-  const {
-    selectedChain: { chainId },
-  } = useNetwork();
-  const api = useAPI();
-  const [duration, setDuration] =
-    useState<ChartAPIParameters["duration"]>("month");
-  const { data } = useQuery({
-    queryKey: [type, "chart", duration, chainId],
-    queryFn: () => api.dashboard.getChart({ type, duration }),
-  });
+export const useChartData = (type: ChartAPIParameters[0]) => {
+  // TODO: mv duration state to component and remove this wrapper hook
+  const [duration, setDuration] = useState<
+    GetDashboardChartTypeDuration | "all"
+  >("month");
+  // @ts-expect-error "all" is valid value but not included in the spec
+  const query = useGetDashboardChartType(type, { duration });
 
-  return { type, data, duration, setDuration };
+  return { ...query, duration, setDuration };
 };
-
-export default useChartData;
