@@ -25,7 +25,7 @@ import useAssets from "~/hooks/useAssets";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -47,7 +47,7 @@ function UnlockPage() {
   const { walletAddress } = useConnectedWallet();
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const { findPairByLpAddress } = usePairs();
   const { assetInfos } = useAssets();
 
@@ -222,7 +222,7 @@ function UnlockPage() {
                       <AssetValueFormatter
                         asset={{
                           symbol:
-                            nativeTokens.find(
+                            nativeTokens?.find(
                               (token) =>
                                 token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",

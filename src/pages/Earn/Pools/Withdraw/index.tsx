@@ -34,7 +34,7 @@ import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -74,7 +74,7 @@ function WithdrawPage() {
   const {
     selectedChain: { explorers, fees },
   } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -503,7 +503,7 @@ function WithdrawPage() {
                       <AssetValueFormatter
                         asset={{
                           symbol:
-                            nativeTokens.find(
+                            nativeTokens?.find(
                               (token) =>
                                 token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",

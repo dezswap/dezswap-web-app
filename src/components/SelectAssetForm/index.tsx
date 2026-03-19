@@ -19,7 +19,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useAssets from "~/hooks/useAssets";
 import useBookmark from "~/hooks/useBookmark";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 
 import { Token } from "~/types/api";
 
@@ -97,7 +97,7 @@ function SelectAssetForm(props: SelectAssetFormProps) {
   const { assetInfos } = useAssets();
   const { bookmarks, toggleBookmark } = useBookmark();
   const [tabIdx, setTabIdx] = useState(0);
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const divRef = useRef<HTMLDivElement>(null);
 
   const assetList = useMemo(() => {

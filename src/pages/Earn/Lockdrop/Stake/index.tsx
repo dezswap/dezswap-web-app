@@ -32,7 +32,7 @@ import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -72,7 +72,7 @@ function StakePage() {
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const form = useForm<Record<FormKey, string>>({
     criteriaMode: "all",
     mode: "all",
@@ -407,7 +407,7 @@ function StakePage() {
                     <AssetValueFormatter
                       asset={{
                         symbol:
-                          nativeTokens.find(
+                          nativeTokens?.find(
                             (token) =>
                               token.token === fees?.feeTokens[0]?.denom,
                           )?.symbol || "",

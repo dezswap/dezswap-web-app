@@ -40,7 +40,7 @@ import useAsset from "~/hooks/useAsset";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -86,7 +86,7 @@ function ProvidePage() {
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -574,7 +574,7 @@ function ProvidePage() {
                             <AssetValueFormatter
                               asset={{
                                 symbol:
-                                  nativeTokens.find(
+                                  nativeTokens?.find(
                                     (token) =>
                                       token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",
@@ -684,7 +684,7 @@ function ProvidePage() {
                             <AssetValueFormatter
                               asset={{
                                 symbol:
-                                  nativeTokens.find(
+                                  nativeTokens?.find(
                                     (token) =>
                                       token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",

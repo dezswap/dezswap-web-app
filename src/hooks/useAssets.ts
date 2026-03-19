@@ -8,11 +8,11 @@ import { useNetwork } from "~/hooks/useNetwork";
 import { Token } from "~/types/api";
 
 import useFetchDecimal from "./useFetchDecimal";
-import useNativeTokens from "./useNativeTokens";
+import { useNativeTokens } from "./useNativeTokens";
 
 const useAssets = () => {
   const { chainName } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const { getCustomAsset, customAssets } = useCustomAssets();
   const { fetchDecimal } = useFetchDecimal();
   const { data: assets } = useGetTokens({

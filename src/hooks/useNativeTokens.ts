@@ -1,26 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useGetTokens } from "~/api/dezswap";
 
-import useAPI from "./useAPI";
+import { isNativeToken } from "~/utils";
+
 import { useNetwork } from "./useNetwork";
 
-function useNativeTokens() {
-  const api = useAPI();
+export function useNativeTokens() {
+  const { selectedChain } = useNetwork();
 
-  const { chainName, selectedChain } = useNetwork();
-  const { data: nativeTokens, isLoading: isNativeTokensLoading } = useQuery({
-    queryKey: ["nativeTokens", chainName],
-    queryFn: () => {
-      return api.getNativeToken(selectedChain.bech32Prefix ?? "");
+  return useGetTokens({
+    query: {
+      select: (tokens) =>
+        tokens.filter(({ token }) =>
+          isNativeToken(token, selectedChain.bech32Prefix ?? ""),
+        ),
+      enabled: !!selectedChain?.bech32Prefix,
+      refetchOnReconnect: true,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
     },
-    enabled: !!chainName && !api.isLoading,
-    refetchOnReconnect: true,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-    initialData: [],
   });
-
-  return { nativeTokens, isNativeTokensLoading };
 }
-
-export default useNativeTokens;

@@ -45,7 +45,7 @@ import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNetwork } from "~/hooks/useNetwork";
 import useNotifications from "~/hooks/useNotifications";
 
@@ -323,14 +323,14 @@ function Header() {
   const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
   const { data: dashboardTokens } = useGetDashboardTokens();
   const { wallet: interchainWallet } = useChain(chainName);
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const {
     token: tokenAddress,
     symbol: tokenSymbol,
     icon: tokenIcon,
   } = useMemo(
     () =>
-      nativeTokens[0] ?? {
+      nativeTokens?.[0] ?? {
         token: "",
         symbol: "",
         icon: "",

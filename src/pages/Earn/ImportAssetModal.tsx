@@ -23,7 +23,7 @@ import {
 import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useCustomAssets from "~/hooks/useCustomAssets";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRPCClient from "~/hooks/useRPCClient";
@@ -52,7 +52,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     selectedChain: { chainId },
   } = useNetwork();
   const { client } = useRPCClient();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
 
   const balance = useBalance(address);
   const deferredAddress = useDeferredValue(address);
@@ -62,7 +62,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   );
 
   const isNativeToken = useMemo(
-    () => nativeTokens.some((item) => item.token === address),
+    () => nativeTokens?.some((item) => item.token === address) ?? false,
     [address, nativeTokens],
   );
   const isIbcToken = useMemo(
@@ -117,7 +117,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     let isAborted = false;
     const fetchAsset = async () => {
       if (isNativeToken) {
-        const asset = nativeTokens.find(
+        const asset = nativeTokens?.find(
           (item) => item.token === deferredAddress,
         );
         if (!isAborted && asset) {
