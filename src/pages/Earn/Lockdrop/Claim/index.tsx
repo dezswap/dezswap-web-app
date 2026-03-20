@@ -62,7 +62,7 @@ function ClaimPage() {
 
   const { findPairByLpAddress } = usePairs();
   const { nativeTokens } = useNativeTokens();
-  const { assetInfos, validate } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],
