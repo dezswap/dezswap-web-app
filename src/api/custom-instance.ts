@@ -4,6 +4,14 @@ import { apiAddresses } from "~/constants/dezswap";
 
 import { chainNameStore } from "~/stores/chainName";
 
+const instance = Axios.create();
+
+instance.interceptors.request.use((config) => {
+  config.baseURL = getBaseUrl();
+  config.params = { [Date.now()]: "", ...config.params };
+  return config;
+});
+
 const getBaseUrl = () => {
   const currentNetworkName = chainNameStore.getState().chainName;
   const baseUrl = apiAddresses[currentNetworkName]?.baseUrl ?? "";
@@ -14,16 +22,6 @@ export const customInstance = async <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig,
 ): Promise<T> => {
-  const instance = Axios.create({
-    baseURL: getBaseUrl(),
-  });
-
-  instance.interceptors.request.use((reqConfig) => {
-    const newConfig = { ...reqConfig };
-    newConfig.params = { [Date.now()]: "", ...newConfig.params };
-    return newConfig;
-  });
-
   return instance({ ...config, ...options }).then(({ data }) => data);
 };
 
