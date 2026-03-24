@@ -38,10 +38,8 @@ import useRequestPost from "~/hooks/useRequestPost";
 
 import {
   amountToValue,
-  cutDecimal,
   ellipsisCenter,
   formatDateTime,
-  formatNumber,
   getTokenLink,
 } from "~/utils";
 import { generateCancelLockdropMsg } from "~/utils/dezswap";

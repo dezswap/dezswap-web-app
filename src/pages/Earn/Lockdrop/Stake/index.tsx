@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { Controller, useForm } from "react-hook-form";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -28,7 +28,6 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
-import useAssets from "~/hooks/useAssets";
 import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
@@ -39,14 +38,9 @@ import useNetwork from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
 
-import { Token } from "~/types/api";
-
 import {
-  amountToValue,
-  cutDecimal,
   ellipsisCenter,
   formatDateTime,
-  formatNumber,
   getTokenLink,
   sanitizeNumberInput,
   valueToAmount,
@@ -88,7 +82,6 @@ function StakePage() {
     },
   });
 
-  const { validate } = useAssets();
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
 

@@ -82,7 +82,7 @@ function ChainModal(modalProps: ReactModal.Props) {
       return `?${queryString}`;
     };
 
-    window.location.href = getRedirectUrl();
+    window.history.replaceState(null, "", getRedirectUrl());
   };
 
   return modalProps.isOpen ? (

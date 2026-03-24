@@ -49,7 +49,7 @@ function UnlockPage() {
   const api = useAPI();
   const { nativeTokens } = useNativeTokens();
   const { findPairByLpAddress } = usePairs();
-  const { assetInfos, validate } = useAssets();
+  const { assetInfos } = useAssets();
 
   const { data: lockdropEventInfo, error: lockdropEventInfoError } = useQuery({
     queryKey: ["lockdropEventInfo", eventAddress, chainId],

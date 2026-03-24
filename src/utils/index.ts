@@ -40,7 +40,7 @@ export const valueToAmount = (value?: Numeric.Input, decimals = 18) => {
       .toString();
 
     return d === "0" ? e : d + e.padStart(decimals, "0");
-  } catch (error) {
+  } catch {
     return undefined;
   }
 };
@@ -53,7 +53,7 @@ export const amountToValue = (value?: Numeric.Input, decimals = 18) => {
     return Numeric.parse(value.toString() || 0)
       .mul(10 ** -decimals)
       .toFixed(decimals, Decimal.ROUND_FLOOR);
-  } catch (error) {
+  } catch {
     return undefined;
   }
 };
@@ -226,7 +226,7 @@ export const formatNumber = (
     return Intl.NumberFormat("en-us", options).format(
       Numeric.parse(value).toNumber(),
     );
-  } catch (error) {
+  } catch {
     return undefined;
   }
 };
@@ -280,7 +280,7 @@ export const getSumOfDashboardChartData = (data: DashboardChartItem[]) => {
         return prev.add(current.v);
       }, Numeric.parse(initialValue))
       .toString();
-  } catch (error) {
+  } catch {
     return initialValue;
   }
 };
@@ -289,7 +289,7 @@ export const isNativeToken = (denom: string, prefix: string): boolean => {
   try {
     const decoded = fromBech32(denom);
     return decoded.prefix !== prefix;
-  } catch (error) {
+  } catch {
     // If Bech32 parsing fails, treat it as a denom token (not a local contract-address token. e.g., ibc/, xerc20:, axpla, ...).
     return true;
   }

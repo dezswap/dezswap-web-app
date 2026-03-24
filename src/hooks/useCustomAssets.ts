@@ -58,6 +58,8 @@ const useCustomAssets = () => {
             if (nativeTokens.some((item) => item.token === address)) {
               const asset = nativeTokens.find((item) => item.token === address);
               if (asset) {
+                // TODO: call setter correctly instead of mutating the store directly
+                // eslint-disable-next-line react-hooks/immutability
                 store[index] = {
                   ...asset,
                   updatedAt: new Date(),
@@ -136,6 +138,8 @@ const useCustomAssets = () => {
     setTimeout(() => {
       fetchQueue.current[chainName]?.shift();
       if (fetchQueue.current[chainName]?.length) {
+        // TODO: refactor this to use Queue instead of recursive setTimeout
+        // eslint-disable-next-line react-hooks/immutability
         fetchAsset();
       }
     }, 100);
@@ -191,6 +195,8 @@ const useCustomAssets = () => {
       const store = customAssetStore[chainName] || [];
       const index = store.findIndex((item) => item.token === asset.token);
       if (index >= 0) {
+        // TODO: call setter correctly instead of mutating the store directly
+        // eslint-disable-next-line react-hooks/immutability
         store[index] = asset;
       } else {
         store.push(asset);

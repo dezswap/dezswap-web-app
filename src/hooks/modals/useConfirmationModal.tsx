@@ -33,7 +33,7 @@ const useConfirmationModal = ({
         isModalParent={isModalParent}
       />
     ),
-    [modal, node, onConfirm],
+    [isModalParent, modal, node, onClose, onConfirm],
   );
 
   useGlobalElement(element);

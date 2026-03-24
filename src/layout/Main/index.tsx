@@ -9,7 +9,7 @@ import {
   useMemo,
 } from "react";
 import { useScreenClass } from "react-grid-system";
-import { useBlocker, useLocation, useSearchParams } from "react-router-dom";
+import { useBlocker, useSearchParams } from "react-router-dom";
 
 import iconOverview from "~/assets/icons/icon-overview-24px.svg";
 import iconPool from "~/assets/icons/icon-pool.svg";
