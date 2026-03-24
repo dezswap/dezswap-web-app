@@ -140,8 +140,11 @@ function CancelPage() {
   const { fee } = useFee(createTxOptions);
 
   const feeAmount = useMemo(() => {
-    return fee?.amount?.get(fees.feeTokens[0]?.denom)?.amount.toString() || "0";
-  }, [fee?.amount, fees.feeTokens[0]]);
+    return (
+      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      "0"
+    );
+  }, [fee?.amount, fees?.feeTokens]);
 
   const { requestPost } = useRequestPost(handleModalClose);
 
@@ -303,7 +306,8 @@ function CancelPage() {
                       asset={{
                         symbol:
                           nativeTokens.find(
-                            (token) => token.token === fees.feeTokens[0]?.denom,
+                            (token) =>
+                              token.token === fees?.feeTokens[0]?.denom,
                           )?.symbol || "",
                       }}
                       amount={feeAmount}
