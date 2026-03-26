@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 import useSigningClient from "./useSigningClient";
 
 function useAuthSequence() {

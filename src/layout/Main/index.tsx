@@ -1,15 +1,9 @@
 import styled from "@emotion/styled";
 import { WalletStatus, useWallet } from "@xpla/wallet-provider";
 import { useAtomValue } from "jotai";
-import {
-  Fragment,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import { Fragment, PropsWithChildren, useCallback, useEffect } from "react";
 import { useScreenClass } from "react-grid-system";
-import { useBlocker, useSearchParams } from "react-router-dom";
+import { useBlocker, useLoaderData, useSearchParams } from "react-router-dom";
 
 import iconOverview from "~/assets/icons/icon-overview-24px.svg";
 import iconPool from "~/assets/icons/icon-pool.svg";
@@ -26,16 +20,14 @@ import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import { useFormatTo } from "~/hooks/useFormatTo";
-import useNetwork from "~/hooks/useNetwork";
 
 import Header, {
   BANNER_HEIGHT,
   DEFAULT_HEADER_HEIGHT,
 } from "~/layout/Main/Header";
 
+import { useChainName } from "~/stores/chainName";
 import globalElementsAtom from "~/stores/globalElements";
-
-import { getValidChain } from "~/utils/dezswap";
 
 import BrowserDelegateButton from "./BrowserDelegateButton";
 import Footer from "./Footer";
@@ -149,7 +141,11 @@ function NavComponent() {
 function MainLayout({ children }: PropsWithChildren) {
   const wallet = useWallet();
   const screenClass = useScreenClass();
-  const { chainName } = useNetwork();
+  const chainName = useChainName();
+  const { isValidChain } = useLoaderData() as {
+    chainName: string;
+    isValidChain: boolean;
+  };
   const globalElements = useAtomValue(globalElementsAtom);
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
@@ -165,40 +161,22 @@ function MainLayout({ children }: PropsWithChildren) {
     onReturnClick: handleModalClose,
   });
 
-  const { paramChainName, isValidChain } = useMemo(() => {
-    const paramValue = searchParams.get(CHAIN_NAME_SEARCH_PARAM);
-    return { paramChainName: paramValue, ...getValidChain(paramValue || "") };
-  }, [searchParams]);
+  useEffect(() => {
+    open(!isValidChain);
+  }, [isValidChain, open]);
 
   useEffect(() => {
-    open(!!(paramChainName && !isValidChain));
-  }, [isValidChain, open, paramChainName]);
-
-  useEffect(() => {
-    const newParams = new URLSearchParams(searchParams);
     if (wallet.status === WalletStatus.WALLET_CONNECTED && isValidChain) {
       const walletChain =
         wallet.network.name === "testnet" ? "xplatestnet" : "xpla";
 
-      if (paramChainName === walletChain) return;
+      if (chainName === walletChain) return;
+      // TODO: fix this - Dapp should control wallet's chain, not the opposite way around!!
+      const newParams = new URLSearchParams(searchParams);
       newParams.set(CHAIN_NAME_SEARCH_PARAM, walletChain);
       setSearchParams(newParams);
-      window.location.href = `?${newParams.toString()}`;
     }
-
-    if (!paramChainName) {
-      newParams.set(CHAIN_NAME_SEARCH_PARAM, chainName);
-      setSearchParams(newParams);
-      window.location.href = `?${newParams.toString()}`;
-    }
-  }, [
-    chainName,
-    isValidChain,
-    paramChainName,
-    searchParams,
-    setSearchParams,
-    wallet,
-  ]);
+  }, [chainName, isValidChain, searchParams, setSearchParams, wallet]);
 
   const needWalletConnection = useBlocker(({ nextLocation }) => {
     // TODO: remove hardcoded pathname

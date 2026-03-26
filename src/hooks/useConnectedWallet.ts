@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { convertProtoToAminoMsg } from "~/utils/dezswap";
 
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 import { NewMsgTxOptions } from "./useRequestPost";
 
 const resetWalletValue = {

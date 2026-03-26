@@ -3,10 +3,10 @@ import type { To } from "react-router-dom";
 
 import { CHAIN_NAME_SEARCH_PARAM } from "~/constants/dezswap";
 
-import useNetwork from "./useNetwork";
+import { useChainName } from "~/stores/chainName";
 
 export const useFormatTo = () => {
-  const { chainName } = useNetwork();
+  const chainName = useChainName();
   const formatTo = useCallback(
     ({ to }: { to: To }) => {
       let searchString: string | undefined;

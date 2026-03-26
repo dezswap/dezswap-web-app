@@ -16,7 +16,7 @@ import OverflowTooltip from "~/components/utils/OverflowTooltip";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
 import useAssets from "~/hooks/useAssets";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import Select from "~/pages/Earn/Pools/Select";
 

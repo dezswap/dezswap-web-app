@@ -18,7 +18,7 @@ import {
   MOBILE_SCREEN_CLASS,
 } from "~/constants/layout";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 const Overlay = styled.div`
   position: fixed;
@@ -79,10 +79,10 @@ function ChainModal(modalProps: ReactModal.Props) {
       if (currentPath.includes("/tokens")) {
         return `${window.location.origin}?${queryString}`;
       }
-      return `?${queryString}`;
+      return `${window.location.origin}${currentPath}?${queryString}`;
     };
 
-    window.history.replaceState(null, "", getRedirectUrl());
+    window.location.assign(getRedirectUrl());
   };
 
   return modalProps.isOpen ? (

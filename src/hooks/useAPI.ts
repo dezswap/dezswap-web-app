@@ -11,7 +11,7 @@ import api, { ApiVersion } from "~/api";
 
 import { contractAddresses, getGasInfo } from "~/constants/dezswap";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { LockdropUserInfo } from "~/types/lockdrop";
 import type {

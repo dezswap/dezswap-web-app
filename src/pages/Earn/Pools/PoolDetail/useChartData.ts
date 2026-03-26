@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import useAPI from "~/hooks/useAPI";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 type ChartAPIParameters = Parameters<
   ReturnType<typeof useAPI>["dashboard"]["getPoolChart"]

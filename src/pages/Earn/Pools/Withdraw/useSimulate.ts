@@ -1,7 +1,7 @@
 import { Dec, Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePool from "~/hooks/usePool";
 
 export interface WithdrawSimulationResult {

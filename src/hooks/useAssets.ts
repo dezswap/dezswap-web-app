@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 
 import useAPI from "~/hooks/useAPI";
 import useCustomAssets from "~/hooks/useCustomAssets";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { Token } from "~/types/api";
 

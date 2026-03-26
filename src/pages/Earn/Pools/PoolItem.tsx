@@ -38,7 +38,7 @@ import {
 import useDashboard from "~/hooks/dashboard/useDashboard";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import usePool from "~/hooks/usePool";
 

@@ -26,7 +26,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 
 import Expand from "~/pages/Earn/Expand";

@@ -6,7 +6,7 @@ import { getIbcTokenHash } from "~/utils";
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
 import useNativeTokens from "./useNativeTokens";
-import useNetwork from "./useNetwork";
+import { useNetwork } from "./useNetwork";
 import useVerifiedAssets from "./useVerifiedAssets";
 
 const UPDATE_INTERVAL = 30000;

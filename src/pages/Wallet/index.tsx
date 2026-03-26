@@ -19,7 +19,7 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import { useNavigate } from "~/hooks/useNavigate";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 
 import { ellipsisCenter, getAddressLink } from "~/utils";
 

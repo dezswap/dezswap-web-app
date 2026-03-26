@@ -50,7 +50,7 @@ import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useHashModal from "~/hooks/useHashModal";
 import useNativeTokens from "~/hooks/useNativeTokens";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";

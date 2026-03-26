@@ -63,7 +63,8 @@
     "react-tiny-popover": "^7.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "simplebar": "^6.2.1",
-    "tippy.js": "^6.3.7"
+    "tippy.js": "^6.3.7",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@chain-registry/types": "^2.0.167",

@@ -27,7 +27,7 @@ import { LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
 import useAsset from "~/hooks/useAsset";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 
 import { LockdropEvent, LockdropUserInfo } from "~/types/lockdrop";

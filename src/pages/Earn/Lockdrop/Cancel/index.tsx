@@ -32,7 +32,7 @@ import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
 import useRequestPost from "~/hooks/useRequestPost";
 

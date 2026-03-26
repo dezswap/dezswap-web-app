@@ -42,7 +42,7 @@ import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useNativeTokens from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
-import useNetwork from "~/hooks/useNetwork";
+import { useNetwork } from "~/hooks/useNetwork";
 import useRequestPost from "~/hooks/useRequestPost";
 
 import InputGroup from "~/pages/Earn/Pools/Provide/InputGroup";
