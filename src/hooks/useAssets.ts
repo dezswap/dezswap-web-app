@@ -1,32 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
-import useAPI from "~/hooks/useAPI";
+import { useGetTokens } from "~/api/dezswap";
+
 import useCustomAssets from "~/hooks/useCustomAssets";
 import { useNetwork } from "~/hooks/useNetwork";
 
 import { Token } from "~/types/api";
 
 import useFetchDecimal from "./useFetchDecimal";
-import useNativeTokens from "./useNativeTokens";
+import { useNativeTokens } from "./useNativeTokens";
 
 const useAssets = () => {
-  const api = useAPI();
   const { chainName } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const { getCustomAsset, customAssets } = useCustomAssets();
   const { fetchDecimal } = useFetchDecimal();
-  const { data: assets } = useQuery({
-    queryKey: ["assets", chainName],
-    queryFn: async () => {
-      const res = await api.getTokens();
-      return res;
+  const { data: assets } = useGetTokens({
+    query: {
+      refetchOnReconnect: true,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
     },
-    enabled: !!chainName,
-    refetchOnReconnect: true,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
   });
 
   const getAsset = useCallback(

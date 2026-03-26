@@ -1,32 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
-import useAPI from "~/hooks/useAPI";
-import { useNetwork } from "~/hooks/useNetwork";
+import { useGetPairs } from "~/api/dezswap";
 
 import { getAddressFromAssetInfo } from "~/utils/dezswap";
 
 const usePairs = () => {
-  const {
-    selectedChain: { chainId },
-  } = useNetwork();
-  const api = useAPI();
-
-  const { data: pairs, isLoading } = useQuery({
-    queryKey: ["pairs", chainId],
-    queryFn: async () => {
-      const res = await api.getPairs();
-      return res?.pairs.map((pair) => ({
-        ...pair,
-        asset_addresses: pair.asset_infos.map(
-          (assetInfo) => getAddressFromAssetInfo(assetInfo) || "",
-        ),
-      }));
+  const { data: pairs, ...query } = useGetPairs({
+    query: {
+      refetchInterval: false,
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+      select: ({ pairs }) => {
+        return pairs.map((pair) => ({
+          ...pair,
+          asset_addresses: pair.asset_infos.map(
+            (assetInfo) => getAddressFromAssetInfo(assetInfo) ?? "",
+          ),
+        }));
+      },
     },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: false,
   });
 
   const getPairedAddresses = useCallback(
@@ -85,8 +78,8 @@ const usePairs = () => {
 
   return useMemo(
     () => ({
+      ...query,
       pairs,
-      isLoading,
       getPairedAddresses,
       availableAssetAddresses,
       getPair,
@@ -97,7 +90,7 @@ const usePairs = () => {
       availableAssetAddresses,
       getPairedAddresses,
       pairs,
-      isLoading,
+      query,
       getPair,
       findPair,
       findPairByLpAddress,

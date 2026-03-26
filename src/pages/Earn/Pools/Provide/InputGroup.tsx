@@ -5,6 +5,8 @@ import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { UseControllerProps, useController } from "react-hook-form";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
 
 import Box from "~/components/Box";
@@ -14,7 +16,6 @@ import { NumberInput, NumberInputProps } from "~/components/Input";
 import Typography from "~/components/Typography";
 import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useBalance from "~/hooks/useBalance";
 
 import { Token } from "~/types/api";
@@ -63,7 +64,10 @@ function InputGroup({
   const screenClass = useScreenClass();
   const theme = useTheme();
   const balance = useBalance(asset?.token);
-  const dashboardToken = useDashboardTokenDetail(asset?.token);
+  const { data: dashboardToken } = useGetDashboardTokensAddress(
+    asset?.token ?? "",
+    { query: { enabled: !!asset?.token, staleTime: 1000 * 60 * 5 } },
+  );
 
   const expectedUsdValue = useMemo(() => {
     try {

@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { useQueryClient } from "@tanstack/react-query";
 import { WalletStatus, useWallet } from "@xpla/wallet-provider";
 import { useAtomValue } from "jotai";
 import { Fragment, PropsWithChildren, useCallback, useEffect } from "react";
@@ -26,7 +27,7 @@ import Header, {
   DEFAULT_HEADER_HEIGHT,
 } from "~/layout/Main/Header";
 
-import { useChainName } from "~/stores/chainName";
+import { chainNameStore, useChainName } from "~/stores/chainName";
 import globalElementsAtom from "~/stores/globalElements";
 
 import BrowserDelegateButton from "./BrowserDelegateButton";
@@ -150,6 +151,15 @@ function MainLayout({ children }: PropsWithChildren) {
   const { walletAddress } = useConnectedWallet();
   const connectWalletModal = useConnectWalletModal();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // sync network name with api instance and clear cache on network change
+  // this is doing anything for now since we reload the page on network change,
+  // but it's better to keep it just in case we don't reload on network change in the future
+  const queryClient = useQueryClient();
+  useEffect(
+    () => chainNameStore.subscribe(() => queryClient.clear()),
+    [queryClient],
+  );
 
   const handleModalClose = useCallback(() => {
     const newParams = new URLSearchParams(searchParams);

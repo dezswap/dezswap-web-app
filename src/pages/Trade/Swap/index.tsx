@@ -14,6 +14,11 @@ import {
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm, useWatch } from "react-hook-form";
 
+import {
+  useGetDashboardTokensAddress,
+  useGetPoolsAddress,
+} from "~/api/dezswap";
+
 import iconDefaultAsset from "~/assets/icons/icon-default-token.svg";
 import iconSwapHover from "~/assets/icons/icon-from-to-hover.svg";
 import iconSwap from "~/assets/icons/icon-from-to.svg";
@@ -40,7 +45,6 @@ import {
   MODAL_CLOSE_TIMEOUT_MS,
 } from "~/constants/layout";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useFirstProvideModal from "~/hooks/modals/useFirstProvideModal";
 import useAsset from "~/hooks/useAsset";
@@ -49,10 +53,9 @@ import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useHashModal from "~/hooks/useHashModal";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
 import useSearchParamState from "~/hooks/useSearchParamState";
 import useSlippageTolerance from "~/hooks/useSlippageTolerance";
@@ -156,7 +159,7 @@ function SwapPage() {
   const { availableAssetAddresses, findPair } = usePairs();
   const [isReversed, setIsReversed] = useState(false);
   const connectWalletModal = useConnectWalletModal();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const selectAsset1Modal = useHashModal(FormKey.asset1Address);
   const selectAsset2Modal = useHashModal(FormKey.asset2Address);
   const theme = useTheme();
@@ -201,8 +204,14 @@ function SwapPage() {
   const { data: asset1 } = useAsset(asset1Address);
   const { data: asset2 } = useAsset(asset2Address);
 
-  const dashboardToken1 = useDashboardTokenDetail(asset1Address);
-  const dashboardToken2 = useDashboardTokenDetail(asset2Address);
+  const { data: dashboardToken1 } = useGetDashboardTokensAddress(
+    asset1Address ?? "",
+    { query: { enabled: !!asset1Address, staleTime: 1000 * 60 * 5 } },
+  );
+  const { data: dashboardToken2 } = useGetDashboardTokensAddress(
+    asset2Address ?? "",
+    { query: { enabled: !!asset2Address, staleTime: 1000 * 60 * 5 } },
+  );
 
   const simulationResult = useSimulate({
     fromAddress: asset1Address,
@@ -272,7 +281,9 @@ function SwapPage() {
     return findPair([asset1Address, asset2Address]);
   }, [asset1Address, asset2Address, findPair]);
 
-  const pool = usePool(selectedPair?.contract_addr);
+  const { data: pool } = useGetPoolsAddress(selectedPair?.contract_addr ?? "", {
+    query: { enabled: !!selectedPair?.contract_addr },
+  });
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&
@@ -1041,7 +1052,7 @@ function SwapPage() {
                       <AssetValueFormatter
                         asset={{
                           symbol:
-                            nativeTokens.find(
+                            nativeTokens?.find(
                               (token) =>
                                 token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",

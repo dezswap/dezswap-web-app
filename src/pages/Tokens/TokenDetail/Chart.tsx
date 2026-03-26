@@ -29,7 +29,7 @@ import {
   getSumOfDashboardChartData,
 } from "~/utils";
 
-import useChartData from "./useChartData";
+import { useChartData } from "./useChartData";
 
 const chartTypeTabs = ["Volume", "TVL", "Price"].map((label) => ({
   key: label,

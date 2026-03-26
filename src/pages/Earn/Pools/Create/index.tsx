@@ -40,7 +40,7 @@ import useAssets from "~/hooks/useAssets";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import useRequestPost from "~/hooks/useRequestPost";
@@ -95,7 +95,7 @@ function CreatePage() {
   }, [assetAddresses]);
   const navigate = useNavigate();
   const screenClass = useScreenClass();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const { validate } = useAssets();
   const [balanceApplied, setBalanceApplied] = useState(false);
   const {
@@ -494,7 +494,7 @@ function CreatePage() {
                       <AssetValueFormatter
                         asset={{
                           symbol:
-                            nativeTokens.find(
+                            nativeTokens?.find(
                               (token) =>
                                 token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",

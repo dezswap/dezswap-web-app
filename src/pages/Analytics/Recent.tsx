@@ -3,13 +3,13 @@ import styled from "@emotion/styled";
 import { useEffect, useMemo, useState } from "react";
 import { useScreenClass } from "react-grid-system";
 
+import { useGetDashboardRecent } from "~/api/dezswap";
+
 import Panel from "~/components/Panel";
 import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
-
-import useDashboard from "~/hooks/dashboard/useDashboard";
 
 import { formatCurrency } from "~/utils";
 
@@ -39,7 +39,7 @@ function Recent() {
   const isSmallScreen = [MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS].includes(
     screenClass,
   );
-  const { recent } = useDashboard();
+  const { data: recent } = useGetDashboardRecent();
 
   const data = useMemo(() => {
     return [

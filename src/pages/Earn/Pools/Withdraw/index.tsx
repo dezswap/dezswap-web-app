@@ -6,6 +6,8 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
 import iconLink from "~/assets/icons/icon-link.svg";
 import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
@@ -25,7 +27,6 @@ import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL, MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
@@ -33,7 +34,7 @@ import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
@@ -73,7 +74,7 @@ function WithdrawPage() {
   const {
     selectedChain: { explorers, fees },
   } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -93,8 +94,14 @@ function WithdrawPage() {
   const { data: asset1 } = useAsset(pair?.asset_addresses?.[0]);
   const { data: asset2 } = useAsset(pair?.asset_addresses?.[1]);
 
-  const dashboardToken1 = useDashboardTokenDetail(asset1?.token);
-  const dashboardToken2 = useDashboardTokenDetail(asset2?.token);
+  const { data: dashboardToken1 } = useGetDashboardTokensAddress(
+    asset1?.token ?? "",
+    { query: { enabled: !!asset1?.token, staleTime: 1000 * 60 * 5 } },
+  );
+  const { data: dashboardToken2 } = useGetDashboardTokensAddress(
+    asset2?.token ?? "",
+    { query: { enabled: !!asset2?.token, staleTime: 1000 * 60 * 5 } },
+  );
 
   useEffect(() => {
     if (!pair?.asset_addresses?.length) {
@@ -496,7 +503,7 @@ function WithdrawPage() {
                       <AssetValueFormatter
                         asset={{
                           symbol:
-                            nativeTokens.find(
+                            nativeTokens?.find(
                               (token) =>
                                 token.token === fees?.feeTokens[0]?.denom,
                             )?.symbol || "",

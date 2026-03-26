@@ -5,7 +5,7 @@ import { getIbcTokenHash } from "~/utils";
 
 import useAPI from "./useAPI";
 import useConnectedWallet from "./useConnectedWallet";
-import useNativeTokens from "./useNativeTokens";
+import { useNativeTokens } from "./useNativeTokens";
 import { useNetwork } from "./useNetwork";
 import useVerifiedAssets from "./useVerifiedAssets";
 
@@ -15,7 +15,7 @@ const useBalances = (addresses: string[]) => {
   const { walletAddress } = useConnectedWallet();
   const { verifiedIbcAssets } = useVerifiedAssets();
   const { chainName } = useNetwork();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const api = useAPI();
 
   const fetchBalance = useCallback(

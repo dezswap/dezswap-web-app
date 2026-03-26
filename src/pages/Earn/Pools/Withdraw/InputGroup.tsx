@@ -5,6 +5,8 @@ import { useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { UseControllerProps, useController } from "react-hook-form";
 
+import { useGetDashboardPoolsAddress, useGetPoolsAddress } from "~/api/dezswap";
+
 import iconDefaultToken from "~/assets/icons/icon-default-token.svg";
 
 import Box from "~/components/Box";
@@ -16,10 +18,8 @@ import Typography from "~/components/Typography";
 import { LP_DECIMALS } from "~/constants/dezswap";
 import { DISPLAY_DECIMAL } from "~/constants/layout";
 
-import useDashboardPoolDetail from "~/hooks/dashboard/useDashboardPoolDetail";
 import useBalance from "~/hooks/useBalance";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 
 import { Token } from "~/types/api";
 
@@ -59,8 +59,8 @@ function InputGroup({
   const { field } = useController(controllerProps);
   const { findPairByLpAddress } = usePairs();
   const poolAddress = findPairByLpAddress(lpToken || "")?.contract_addr || "";
-  const pool = usePool(poolAddress);
-  const dashboardPool = useDashboardPoolDetail(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress);
+  const { data: dashboardPool } = useGetDashboardPoolsAddress(poolAddress);
 
   const valueUsd = useMemo(() => {
     if (!dashboardPool?.recent.tvl || !field.value) {

@@ -3,6 +3,8 @@ import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
+import { useGetPools } from "~/api/dezswap";
+
 import Pagination from "~/components/Pagination";
 import Panel from "~/components/Panel";
 import TabButton from "~/components/TabButton";
@@ -13,9 +15,8 @@ import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 import useBalances from "~/hooks/useBalances";
 import usePairBookmark from "~/hooks/usePairBookmark";
 import usePairs from "~/hooks/usePairs";
-import usePools from "~/hooks/usePools";
 
-import { Pool } from "~/types/api";
+import type { Pool } from "~/types/api";
 
 import PoolItem from "./PoolItem";
 
@@ -43,7 +44,7 @@ function Pools() {
   );
   const [selectedTabIndex, setSelectedIndex] = useState(0);
   const { getPair } = usePairs();
-  const { pools } = usePools();
+  const { data: pools } = useGetPools();
   const { bookmarks, toggleBookmark } = usePairBookmark();
   const balances = useBalances(
     pools?.map((pool) => getPair(pool.address)?.liquidity_token || "") || [],

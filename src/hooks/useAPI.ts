@@ -7,8 +7,6 @@ import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
-import api, { ApiVersion } from "~/api";
-
 import { contractAddresses, getGasInfo } from "~/constants/dezswap";
 
 import { useNetwork } from "~/hooks/useNetwork";
@@ -34,17 +32,13 @@ import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;
 
-const useAPI = (version: ApiVersion = "v1") => {
+const useAPI = () => {
   const {
     chainName,
     selectedChain: { chainId },
   } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
   const { walletAddress } = useConnectedWallet();
-  const apiClient = useMemo(
-    () => api(chainName, version),
-    [chainName, version],
-  );
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
@@ -354,7 +348,6 @@ const useAPI = (version: ApiVersion = "v1") => {
 
   return useMemo(
     () => ({
-      ...apiClient,
       simulate,
       reverseSimulate,
       getNativeTokenBalance,
@@ -374,7 +367,6 @@ const useAPI = (version: ApiVersion = "v1") => {
       isLoading,
     }),
     [
-      apiClient,
       simulate,
       reverseSimulate,
       getNativeTokenBalance,

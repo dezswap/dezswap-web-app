@@ -17,7 +17,7 @@ import {
 } from "~/utils/dezswap";
 
 import useFetchDecimal from "./useFetchDecimal";
-import useNativeTokens from "./useNativeTokens";
+import { useNativeTokens } from "./useNativeTokens";
 import usePairs from "./usePairs";
 import useRPCClient from "./useRPCClient";
 import useVerifiedAssets from "./useVerifiedAssets";
@@ -28,7 +28,7 @@ const useCustomAssets = () => {
   const [customAssetStore, setCustomAssetStore] = useAtom(customAssetsAtom);
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const { client } = useRPCClient();
   const {
     chainName,
@@ -55,7 +55,7 @@ const useCustomAssets = () => {
               Date.now() - UPDATE_INTERVAL_SEC &&
             window.navigator.onLine
           ) {
-            if (nativeTokens.some((item) => item.token === address)) {
+            if (nativeTokens?.some((item) => item.token === address)) {
               const asset = nativeTokens.find((item) => item.token === address);
               if (asset) {
                 // TODO: call setter correctly instead of mutating the store directly
@@ -159,7 +159,7 @@ const useCustomAssets = () => {
         hasChainPrefix(address) && (await fetchDecimal(address)) !== undefined;
 
       if (
-        nativeTokens.some((item) => item.token === address) ||
+        nativeTokens?.some((item) => item.token === address) ||
         isValidate ||
         (verifiedIbcAssets && verifiedIbcAssets?.[getIbcTokenHash(address)])
       ) {

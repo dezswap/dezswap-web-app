@@ -1,8 +1,9 @@
 import { Dec, Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useState } from "react";
 
+import { useGetPoolsAddress } from "~/api/dezswap";
+
 import { useNetwork } from "~/hooks/useNetwork";
-import usePool from "~/hooks/usePool";
 
 export interface WithdrawSimulationResult {
   estimatedAmount: { address: string; amount: string }[];
@@ -15,7 +16,7 @@ const useSimulate = (
   amount: string,
 ) => {
   const { chainName } = useNetwork();
-  const pool = usePool(pairAddress);
+  const { data: pool } = useGetPoolsAddress(pairAddress);
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [result, setResult] = useState<WithdrawSimulationResult>();
@@ -37,7 +38,7 @@ const useSimulate = (
               "token" in asset.info
                 ? asset.info.token.contract_addr
                 : asset.info.native_token.denom,
-            amount: asset.amount,
+            amount: asset.amount || "0",
           }));
 
           if (

@@ -31,7 +31,7 @@ import {
   getSumOfDashboardChartData,
 } from "~/utils";
 
-import useChartData from "./useChartData";
+import { useChartData } from "./useChartData";
 
 const chartTypeTabs: {
   key: string;

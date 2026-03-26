@@ -2,12 +2,13 @@ import styled from "@emotion/styled";
 import { Numeric } from "@xpla/xpla.js";
 import { useMemo, useState } from "react";
 
+import { useGetPoolsAddress } from "~/api/dezswap";
+
 import iconShift from "~/assets/icons/icon-shift.svg";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useAssets from "~/hooks/useAssets";
-import usePool from "~/hooks/usePool";
 
 import { amountToValue, formatDecimals } from "~/utils";
 import { getAddressFromAssetInfo } from "~/utils/dezswap";
@@ -57,7 +58,7 @@ const IconShift = styled.div`
 `;
 
 function PoolValueButton({ poolAddress }: PoolValueButtonProps) {
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress);
   const { assetInfos } = useAssets();
   const [isOpposite, setIsOpposite] = useState(false);
 

@@ -12,6 +12,8 @@ import { Col, Row, useScreenClass } from "react-grid-system";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
+import { useGetPoolsAddress } from "~/api/dezswap";
+
 import iconLink from "~/assets/icons/icon-link.svg";
 import iconProvide from "~/assets/icons/icon-provide.svg";
 import iconSettingHover from "~/assets/icons/icon-setting-hover.svg";
@@ -38,11 +40,10 @@ import useAsset from "~/hooks/useAsset";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
 import useConnectedWallet from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
-import useNativeTokens from "~/hooks/useNativeTokens";
+import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import usePool from "~/hooks/usePool";
 import useRequestPost from "~/hooks/useRequestPost";
 import useSlippageTolerance from "~/hooks/useSlippageTolerance";
 import useTxDeadlineMinutes from "~/hooks/useTxDeadlineMinutes";
@@ -85,7 +86,7 @@ function ProvidePage() {
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
   const { walletAddress } = useConnectedWallet();
-  const { nativeTokens } = useNativeTokens();
+  const { data: nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });
   }, [navigate]);
@@ -133,7 +134,9 @@ function ProvidePage() {
   });
   const formData = form.watch();
 
-  const pool = usePool(poolAddress);
+  const { data: pool } = useGetPoolsAddress(poolAddress ?? "", {
+    query: { enabled: !!poolAddress },
+  });
   const isPoolEmpty = useMemo(
     () =>
       pool?.total_share !== undefined &&
@@ -571,7 +574,7 @@ function ProvidePage() {
                             <AssetValueFormatter
                               asset={{
                                 symbol:
-                                  nativeTokens.find(
+                                  nativeTokens?.find(
                                     (token) =>
                                       token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",
@@ -681,7 +684,7 @@ function ProvidePage() {
                             <AssetValueFormatter
                               asset={{
                                 symbol:
-                                  nativeTokens.find(
+                                  nativeTokens?.find(
                                     (token) =>
                                       token.token === fees?.feeTokens[0]?.denom,
                                   )?.symbol || "",

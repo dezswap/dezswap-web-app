@@ -3,11 +3,11 @@ import styled from "@emotion/styled";
 import { Col, Container, Row } from "react-grid-system";
 import { Outlet, useParams } from "react-router-dom";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import Hr from "~/components/Hr";
 import ScrollToTop from "~/components/ScrollToTop";
 import Typography from "~/components/Typography";
-
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 
 import Chart from "~/pages/Tokens/TokenDetail/Chart";
 import TokenSummary from "~/pages/Tokens/TokenDetail/TokenSummary";
@@ -23,7 +23,10 @@ const Wrapper = styled(Container)`
 function PlayAnalytics() {
   const { tokenAddress } = useParams<{ tokenAddress: string }>();
 
-  const dashboardToken = useDashboardTokenDetail(tokenAddress || "");
+  const { data: dashboardToken } = useGetDashboardTokensAddress(
+    tokenAddress || "",
+    { query: { enabled: !!tokenAddress, staleTime: 1000 * 60 * 5 } },
+  );
 
   return (
     <Wrapper key={tokenAddress}>

@@ -3,34 +3,38 @@ import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 
 import {
+  getGetNoticesQueryKey,
+  getNotices,
+} from "~/api/dezswap/endpoints/notice/notice";
+import type { GetNoticesParams } from "~/api/dezswap/models";
+
+import {
   notificationFirstSeenDateAtom,
   readNotificationIdsAtom,
 } from "~/stores/notifications";
 
-import useAPI from "./useAPI";
-import { useNetwork } from "./useNetwork";
-
-const useNotifications = () => {
-  const {
-    selectedChain: { chainId },
-  } = useNetwork();
-  const api = useAPI();
-
-  const { fetchNextPage, data, hasNextPage, isLoading } = useInfiniteQuery({
-    queryKey: ["notices", chainId],
-    queryFn: async ({ pageParam }) => {
-      const res = await api.getNotices({
-        asc: false,
-        limit: 9999, // TODO: Pagination
-        after: pageParam,
-      });
-      return res;
-    },
+const useGetNoticesInfinite = (params?: GetNoticesParams) => {
+  return useInfiniteQuery({
+    queryKey: getGetNoticesQueryKey(params),
+    queryFn: ({ signal, pageParam }) =>
+      getNotices({ ...params, after: pageParam }, undefined, signal),
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) => {
       const lastItem = lastPage.at(-1);
       return lastItem?.id ? +lastItem.id : undefined;
     },
+  });
+};
+
+const useNotifications = () => {
+  const {
+    fetchNextPage: fetchMore,
+    data,
+    hasNextPage,
+    isLoading,
+  } = useGetNoticesInfinite({
+    asc: false,
+    limit: 9999, // TODO: Pagination
   });
 
   const [notificationFirstSeenDate, setNotificationFirstSeenDate] = useAtom(
@@ -73,17 +77,11 @@ const useNotifications = () => {
           ),
         );
       },
-      fetchMore: () => fetchNextPage(),
+      fetchMore,
       hasNextPage,
       isLoading,
     }),
-    [
-      fetchNextPage,
-      hasNextPage,
-      isLoading,
-      notifications,
-      setReadNotificationIds,
-    ],
+    [fetchMore, hasNextPage, isLoading, notifications, setReadNotificationIds],
   );
 };
 

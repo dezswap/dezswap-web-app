@@ -12,6 +12,8 @@ import {
 } from "react-grid-system";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
+import { useGetDashboardTokensAddress } from "~/api/dezswap";
+
 import iconBookmark from "~/assets/icons/icon-bookmark-default.svg";
 import iconBookmarkSelected from "~/assets/icons/icon-bookmark-selected.svg";
 
@@ -29,7 +31,6 @@ import AssetValueFormatter from "~/components/utils/AssetValueFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
-import useDashboardTokenDetail from "~/hooks/dashboard/useDashboardTokenDetail";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
@@ -57,7 +58,6 @@ const Wrapper = styled.div`
 function TokenDetailPage() {
   const screenClass = useScreenClass();
   const {
-    chainName,
     selectedChain: { explorers },
   } = useNetwork();
   const navigate = useNavigate();
@@ -69,7 +69,10 @@ function TokenDetailPage() {
     },
   });
 
-  const dashboardToken = useDashboardTokenDetail(tokenAddress);
+  const { data: dashboardToken, error } = useGetDashboardTokensAddress(
+    tokenAddress ?? "",
+    { query: { enabled: !!tokenAddress, staleTime: 1000 * 60 * 5 } },
+  );
 
   const { data: asset } = useAsset(tokenAddress);
 
@@ -100,14 +103,14 @@ function TokenDetailPage() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (dashboardToken === null) {
+      if (error) {
         invalidPathModal.open();
       }
     }, 500);
     return () => {
       clearTimeout(timerId);
     };
-  }, [dashboardToken, invalidPathModal, chainName]);
+  }, [error, invalidPathModal]);
   const tokenLink = useMemo(
     () => getTokenLink(tokenAddress, explorers?.[0].url),
     [explorers, tokenAddress],
