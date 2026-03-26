@@ -11,7 +11,13 @@ import { contractAddresses, getGasInfo } from "~/constants/dezswap";
 
 import { useNetwork } from "~/hooks/useNetwork";
 
-import { LockdropUserInfo } from "~/types/lockdrop";
+import type {
+  LockdropEstimatedReward,
+  LockdropEventInfo,
+  LockdropEvents,
+  LockdropUserInfo,
+} from "~/types/lockdrop";
+import type { ReverseSimulation, Simulation } from "~/types/pair";
 import type {
   VerifiedAssets,
   VerifiedIbcAssets,
@@ -22,10 +28,9 @@ import {
   createEncodedTx,
   generateReverseSimulationMsg,
   generateSimulationMsg,
-  getQueryData,
   hasChainPrefix,
-  parseJsonFromBinary,
 } from "~/utils/dezswap";
+import { Json } from "~/utils/encode";
 
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
@@ -43,13 +48,13 @@ const useAPI = () => {
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
       if (!client) return undefined;
-      const queryData = getQueryData(generateSimulationMsg(offerAsset, amount));
+      const queryData = Json.toBytes(generateSimulationMsg(offerAsset, amount));
       const { data } = await client.cosmwasm.wasm.v1.smartContractState({
         address: contractAddress,
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return Json.fromBytes<Simulation>(data);
     },
     [client],
   );
@@ -58,7 +63,7 @@ const useAPI = () => {
     async (contractAddress: string, askAsset: string, amount: string) => {
       if (!client) return undefined;
 
-      const queryData = getQueryData(
+      const queryData = Json.toBytes(
         generateReverseSimulationMsg(askAsset, amount),
       );
 
@@ -67,7 +72,7 @@ const useAPI = () => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return Json.fromBytes<ReverseSimulation>(data);
     },
     [client],
   );
@@ -98,7 +103,7 @@ const useAPI = () => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         balance: { address: walletAddress },
       });
 
@@ -107,7 +112,7 @@ const useAPI = () => {
         queryData,
       });
 
-      const res = parseJsonFromBinary(data);
+      const res = Json.fromBytes<{ balance: string }>(data);
 
       return res.balance;
     },
@@ -156,7 +161,7 @@ const useAPI = () => {
       }
 
       const isNativeTokenAddress = hasChainPrefix(denom);
-      const queryData = getQueryData(
+      const queryData = Json.toBytes(
         isNativeTokenAddress
           ? { token_info: {} }
           : { native_token_decimals: { denom } },
@@ -170,7 +175,7 @@ const useAPI = () => {
           queryData,
         });
 
-        const parsed = parseJsonFromBinary(res);
+        const parsed = Json.fromBytes<{ decimals: number }>(res);
         return isNativeTokenAddress ? { a: parsed.decimals } : parsed.decimals;
       } catch (e) {
         console.log(e);
@@ -187,7 +192,7 @@ const useAPI = () => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         events_by_end: { start_after: startAfter },
       });
 
@@ -196,7 +201,7 @@ const useAPI = () => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return Json.fromBytes<LockdropEvents>(data);
     },
     [client, chainName],
   );
@@ -205,7 +210,7 @@ const useAPI = () => {
     async (lockdropEventAddress: string) => {
       if (!client) return undefined;
 
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         event_info: {},
       });
 
@@ -214,7 +219,7 @@ const useAPI = () => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return Json.fromBytes<LockdropEventInfo>(data);
     },
     [client],
   );
@@ -225,7 +230,7 @@ const useAPI = () => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         user_info: {
           addr: walletAddress,
         },
@@ -236,7 +241,7 @@ const useAPI = () => {
         queryData,
       });
 
-      return parseJsonFromBinary(data) as LockdropUserInfo;
+      return Json.fromBytes<LockdropUserInfo>(data);
     },
     [client, walletAddress],
   );
@@ -251,7 +256,7 @@ const useAPI = () => {
         return undefined;
       }
 
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         estimate: {
           amount: `${amount}`,
           duration,
@@ -263,7 +268,7 @@ const useAPI = () => {
         queryData,
       });
 
-      return parseJsonFromBinary(data);
+      return Json.fromBytes<LockdropEstimatedReward>(data);
     },
     [client, walletAddress],
   );
@@ -278,7 +283,7 @@ const useAPI = () => {
     let lastAddress = "";
 
     while (true) {
-      const queryData = getQueryData({
+      const queryData = Json.toBytes({
         get_complete_meme_data_list: {
           start_after: lastAddress,
           limit: PLAY3_LIST_SIZE,
@@ -291,7 +296,8 @@ const useAPI = () => {
             queryData,
           })) || {};
 
-        const { data: parsed } = parseJsonFromBinary(data) ?? {};
+        const { data: parsed } =
+          Json.fromBytes<{ data: WhiteList }>(data) ?? {};
 
         if (!parsed || parsed.length === 0) break;
         res = [...res, ...parsed];

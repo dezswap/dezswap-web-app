@@ -10,11 +10,8 @@ import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
 import { getIbcTokenHash } from "~/utils";
-import {
-  getQueryData,
-  hasChainPrefix,
-  parseJsonFromBinary,
-} from "~/utils/dezswap";
+import { hasChainPrefix } from "~/utils/dezswap";
+import { Json } from "~/utils/encode";
 
 import useFetchDecimal from "./useFetchDecimal";
 import { useNativeTokens } from "./useNativeTokens";
@@ -88,7 +85,7 @@ const useCustomAssets = () => {
                 }));
               }
             } else {
-              const queryData = getQueryData({
+              const queryData = Json.toBytes({
                 token_info: {},
               });
               if (!client) {
@@ -103,7 +100,7 @@ const useCustomAssets = () => {
                 },
               );
 
-              const token = parseJsonFromBinary(data) as unknown as TokenInfo;
+              const token = Json.fromBytes<TokenInfo>(data);
 
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];

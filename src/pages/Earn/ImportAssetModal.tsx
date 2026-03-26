@@ -33,7 +33,7 @@ import { Token } from "~/types/api";
 import { TokenInfo } from "~/types/token";
 
 import { getIbcTokenHash } from "~/utils";
-import { getQueryData, parseJsonFromBinary } from "~/utils/dezswap";
+import { Json } from "~/utils/encode";
 
 interface ImportAssetModalProps extends ReactModal.Props {
   onFinish?(asset: Token): void;
@@ -135,7 +135,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
         }
       } else if (isValidAddress && client) {
         try {
-          const queryData = getQueryData({
+          const queryData = Json.toBytes({
             token_info: {},
           });
 
@@ -146,7 +146,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             });
 
           if (!isAborted) {
-            setTokenInfo(parseJsonFromBinary(res) as unknown as TokenInfo);
+            setTokenInfo(Json.fromBytes<TokenInfo>(res));
           }
         } catch (error) {
           console.log(error);
