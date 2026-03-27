@@ -1,8 +1,6 @@
 // TODO: refactor this hook using react-query
 /* eslint-disable react-hooks/preserve-manual-memoization */
-import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
 import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
-import { Any } from "@xpla/xplajs/google/protobuf/any";
 import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
@@ -314,18 +312,12 @@ const useAPI = () => {
     if (!walletAddress || !client) {
       return undefined;
     }
-    const { account } =
-      ((await client?.cosmos.auth.v1beta1.account({
-        address: walletAddress,
-      })) as { account: Any }) || {};
-    if (account?.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
-      return BaseAccount.decode(account?.value);
-    }
-    if (account?.typeUrl === "/ethermint.types.v1.EthAccount") {
-      const { baseAccount } = EthAccount.decode(account?.value);
-      return baseAccount;
-    }
-    return undefined;
+
+    const { info } = await client.cosmos.auth.v1beta1.accountInfo({
+      address: walletAddress,
+    });
+
+    return info;
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
