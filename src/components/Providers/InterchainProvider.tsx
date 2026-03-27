@@ -2,8 +2,11 @@ import { WCWallet } from "@interchain-kit/core";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { ChainProvider } from "@interchain-kit/react";
-import { defaultSignerOptions } from "@interchainjs/cosmos/defaults";
-import { defaultSignerOptions as xplaSignerOptions } from "@xpla/xpla/defaults";
+import {
+  type CosmosSignerConfig,
+  DEFAULT_COSMOS_SIGNER_CONFIG,
+} from "@interchainjs/cosmos";
+import { DEFAULT_COSMOS_EVM_SIGNER_CONFIG } from "@xpla/xpla";
 import { useMemo } from "react";
 
 import { getAssetList, getChain } from "~/constants/dezswap";
@@ -36,21 +39,24 @@ export function InterchainProvider({
   const chainName = useChainName();
 
   const interchainOptions = useMemo(
-    () => ({
-      chains: getChain(chainName),
-      assetLists: getAssetList(chainName),
-      wallets,
-      signerOptions: {
-        signing: () => ({
-          signerOptions: chainName.includes("xpla")
-            ? xplaSignerOptions.Cosmos
-            : defaultSignerOptions,
-          broadcast: {
-            checkTx: true,
-          },
-        }),
-      },
-    }),
+    () =>
+      ({
+        chains: getChain(chainName),
+        assetLists: getAssetList(chainName),
+        wallets,
+        signerOptions: {
+          signing: (chain) => ({
+            cosmosSignerConfig: ((
+              typeof chain === "string"
+                ? chain.includes("xpla")
+                : chain.chainName.includes("xpla")
+            )
+              ? DEFAULT_COSMOS_EVM_SIGNER_CONFIG
+              : // TODO: rm type assertion once https://github.com/hyperweb-io/interchain-kit/pull/41 is released
+                DEFAULT_COSMOS_SIGNER_CONFIG) as CosmosSignerConfig,
+          }),
+        },
+      }) satisfies Partial<Parameters<typeof ChainProvider>[0]>,
     [chainName],
   );
 
