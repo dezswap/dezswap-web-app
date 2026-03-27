@@ -50,7 +50,7 @@ import useFirstProvideModal from "~/hooks/modals/useFirstProvideModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useHashModal from "~/hooks/useHashModal";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -166,7 +166,7 @@ function SwapPage() {
   const { requestPost } = useRequestPost();
   const screenClass = useScreenClass();
   const [balanceApplied, setBalanceApplied] = useState(false);
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const isSelectAssetOpen = useMemo(
     () => selectAsset1Modal.isOpen || selectAsset2Modal.isOpen,
     [selectAsset1Modal, selectAsset2Modal],

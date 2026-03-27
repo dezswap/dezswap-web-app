@@ -42,7 +42,7 @@ import {
 
 import useConnectWalletModal from "~/hooks/modals/useConnectWalletModal";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useHashModal from "~/hooks/useHashModal";
 import useModal from "~/hooks/useModal";
 import { useNativeTokens } from "~/hooks/useNativeTokens";

@@ -29,7 +29,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -68,7 +68,7 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();

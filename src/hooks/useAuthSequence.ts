@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import useAPI from "./useAPI";
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import { useNetwork } from "./useNetwork";
 import useSigningClient from "./useSigningClient";
 
 function useAuthSequence() {
   const api = useAPI();
   const { signingClient: client } = useSigningClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { chainName } = useNetwork();
   const isXpla = useMemo(() => chainName.includes("xpla"), [chainName]);
 
