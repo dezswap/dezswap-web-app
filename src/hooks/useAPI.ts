@@ -1,11 +1,10 @@
 // TODO: refactor this hook using react-query
 /* eslint-disable react-hooks/preserve-manual-memoization */
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
 import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
-import { contractAddresses, getGasInfo } from "~/constants/dezswap";
+import { contractAddresses } from "~/constants/dezswap";
 
 import { useNetwork } from "~/hooks/useNetwork";
 
@@ -29,6 +28,7 @@ import {
   hasChainPrefix,
 } from "~/utils/dezswap";
 import { Json } from "~/utils/encode";
+import { calculateStdFee } from "~/utils/fee";
 
 import useConnectedWallet from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
@@ -36,12 +36,9 @@ import useRPCClient from "./useRPCClient";
 const PLAY3_LIST_SIZE = 20;
 
 const useAPI = () => {
-  const {
-    chainName,
-    selectedChain: { chainId },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
@@ -332,13 +329,7 @@ const useAPI = () => {
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        getGasInfo(chainName),
-        chainId ? () => Promise.resolve(chainId) : undefined,
-      );
-
-      return fee;
+      return calculateStdFee(res?.gasInfo?.gasUsed ?? 0n, chainName);
     },
 
     [client],

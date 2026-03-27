@@ -1,5 +1,4 @@
 import { assetLists, chains } from "@chain-registry/v2";
-import Decimal from "decimal.js";
 
 import iconASI from "~/assets/icons/icon-chain-asi-32px.svg";
 import iconXpla from "~/assets/icons/icon-chain-xpla-32px.svg";
@@ -83,25 +82,7 @@ export const contractAddresses: {
     play3List: "",
   },
 };
-export const getGasInfo = (chainName: string) => {
-  if (chainName === "fetchhub")
-    return {
-      multiplier: 1.4,
-      gasPrice: {
-        amount: new Decimal("2"),
-        denom: "afet",
-      },
-    };
-  if (chainName === "fetchhubtestnet")
-    return {
-      multiplier: 1.2,
-      gasPrice: {
-        amount: new Decimal("1000000000"),
-        denom: "atestfet",
-      },
-    };
-  return undefined;
-};
+
 export const LP_DECIMALS = 6;
 export const LOCKED_LP_SUPPLY = 1_000;
 
