@@ -1,10 +1,4 @@
-import {
-  AccAddress,
-  MsgExecuteContract as BeforeMsgExecuteContract,
-  Coin,
-  Coins,
-  Numeric,
-} from "@xpla/xpla.js";
+import { AccAddress, Coin, Coins, Numeric } from "@xpla/xpla.js";
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 import {
   AuthInfo,
@@ -53,7 +47,7 @@ export const createEncodedTx = (
 
   return Tx.encode(tx).finish();
 };
-const getCoins = (assets: { address: string; amount: string }[]) =>
+export const getCoins = (assets: { address: string; amount: string }[]) =>
   new Coins(
     assets
       .filter(
@@ -62,25 +56,6 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .sort((a, b) => a.address.localeCompare(b.address))
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
-
-export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
-  return {
-    msgs: protoMsgs.map(
-      (protoMsg) =>
-        new BeforeMsgExecuteContract(
-          protoMsg.sender,
-          protoMsg.contract,
-          Json.fromBytes(protoMsg.msg),
-          getCoins(
-            protoMsg.funds?.map((fund) => ({
-              address: fund.denom,
-              amount: fund.amount,
-            })) || [],
-          ),
-        ),
-    ),
-  };
-};
 
 const assetMsg = (asset: { address: string; amount: string }) => ({
   info: AccAddress.validate(asset.address)

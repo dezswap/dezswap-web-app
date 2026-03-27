@@ -1,200 +1,124 @@
-// TODO: rework this hook leveraging more of InterchainKit's features and simplifying the logic
-/* eslint-disable react-hooks/preserve-manual-memoization */
-import { WalletState } from "@interchain-kit/core";
-import { type SigningClient, useWalletManager } from "@interchain-kit/react";
-import { TxRaw } from "@interchainjs/cosmos-types/cosmos/tx/v1beta1/tx";
-import { useQuery } from "@tanstack/react-query";
-import {
-  WalletApp,
-  useConnectedWallet as useConnectedXplaWallet,
-  useWallet,
-} from "@xpla/wallet-provider";
-import { Coin } from "@xpla/xplajs/cosmos/base/v1beta1/coin";
-import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWalletManager } from "@interchain-kit/react";
+import { useChain } from "@interchain-kit/react";
+import { CosmosSignArgs, toEncoders } from "@interchainjs/cosmos";
+import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { useEffect } from "react";
 
-import { convertProtoToAminoMsg } from "~/utils/dezswap";
+import {
+  LegacyConnectType,
+  type LegacyTxResult,
+  convertCosmosArgsToTxOptions,
+  useConnectedLegacyWallet,
+  useLegacyWallet,
+} from "~/utils/legacy";
+import type { Optional, Prettify } from "~/utils/type";
 
 import { useNetwork } from "./useNetwork";
-import { NewMsgTxOptions } from "./useRequestPost";
 
-const resetWalletValue = {
-  walletAddress: "",
-  isInterchain: false,
-};
+type TxResultResult = Prettify<
+  Optional<Omit<LegacyTxResult["result"], "height">, "raw_log">
+>;
 
-// FIXME: remove this temporary function once the type error in signAndBroadcastSync is fixed
-function base64ToUint8Array(data: string | Uint8Array) {
-  if (typeof data !== "string") return data;
-  const binaryString = atob(data);
-
-  const len = binaryString.length;
-
-  const bytes = new Uint8Array(len);
-
-  for (let i = 0; i < len; i += 1) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  return bytes;
+interface TxResult {
+  success: boolean;
+  result: TxResultResult;
 }
 
-const useConnectedWallet = () => {
-  const wm = useWalletManager();
+interface UseConnectedWalletReturnType {
+  walletAddress: string;
+  connection: {
+    name?: string;
+    icon?: string;
+  };
+  connectType: LegacyConnectType;
+  post: (args: CosmosSignArgs) => Promise<TxResult>;
+  disconnect: () => void;
+}
+
+export const useConnectedWallet = ():
+  | UseConnectedWalletReturnType
+  | undefined => {
+  const connectedLegacyWallet = useConnectedLegacyWallet();
+  const legacyWallet = useLegacyWallet();
+  const {
+    currentChainName,
+    currentWalletName,
+    disconnect: disconnectByWalletManager,
+  } = useWalletManager();
+
   const { chainName } = useNetwork();
-  const connectedXplaWallet = useConnectedXplaWallet();
-  const [walletInfo, setWalletInfo] = useState(resetWalletValue);
-  const wallet = useWallet();
-  const fetchWalletAddress = useCallback(async () => {
-    if (wm.isReady && wm.currentChainName !== chainName) {
-      const { walletState } =
-        wm.getChainWalletState(wm.currentWalletName, wm.currentChainName) ?? {};
-      if (walletState === WalletState.Connected) {
-        await wm.disconnect(wm.currentWalletName, wm.currentChainName);
-      }
-      wm.setCurrentChainName(chainName);
-    }
-
-    const { walletState } =
-      wm.getChainWalletState(wm.currentWalletName, chainName) ?? {};
-
-    if (walletState === WalletState.Connected) {
-      const accountData = await wm.getAccount(wm.currentWalletName, chainName);
-      if (!accountData) throw new Error("Failed to fetch account data");
-      return {
-        walletAddress: accountData.address,
-        isInterchain: true,
-      };
-    }
-    if (connectedXplaWallet?.walletAddress) {
-      return {
-        walletAddress: connectedXplaWallet.walletAddress,
-        isInterchain: false,
-      };
-    }
-
-    return resetWalletValue;
-  }, [chainName, connectedXplaWallet?.walletAddress, wm]);
-
-  const { data: walletAddressResult } = useQuery({
-    queryKey: [
-      "walletAddress",
-      chainName,
-      wm.currentWalletName,
-      wm.chainWalletState,
-      connectedXplaWallet?.connectType,
-    ],
-    queryFn: () => {
-      return fetchWalletAddress();
-    },
-    enabled: !!chainName && !!wm,
-    refetchOnMount: false,
-    retry: 2,
-  });
-
-  const prevDataString = useRef("");
-
-  const post = useCallback(
-    async (
-      tx: NewMsgTxOptions,
-      signingClient?: SigningClient,
-      walletApp?: WalletApp | boolean,
-    ) => {
-      if (walletInfo.isInterchain) {
-        const { executeContract } = MessageComposer.fromPartial;
-        const messages = tx.msgs.map((txOption) => executeContract(txOption));
-        if (!tx?.fee?.amount || !tx?.fee?.gas_limit) {
-          throw new Error("PostError: Fee Not Found");
-        }
-        if (!signingClient) {
-          throw new Error("signingClient is not found");
-        }
-        const signResult = await signingClient.sign(
-          walletInfo.walletAddress,
-          messages,
-          {
-            amount: [
-              ...tx.fee.amount.map((coin) =>
-                Coin.fromPartial({
-                  amount: coin.amount.toString(),
-                  denom: coin.denom,
-                }),
-              ),
-            ],
-            gas: tx.fee.gas_limit.toString(),
-          },
-          "",
-        );
-
-        const txRaw = {
-          ...signResult,
-          authInfoBytes: base64ToUint8Array(signResult.authInfoBytes),
-          bodyBytes: base64ToUint8Array(signResult.bodyBytes),
-          signatures: signResult.signatures,
-        };
-
-        const txBytes = TxRaw.encode(txRaw).finish();
-        return signingClient.broadcastTxSync(txBytes);
-        // Temporarily using this method due to type mismatch between base64 and Uint8Array
-        // TODO: Use signAndBroadcastSync after InterchainKit update fixes the issue
-      }
-      return connectedXplaWallet?.post(
-        { ...tx, ...convertProtoToAminoMsg(tx.msgs) },
-        walletApp,
-      );
-    },
-    [connectedXplaWallet, walletInfo.isInterchain, walletInfo.walletAddress],
-  );
-
-  const availablePost = useMemo(
-    () => (walletInfo.isInterchain ? null : connectedXplaWallet?.availablePost),
-    [connectedXplaWallet?.availablePost, walletInfo.isInterchain],
-  );
-
-  const connectType = useMemo(
-    () =>
-      walletInfo.isInterchain ? undefined : connectedXplaWallet?.connectType,
-    // TODO: Implement with XplaSingingClient
-    [connectedXplaWallet?.connectType, walletInfo.isInterchain],
-  );
-
-  const connection = useMemo(
-    () =>
-      walletInfo.isInterchain ? undefined : connectedXplaWallet?.connection,
-    // TODO: Implement with XplaSingingClient
-    [connectedXplaWallet?.connection, walletInfo.isInterchain],
-  );
-
-  const disconnect = useCallback(async () => {
-    if (walletInfo.isInterchain && wm.currentWalletName) {
-      await wm.disconnect(wm.currentWalletName, chainName);
-    } else {
-      wallet.disconnect();
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
-    }
-  }, [chainName, wallet, walletInfo.isInterchain, wm]);
+  const {
+    signingClient,
+    address: walletAddress,
+    disconnect,
+    wallet: connectedWallet,
+  } = useChain(chainName);
 
   useEffect(() => {
-    if (prevDataString.current !== JSON.stringify(walletAddressResult)) {
-      prevDataString.current = JSON.stringify(walletAddressResult);
-      setWalletInfo((prevData) => ({ ...prevData, ...walletAddressResult }));
+    signingClient?.addEncoders(toEncoders(MsgExecuteContract));
+  }, [signingClient]);
+
+  useEffect(() => {
+    if (currentChainName && currentChainName !== chainName) {
+      disconnectByWalletManager(currentWalletName, currentChainName);
     }
-  }, [walletAddressResult]);
+  }, [
+    currentChainName,
+    chainName,
+    currentWalletName,
+    disconnectByWalletManager,
+  ]);
 
-  return useMemo(
-    () => ({
-      ...walletInfo,
-      post,
-      availablePost,
-      connectType,
-      connection,
-      disconnect,
-    }),
-    [walletInfo, post, availablePost, connectType, connection, disconnect],
-  );
+  if (connectedLegacyWallet) {
+    return {
+      ...connectedLegacyWallet,
+      post: (args: CosmosSignArgs) =>
+        connectedLegacyWallet.post(convertCosmosArgsToTxOptions(args)),
+      disconnect: legacyWallet.disconnect,
+    };
+  }
+
+  if (!connectedWallet || !signingClient) {
+    return undefined;
+  }
+
+  const connection = {
+    name: connectedWallet.info.prettyName,
+    icon:
+      typeof connectedWallet.info.logo === "string"
+        ? connectedWallet.info.logo
+        : connectedWallet.info.logo?.major,
+  };
+
+  const connectType =
+    connectedWallet.info.mode === "wallet-connect"
+      ? LegacyConnectType.WALLETCONNECT
+      : LegacyConnectType.EXTENSION;
+
+  const post = async (args: CosmosSignArgs) => {
+    const postResult = await signingClient.signAndBroadcast(
+      walletAddress,
+      args.messages,
+      args.fee ?? "auto",
+      args.memo,
+    );
+
+    const txResp = await postResult.wait();
+
+    return {
+      success: txResp.code === 0,
+      result: {
+        txhash: postResult.transactionHash,
+        raw_log: txResp.rawLog,
+      },
+    };
+  };
+
+  return {
+    walletAddress,
+    connection,
+    post,
+    connectType,
+    disconnect,
+  };
 };
-
-export default useConnectedWallet;
