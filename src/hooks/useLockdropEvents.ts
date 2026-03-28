@@ -1,28 +1,41 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
-import { LockdropEvent } from "~/types/lockdrop";
+import {
+  useClientsLoading,
+  useCosmWasmClient,
+} from "~/components/Providers/ClientProvider";
+import { contractAddresses } from "~/constants/dezswap";
+import type { LockdropEvent, LockdropEventInfo, LockdropEvents } from "~/types/lockdrop";
 
-import useAPI from "./useAPI";
 import { useNetwork } from "./useNetwork";
 
 const useLockdropEvents = () => {
-  const { selectedChain: chainId } = useNetwork();
-  const api = useAPI();
+  const { selectedChain: chainId, chainName } = useNetwork();
+  const client = useCosmWasmClient();
+  const isClientsLoading = useClientsLoading();
+
   const {
     data: lockdropEvents,
     isLoading,
     refetch,
   } = useQuery({
     queryKey: ["lockdropEvents", chainId],
-    enabled: !api.isLoading,
+    enabled: !isClientsLoading,
     queryFn: async () => {
+      const contractAddress = contractAddresses?.[chainName]?.lockdrop;
+      if (!contractAddress || !client) {
+        return [];
+      }
+
       const fetchAll = async (
         prevData: LockdropEvent[] = [],
         startAfter = 0,
       ): Promise<LockdropEvent[]> => {
         try {
-          const res = await api.getLockdropEvents(startAfter);
+          const res = (await client.queryContractSmart(contractAddress, {
+            events_by_end: { start_after: startAfter },
+          })) as LockdropEvents;
           if (
             !res?.events?.length ||
             !!prevData.find(
@@ -54,10 +67,12 @@ const useLockdropEvents = () => {
 
   const getLockdropEventInfo = useCallback(
     async (address: string) => {
-      const res = await api.getLockdropEventInfo(address);
-      return res;
+      if (!client) return undefined;
+      return client.queryContractSmart(address, {
+        event_info: {},
+      }) as Promise<LockdropEventInfo>;
     },
-    [api],
+    [client],
   );
 
   const getLockdropEventInfoByRewardToken = useCallback(

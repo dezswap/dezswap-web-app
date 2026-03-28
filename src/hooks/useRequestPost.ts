@@ -2,21 +2,19 @@ import {
   ConnectType,
   CreateTxFailed,
   TxFailed,
-  TxResult,
 } from "@xpla/wallet-provider";
 import { CreateTxOptions, Fee } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { DeliverTxResponse } from "@xpla/xplajs/types";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 import { TxError } from "~/types/common";
 
-import { convertProtoToAminoMsg } from "~/utils/dezswap";
+import { convertProtoToAminoMsg } from "~/utils/legacy";
+import type { CosmosSignArgs } from "~/utils/legacy";
 
 import useConfirmationModal from "./modals/useConfirmationModal";
 import useTxBroadcastingModal from "./modals/useTxBroadcastingModal";
-import useConnectedWallet from "./useConnectedWallet";
-import useSigningClient from "./useSigningClient";
+import { useConnectedWallet } from "./useConnectedWallet";
 
 export interface NewMsgTxOptions extends Omit<CreateTxOptions, "msgs"> {
   msgs: MsgExecuteContract[];
@@ -27,7 +25,6 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
   const [args, setArgs] = useState<NewMsgTxOptions>();
   const [txHash, setTxHash] = useState<string>();
   const [txError, setTxError] = useState<TxError>();
-  const { signingClient } = useSigningClient();
   const txBroadcastModal = useTxBroadcastingModal({
     txHash,
     txError,
@@ -38,54 +35,53 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
   const postTx = useCallback(
     async (createTxOptions: NewMsgTxOptions) => {
-      if (connectedWallet.isInterchain || connectedWallet.availablePost) {
-        try {
-          txBroadcastModal.open();
-          const result = await connectedWallet.post(
-            {
-              ...createTxOptions,
-              msgs: createTxOptions.msgs,
-            },
-            signingClient,
+      if (!connectedWallet) return;
+      try {
+        txBroadcastModal.open();
+        const { msgs, fee: txFee, memo } = createTxOptions;
+        const { msgs: aminoMsgs } = convertProtoToAminoMsg(msgs);
+
+        // Build CosmosSignArgs for graz path or legacy path
+        const cosmosArgs: CosmosSignArgs = {
+          messages: msgs.map((msg) => ({
+            typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+            value: msg,
+          })),
+          memo,
+        };
+
+        const result = await connectedWallet.post(cosmosArgs);
+
+        if (result.success) {
+          setTxHash(result.result.txhash);
+        } else {
+          setTxError(
+            new TxFailed(
+              {
+                ...createTxOptions,
+                msgs: aminoMsgs,
+              },
+              result.result.txhash,
+              result.result.raw_log || "",
+              result.result.raw_log,
+            ),
           );
-          if (connectedWallet.isInterchain && result) {
-            const { transactionHash, code, rawLog } =
-              result as DeliverTxResponse;
-            if (code !== 0) {
-              setTxError(
-                new TxFailed(
-                  {
-                    ...createTxOptions,
-                    ...convertProtoToAminoMsg(createTxOptions.msgs),
-                  },
-                  transactionHash,
-                  rawLog || "",
-                  rawLog,
-                ),
-              );
-            } else {
-              setTxHash(transactionHash);
-            }
-          } else {
-            const { result: res } = (result as TxResult) ?? {};
-            setTxHash(res?.txhash);
-          }
-        } catch (error) {
-          console.log(error);
-          if (
-            error instanceof CreateTxFailed &&
-            connectedWallet.connectType === ConnectType.WALLETCONNECT
-          ) {
-            error.message =
-              "Transaction creation failed, please check the details in your wallet and try again";
-          }
-          if (error instanceof Error) {
-            setTxError(error);
-          }
+        }
+      } catch (error) {
+        console.log(error);
+        if (
+          error instanceof CreateTxFailed &&
+          connectedWallet.connectType === ConnectType.WALLETCONNECT
+        ) {
+          error.message =
+            "Transaction creation failed, please check the details in your wallet and try again";
+        }
+        if (error instanceof Error) {
+          setTxError(error);
         }
       }
     },
-    [connectedWallet, txBroadcastModal, signingClient],
+    [connectedWallet, txBroadcastModal],
   );
 
   const handleConfirm = useCallback(async () => {
@@ -122,7 +118,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
       skipConfirmation?: boolean;
     }) => {
       if (createTxOptions.skipConfirmation) {
-        if (createTxOptions.txOptions || connectedWallet.isInterchain) {
+        if (createTxOptions.txOptions) {
           postTx({
             ...createTxOptions.txOptions,
             fee: createTxOptions.fee ?? createTxOptions.txOptions.fee,
@@ -147,7 +143,7 @@ const useRequestPost = (onDoneTx?: () => void, isModalParent = false) => {
 
       confirmationModal.open();
     },
-    [confirmationModal, connectedWallet.isInterchain, postTx],
+    [confirmationModal, postTx],
   );
 
   return { requestPost };

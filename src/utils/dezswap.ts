@@ -1,14 +1,14 @@
 import { AccAddress, Coin, Coins, Numeric } from "@xpla/xpla.js";
-import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
+import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import {
   AuthInfo,
   Fee,
   SignerInfo,
   Tx,
   TxBody,
-} from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { EncodeObject } from "@xpla/xplajs/types";
+} from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { EncodeObject } from "@cosmjs/proto-signing";
 
 import {
   DefaultChainName,

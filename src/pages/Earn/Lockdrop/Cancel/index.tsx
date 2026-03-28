@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -25,8 +25,9 @@ import { LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
-import useAPI from "~/hooks/useAPI";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 import useAsset from "~/hooks/useAsset";
+import type { LockdropUserInfo } from "~/types/lockdrop";
 import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
@@ -81,7 +82,7 @@ function CancelPage() {
     () => getTokenLink(lockdropEventInfo?.lp_token_addr, explorers?.[0].url),
     [explorers, lockdropEventInfo?.lp_token_addr],
   );
-  const api = useAPI();
+  const cosmwasmClient = useCosmWasmClient();
   const navigate = useNavigate();
   const handleModalClose = useCallback(() => {
     navigate("../..", { relative: "route" });
@@ -94,10 +95,12 @@ function CancelPage() {
   const { data: lockdropUserInfo } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
-      if (!eventAddress) {
+      if (!eventAddress || !walletAddress || !cosmwasmClient) {
         return null;
       }
-      const res = await api.getLockdropUserInfo(eventAddress);
+      const res = (await cosmwasmClient.queryContractSmart(eventAddress, {
+        user_info: { addr: walletAddress },
+      })) as LockdropUserInfo;
       return res || null;
     },
   });

@@ -11,7 +11,7 @@ import theme from "~/styles/theme";
 
 import "~/utils/overrideXplaNumeric";
 
-import { InterchainProvider } from "~/components/Providers/InterchainProvider";
+import { GrazProvider } from "~/components/Providers/GrazProvider";
 
 import App from "./App";
 
@@ -24,13 +24,13 @@ const root = ReactDOM.createRoot(document.getElementById("root")!);
 getChainOptions().then((chainOptions) => {
   root.render(
     <WalletProvider {...chainOptions}>
-      <InterchainProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <GrazProvider>
           <ThemeProvider theme={theme}>
             <App />
           </ThemeProvider>
-        </QueryClientProvider>
-      </InterchainProvider>
+        </GrazProvider>
+      </QueryClientProvider>
     </WalletProvider>,
   );
 });

@@ -20,7 +20,8 @@ import Typography from "~/components/Typography";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
-import useAPI from "~/hooks/useAPI";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useLockdropBookmark from "~/hooks/useLockdropBookmark";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNetwork } from "~/hooks/useNetwork";
@@ -80,7 +81,8 @@ function LockdropPage() {
     lockdropEvents: originalLockdropEvents,
     refetch: refetchLockdropEvents,
   } = useLockdropEvents();
-  const api = useAPI();
+  const cosmwasmClient = useCosmWasmClient();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { findPairByLpAddress } = usePairs();
 
   const lockdropEvents = useMemo(() => {
@@ -94,7 +96,12 @@ function LockdropPage() {
     queries: lockdropEvents.map((lockdropEvent) => ({
       queryKey: ["lockdropUserInfo", lockdropEvent.addr, chainId],
       queryFn: async () => {
-        const res = await api.getLockdropUserInfo(lockdropEvent.addr);
+        if (!walletAddress || !lockdropEvent.addr || !cosmwasmClient) {
+          return null;
+        }
+        const res = await cosmwasmClient.queryContractSmart(lockdropEvent.addr, {
+          user_info: { addr: walletAddress },
+        });
         if (!res) {
           return null;
         }

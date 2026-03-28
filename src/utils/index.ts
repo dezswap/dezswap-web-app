@@ -1,4 +1,4 @@
-import { fromBech32 } from "@interchainjs/encoding";
+import { fromBech32 } from "@cosmjs/encoding";
 import { Numeric } from "@xpla/xpla.js";
 import { Decimal } from "decimal.js";
 

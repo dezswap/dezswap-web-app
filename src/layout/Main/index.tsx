@@ -157,7 +157,14 @@ function MainLayout({ children }: PropsWithChildren) {
   // but it's better to keep it just in case we don't reload on network change in the future
   const queryClient = useQueryClient();
   useEffect(
-    () => chainNameStore.subscribe(() => queryClient.clear()),
+    () =>
+      chainNameStore.subscribe(
+        (state, prev) => {
+          if (state.chainName !== prev.chainName) {
+            queryClient.clear();
+          }
+        },
+      ),
     [queryClient],
   );
 

@@ -1,10 +1,13 @@
 import { Numeric } from "@xpla/xpla.js";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
-import useAPI from "~/hooks/useAPI";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import useRPCClient from "~/hooks/useRPCClient";
+import {
+  generateReverseSimulationMsg,
+  generateSimulationMsg,
+} from "~/utils/dezswap";
 
 import { ReverseSimulation, Simulation } from "~/types/pair";
 
@@ -19,7 +22,6 @@ const useSimulate = ({
   amount?: Numeric.Input;
   isReversed?: boolean;
 }) => {
-  const { client } = useRPCClient();
   const { findPair } = usePairs();
   const [result, setResult] = useState<
     Simulation | ReverseSimulation | undefined
@@ -27,7 +29,7 @@ const useSimulate = ({
   const [isLoading, setIsLoading] = useState(false);
   const isSimulated = useRef(false);
   const { chainName } = useNetwork();
-  const api = useAPI();
+  const client = useCosmWasmClient();
 
   const deferredAmount = useDeferredValue(amount);
 
@@ -51,23 +53,25 @@ const useSimulate = ({
           setIsLoading(false);
           return;
         }
+        if (!client) {
+          setIsLoading(false);
+          return;
+        }
         if (!isReversed) {
-          const res = await api.simulate(
+          const res = (await client.queryContractSmart(
             pair.contract_addr,
-            fromAddress,
-            deferredAmount.toString(),
-          );
+            generateSimulationMsg(fromAddress, deferredAmount.toString()),
+          )) as Simulation;
           if (res && !isAborted) {
             setResult(res);
           }
         }
 
         if (isReversed) {
-          const res = await api.reverseSimulate(
+          const res = (await client.queryContractSmart(
             pair.contract_addr,
-            toAddress,
-            deferredAmount.toString(),
-          );
+            generateReverseSimulationMsg(toAddress, deferredAmount.toString()),
+          )) as ReverseSimulation;
           if (res && !isAborted) {
             setResult(res);
           }
@@ -94,7 +98,6 @@ const useSimulate = ({
     findPair,
     fromAddress,
     isReversed,
-    client,
     toAddress,
     chainName,
   ]);

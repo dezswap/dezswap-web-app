@@ -1,5 +1,5 @@
 import type { Chain } from "@chain-registry/types";
-import type { HttpEndpoint } from "@interchainjs/types";
+import type { HttpEndpoint } from "@cosmjs/stargate";
 import type {
   CreateTxFailed,
   SignBytesFailed,

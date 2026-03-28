@@ -1,11 +1,18 @@
-import { CosmosSignArgs } from "@interchainjs/cosmos";
 import {
   MsgExecuteContract as BeforeMsgExecuteContract,
   CreateTxOptions,
 } from "@xpla/xpla.js";
 import { Coin, Fee } from "@xpla/xpla.js";
-import type { StdFee } from "@xpla/xplajs";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import type { StdFee } from "@cosmjs/stargate";
+import type { EncodeObject } from "@cosmjs/proto-signing";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+
+/** Local replacement for @interchainjs/cosmos CosmosSignArgs */
+export interface CosmosSignArgs {
+  messages: EncodeObject[];
+  fee?: StdFee;
+  memo?: string;
+}
 
 import { getCoins } from "./dezswap";
 import { Json } from "./encode";

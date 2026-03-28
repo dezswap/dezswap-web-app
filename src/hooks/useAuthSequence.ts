@@ -1,35 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import useAPI from "./useAPI";
+import {
+  useClientsLoading,
+  useStargateClient,
+} from "~/components/Providers/ClientProvider";
+
 import { useConnectedWallet } from "./useConnectedWallet";
 import { useNetwork } from "./useNetwork";
-import useSigningClient from "./useSigningClient";
 
 function useAuthSequence() {
-  const api = useAPI();
-  const { signingClient: client } = useSigningClient();
+  const client = useStargateClient();
+  const isClientsLoading = useClientsLoading();
   const { walletAddress } = useConnectedWallet() ?? {};
   const { chainName } = useNetwork();
   const isXpla = useMemo(() => chainName.includes("xpla"), [chainName]);
 
   const { data: sequence, isLoading } = useQuery({
-    queryKey: ["authSequence", walletAddress, chainName, isXpla, !!client],
+    queryKey: ["authSequence", walletAddress, chainName, isXpla],
     queryFn: async (): Promise<bigint> => {
       if (!walletAddress || !chainName) {
         throw new Error("Wallet address or chain name is not available");
       }
 
       try {
-        const authInfo = await api.getAuthInfo();
-        const { sequence: authSequence } = authInfo || {};
-        return authSequence ?? 0n;
+        const account = await client!.getAccount(walletAddress);
+        const { sequence: authSequence } = account || {};
+        return authSequence != null ? BigInt(authSequence) : 0n;
       } catch (err) {
         console.error("Failed to get auth sequence:", err);
         throw err;
       }
     },
-    enabled: !api.isLoading && !!walletAddress && !!chainName,
+    enabled: !isClientsLoading && !!client && !!walletAddress && !!chainName,
     retry: 3,
     staleTime: 0,
   });

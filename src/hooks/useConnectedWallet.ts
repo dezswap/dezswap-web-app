@@ -1,8 +1,7 @@
-import { useWalletManager } from "@interchain-kit/react";
-import { useChain } from "@interchain-kit/react";
-import { CosmosSignArgs, toEncoders } from "@interchainjs/cosmos";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { useEffect } from "react";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { GasPrice } from "@cosmjs/stargate";
+import { useQuery } from "@tanstack/react-query";
+import { useAccount, useDisconnect } from "graz";
 
 import {
   LegacyConnectType,
@@ -11,7 +10,9 @@ import {
   useConnectedLegacyWallet,
   useLegacyWallet,
 } from "~/utils/legacy";
+import type { CosmosSignArgs } from "~/utils/legacy";
 import type { Optional, Prettify } from "~/utils/type";
+import { isCosmosEvmChain, wrapSignerForCosmosEvm } from "~/utils/cosmos-evm";
 
 import { useNetwork } from "./useNetwork";
 
@@ -35,39 +36,58 @@ interface UseConnectedWalletReturnType {
   disconnect: () => void;
 }
 
+/**
+ * Create a SigningCosmWasmClient using Amino-only signer.
+ *
+ * For cosmos-evm chains (XPLA), wraps the signer to fix the `algo` field
+ * so CosmJS encodes the pubkey with the correct ethsecp256k1 typeUrl.
+ * Detection is chain-registry based (Skip-go pattern), not Keplr-dependent.
+ */
+async function createAminoSigningClient(
+  chainId: string,
+  rpcUrl: string,
+  gasPrice: string,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const keplr = (window as any).keplr;
+  if (!keplr) return null;
+
+  let aminoSigner = keplr.getOfflineSignerOnlyAmino(chainId);
+
+  // Skip-go pattern: detect cosmos-evm from chain registry, not from Keplr's algo field
+  if (isCosmosEvmChain(chainId)) {
+    aminoSigner = wrapSignerForCosmosEvm(aminoSigner);
+  }
+
+  return SigningCosmWasmClient.connectWithSigner(rpcUrl, aminoSigner, {
+    gasPrice: GasPrice.fromString(gasPrice),
+  });
+}
+
 export const useConnectedWallet = ():
   | UseConnectedWalletReturnType
   | undefined => {
   const connectedLegacyWallet = useConnectedLegacyWallet();
   const legacyWallet = useLegacyWallet();
-  const {
-    currentChainName,
-    currentWalletName,
-    disconnect: disconnectByWalletManager,
-  } = useWalletManager();
 
-  const { chainName } = useNetwork();
-  const {
-    signingClient,
-    address: walletAddress,
-    disconnect,
-    wallet: connectedWallet,
-  } = useChain(chainName);
+  const { selectedChain, rpcUrl } = useNetwork();
+  const chainId = selectedChain?.chainId ?? "";
 
-  useEffect(() => {
-    signingClient?.addEncoders(toEncoders(MsgExecuteContract));
-  }, [signingClient]);
+  const { data: accounts, isConnected, walletType } = useAccount();
+  const { disconnect } = useDisconnect();
 
-  useEffect(() => {
-    if (currentChainName && currentChainName !== chainName) {
-      disconnectByWalletManager(currentWalletName, currentChainName);
-    }
-  }, [
-    currentChainName,
-    chainName,
-    currentWalletName,
-    disconnectByWalletManager,
-  ]);
+  const feeToken = selectedChain?.fees?.feeTokens?.[0];
+  const gasPriceStr = feeToken
+    ? `${feeToken.averageGasPrice ?? 850000000000}${feeToken.denom}`
+    : "850000000000axpla";
+
+  const { data: signingClient } = useQuery({
+    queryKey: ["aminoSigningClient", chainId, rpcUrl, isConnected],
+    queryFn: () => createAminoSigningClient(chainId, rpcUrl, gasPriceStr),
+    enabled: isConnected && !!chainId && !!rpcUrl,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  });
 
   if (connectedLegacyWallet) {
     return {
@@ -78,24 +98,32 @@ export const useConnectedWallet = ():
     };
   }
 
-  if (!connectedWallet || !signingClient) {
+  if (!isConnected || !chainId) {
     return undefined;
   }
 
+  const accountKey = accounts?.[chainId];
+  const walletAddress = accountKey?.bech32Address;
+
+  if (!walletAddress) {
+    return undefined;
+  }
+
+  const walletTypeStr = walletType ?? "";
   const connection = {
-    name: connectedWallet.info.prettyName,
-    icon:
-      typeof connectedWallet.info.logo === "string"
-        ? connectedWallet.info.logo
-        : connectedWallet.info.logo?.major,
+    name: walletTypeStr,
+    icon: undefined as string | undefined,
   };
 
   const connectType =
-    connectedWallet.info.mode === "wallet-connect"
+    walletTypeStr === "walletconnect"
       ? LegacyConnectType.WALLETCONNECT
       : LegacyConnectType.EXTENSION;
 
-  const post = async (args: CosmosSignArgs) => {
+  const post = async (args: CosmosSignArgs): Promise<TxResult> => {
+    if (!signingClient) {
+      throw new Error("Signing client not ready");
+    }
     const postResult = await signingClient.signAndBroadcast(
       walletAddress,
       args.messages,
@@ -103,13 +131,11 @@ export const useConnectedWallet = ():
       args.memo,
     );
 
-    const txResp = await postResult.wait();
-
     return {
-      success: txResp.code === 0,
+      success: postResult.code === 0,
       result: {
         txhash: postResult.transactionHash,
-        raw_log: txResp.rawLog,
+        raw_log: postResult.rawLog,
       },
     };
   };
@@ -119,6 +145,6 @@ export const useConnectedWallet = ():
     connection,
     post,
     connectType,
-    disconnect,
+    disconnect: () => disconnect(),
   };
 };

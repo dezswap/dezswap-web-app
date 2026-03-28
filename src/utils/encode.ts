@@ -2,7 +2,7 @@ import {
   toBase64 as bytesToBase64,
   fromUtf8,
   toUtf8,
-} from "@interchainjs/encoding";
+} from "@cosmjs/encoding";
 
 /**
  * JSON encoding/decoding utilities.

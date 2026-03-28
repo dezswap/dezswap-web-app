@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { useQuery } from "@tanstack/react-query";
 import { AccAddress, Numeric } from "@xpla/xpla.js";
-import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { useCallback, useEffect, useMemo } from "react";
 import { useScreenClass } from "react-grid-system";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -20,8 +20,9 @@ import { LP_DECIMALS } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
-import useAPI from "~/hooks/useAPI";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 import useAssets from "~/hooks/useAssets";
+import type { LockdropUserInfo } from "~/types/lockdrop";
 import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
@@ -46,7 +47,7 @@ function UnlockPage() {
   } = useNetwork();
   const { walletAddress } = useConnectedWallet() ?? {};
   const { getLockdropEventInfo } = useLockdropEvents();
-  const api = useAPI();
+  const cosmwasmClient = useCosmWasmClient();
   const { data: nativeTokens } = useNativeTokens();
   const { findPairByLpAddress } = usePairs();
   const { assetInfos } = useAssets();
@@ -65,10 +66,12 @@ function UnlockPage() {
   const { data: lockdropUserInfo, error: lockdropUserInfoError } = useQuery({
     queryKey: ["lockdropUserInfo", eventAddress, chainId],
     queryFn: async () => {
-      if (!eventAddress) {
+      if (!eventAddress || !walletAddress || !cosmwasmClient) {
         return null;
       }
-      const res = await api.getLockdropUserInfo(eventAddress);
+      const res = (await cosmwasmClient.queryContractSmart(eventAddress, {
+        user_info: { addr: walletAddress },
+      })) as LockdropUserInfo;
       return res || null;
     },
   });

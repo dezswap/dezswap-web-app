@@ -1,6 +1,5 @@
 import { css, useTheme } from "@emotion/react";
-import { TxInfo } from "@xpla/xpla.js";
-import { TxResponse } from "@xpla/xplajs/cosmos/base/abci/v1beta1/abci";
+import type { IndexedTx } from "@cosmjs/stargate";
 import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
 
@@ -19,8 +18,8 @@ import Typography from "~/components/Typography";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
+import { useStargateClient } from "~/components/Providers/ClientProvider";
 import { useNetwork } from "~/hooks/useNetwork";
-import useRPCClient from "~/hooks/useRPCClient";
 
 import { TxError } from "~/types/common";
 
@@ -31,9 +30,6 @@ interface TxBroadcastingModalProps {
   txError?: TxError;
   onDoneClick?: MouseEventHandler<HTMLButtonElement>;
   onRetryClick?: MouseEventHandler<HTMLButtonElement>;
-}
-interface XplaTxResponse extends Omit<TxResponse, "tx_response"> {
-  txResponse: TxInfo;
 }
 
 function TxBroadcastingModal({
@@ -46,21 +42,21 @@ function TxBroadcastingModal({
   const {
     selectedChain: { explorers },
   } = useNetwork();
-  const { client } = useRPCClient();
+  const clients = useStargateClient();
   const theme = useTheme();
   const screenClass = useScreenClass();
 
   const [timeAfterQueued, setTimeAfterQueued] = useState(0);
 
-  const [txInfo, setTxInfo] = useState<TxInfo>();
+  const [txInfo, setTxInfo] = useState<IndexedTx>();
 
   useEffect(() => {
     const fetchTxInfo = async () => {
-      if (client && txHash) {
-        const res = (await client.cosmos.tx.v1beta1.getTx({
-          hash: txHash,
-        })) as unknown as XplaTxResponse;
-        setTxInfo(res.txResponse);
+      if (clients && txHash) {
+        const res = await clients.getTx(txHash);
+        if (res) {
+          setTxInfo(res);
+        }
       }
     };
 
@@ -76,11 +72,11 @@ function TxBroadcastingModal({
         clearInterval(intervalId);
       }
     };
-  }, [client, txHash, txInfo]);
+  }, [clients, txHash, txInfo]);
 
   useEffect(() => {
     setTimeAfterQueued(0);
-  }, [txHash, client]);
+  }, [txHash, clients]);
 
   const hasError = useMemo(
     () => !!(txError || txInfo?.code),
@@ -123,7 +119,7 @@ function TxBroadcastingModal({
         clearInterval(intervalId);
       }
     };
-  }, [isOpen, txHash, txError, txInfo]);
+  }, [clients, isOpen, txHash, txError, txInfo]);
 
   return (
     <Modal
@@ -397,7 +393,7 @@ function TxBroadcastingModal({
                 padding-top: 10px;
               `}
             >
-              {txInfo?.raw_log ?? txError?.message}
+              {txInfo?.rawLog ?? txError?.message}
             </Typography>
           </Panel>
           <Button

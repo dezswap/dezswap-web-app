@@ -11,12 +11,12 @@ import { TokenInfo } from "~/types/token";
 
 import { getIbcTokenHash } from "~/utils";
 import { hasChainPrefix } from "~/utils/dezswap";
-import { Json } from "~/utils/encode";
+
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 
 import useFetchDecimal from "./useFetchDecimal";
 import { useNativeTokens } from "./useNativeTokens";
 import usePairs from "./usePairs";
-import useRPCClient from "./useRPCClient";
 import useVerifiedAssets from "./useVerifiedAssets";
 
 const UPDATE_INTERVAL_SEC = 5000;
@@ -26,7 +26,7 @@ const useCustomAssets = () => {
   const { verifiedAssets, verifiedIbcAssets } = useVerifiedAssets();
   const { availableAssetAddresses } = usePairs();
   const { data: nativeTokens } = useNativeTokens();
-  const { client } = useRPCClient();
+  const clients = useCosmWasmClient();
   const {
     chainName,
     selectedChain: { chainId },
@@ -85,22 +85,15 @@ const useCustomAssets = () => {
                 }));
               }
             } else {
-              const queryData = Json.toBytes({
-                token_info: {},
-              });
-              if (!client) {
+              if (!clients) {
                 console.log("Error: RPCClient is not exist");
                 return;
               }
 
-              const { data } = await client.cosmwasm.wasm.v1.smartContractState(
-                {
-                  address,
-                  queryData,
-                },
-              );
-
-              const token = Json.fromBytes<TokenInfo>(data);
+              const token = (await clients.queryContractSmart(
+                address,
+                { token_info: {} },
+              )) as TokenInfo;
 
               if (verifiedAssets) {
                 const verifiedAsset = verifiedAssets?.[address];
@@ -146,7 +139,7 @@ const useCustomAssets = () => {
     customAssetStore,
     verifiedIbcAssets,
     setCustomAssetStore,
-    client,
+    clients,
     verifiedAssets,
   ]);
 

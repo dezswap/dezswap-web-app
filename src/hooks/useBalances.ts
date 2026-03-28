@@ -1,9 +1,13 @@
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  useClientsLoading,
+  useCosmWasmClient,
+  useStargateClient,
+} from "~/components/Providers/ClientProvider";
 import { getIbcTokenHash } from "~/utils";
 
-import useAPI from "./useAPI";
 import { useConnectedWallet } from "./useConnectedWallet";
 import { useNativeTokens } from "./useNativeTokens";
 import { useNetwork } from "./useNetwork";
@@ -16,7 +20,9 @@ const useBalances = (addresses: string[]) => {
   const { verifiedIbcAssets } = useVerifiedAssets();
   const { chainName } = useNetwork();
   const { data: nativeTokens } = useNativeTokens();
-  const api = useAPI();
+  const cosmwasmClient = useCosmWasmClient();
+  const stargateClient = useStargateClient();
+  const isClientsLoading = useClientsLoading();
 
   const fetchBalance = useCallback(
     async (address: string) => {
@@ -26,21 +32,25 @@ const useBalances = (addresses: string[]) => {
           address.includes("ibc") ||
           (verifiedIbcAssets && !!verifiedIbcAssets?.[getIbcTokenHash(address)])
         ) {
-          const value = await api.getNativeTokenBalance(address);
-          return `${value || 0}`;
+          if (!stargateClient) return "0";
+          const coin = await stargateClient.getBalance(walletAddress, address);
+          return `${coin?.amount || 0}`;
         }
-        const value = await api.getTokenBalance(address);
-        return `${value || 0}`;
+        if (!cosmwasmClient) return "0";
+        const res = (await cosmwasmClient.queryContractSmart(address, {
+          balance: { address: walletAddress },
+        })) as { balance: string };
+        return `${res.balance || 0}`;
       }
       return "0";
     },
-    [chainName, walletAddress, verifiedIbcAssets, api, nativeTokens],
+    [chainName, walletAddress, verifiedIbcAssets, cosmwasmClient, stargateClient, nativeTokens],
   );
 
   const balanceQueryResults = useQueries({
     queries:
       addresses?.map((address) => ({
-        queryKey: ["balance", walletAddress, address, chainName, api.isLoading],
+        queryKey: ["balance", walletAddress, address, chainName, isClientsLoading],
         queryFn: async () => {
           try {
             const balance = await fetchBalance(address);

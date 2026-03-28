@@ -1,5 +1,5 @@
-import { GasPrice, calculateFee } from "@interchainjs/cosmos/utils/fee";
-import type { StdFee } from "@interchainjs/types";
+import { GasPrice, calculateFee } from "@cosmjs/stargate";
+import type { StdFee } from "@cosmjs/stargate";
 
 import { getChain } from "~/constants/dezswap";
 
@@ -53,5 +53,5 @@ export const calculateStdFee = (gasUsed: bigint, chainName: string): StdFee => {
   const multiplier = getMultiplier(chainName);
   const gasLimit = applyMultiplier(gasUsed, multiplier);
   const gasPrice = getGasPrice(chainName);
-  return calculateFee(gasLimit, gasPrice);
+  return calculateFee(Number(gasLimit), gasPrice);
 };

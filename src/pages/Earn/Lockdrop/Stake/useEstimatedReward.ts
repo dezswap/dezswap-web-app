@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import useAPI from "~/hooks/useAPI";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 import { useNetwork } from "~/hooks/useNetwork";
+import type { LockdropEstimatedReward } from "~/types/lockdrop";
 
 const useExpectedReward = ({
   lockdropEventAddress,
@@ -13,7 +14,7 @@ const useExpectedReward = ({
   amount?: number | string;
   duration?: number;
 }) => {
-  const { getEstimatedLockdropReward } = useAPI();
+  const client = useCosmWasmClient();
   const { chainName } = useNetwork();
   const { data } = useQuery({
     queryKey: [
@@ -24,14 +25,15 @@ const useExpectedReward = ({
       chainName,
     ],
     queryFn: async () => {
-      if (!lockdropEventAddress || !amount || !duration) {
+      if (!lockdropEventAddress || !amount || !duration || !client) {
         return null;
       }
-      const res = await getEstimatedLockdropReward(
-        lockdropEventAddress,
-        amount,
-        duration,
-      );
+      const res = (await client.queryContractSmart(lockdropEventAddress, {
+        estimate: {
+          amount: `${amount}`,
+          duration,
+        },
+      })) as LockdropEstimatedReward;
       return res || null;
     },
   });

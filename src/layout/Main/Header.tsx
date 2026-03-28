@@ -1,6 +1,5 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useChain } from "@interchain-kit/react";
 import { Numeric } from "@xpla/xpla.js";
 import { useEffect, useMemo, useRef } from "react";
 import { Col, Container, Row, useScreenClass } from "react-grid-system";
@@ -322,7 +321,6 @@ function Header() {
   const connectWalletModal = useConnectWalletModal();
   const isTestnet = useMemo(() => networkType === "testnet", [networkType]);
   const { data: dashboardTokens } = useGetDashboardTokens();
-  const { wallet: interchainWallet } = useChain(chainName);
   const { data: nativeTokens } = useNativeTokens();
   const {
     token: tokenAddress,
@@ -348,21 +346,11 @@ function Header() {
   }, [dashboardTokens, tokenAddress]);
 
   const { walletName, logo } = useMemo(() => {
-    if (connectedWallet.isInterchain)
-      return {
-        walletName: interchainWallet?.info.prettyName,
-        logo: interchainWallet?.info.logo?.toString(),
-      };
     return {
       walletName: connectedWallet?.connection?.name,
       logo: connectedWallet?.connection?.icon,
     };
-  }, [
-    connectedWallet?.connection?.name,
-    connectedWallet?.connection?.icon,
-    connectedWallet.isInterchain,
-    interchainWallet,
-  ]);
+  }, [connectedWallet?.connection?.name, connectedWallet?.connection?.icon]);
 
   useEffect(() => {
     const handleScroll = (event?: Event) => {
@@ -515,7 +503,7 @@ function Header() {
                   </Col>
                   <Col width="auto">
                     {/* // TODO: Refactor */}
-                    {connectedWallet.walletAddress ? (
+                    {connectedWallet?.walletAddress ? (
                       <WalletInfo
                         title={
                           <Row justify="center">
@@ -552,9 +540,9 @@ function Header() {
                         connectButton={
                           <Button onClick={walletPopover.toggle}>
                             {screenClass === MOBILE_SCREEN_CLASS
-                              ? ellipsisCenter(connectedWallet.walletAddress)
+                              ? ellipsisCenter(connectedWallet!.walletAddress)
                               : `${ellipsisCenter(
-                                  connectedWallet.walletAddress,
+                                  connectedWallet!.walletAddress,
                                 )} | ${formatNumber(
                                   cutDecimal(
                                     amountToValue(tokenBalance) || 0,
@@ -620,7 +608,7 @@ function Header() {
                                 <Col width="auto">
                                   <a
                                     href={getAddressLink(
-                                      connectedWallet.walletAddress,
+                                      connectedWallet!.walletAddress,
                                       explorers?.[0].url,
                                     )}
                                     target="_blank"
@@ -659,7 +647,7 @@ function Header() {
                                 >
                                   <Col>
                                     {ellipsisCenter(
-                                      connectedWallet.walletAddress,
+                                      connectedWallet!.walletAddress,
                                       10,
                                     )}
                                   </Col>
@@ -670,7 +658,7 @@ function Header() {
                                     `}
                                   >
                                     <Copy
-                                      value={connectedWallet.walletAddress}
+                                      value={connectedWallet!.walletAddress}
                                     />
                                   </Col>
                                 </Row>
@@ -745,7 +733,7 @@ function Header() {
                                     .background};
                                 `}
                                 onClick={() => {
-                                  connectedWallet.disconnect();
+                                  connectedWallet?.disconnect();
                                   walletPopover.close();
                                 }}
                               >

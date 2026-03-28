@@ -1,25 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 
-import useAPI from "~/hooks/useAPI";
+import { useStargateClient } from "~/components/Providers/ClientProvider";
 
 import { useNetwork } from "./useNetwork";
 
 const UPDATE_INTERVAL = 3000;
 
 export const useLatestBlock = () => {
-  const api = useAPI();
+  const client = useStargateClient();
   const { selectedChain: chainName } = useNetwork();
 
   const { data: height } = useQuery({
     queryKey: ["latestBlockHeight", chainName],
-    queryFn: api.getLatestBlockHeight,
+    queryFn: async () => {
+      if (!client) return "0";
+      const h = await client.getHeight();
+      return String(h);
+    },
+    enabled: !!client,
     refetchInterval: UPDATE_INTERVAL,
     refetchIntervalInBackground: false,
     refetchOnMount: false,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
-  if (typeof height === "bigint") return height.toString();
-
   return height || "0";
 };

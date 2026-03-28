@@ -1,13 +1,11 @@
 import { css, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { WalletState } from "@interchain-kit/core";
-import { useWalletManager } from "@interchain-kit/react";
+import { useConnect, WalletType } from "graz";
 import { isMobile } from "@xpla/wallet-controller/utils/browser-check";
 import { ConnectType, WalletApp, useWallet } from "@xpla/wallet-provider";
 import React, {
   type ComponentProps,
   MouseEventHandler,
-  useEffect,
   useState,
 } from "react";
 import { Col, Row, useScreenClass } from "react-grid-system";
@@ -22,7 +20,7 @@ import Hr from "~/components/Hr";
 import Modal from "~/components/Modal";
 import Typography from "~/components/Typography";
 
-import { UNSUPPORT_WALLET_LIST } from "~/constants/dezswap";
+import { UNSUPPORT_WALLET_LIST, getChain } from "~/constants/dezswap";
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
 import { useChainName } from "~/stores/chainName";
@@ -68,7 +66,7 @@ const getBrowser = () => {
   }
   return undefined;
 };
-const browserType = getBrowser();
+getBrowser();
 
 function QrModalContent({ uri }: { uri: string }) {
   const theme = useTheme();
@@ -104,21 +102,38 @@ function QrModalContent({ uri }: { uri: string }) {
   );
 }
 
+// Graz wallet entries with display info
+const GRAZ_WALLET_INFO: Record<
+  string,
+  { label: string; iconSrc: string; walletType: WalletType }
+> = {
+  [WalletType.KEPLR]: {
+    label: "Keplr",
+    iconSrc: "https://wallet.keplr.app/assets/favicon.png",
+    walletType: WalletType.KEPLR,
+  },
+  [WalletType.COSMOSTATION]: {
+    label: "Cosmostation",
+    iconSrc:
+      "https://raw.githubusercontent.com/cosmostation/cosmostation_token_resource/master/dapps/cosmostation.png",
+    walletType: WalletType.COSMOSTATION,
+  },
+  [WalletType.WALLETCONNECT]: {
+    label: "WalletConnect",
+    iconSrc:
+      "https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.png",
+    walletType: WalletType.WALLETCONNECT,
+  },
+};
+
 function ConnectWalletModal(props: ReactModal.Props) {
   const { availableConnections, availableInstallations } = useWallet();
   const { connect } = useWallet();
   const chainName = useChainName();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const wm = useWalletManager();
-  const [wcUri, setWcUri] = useState("");
-  const currentWallet = wm.getWalletByName(wm.currentWalletName);
-
-  useEffect(() => {
-    if (wm?.walletConnectQRCodeUri) {
-      setWcUri(wm?.walletConnectQRCodeUri);
-    }
-  }, [wm?.walletConnectQRCodeUri]);
+  const { connect: grazConnect } = useConnect();
+  const [wcUri] = useState("");
 
   const xplaButtons: WalletButtonProps[] = [
     ...availableConnections
@@ -172,56 +187,36 @@ function ConnectWalletModal(props: ReactModal.Props) {
         },
       })),
   ];
-  const interchainButtons: WalletButtonProps[] = [
-    ...wm.wallets
-      .filter(
-        (wallet) =>
-          !UNSUPPORT_WALLET_LIST[chainName].includes(wallet.info.name),
-      )
-      .map((wallet) => {
-        const isInstalled = wallet.walletState !== WalletState.NotExist;
-        const iconSrc =
-          typeof wallet.info.logo === "string"
-            ? wallet.info.logo
-            : (wallet.info.logo?.major ?? "");
 
-        return {
-          label: wallet.info.prettyName,
-          iconSrc,
-          isInstalled,
-          key: `interchain-${wallet.info.name}`,
-          onClick: async (event) => {
-            try {
-              if (!isInstalled) {
-                const url = wallet.info.downloads?.find(
-                  (d) => d.browser === browserType,
-                )?.link;
-                if (url) window.open(url);
-              }
-              await wm.connect(wallet.info.name, chainName);
-              if (props.onRequestClose) {
-                props.onRequestClose(event);
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          },
-        } satisfies WalletButtonProps;
-      }),
-  ];
+  const unsupportedWallets = UNSUPPORT_WALLET_LIST[chainName] ?? [];
+  const grazButtons: WalletButtonProps[] = Object.values(GRAZ_WALLET_INFO)
+    .filter((info) => !unsupportedWallets.includes(info.walletType))
+    .map((info) => ({
+      label: info.label,
+      iconSrc: info.iconSrc,
+      isInstalled: true,
+      key: `graz-${info.walletType}`,
+      onClick: async (event) => {
+        try {
+          const chainData = getChain(chainName);
+          const chainId = chainData?.[0]?.chainId ?? "";
+          grazConnect({ chainId, walletType: info.walletType });
+          if (props.onRequestClose) {
+            props.onRequestClose(event);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }));
 
   return (
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       hasCloseButton
-      title={wcUri ? currentWallet?.info.prettyName : "Connect to a wallet"}
+      title={wcUri ? "WalletConnect" : "Connect to a wallet"}
       hasGoBackButton={!!wcUri}
-      onGoBack={() => {
-        return setWcUri("");
-      }}
-      onAfterClose={() => {
-        return setWcUri("");
-      }}
+      onAfterClose={() => {}}
       {...props}
     >
       <Hr size={1} />
@@ -240,7 +235,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
                 : "0px"};
             `}
           >
-            By connecting a wallet, you understand and agree to Dezswap’s
+            By connecting a wallet, you understand and agree to Dezswap's
             Disclaimer. Wallets are provided by third parties. By connecting
             your wallet is considered that you agree to their terms and
             conditions. Always trade at your own risk.
@@ -254,7 +249,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
           >
             {[
               ...(chainName.includes("xpla") ? xplaButtons : []),
-              ...interchainButtons,
+              ...grazButtons,
             ].map((item) => (
               <Col
                 xs={6}

@@ -26,7 +26,7 @@ import useCustomAssets from "~/hooks/useCustomAssets";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNetwork } from "~/hooks/useNetwork";
 import usePairs from "~/hooks/usePairs";
-import useRPCClient from "~/hooks/useRPCClient";
+import { useCosmWasmClient } from "~/components/Providers/ClientProvider";
 import useVerifiedAssets from "~/hooks/useVerifiedAssets";
 
 import { Token } from "~/types/api";
@@ -51,7 +51,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
   const {
     selectedChain: { chainId },
   } = useNetwork();
-  const { client } = useRPCClient();
+  const clients = useCosmWasmClient();
   const { data: nativeTokens } = useNativeTokens();
 
   const balance = useBalance(address);
@@ -133,20 +133,14 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
             } as TokenInfo);
           }
         }
-      } else if (isValidAddress && client) {
+      } else if (isValidAddress && clients) {
         try {
-          const queryData = Json.toBytes({
+          const res = await clients.queryContractSmart(address, {
             token_info: {},
-          });
-
-          const { data: res } =
-            await client.cosmwasm.wasm.v1.smartContractState({
-              address,
-              queryData,
-            });
+          }) as TokenInfo;
 
           if (!isAborted) {
-            setTokenInfo(Json.fromBytes<TokenInfo>(res));
+            setTokenInfo(res);
           }
         } catch (error) {
           console.log(error);
@@ -167,7 +161,7 @@ function ImportAssetModal({ onFinish, ...modalProps }: ImportAssetModalProps) {
     isNativeToken,
     isIbcToken,
     verifiedIbcAssets,
-    client,
+    clients,
     address,
   ]);
 

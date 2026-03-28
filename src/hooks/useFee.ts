@@ -1,26 +1,35 @@
 import { Coin, Fee } from "@xpla/xpla.js";
-import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
-import { AxiosError } from "axios";
+import {
+  MsgExecuteContract,
+} from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import type { EncodeObject } from "@cosmjs/proto-signing";
+import axios, { AxiosError } from "axios";
 import { useDeferredValue, useEffect, useState } from "react";
 
-import useAPI from "./useAPI";
+import { useStargateClient } from "~/components/Providers/ClientProvider";
+import { createEncodedTx } from "~/utils/dezswap";
+import { calculateStdFee } from "~/utils/fee";
+
 import useAuthSequence from "./useAuthSequence";
 import { useConnectedWallet } from "./useConnectedWallet";
-import useRPCClient from "./useRPCClient";
+import { useNetwork } from "./useNetwork";
 
 const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
   const { walletAddress } = useConnectedWallet() ?? {};
-  const { client } = useRPCClient();
+  const client = useStargateClient();
+  const { chainName, selectedChain } = useNetwork();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const api = useAPI();
   const { sequence, isLoading: isSequenceLoading } = useAuthSequence();
   const [errMsg, setErrMsg] = useState("");
   const deferredCreateTxOptions = useDeferredValue(txOptions);
-  const { executeContract } = MessageComposer.encoded;
-  const messages = deferredCreateTxOptions?.map((msg) => executeContract(msg));
+  const messages: EncodeObject[] | undefined = deferredCreateTxOptions?.map(
+    (msg) => ({
+      typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+      value: MsgExecuteContract.encode(MsgExecuteContract.fromPartial(msg)).finish(),
+    }),
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -46,11 +55,29 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
           return;
         }
 
-        const res = await api.estimateFee(messages, sequence);
-        if (res && !isAborted) {
+        const txBytes = createEncodedTx(messages, sequence);
+        const restEndpoint = selectedChain?.apis?.rest?.[0]?.address;
+        if (!restEndpoint) {
+          setIsLoading(false);
+          return;
+        }
+
+        const { data: res } = await axios.post(
+          `${restEndpoint}/cosmos/tx/v1beta1/simulate`,
+          {
+            tx_bytes: Buffer.from(txBytes).toString("base64"),
+          },
+        );
+
+        const stdFee = calculateStdFee(
+          BigInt(res?.gas_info?.gas_used ?? "0"),
+          chainName,
+        );
+
+        if (stdFee && !isAborted) {
           setFee(
-            new Fee(Number(res.gas), [
-              new Coin(res.amount[0].denom, res.amount[0].amount),
+            new Fee(Number(stdFee.gas), [
+              new Coin(stdFee.amount[0].denom, stdFee.amount[0].amount),
             ]),
           );
 
