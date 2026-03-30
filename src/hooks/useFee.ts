@@ -6,11 +6,11 @@ import { useDeferredValue, useEffect, useState } from "react";
 
 import useAPI from "./useAPI";
 import useAuthSequence from "./useAuthSequence";
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
 
 const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { client } = useRPCClient();
   const [fee, setFee] = useState<Fee>();
   const [isLoading, setIsLoading] = useState(false);

@@ -38,7 +38,7 @@ import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
 import useAsset from "~/hooks/useAsset";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
@@ -85,7 +85,7 @@ function ProvidePage() {
     selectedChain: { explorers, fees },
   } = useNetwork();
   const { value: slippageTolerance } = useSlippageTolerance();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { data: nativeTokens } = useNativeTokens();
   const handleModalClose = useCallback(() => {
     navigate("..", { replace: true, relative: "route" });

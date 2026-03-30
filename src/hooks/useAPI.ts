@@ -30,7 +30,7 @@ import {
 import { Json } from "~/utils/encode";
 import { calculateStdFee } from "~/utils/fee";
 
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;

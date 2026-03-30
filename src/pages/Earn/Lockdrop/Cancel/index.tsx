@@ -27,7 +27,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAsset from "~/hooks/useAsset";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -63,7 +63,7 @@ function CancelPage() {
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
   const { data: nativeTokens } = useNativeTokens();
