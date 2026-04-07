@@ -8,7 +8,7 @@ import {
   TxBody,
 } from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { EncodeObject } from "@xpla/xplajs/types";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 
 import {
   DefaultChainName,
@@ -23,16 +23,23 @@ import { Json } from "./encode";
 const CHAIN_PREFIXS = ["xpla1", "fetch1"];
 export type Amount = string | number;
 
-export const createEncodedTx = (
-  messages: EncodeObject[],
-  authSequence: bigint,
+/**
+ * It builds a encoded tx for simulation, which has the same structure as a real tx but with dummy values for signatures and fee.
+ * This is capsulated in the stargate client but we need to do this manually
+ * since we have the legacy wallet client without simulate support.
+ * */
+export const buildSimulateTx = (
+  messages: MsgExecuteContract[],
+  sequence: bigint,
 ): Uint8Array => {
   const txBody = TxBody.fromPartial({
-    messages,
+    messages: messages.map((message) =>
+      MessageComposer.encoded.executeContract(message),
+    ),
   });
 
   const signerInfo = SignerInfo.fromPartial({
-    sequence: authSequence,
+    sequence,
     modeInfo: { single: { mode: SignMode.SIGN_MODE_UNSPECIFIED } },
   });
 

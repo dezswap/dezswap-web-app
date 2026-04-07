@@ -1,8 +1,8 @@
 // TODO: refactor this hook using react-query
 /* eslint-disable react-hooks/preserve-manual-memoization */
 import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
+import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
 import type { Any } from "@xpla/xplajs/google/protobuf/any";
-import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
@@ -24,7 +24,7 @@ import type {
 } from "~/types/token";
 
 import {
-  createEncodedTx,
+  buildSimulateTx,
   generateReverseSimulationMsg,
   generateSimulationMsg,
   hasChainPrefix,
@@ -336,12 +336,12 @@ const useAPI = () => {
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
-    async (msg: EncodeObject[], authSequence: bigint) => {
-      if (!msg || !client) {
+    async (messages: MsgExecuteContract[], sequence: bigint) => {
+      if (!messages || !client) {
         return undefined;
       }
 
-      const txBytes = createEncodedTx(msg, authSequence);
+      const txBytes = buildSimulateTx(messages, sequence);
 
       const res = await client?.cosmos.tx.v1beta1.simulate({
         txBytes,

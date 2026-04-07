@@ -135,7 +135,7 @@ function ClaimPage() {
   const { fee } = useFee(createTxOptions);
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens]);
@@ -157,7 +157,7 @@ function ClaimPage() {
         return;
       }
       requestPost({
-        txOptions: { msgs: createTxOptions },
+        messages: createTxOptions,
         fee,
         skipConfirmation: true,
       });
