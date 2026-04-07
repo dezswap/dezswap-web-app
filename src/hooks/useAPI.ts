@@ -1,5 +1,7 @@
 // TODO: refactor this hook using react-query
 /* eslint-disable react-hooks/preserve-manual-memoization */
+import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
+import type { Any } from "@xpla/xplajs/google/protobuf/any";
 import { EncodeObject } from "@xpla/xplajs/types";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
@@ -310,11 +312,27 @@ const useAPI = () => {
       return undefined;
     }
 
-    const { info } = await client.cosmos.auth.v1beta1.accountInfo({
+    // Some chains (Cosmos-sdk < 0.47, e.g., fetch.ai) don't support account-info query, so we still need this handling.
+    const { account } = await client.cosmos.auth.v1beta1.account({
       address: walletAddress,
     });
 
-    return info;
+    if (!account) {
+      return undefined;
+    }
+
+    // This is a workaround for wrong Type intersection of `BaseAccount` and `EthAccount` - missing `typeUrl` field :/
+    const accountAny = account as unknown as Any;
+
+    if (accountAny.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
+      return BaseAccount.decode(accountAny.value);
+    } else if (accountAny.typeUrl === "/ethermint.types.v1.EthAccount") {
+      const { baseAccount } = EthAccount.decode(accountAny.value);
+      return baseAccount;
+    }
+
+    // Unsupported account types
+    return undefined;
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
