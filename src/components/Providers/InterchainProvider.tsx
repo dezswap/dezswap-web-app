@@ -1,4 +1,4 @@
-import { WCWallet } from "@interchain-kit/core";
+import { WCCosmosWallet, WCWallet } from "@interchain-kit/core";
 import { cosmostationWallet } from "@interchain-kit/cosmostation-extension";
 import { keplrWallet } from "@interchain-kit/keplr-extension";
 import { ChainProvider } from "@interchain-kit/react";
@@ -25,7 +25,7 @@ const defaultOption = {
 };
 
 const walletConnect = new WCWallet(undefined, defaultOption);
-
+walletConnect.setNetworkWallet("cosmos", new WCCosmosWallet());
 const wallets = [keplrWallet, cosmostationWallet, walletConnect];
 
 export function InterchainProvider({
