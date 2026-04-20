@@ -6,9 +6,19 @@ import { chainNameStore } from "~/stores/chainName";
 
 const instance = Axios.create();
 
+/**
+ * Replace encoded slashes in a URL with a surrogate form the API restores
+ * server-side. GCP load balancer rejects paths containing `%2F`, and currently
+ * only IBC denoms (`ibc/XXX`) carry slashes through path segments.
+ *
+ * See https://github.com/dezswap/dezswap-api/pull/93.
+ */
+const applySlashSurrogate = (url?: string) => url?.replace(/ibc%2F/g, "ibc-");
+
 instance.interceptors.request.use((config) => {
   config.baseURL = getBaseUrl();
   config.params = { [Date.now()]: "", ...config.params };
+  config.url = applySlashSurrogate(config.url);
   return config;
 });
 
