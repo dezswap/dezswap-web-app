@@ -112,7 +112,6 @@ function ConnectWalletModal(props: ReactModal.Props) {
   const screenClass = useScreenClass();
   const wm = useWalletManager();
   const [wcUri, setWcUri] = useState("");
-  const currentWallet = wm.getWalletByName(wm.currentWalletName);
 
   useEffect(() => {
     if (wm?.walletConnectQRCodeUri) {
@@ -214,7 +213,7 @@ function ConnectWalletModal(props: ReactModal.Props) {
     <Modal
       drawer={screenClass === MOBILE_SCREEN_CLASS}
       hasCloseButton
-      title={wcUri ? currentWallet?.info.prettyName : "Connect to a wallet"}
+      title={wcUri ? "WalletConnect" : "Connect to a wallet"}
       hasGoBackButton={!!wcUri}
       onGoBack={() => {
         return setWcUri("");
