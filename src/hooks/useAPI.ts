@@ -1,13 +1,12 @@
 // TODO: refactor this hook using react-query
 /* eslint-disable react-hooks/preserve-manual-memoization */
 import { BaseAccount, EthAccount } from "@interchainjs/cosmos-types";
-import { calculateFee } from "@interchainjs/cosmos/utils/chain.js";
-import { Any } from "@xpla/xplajs/google/protobuf/any";
-import { EncodeObject } from "@xpla/xplajs/types";
+import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
+import type { Any } from "@xpla/xplajs/google/protobuf/any";
 import axios from "axios";
 import { useCallback, useMemo } from "react";
 
-import { contractAddresses, getGasInfo } from "~/constants/dezswap";
+import { contractAddresses } from "~/constants/dezswap";
 
 import { useNetwork } from "~/hooks/useNetwork";
 
@@ -25,25 +24,23 @@ import type {
 } from "~/types/token";
 
 import {
-  createEncodedTx,
+  buildSimulateTx,
   generateReverseSimulationMsg,
   generateSimulationMsg,
   hasChainPrefix,
 } from "~/utils/dezswap";
 import { Json } from "~/utils/encode";
+import { calculateStdFee } from "~/utils/fee";
 
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import useRPCClient from "./useRPCClient";
 
 const PLAY3_LIST_SIZE = 20;
 
 const useAPI = () => {
-  const {
-    chainName,
-    selectedChain: { chainId },
-  } = useNetwork();
+  const { chainName } = useNetwork();
   const { client, rpcEndpoint, isLoading } = useRPCClient();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
 
   const simulate = useCallback(
     async (contractAddress: string, offerAsset: string, amount: string) => {
@@ -314,39 +311,43 @@ const useAPI = () => {
     if (!walletAddress || !client) {
       return undefined;
     }
-    const { account } =
-      ((await client?.cosmos.auth.v1beta1.account({
-        address: walletAddress,
-      })) as { account: Any }) || {};
-    if (account?.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
-      return BaseAccount.decode(account?.value);
+
+    // Some chains (Cosmos-sdk < 0.47, e.g., fetch.ai) don't support account-info query, so we still need this handling.
+    const { account } = await client.cosmos.auth.v1beta1.account({
+      address: walletAddress,
+    });
+
+    if (!account) {
+      return undefined;
     }
-    if (account?.typeUrl === "/ethermint.types.v1.EthAccount") {
-      const { baseAccount } = EthAccount.decode(account?.value);
+
+    // This is a workaround for wrong Type intersection of `BaseAccount` and `EthAccount` - missing `typeUrl` field :/
+    const accountAny = account as unknown as Any;
+
+    if (accountAny.typeUrl === "/cosmos.auth.v1beta1.BaseAccount") {
+      return BaseAccount.decode(accountAny.value);
+    } else if (accountAny.typeUrl === "/ethermint.types.v1.EthAccount") {
+      const { baseAccount } = EthAccount.decode(accountAny.value);
       return baseAccount;
     }
+
+    // Unsupported account types
     return undefined;
   }, [walletAddress, client]);
 
   const estimateFee = useCallback(
-    async (msg: EncodeObject[], authSequence: bigint) => {
-      if (!msg || !client) {
+    async (messages: MsgExecuteContract[], sequence: bigint) => {
+      if (!messages || !client) {
         return undefined;
       }
 
-      const txBytes = createEncodedTx(msg, authSequence);
+      const txBytes = buildSimulateTx(messages, sequence);
 
       const res = await client?.cosmos.tx.v1beta1.simulate({
         txBytes,
       });
 
-      const fee = await calculateFee(
-        { gasUsed: res?.gasInfo?.gasUsed },
-        getGasInfo(chainName),
-        chainId ? () => Promise.resolve(chainId) : undefined,
-      );
-
-      return fee;
+      return calculateStdFee(res?.gasInfo?.gasUsed ?? 0n, chainName);
     },
 
     [client],

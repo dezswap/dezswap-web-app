@@ -38,7 +38,7 @@ import useSettingsModal from "~/hooks/modals/useSettingsModal";
 import useAsset from "~/hooks/useAsset";
 import useAssets from "~/hooks/useAssets";
 import useBalanceMinusFee from "~/hooks/useBalanceMinusFee";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
@@ -78,7 +78,7 @@ const Box = styled(box)`
 `;
 
 function CreatePage() {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const connectWalletModal = useConnectWalletModal();
   const settingsModal = useSettingsModal({
     items: ["txDeadline"],
@@ -198,7 +198,7 @@ function CreatePage() {
 
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens]);
@@ -259,7 +259,7 @@ function CreatePage() {
       event.preventDefault();
       if (event.target && createTxOptions && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createTxOptions,
           fee,
           formElement: event.target as HTMLFormElement,
         });

@@ -29,7 +29,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -68,7 +68,7 @@ const Box = styled(box)`
 function StakePage() {
   const { eventAddress } = useParams<{ eventAddress?: string }>();
   const [searchParams] = useSearchParams();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
@@ -155,7 +155,7 @@ function StakePage() {
 
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens[0]]);
@@ -185,7 +185,7 @@ function StakePage() {
       event.preventDefault();
       if (createTxOptions && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createTxOptions,
           fee,
           formElement: event.currentTarget,
         });

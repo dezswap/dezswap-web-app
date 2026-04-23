@@ -27,7 +27,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAsset from "~/hooks/useAsset";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -63,7 +63,7 @@ function CancelPage() {
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { findPairByLpAddress } = usePairs();
   const { getLockdropEventInfo } = useLockdropEvents();
   const { data: nativeTokens } = useNativeTokens();
@@ -141,7 +141,7 @@ function CancelPage() {
 
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens]);
@@ -153,7 +153,7 @@ function CancelPage() {
       event.preventDefault();
       if (createTxOptions && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: createTxOptions,
           fee,
           skipConfirmation: true,
         });

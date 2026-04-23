@@ -1,10 +1,4 @@
-import {
-  AccAddress,
-  MsgExecuteContract as BeforeMsgExecuteContract,
-  Coin,
-  Coins,
-  Numeric,
-} from "@xpla/xpla.js";
+import { AccAddress, Coin, Coins, Numeric } from "@xpla/xpla.js";
 import { SignMode } from "@xpla/xplajs/cosmos/tx/signing/v1beta1/signing";
 import {
   AuthInfo,
@@ -14,7 +8,7 @@ import {
   TxBody,
 } from "@xpla/xplajs/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { EncodeObject } from "@xpla/xplajs/types";
+import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 
 import {
   DefaultChainName,
@@ -29,16 +23,23 @@ import { Json } from "./encode";
 const CHAIN_PREFIXS = ["xpla1", "fetch1"];
 export type Amount = string | number;
 
-export const createEncodedTx = (
-  messages: EncodeObject[],
-  authSequence: bigint,
+/**
+ * It builds a encoded tx for simulation, which has the same structure as a real tx but with dummy values for signatures and fee.
+ * This is capsulated in the stargate client but we need to do this manually
+ * since we have the legacy wallet client without simulate support.
+ * */
+export const buildSimulateTx = (
+  messages: MsgExecuteContract[],
+  sequence: bigint,
 ): Uint8Array => {
   const txBody = TxBody.fromPartial({
-    messages,
+    messages: messages.map((message) =>
+      MessageComposer.encoded.executeContract(message),
+    ),
   });
 
   const signerInfo = SignerInfo.fromPartial({
-    sequence: authSequence,
+    sequence,
     modeInfo: { single: { mode: SignMode.SIGN_MODE_UNSPECIFIED } },
   });
 
@@ -53,7 +54,7 @@ export const createEncodedTx = (
 
   return Tx.encode(tx).finish();
 };
-const getCoins = (assets: { address: string; amount: string }[]) =>
+export const getCoins = (assets: { address: string; amount: string }[]) =>
   new Coins(
     assets
       .filter(
@@ -62,25 +63,6 @@ const getCoins = (assets: { address: string; amount: string }[]) =>
       .sort((a, b) => a.address.localeCompare(b.address))
       .map((a) => Coin.fromData({ denom: a.address, amount: a.amount })),
   );
-
-export const convertProtoToAminoMsg = (protoMsgs: MsgExecuteContract[]) => {
-  return {
-    msgs: protoMsgs.map(
-      (protoMsg) =>
-        new BeforeMsgExecuteContract(
-          protoMsg.sender,
-          protoMsg.contract,
-          Json.fromBytes(protoMsg.msg),
-          getCoins(
-            protoMsg.funds?.map((fund) => ({
-              address: fund.denom,
-              amount: fund.amount,
-            })) || [],
-          ),
-        ),
-    ),
-  };
-};
 
 const assetMsg = (asset: { address: string; amount: string }) => ({
   info: AccAddress.validate(asset.address)

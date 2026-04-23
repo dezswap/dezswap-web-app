@@ -1,44 +1,40 @@
-import { Coin, Fee } from "@xpla/xpla.js";
+import type { StdFee } from "@interchainjs/types";
 import type { MsgExecuteContract } from "@xpla/xplajs/cosmwasm/wasm/v1/tx";
-import { MessageComposer } from "@xpla/xplajs/cosmwasm/wasm/v1/tx.registry";
 import { AxiosError } from "axios";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import useAPI from "./useAPI";
 import useAuthSequence from "./useAuthSequence";
-import useConnectedWallet from "./useConnectedWallet";
-import useRPCClient from "./useRPCClient";
+import { useConnectedWallet } from "./useConnectedWallet";
 
-const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
-  const { walletAddress } = useConnectedWallet();
-  const { client } = useRPCClient();
-  const [fee, setFee] = useState<Fee>();
+// TODO: refactor this with proper useQuery wrapping
+const useFee = (messages?: MsgExecuteContract[]) => {
+  const { walletAddress } = useConnectedWallet() ?? {};
+  const [fee, setFee] = useState<StdFee>();
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const api = useAPI();
-  const { sequence, isLoading: isSequenceLoading } = useAuthSequence();
+  const { estimateFee } = useAPI();
+  const { data: sequence } = useAuthSequence();
   const [errMsg, setErrMsg] = useState("");
-  const deferredCreateTxOptions = useDeferredValue(txOptions);
-  const { executeContract } = MessageComposer.encoded;
-  const messages = deferredCreateTxOptions?.map((msg) => executeContract(msg));
+  const deferredMessages = useDeferredValue(messages);
 
   useEffect(() => {
     setIsLoading(true);
     setIsFailed(false);
-  }, [txOptions]);
+  }, [messages]);
 
   useEffect(() => {
     let isAborted = false;
-    if (!walletAddress || !deferredCreateTxOptions || isSequenceLoading) {
+    if (!walletAddress || !deferredMessages || sequence === undefined) {
       setIsLoading(false);
       return () => {
         isAborted = true;
       };
     }
 
-    const estimateFee = async () => {
+    const doEstimate = async () => {
       try {
-        if (!walletAddress || !messages) {
+        if (!walletAddress || !deferredMessages) {
           setFee(undefined);
           setErrMsg("");
           setIsFailed(false);
@@ -46,14 +42,10 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
           return;
         }
 
-        const res = await api.estimateFee(messages, sequence);
-        if (res && !isAborted) {
-          setFee(
-            new Fee(Number(res.gas), [
-              new Coin(res.amount[0].denom, res.amount[0].amount),
-            ]),
-          );
+        const estimatedFee = await estimateFee(deferredMessages, sequence);
 
+        if (estimatedFee && !isAborted) {
+          setFee(estimatedFee);
           setErrMsg("");
           setIsLoading(false);
           setIsFailed(false);
@@ -89,7 +81,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
     const timerId = setTimeout(
       () => {
         if (!isAborted) {
-          estimateFee();
+          doEstimate();
         }
       },
       fee ? 750 : 125,
@@ -104,7 +96,7 @@ const useFee = (txOptions?: MsgExecuteContract[] | undefined) => {
         clearTimeout(timerId);
       }
     };
-  }, [walletAddress, client, deferredCreateTxOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, deferredMessages, sequence]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { fee, isLoading, isFailed, errMsg };
 };

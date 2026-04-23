@@ -22,7 +22,7 @@ import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useAPI from "~/hooks/useAPI";
 import useAssets from "~/hooks/useAssets";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import useLockdropEvents from "~/hooks/useLockdropEvents";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
@@ -44,7 +44,7 @@ function UnlockPage() {
   const {
     selectedChain: { chainId, explorers, fees },
   } = useNetwork();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { getLockdropEventInfo } = useLockdropEvents();
   const api = useAPI();
   const { data: nativeTokens } = useNativeTokens();
@@ -117,7 +117,7 @@ function UnlockPage() {
 
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens]);
@@ -139,7 +139,7 @@ function UnlockPage() {
         return;
       }
       requestPost({
-        txOptions: { msgs: txOptions },
+        messages: txOptions,
         fee,
         skipConfirmation: true,
       });

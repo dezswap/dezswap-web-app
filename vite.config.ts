@@ -1,6 +1,5 @@
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
-import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import svgr from "vite-plugin-svgr";
@@ -27,11 +26,6 @@ export default defineConfig(({ mode }) => {
         protocolImports: false,
       }),
     ],
-    resolve: {
-      alias: {
-        "@interchainjs": path.resolve(__dirname, "node_modules/@interchainjs"),
-      },
-    },
     server: {
       port: Number(env.port) || undefined,
     },

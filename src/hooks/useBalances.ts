@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getIbcTokenHash } from "~/utils";
 
 import useAPI from "./useAPI";
-import useConnectedWallet from "./useConnectedWallet";
+import { useConnectedWallet } from "./useConnectedWallet";
 import { useNativeTokens } from "./useNativeTokens";
 import { useNetwork } from "./useNetwork";
 import useVerifiedAssets from "./useVerifiedAssets";
@@ -12,7 +12,7 @@ import useVerifiedAssets from "./useVerifiedAssets";
 const UPDATE_INTERVAL = 30000;
 
 const useBalances = (addresses: string[]) => {
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const { verifiedIbcAssets } = useVerifiedAssets();
   const { chainName } = useNetwork();
   const { data: nativeTokens } = useNativeTokens();

@@ -32,7 +32,7 @@ import useInvalidPathModal from "~/hooks/modals/useInvalidPathModal";
 import useSettingsModal from "~/hooks/modals/useSettingsModal";
 import useAsset from "~/hooks/useAsset";
 import useBalance from "~/hooks/useBalance";
-import useConnectedWallet from "~/hooks/useConnectedWallet";
+import { useConnectedWallet } from "~/hooks/useConnectedWallet";
 import useFee from "~/hooks/useFee";
 import { useNativeTokens } from "~/hooks/useNativeTokens";
 import { useNavigate } from "~/hooks/useNavigate";
@@ -69,7 +69,7 @@ function WithdrawPage() {
   const { value: txDeadlineMinutes } = useTxDeadlineMinutes();
   const theme = useTheme();
   const screenClass = useScreenClass();
-  const { walletAddress } = useConnectedWallet();
+  const { walletAddress } = useConnectedWallet() ?? {};
   const navigate = useNavigate();
   const {
     selectedChain: { explorers, fees },
@@ -164,7 +164,7 @@ function WithdrawPage() {
     [lpValue, balance],
   );
 
-  const createTxOptions = useMemo<MsgExecuteContract[] | undefined>(
+  const withdrawLiqudityMsg = useMemo<MsgExecuteContract[] | undefined>(
     () =>
       !simulationResult?.isLoading &&
       !simulationResult?.isFailed &&
@@ -197,7 +197,7 @@ function WithdrawPage() {
     fee,
     isLoading: isFeeLoading,
     isFailed: isFeeFailed,
-  } = useFee(createTxOptions);
+  } = useFee(withdrawLiqudityMsg);
   const asset1TokenLink = useMemo(
     () => getTokenLink(asset1?.token, explorers?.[0].url),
     [explorers, asset1?.token],
@@ -208,7 +208,7 @@ function WithdrawPage() {
   );
   const feeAmount = useMemo(() => {
     return (
-      fee?.amount?.get(fees?.feeTokens[0]?.denom ?? "")?.amount.toString() ||
+      fee?.amount.find((c) => c.denom === fees?.feeTokens[0]?.denom)?.amount ||
       "0"
     );
   }, [fee?.amount, fees?.feeTokens]);
@@ -216,15 +216,15 @@ function WithdrawPage() {
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
-      if (event.target && createTxOptions && fee) {
+      if (event.target && withdrawLiqudityMsg && fee) {
         requestPost({
-          txOptions: { msgs: createTxOptions },
+          messages: withdrawLiqudityMsg,
           fee,
           formElement: event.target as HTMLFormElement,
         });
       }
     },
-    [createTxOptions, fee, requestPost],
+    [withdrawLiqudityMsg, fee, requestPost],
   );
 
   const buttonMsg = useMemo(() => {
