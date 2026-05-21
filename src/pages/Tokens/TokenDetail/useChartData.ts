@@ -13,7 +13,7 @@ type ChartAPIParameters = Parameters<
   typeof useGetDashboardChartTokensAddressType
 >;
 
-const getAxlUSDCChartData = (
+const getAxlUSDCPriceChartData = (
   duration: GetDashboardChartTokensAddressTypeDuration | "all" = "month",
 ): Awaited<ReturnType<typeof getDashboardChartTokensAddressType>> => {
   const days = {
@@ -45,15 +45,19 @@ export const useChartData = (
 
   const { assetInfos } = useAssets();
 
-  const isAxlUSDC = useMemo(() => {
+  const isAxlUSDCPrice = useMemo(() => {
     const asset = assetInfos[address];
-    return !!(asset?.verified && asset.symbol === "axlUSDC");
-  }, [assetInfos, address]);
+    return !!(
+      asset?.verified &&
+      asset.symbol === "axlUSDC" &&
+      type === "price"
+    );
+  }, [assetInfos, address, type]);
 
-  const axlUSDCQuery = useQuery({
-    queryKey: ["axlUSDCChartData", duration],
-    queryFn: () => getAxlUSDCChartData(duration),
-    enabled: isAxlUSDC,
+  const axlUSDCPriceQuery = useQuery({
+    queryKey: ["axlUSDCPriceChartData", duration],
+    queryFn: () => getAxlUSDCPriceChartData(duration),
+    enabled: isAxlUSDCPrice,
   });
 
   const dashboardQuery = useGetDashboardChartTokensAddressType(
@@ -61,11 +65,11 @@ export const useChartData = (
     type,
     // @ts-expect-error "all" is valid value but not included in the spec
     { duration },
-    { query: { enabled: !isAxlUSDC } },
+    { query: { enabled: !isAxlUSDCPrice } },
   );
 
   return {
-    ...(isAxlUSDC ? axlUSDCQuery : dashboardQuery),
+    ...(isAxlUSDCPrice ? axlUSDCPriceQuery : dashboardQuery),
     type,
     duration,
     setDuration,
