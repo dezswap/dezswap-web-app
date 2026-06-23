@@ -12,7 +12,7 @@ import Marquee from "~/components/Marquee";
 import Panel from "~/components/Panel";
 import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
-import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
+import TokenPriceFormatter from "~/components/utils/TokenPriceFormatter";
 
 import { MOBILE_SCREEN_CLASS } from "~/constants/layout";
 
@@ -138,7 +138,7 @@ function TopMovers({ whiteList }: { whiteList?: string[] }) {
                         )}
                       </div>
                       <Typography size={14} weight={700} color="primary">
-                        <CurrencyFormatter value={token.price} />
+                        <TokenPriceFormatter value={token.price} />
                         &nbsp;
                         <ChangeRateFormatter
                           rate={token.priceChange}

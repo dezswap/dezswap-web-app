@@ -11,6 +11,7 @@ import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
 import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
 import HoverUnderline from "~/components/utils/HoverUnderline";
+import TokenPriceFormatter from "~/components/utils/TokenPriceFormatter";
 
 import useAssets from "~/hooks/useAssets";
 
@@ -144,7 +145,7 @@ function MobileTokenItem({ number, token }: MobileTokenItemProps) {
           <div>
             <Label>Price</Label>
             <Value>
-              <CurrencyFormatter value={token.price} />
+              <TokenPriceFormatter value={token.price} />
             </Value>
           </div>
         </Content>

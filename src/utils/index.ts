@@ -250,6 +250,25 @@ export const formatCurrency = (value: Numeric.Input) => {
   });
 };
 
+export const formatTokenPrice = (value: Numeric.Input) => {
+  const numericValue = Numeric.parse(value);
+  if (numericValue.lte(0)) {
+    return "$0";
+  }
+  if (numericValue.lt(0.000001)) {
+    return "< $0.000001";
+  }
+  if (numericValue.gte(1)) {
+    return formatNumber(value, {
+      ...getBigNumberFormatOptions(value),
+      style: "currency",
+      currency: "USD",
+    });
+  }
+  // 0.000001 <= value < 1: show 4 significant digits
+  return `$${formatNumber(value, { maximumSignificantDigits: 4 })}`;
+};
+
 export const formatPercentage = (value: Numeric.Input) => {
   const numericValue = Numeric.parse(value);
   if (numericValue.lt(0)) {

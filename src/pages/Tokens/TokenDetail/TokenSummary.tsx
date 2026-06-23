@@ -14,7 +14,7 @@ import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
 
 import useAsset from "~/hooks/useAsset";
 
-import { formatDecimals, formatNumber } from "~/utils";
+import { formatDecimals, formatNumber, formatTokenPrice } from "~/utils";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -56,14 +56,20 @@ function ChangeRate({ value }: { value?: Numeric.Input }) {
 function PriceAndChangeRate({
   price,
   priceChange,
+  isTokenPrice = false,
 }: {
   price?: Numeric.Input;
   priceChange?: Numeric.Input;
+  isTokenPrice?: boolean;
 }) {
   return (
     <Row justify="start" align="center" gutterWidth={6}>
       <Col xs="content">
-        <Value>${formatNumber(formatDecimals(price || 0, 2))}</Value>
+        <Value>
+          {isTokenPrice
+            ? formatTokenPrice(price || 0)
+            : `$${formatNumber(formatDecimals(price || 0, 2))}`}
+        </Value>
       </Col>
       <Col xs="content">
         <ChangeRate value={priceChange} />
@@ -100,6 +106,7 @@ function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
             <PriceAndChangeRate
               price={dashboardToken?.price}
               priceChange={dashboardToken?.priceChange}
+              isTokenPrice
             />
           </Col>
         </Row>
