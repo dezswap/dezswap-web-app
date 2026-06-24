@@ -11,10 +11,11 @@ import Hr from "~/components/Hr";
 import Panel from "~/components/Panel";
 import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+import TokenPriceFormatter from "~/components/utils/TokenPriceFormatter";
 
 import useAsset from "~/hooks/useAsset";
 
-import { formatDecimals, formatNumber, formatTokenPrice } from "~/utils";
+import { formatDecimals, formatNumber } from "~/utils";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -66,9 +67,11 @@ function PriceAndChangeRate({
     <Row justify="start" align="center" gutterWidth={6}>
       <Col xs="content">
         <Value>
-          {isTokenPrice
-            ? formatTokenPrice(price || 0)
-            : `$${formatNumber(formatDecimals(price || 0, 2))}`}
+          {isTokenPrice ? (
+            <TokenPriceFormatter value={price || 0} />
+          ) : (
+            `$${formatNumber(formatDecimals(price || 0, 2))}`
+          )}
         </Value>
       </Col>
       <Col xs="content">
