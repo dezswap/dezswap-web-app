@@ -57,5 +57,9 @@ describe("formatTokenPrice", () => {
     it("formats 0 as $0", () => {
       expect(formatTokenPrice(0)).toBe("$0");
     });
+
+    it("formats negative values as $0", () => {
+      expect(formatTokenPrice(-0.5)).toBe("$0");
+    });
   });
 });
