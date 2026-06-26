@@ -9,9 +9,7 @@ on:
         default: false
         type: boolean
 
-permissions:
-  id-token: write
-  contents: read
+permissions: {}
 
 jobs:
   on-failure:
@@ -24,10 +22,15 @@ jobs:
     if: github.event.inputs.deploy == 'true'
     name: Build, Deploy to GCS bucket
     runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout Repository 📝
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/install
@@ -38,19 +41,18 @@ jobs:
         run: pnpm build
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
       - name: Upload hashed assets
         run: |
           gcloud storage rsync dist/assets gs://${{ secrets.GCP_BUCKET_NAME }}/assets \
             --recursive \
-            --delete-unmatched-destination-objects \
             --cache-control="public, max-age=31536000, immutable"
 
       - name: Upload non-hashed assets
