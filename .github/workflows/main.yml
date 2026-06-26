@@ -9,6 +9,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   on-failure:
     if: github.event.inputs.deploy == 'false'
@@ -18,12 +22,12 @@ jobs:
 
   deploy:
     if: github.event.inputs.deploy == 'true'
-    name: Build, Deploy to S3 bucket
+    name: Build, Deploy to GCS bucket
     runs-on: [ubuntu-latest]
 
     steps:
       - name: Checkout Repository 📝
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup
         uses: ./.github/actions/install
@@ -33,22 +37,32 @@ jobs:
           VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
         run: pnpm build
 
-      - name: Transfer to S3 for serving static
-        uses: jakejarvis/s3-sync-action@master
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
         with:
-          args: --acl public-read --follow-symlinks --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_MANAGER_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
-          AWS_REGION: ap-northeast-2
-          SOURCE_DIR: "dist"
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-      - name: Invalidate Cloudfront Distribution
-        uses: awact/cloudfront-action@master
-        env:
-          SOURCE_PATH: "/*"
-          AWS_REGION: ap-northeast-2
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_MANAGER_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
-          DISTRIBUTION_ID: ${{ secrets.DISTRIBUTION_ID_APP }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Upload hashed assets
+        run: |
+          gcloud storage rsync dist/assets gs://${{ secrets.GCP_BUCKET_NAME }}/assets \
+            --recursive \
+            --delete-unmatched-destination-objects \
+            --cache-control="public, max-age=31536000, immutable"
+
+      - name: Upload non-hashed assets
+        run: |
+          gcloud storage rsync dist gs://${{ secrets.GCP_BUCKET_NAME }} \
+            --recursive \
+            --delete-unmatched-destination-objects \
+            --cache-control="no-cache, must-revalidate" \
+            --exclude="^assets/.*$"
+
+      - name: Invalidate Cloud CDN cache
+        run: |
+          gcloud compute url-maps invalidate-cdn-cache ${{ secrets.GCP_CDN_URL_MAP }} \
+            --path "/*" \
+            --global
