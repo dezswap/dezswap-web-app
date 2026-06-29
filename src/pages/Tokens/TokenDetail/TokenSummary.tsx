@@ -11,6 +11,7 @@ import Hr from "~/components/Hr";
 import Panel from "~/components/Panel";
 import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
+import TokenPriceFormatter from "~/components/utils/TokenPriceFormatter";
 
 import useAsset from "~/hooks/useAsset";
 
@@ -56,14 +57,22 @@ function ChangeRate({ value }: { value?: Numeric.Input }) {
 function PriceAndChangeRate({
   price,
   priceChange,
+  isTokenPrice = false,
 }: {
   price?: Numeric.Input;
   priceChange?: Numeric.Input;
+  isTokenPrice?: boolean;
 }) {
   return (
     <Row justify="start" align="center" gutterWidth={6}>
       <Col xs="content">
-        <Value>${formatNumber(formatDecimals(price || 0, 2))}</Value>
+        <Value>
+          {isTokenPrice ? (
+            <TokenPriceFormatter value={price || 0} />
+          ) : (
+            `$${formatNumber(formatDecimals(price || 0, 2))}`
+          )}
+        </Value>
       </Col>
       <Col xs="content">
         <ChangeRate value={priceChange} />
@@ -100,6 +109,7 @@ function TokenSummary({ tokenAddress }: { tokenAddress: string }) {
             <PriceAndChangeRate
               price={dashboardToken?.price}
               priceChange={dashboardToken?.priceChange}
+              isTokenPrice
             />
           </Col>
         </Row>

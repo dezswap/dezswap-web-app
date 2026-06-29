@@ -15,6 +15,7 @@ import Typography from "~/components/Typography";
 import ChangeRateFormatter from "~/components/utils/ChangeRateFormatter";
 import CurrencyFormatter from "~/components/utils/CurrencyFormatter";
 import HoverUnderline from "~/components/utils/HoverUnderline";
+import TokenPriceFormatter from "~/components/utils/TokenPriceFormatter";
 
 import { MOBILE_SCREEN_CLASS, TABLET_SCREEN_CLASS } from "~/constants/layout";
 
@@ -245,7 +246,7 @@ function AllTokens({ whiteList }: { whiteList?: string[] }) {
                 width: 190,
                 hasSort: true,
                 render(price) {
-                  return price && <CurrencyFormatter value={price} />;
+                  return price && <TokenPriceFormatter value={price} />;
                 },
               },
               {
