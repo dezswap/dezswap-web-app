@@ -1,0 +1,76 @@
+diff --git a/esm/mainnet/xpla/chain.js b/esm/mainnet/xpla/chain.js
+index 0cf5493bfa7087fbfa971b12df47cb23a2b2f67c..17ff842116d34f806b06e65647f770f7900871e9 100644
+--- a/esm/mainnet/xpla/chain.js
++++ b/esm/mainnet/xpla/chain.js
+@@ -15,10 +15,10 @@ const info = {
+     fees: {
+         feeTokens: [{
+                 denom: 'axpla',
+-                fixedMinGasPrice: 280000000000,
+-                lowGasPrice: 280000000000,
+-                averageGasPrice: 280000000000,
+-                highGasPrice: 280000000000
++                fixedMinGasPrice: 10000000000000,
++                lowGasPrice: 10000000000000,
++                averageGasPrice: 10000000000000,
++                highGasPrice: 10000000000000
+             }]
+     },
+     staking: {
+diff --git a/esm/testnet/xplatestnet/chain.js b/esm/testnet/xplatestnet/chain.js
+index e21b86bed96ca5a5e6cf6cd9c9bbf7b8a04bb416..35bf73be4b8a285600720b7db0d17bd0875ef9c9 100644
+--- a/esm/testnet/xplatestnet/chain.js
++++ b/esm/testnet/xplatestnet/chain.js
+@@ -15,10 +15,10 @@ const info = {
+     fees: {
+         feeTokens: [{
+                 denom: 'axpla',
+-                fixedMinGasPrice: 280000000000,
+-                lowGasPrice: 280000000000,
+-                averageGasPrice: 280000000000,
+-                highGasPrice: 280000000000
++                fixedMinGasPrice: 1200000000000,
++                lowGasPrice: 1200000000000,
++                averageGasPrice: 1200000000000,
++                highGasPrice: 1200000000000
+             }]
+     },
+     staking: {
+diff --git a/mainnet/xpla/chain.js b/mainnet/xpla/chain.js
+index 1e62eb661f2effa3b889e9b0d7c612099ca57068..fc1e9a9aab5ecbd4a4be5a5735a50039df8a49ff 100644
+--- a/mainnet/xpla/chain.js
++++ b/mainnet/xpla/chain.js
+@@ -17,10 +17,10 @@ const info = {
+     fees: {
+         feeTokens: [{
+                 denom: 'axpla',
+-                fixedMinGasPrice: 280000000000,
+-                lowGasPrice: 280000000000,
+-                averageGasPrice: 280000000000,
+-                highGasPrice: 280000000000
++                fixedMinGasPrice: 10000000000000,
++                lowGasPrice: 10000000000000,
++                averageGasPrice: 10000000000000,
++                highGasPrice: 10000000000000
+             }]
+     },
+     staking: {
+diff --git a/testnet/xplatestnet/chain.js b/testnet/xplatestnet/chain.js
+index d8546905419122e4ea3dd839ce8a2a20af34a42a..79e436d4e078d53e9474ebe03ef35622953c4c27 100644
+--- a/testnet/xplatestnet/chain.js
++++ b/testnet/xplatestnet/chain.js
+@@ -17,10 +17,10 @@ const info = {
+     fees: {
+         feeTokens: [{
+                 denom: 'axpla',
+-                fixedMinGasPrice: 280000000000,
+-                lowGasPrice: 280000000000,
+-                averageGasPrice: 280000000000,
+-                highGasPrice: 280000000000
++                fixedMinGasPrice: 1200000000000,
++                lowGasPrice: 1200000000000,
++                averageGasPrice: 1200000000000,
++                highGasPrice: 1200000000000
+             }]
+     },
+     staking: {

@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@chain-registry/v2@1.71.237': patches/@chain-registry__v2@1.71.237.patch
