@@ -4,13 +4,18 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@chain-registry/v2@1.71.237':
+    hash: 1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7
+    path: patches/@chain-registry__v2@1.71.237.patch
+
 importers:
 
   .:
     dependencies:
       '@chain-registry/v2':
         specifier: 1.71.237
-        version: 1.71.237
+        version: 1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7)
       '@emotion/react':
         specifier: ^11.10.6
         version: 11.14.0(@types/react@18.3.27)(react@18.3.1)
@@ -19,22 +24,22 @@ importers:
         version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1)
       '@interchain-kit/core':
         specifier: 0.10.2
-        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchain-kit/cosmostation-extension':
         specifier: 0.10.2
-        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchain-kit/keplr-extension':
         specifier: 0.10.2
-        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchain-kit/react':
         specifier: 0.10.2
-        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(jiti@2.6.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@4.3.6)
+        version: 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(jiti@2.6.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchainjs/cosmos':
         specifier: 1.21.0
-        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/cosmos-types':
         specifier: 1.21.0
-        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding':
         specifier: 1.20.0
         version: 1.20.0
@@ -43,7 +48,7 @@ importers:
         version: 1.21.0
       '@interchainjs/utils':
         specifier: 1.21.0
-        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+        version: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@rollup/plugin-inject':
         specifier: ^5.0.3
         version: 5.0.5(rollup@4.54.0)
@@ -61,13 +66,13 @@ importers:
         version: 1.7.3(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@6.0.6)
       '@xpla/xpla':
         specifier: 1.9.2
-        version: 1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@xpla/xpla.js':
         specifier: 1.9.0
         version: 1.9.0
       '@xpla/xplajs':
         specifier: 1.9.2
-        version: 1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       axios:
         specifier: ^1.1.3
         version: 1.13.2
@@ -5599,7 +5604,7 @@ snapshots:
 
   '@chain-registry/v2-types@0.53.146': {}
 
-  '@chain-registry/v2@1.71.237':
+  '@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7)':
     dependencies:
       '@chain-registry/v2-types': 0.53.146
 
@@ -6247,13 +6252,13 @@ snapshots:
       browser-headers: 0.4.1
       google-protobuf: 3.21.4
 
-  '@interchain-kit/core@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@interchain-kit/core@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
       '@chain-registry/keplr': 2.0.130
       '@chain-registry/types': 2.0.167
-      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
       '@ledgerhq/hw-app-cosmos': 6.32.10
       '@ledgerhq/hw-transport': 6.31.14
@@ -6269,7 +6274,7 @@ snapshots:
       buffer: 6.0.3
       chain-registry: 2.0.130
       events: 3.3.0
-      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       long: 5.3.2
       pino-pretty: 7.6.1
     transitivePeerDependencies:
@@ -6300,9 +6305,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/cosmostation-extension@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@interchain-kit/cosmostation-extension@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
-      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -6331,9 +6336,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/keplr-extension@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@interchain-kit/keplr-extension@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(starknet@8.9.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
-      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@keplr-wallet/provider-extension': 0.13.16(starknet@8.9.2)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6364,20 +6369,20 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/react@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(jiti@2.6.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@interchain-kit/react@0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(immer@10.2.0)(jiti@2.6.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
       '@chain-registry/types': 2.0.167
-      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@interchain-kit/store': 0.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@interchain-kit/store': 0.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       '@interchain-ui/react': 1.26.3(@types/react@18.3.27)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
       '@react-icons/all-files': 4.1.0(react@18.3.1)
       '@types/react': 18.3.27
       '@types/react-dom': 18.3.7(@types/react@18.3.27)
       '@walletconnect/types': 2.23.1
-      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       jest-transform-stub: 2.0.0
       postcss: 8.5.6
       postcss-cli: 11.0.1(jiti@2.6.1)(postcss@8.5.6)
@@ -6418,13 +6423,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@interchain-kit/store@0.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@interchain-kit/store@0.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
     dependencies:
       '@chain-registry/types': 2.0.167
-      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchain-kit/core': 0.10.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/types': 1.21.0
-      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      interchainjs: 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -6487,21 +6492,21 @@ snapshots:
       - '@types/react'
       - babel-plugin-macros
 
-  '@interchainjs/amino@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/amino@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
-      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/auth@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/auth@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
-      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
@@ -6512,26 +6517,26 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/cosmos-types@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/cosmos-types@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
     transitivePeerDependencies:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/cosmos@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@interchainjs/cosmos@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
-      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
-      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       bech32: 1.1.4
@@ -6546,11 +6551,11 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@interchainjs/crypto@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/crypto@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/hashes': 1.8.0
       bn.js: 5.2.2
       elliptic: 6.6.1
@@ -6566,16 +6571,16 @@ snapshots:
       bech32: 1.1.4
       readonly-date: 1.0.0
 
-  '@interchainjs/ethereum@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/ethereum@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
       '@ethersproject/bignumber': 5.8.0
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/hash': 5.8.0
       '@ethersproject/transactions': 5.8.0
-      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       bip39: 3.1.0
@@ -6590,10 +6595,10 @@ snapshots:
     dependencies:
       bn.js: 5.2.2
 
-  '@interchainjs/pubkey@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/pubkey@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
-      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
       '@interchainjs/types': 1.21.0
@@ -6601,12 +6606,12 @@ snapshots:
       - '@chain-registry/v2'
       - '@chain-registry/v2-types'
 
-  '@interchainjs/solana@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@interchainjs/solana@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@types/bn.js': 5.2.0
       '@types/ws': 8.18.1
       bn.js: 5.2.2
@@ -6624,9 +6629,9 @@ snapshots:
     dependencies:
       decimal.js: 10.6.0
 
-  '@interchainjs/utils@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)':
+  '@interchainjs/utils@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))':
     dependencies:
-      '@chain-registry/v2': 1.71.237
+      '@chain-registry/v2': 1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7)
       '@chain-registry/v2-types': 0.53.146
       '@interchainjs/types': 1.21.0
       bech32: 2.0.0
@@ -8981,14 +8986,14 @@ snapshots:
       google-protobuf: 3.21.4
       protobufjs: 7.5.4
 
-  '@xpla/xpla@1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xpla/xpla@1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
-      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/amino': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/auth': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/hashes': 1.8.0
       bech32: 2.0.0
       bip39: 3.1.0
@@ -8999,18 +9004,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@xpla/xplajs@1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xpla/xplajs@1.9.2(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
     dependencies:
       '@cosmjs/stargate': 0.38.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@cosmjs/tendermint-rpc': 0.38.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@cosmology/lcd': 0.14.5
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
       '@interchainjs/math': 1.20.0
-      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/hashes': 1.8.0
       decimal.js: 10.6.0
     transitivePeerDependencies:
@@ -10231,18 +10236,18 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  interchainjs@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  interchainjs@1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     dependencies:
-      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/cosmos': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/cosmos-types': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/crypto': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/encoding': 1.20.0
-      '@interchainjs/ethereum': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/ethereum': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@interchainjs/math': 1.20.0
-      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
-      '@interchainjs/solana': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@interchainjs/pubkey': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
+      '@interchainjs/solana': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       '@interchainjs/types': 1.21.0
-      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237)
+      '@interchainjs/utils': 1.21.0(@chain-registry/v2-types@0.53.146)(@chain-registry/v2@1.71.237(patch_hash=1f74805ae86782f006cf3e614bbbe9844ecd92d45609a65c5b2f7aad707325d7))
       '@noble/hashes': 1.8.0
       decimal.js: 10.6.0
     transitivePeerDependencies:
