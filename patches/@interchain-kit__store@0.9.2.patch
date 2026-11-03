@@ -1,0 +1,40 @@
+diff --git a/esm/wallet-manager/chain-wallet-store.js b/esm/wallet-manager/chain-wallet-store.js
+index 56dc3d3248e73d40f33f4215a611a2772d4f0eba..a69d660e21354d261d2c2c2731162fe4a9651e6a 100644
+--- a/esm/wallet-manager/chain-wallet-store.js
++++ b/esm/wallet-manager/chain-wallet-store.js
+@@ -90,13 +90,13 @@ export class ChainWalletStore extends BaseWallet {
+         const aminoOfflineSigner = {
+             getAccounts: async () => [account],
+             signAmino: async (signer, signDoc) => {
+-                return cosmosWallet.signAmino(this.chain.chainId, signer, signDoc, {});
++                return cosmosWallet.signAmino(this.chain.chainId, signer, signDoc);
+             }
+         };
+         const directOfflineSigner = {
+             getAccounts: async () => [account],
+             signDirect: async (signer, signDoc) => {
+-                return cosmosWallet.signDirect(this.chain.chainId, signer, signDoc, {});
++                return cosmosWallet.signDirect(this.chain.chainId, signer, signDoc);
+             }
+         };
+         const signType = preferSignType || preferredSignTypeFromSettings;
+diff --git a/wallet-manager/chain-wallet-store.js b/wallet-manager/chain-wallet-store.js
+index c23ddedb31d655e84c667d89d2409f73aa9898bd..519c353ef16e373e30c074d8d6e76ac2b860ae79 100644
+--- a/wallet-manager/chain-wallet-store.js
++++ b/wallet-manager/chain-wallet-store.js
+@@ -93,13 +93,13 @@ class ChainWalletStore extends core_1.BaseWallet {
+         const aminoOfflineSigner = {
+             getAccounts: async () => [account],
+             signAmino: async (signer, signDoc) => {
+-                return cosmosWallet.signAmino(this.chain.chainId, signer, signDoc, {});
++                return cosmosWallet.signAmino(this.chain.chainId, signer, signDoc);
+             }
+         };
+         const directOfflineSigner = {
+             getAccounts: async () => [account],
+             signDirect: async (signer, signDoc) => {
+-                return cosmosWallet.signDirect(this.chain.chainId, signer, signDoc, {});
++                return cosmosWallet.signDirect(this.chain.chainId, signer, signDoc);
+             }
+         };
+         const signType = preferSignType || preferredSignTypeFromSettings;
